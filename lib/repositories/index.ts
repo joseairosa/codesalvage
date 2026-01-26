@@ -48,3 +48,26 @@ export type {
   PaginatedTransactions,
   PaginationOptions as TransactionPaginationOptions,
 } from './TransactionRepository';
+
+export { AnalyticsRepository } from './AnalyticsRepository';
+export type {
+  SellerRevenueSummary,
+  RevenueDataPoint,
+  ProjectPerformanceMetrics,
+  SellerAnalyticsOverview,
+  DateRangeFilter,
+} from './AnalyticsRepository';
+
+export { FeaturedListingRepository } from './FeaturedListingRepository';
+export type {
+  FeaturedProjectWithSeller,
+  PaginatedFeaturedProjects,
+  FeaturedPaginationOptions,
+} from './FeaturedListingRepository';
+
+export { SubscriptionRepository } from './SubscriptionRepository';
+export type {
+  CreateSubscriptionInput,
+  UpdateSubscriptionInput,
+  SubscriptionWithUser,
+} from './SubscriptionRepository';

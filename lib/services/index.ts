@@ -34,6 +34,7 @@ export type {
   EscrowReleaseEmailData,
   MessageEmailData,
   ReviewEmailData,
+  FeaturedListingEmailData,
 } from './EmailService';
 
 export {
@@ -67,3 +68,36 @@ export {
   TransactionNotFoundError,
 } from './TransactionService';
 export type { CreateTransactionRequest } from './TransactionService';
+
+export {
+  AnalyticsService,
+  AnalyticsPermissionError,
+  AnalyticsValidationError,
+} from './AnalyticsService';
+export type {
+  AnalyticsOverviewRequest,
+  AnalyticsOverviewResponse,
+} from './AnalyticsService';
+
+export {
+  FeaturedListingService,
+  FeaturedListingValidationError,
+  FeaturedListingPermissionError,
+  FeaturedListingNotFoundError,
+} from './FeaturedListingService';
+export type {
+  PurchaseFeaturedRequest,
+  PurchaseFeaturedResponse,
+} from './FeaturedListingService';
+
+export {
+  SubscriptionService,
+  SubscriptionValidationError,
+  SubscriptionPermissionError,
+  SubscriptionNotFoundError,
+} from './SubscriptionService';
+export type {
+  CreateSubscriptionRequest,
+  CreateSubscriptionResponse,
+  SubscriptionStatusResponse,
+} from './SubscriptionService';

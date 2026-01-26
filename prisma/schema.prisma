@@ -57,6 +57,7 @@ model User {
   reviewsGiven         Review[]          @relation("BuyerReviews")
   favorites            Favorite[]
   sellerAnalytics      SellerAnalytics?
+  subscription         Subscription?
   accounts             Account[]
   sessions             Session[]
 
@@ -355,4 +356,39 @@ model SellerAnalytics {
 
   @@index([sellerId], map: "idx_seller_analytics_seller_id")
   @@map("seller_analytics")
+}
+
+// ============================================
+// SUBSCRIPTIONS
+// ============================================
+
+model Subscription {
+  id String @id @default(cuid())
+
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Stripe details
+  stripeSubscriptionId String @unique @map("stripe_subscription_id")
+  stripeCustomerId     String @map("stripe_customer_id")
+  stripePriceId        String @map("stripe_price_id")
+
+  // Plan details
+  plan   String // 'free', 'pro'
+  status String // 'active', 'canceled', 'past_due', 'incomplete', 'trialing'
+
+  // Billing cycle
+  currentPeriodStart DateTime @map("current_period_start")
+  currentPeriodEnd   DateTime @map("current_period_end")
+  cancelAtPeriodEnd  Boolean  @default(false) @map("cancel_at_period_end")
+  canceledAt         DateTime? @map("canceled_at")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId], map: "idx_subscription_user_id")
+  @@index([stripeSubscriptionId], map: "idx_subscription_stripe_id")
+  @@index([status], map: "idx_subscription_status")
+  @@map("subscriptions")
 }

@@ -19,8 +19,22 @@ import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { stripeService, emailService } from '@/lib/services';
 import { env } from '@/config/env';
+import { TransactionRepository } from '@/lib/repositories/TransactionRepository';
+import { TransactionService } from '@/lib/services/TransactionService';
+import { UserRepository } from '@/lib/repositories/UserRepository';
+import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 
 const componentName = 'EscrowReleaseCron';
+
+// Initialize repositories and service
+const transactionRepository = new TransactionRepository(prisma);
+const userRepository = new UserRepository(prisma);
+const projectRepository = new ProjectRepository(prisma);
+const transactionService = new TransactionService(
+  transactionRepository,
+  userRepository,
+  projectRepository
+);
 
 /**
  * GET /api/cron/release-escrow
@@ -90,25 +104,19 @@ export async function GET() {
           continue;
         }
 
-        // Transfer funds to seller
+        // Release escrow via TransactionService (handles validation and updates)
+        await transactionService.releaseEscrow(transaction.id);
+
+        console.log(`[${componentName}] Escrow released via service:`, transaction.id);
+
+        // Transfer funds to seller via Stripe Connect
         const transfer = await stripeService.transferToSeller(
           transaction.seller.stripeAccountId,
-          transaction.amountCents,
+          transaction.sellerReceivesCents, // Use seller amount after commission
           transaction.id
         );
 
-        console.log(`[${componentName}] Transfer completed:`, transfer.id);
-
-        // Update transaction status
-        await prisma.transaction.update({
-          where: { id: transaction.id },
-          data: {
-            escrowStatus: 'released',
-            releasedToSellerAt: now,
-          },
-        });
-
-        console.log(`[${componentName}] Transaction updated:`, transaction.id);
+        console.log(`[${componentName}] Stripe transfer completed:`, transfer.id);
 
         successCount++;
 

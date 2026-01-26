@@ -29,6 +29,7 @@ import {
   PaginatedProjects,
 } from '@/lib/repositories/ProjectRepository';
 import { R2Service, FileType } from './R2Service';
+import { SubscriptionService } from './SubscriptionService';
 
 /**
  * Project creation request (from user input)
@@ -124,6 +125,7 @@ export class ProjectService {
   constructor(
     private projectRepository: ProjectRepository,
     private userRepository: any, // UserRepository type (avoiding circular dependency)
+    private subscriptionService: SubscriptionService,
     private r2Service?: R2Service
   ) {
     console.log('[ProjectService] Initialized');
@@ -161,6 +163,25 @@ export class ProjectService {
     }
     if (!user.isSeller) {
       throw new ProjectPermissionError('User must be a seller to create projects');
+    }
+
+    // Check project limit for free tier users
+    const subscriptionStatus = await this.subscriptionService.getSubscriptionStatus(sellerId);
+    if (!subscriptionStatus.benefits.unlimitedListings) {
+      // Free tier: enforce 3-project limit
+      const activeProjectCount = await this.projectRepository.countByUser(sellerId, {
+        status: 'active',
+      });
+
+      if (activeProjectCount >= 3) {
+        console.log(
+          `[ProjectService] Project limit reached for user ${sellerId}: ${activeProjectCount} active projects`
+        );
+        throw new ProjectValidationError(
+          'Free plan limited to 3 active projects. Upgrade to Pro for unlimited listings.',
+          'plan_limit'
+        );
+      }
     }
 
     // Validate input

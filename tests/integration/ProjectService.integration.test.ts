@@ -15,8 +15,10 @@ import {
 } from '@/tests/helpers/db';
 import { createTestUser, createTestSeller, createTestProject } from '@/tests/helpers/fixtures';
 import { ProjectService } from '@/lib/services/ProjectService';
+import { SubscriptionService } from '@/lib/services/SubscriptionService';
 import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
+import { SubscriptionRepository } from '@/lib/repositories/SubscriptionRepository';
 import { prisma } from '@/lib/prisma';
 
 // Mock R2Service since we don't need real file uploads for integration tests
@@ -36,12 +38,20 @@ describe('ProjectService (Integration)', () => {
   let projectService: ProjectService;
   let projectRepository: ProjectRepository;
   let userRepository: UserRepository;
+  let subscriptionService: SubscriptionService;
+  let subscriptionRepository: SubscriptionRepository;
 
   beforeAll(async () => {
     await setupTestDatabase();
     projectRepository = new ProjectRepository(prisma);
     userRepository = new UserRepository(prisma);
-    projectService = new ProjectService(projectRepository, userRepository);
+    subscriptionRepository = new SubscriptionRepository(prisma);
+    subscriptionService = new SubscriptionService(subscriptionRepository, userRepository);
+    projectService = new ProjectService(
+      projectRepository,
+      userRepository,
+      subscriptionService
+    );
   });
 
   beforeEach(async () => {

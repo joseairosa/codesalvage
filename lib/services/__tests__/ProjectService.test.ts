@@ -9,6 +9,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ProjectService, ProjectValidationError, ProjectPermissionError } from '../ProjectService';
 import type { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 import type { UserRepository } from '@/lib/repositories/UserRepository';
+import type { SubscriptionService } from '../SubscriptionService';
 import type { R2Service } from '../R2Service';
 
 // Mock implementations
@@ -22,6 +23,7 @@ const mockProjectRepository: ProjectRepository = {
   incrementViewCount: vi.fn(),
   getFeatured: vi.fn(),
   getStatistics: vi.fn(),
+  countByUser: vi.fn(),
 } as any;
 
 const mockUserRepository: UserRepository = {
@@ -33,6 +35,20 @@ const mockUserRepository: UserRepository = {
   deleteUser: vi.fn(),
   getVerifiedSellers: vi.fn(),
   updateStripeAccount: vi.fn(),
+} as any;
+
+const mockSubscriptionService: SubscriptionService = {
+  getSubscriptionStatus: vi.fn(),
+  createSubscription: vi.fn(),
+  cancelSubscription: vi.fn(),
+  resumeSubscription: vi.fn(),
+  createPortalSession: vi.fn(),
+  isActiveSubscriber: vi.fn(),
+  getPricing: vi.fn(),
+  updateFromWebhook: vi.fn(),
+  cancelImmediately: vi.fn(),
+  findAllActive: vi.fn(),
+  findByStatus: vi.fn(),
 } as any;
 
 const mockR2Service: R2Service = {
@@ -48,7 +64,12 @@ describe('ProjectService', () => {
     vi.clearAllMocks();
 
     // Create fresh instance
-    projectService = new ProjectService(mockProjectRepository, mockUserRepository, mockR2Service);
+    projectService = new ProjectService(
+      mockProjectRepository,
+      mockUserRepository,
+      mockSubscriptionService,
+      mockR2Service
+    );
   });
 
   // ============================================
@@ -74,6 +95,21 @@ describe('ProjectService', () => {
         isSeller: true,
         isVerifiedSeller: true,
       } as any);
+
+      // Mock subscription status (default: Pro with unlimited listings)
+      vi.mocked(mockSubscriptionService.getSubscriptionStatus).mockResolvedValue({
+        subscriptionId: 'sub_test',
+        plan: 'pro',
+        status: 'active',
+        currentPeriodEnd: new Date(),
+        cancelAtPeriodEnd: false,
+        benefits: {
+          unlimitedListings: true,
+          advancedAnalytics: true,
+          featuredListingDiscount: 20,
+          verificationBadge: true,
+        },
+      });
     });
 
     it('should create project with valid data', async () => {
@@ -256,6 +292,132 @@ describe('ProjectService', () => {
       await expect(
         projectService.createProject('seller123', invalidData)
       ).rejects.toThrow(ProjectValidationError);
+    });
+
+    // ============================================
+    // PROJECT LIMIT ENFORCEMENT TESTS
+    // ============================================
+
+    it('should allow free tier user to create up to 3 projects', async () => {
+      // Mock free tier subscription
+      vi.mocked(mockSubscriptionService.getSubscriptionStatus).mockResolvedValue({
+        subscriptionId: null,
+        plan: 'free',
+        status: null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        benefits: {
+          unlimitedListings: false,
+          advancedAnalytics: false,
+          featuredListingDiscount: 0,
+          verificationBadge: false,
+        },
+      });
+
+      // Mock project count: 2 active projects
+      vi.mocked(mockProjectRepository.countByUser).mockResolvedValue(2);
+
+      // Mock successful creation
+      vi.mocked(mockProjectRepository.create).mockResolvedValue({
+        id: 'project123',
+        ...validProjectData,
+      } as any);
+
+      // Should succeed (3rd project)
+      await expect(
+        projectService.createProject('seller123', validProjectData)
+      ).resolves.toBeDefined();
+
+      // Verify countByUser was called with correct filters
+      expect(mockProjectRepository.countByUser).toHaveBeenCalledWith('seller123', {
+        status: 'active',
+      });
+    });
+
+    it('should reject free tier user creating 4th project', async () => {
+      // Mock free tier subscription
+      vi.mocked(mockSubscriptionService.getSubscriptionStatus).mockResolvedValue({
+        subscriptionId: null,
+        plan: 'free',
+        status: null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        benefits: {
+          unlimitedListings: false,
+          advancedAnalytics: false,
+          featuredListingDiscount: 0,
+          verificationBadge: false,
+        },
+      });
+
+      // Mock project count: 3 active projects (limit reached)
+      vi.mocked(mockProjectRepository.countByUser).mockResolvedValue(3);
+
+      // Should throw error
+      await expect(
+        projectService.createProject('seller123', validProjectData)
+      ).rejects.toThrow(ProjectValidationError);
+
+      await expect(
+        projectService.createProject('seller123', validProjectData)
+      ).rejects.toThrow('Free plan limited to 3 active projects');
+
+      // Verify create was NOT called
+      expect(mockProjectRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('should allow Pro subscriber unlimited projects', async () => {
+      // Mock Pro subscription (default from beforeEach has unlimited listings)
+      // Mock project count: 100 active projects
+      vi.mocked(mockProjectRepository.countByUser).mockResolvedValue(100);
+
+      // Mock successful creation
+      vi.mocked(mockProjectRepository.create).mockResolvedValue({
+        id: 'project123',
+        ...validProjectData,
+      } as any);
+
+      // Should succeed even with 100 projects
+      await expect(
+        projectService.createProject('seller123', validProjectData)
+      ).resolves.toBeDefined();
+
+      // Verify countByUser was NOT called (unlimited, no need to check)
+      // Actually it should be called since we check before knowing the benefits
+      expect(mockSubscriptionService.getSubscriptionStatus).toHaveBeenCalled();
+    });
+
+    it('should only count active projects towards limit', async () => {
+      // Mock free tier subscription
+      vi.mocked(mockSubscriptionService.getSubscriptionStatus).mockResolvedValue({
+        subscriptionId: null,
+        plan: 'free',
+        status: null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        benefits: {
+          unlimitedListings: false,
+          advancedAnalytics: false,
+          featuredListingDiscount: 0,
+          verificationBadge: false,
+        },
+      });
+
+      // Mock project count with status filter
+      vi.mocked(mockProjectRepository.countByUser).mockResolvedValue(2);
+
+      // Mock successful creation
+      vi.mocked(mockProjectRepository.create).mockResolvedValue({
+        id: 'project123',
+        ...validProjectData,
+      } as any);
+
+      await projectService.createProject('seller123', validProjectData);
+
+      // Verify countByUser was called with status: 'active' filter
+      expect(mockProjectRepository.countByUser).toHaveBeenCalledWith('seller123', {
+        status: 'active',
+      });
     });
   });
 

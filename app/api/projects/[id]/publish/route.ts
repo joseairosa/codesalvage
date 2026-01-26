@@ -12,9 +12,14 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { ProjectRepository } from '@/lib/repositories';
+import {
+  ProjectRepository,
+  UserRepository,
+  SubscriptionRepository,
+} from '@/lib/repositories';
 import {
   ProjectService,
+  SubscriptionService,
   r2Service,
   ProjectValidationError,
   ProjectPermissionError,
@@ -24,7 +29,15 @@ import {
  * Initialize services
  */
 const projectRepository = new ProjectRepository(prisma);
-const projectService = new ProjectService(projectRepository, r2Service);
+const userRepository = new UserRepository(prisma);
+const subscriptionRepository = new SubscriptionRepository(prisma);
+const subscriptionService = new SubscriptionService(subscriptionRepository, userRepository);
+const projectService = new ProjectService(
+  projectRepository,
+  userRepository,
+  subscriptionService,
+  r2Service
+);
 
 /**
  * POST /api/projects/[id]/publish

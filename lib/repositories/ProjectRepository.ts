@@ -484,6 +484,40 @@ export class ProjectRepository {
   }
 
   /**
+   * Count projects by seller with optional status filter
+   *
+   * @param sellerId - Seller user ID
+   * @param options - Optional filters (status)
+   * @returns Count of projects
+   *
+   * @example
+   * const activeCount = await projectRepo.countByUser('user123', { status: 'active' });
+   */
+  async countByUser(
+    sellerId: string,
+    options?: { status?: string }
+  ): Promise<number> {
+    console.log('[ProjectRepository] Counting projects for seller:', sellerId);
+
+    try {
+      const count = await this.prisma.project.count({
+        where: {
+          sellerId,
+          ...(options?.status && { status: options.status }),
+        },
+      });
+
+      console.log('[ProjectRepository] Project count:', count);
+      return count;
+    } catch (error) {
+      console.error('[ProjectRepository] Failed to count projects:', error);
+      throw new Error(
+        `Failed to count projects: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
    * Increment view count for a project
    *
    * @param id - Project ID

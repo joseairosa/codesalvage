@@ -62,6 +62,16 @@ export interface ReviewEmailData {
   reviewUrl: string;
 }
 
+export interface FeaturedListingEmailData {
+  sellerName: string;
+  projectTitle: string;
+  projectId: string;
+  durationDays: number;
+  costCents: number;
+  featuredUntil: string;
+  projectUrl: string;
+}
+
 export class EmailService {
   private fromEmail: string;
   private fromName: string;
@@ -191,6 +201,60 @@ export class EmailService {
     await this.sendEmail(recipient, subject, html, text);
 
     console.log(`[${componentName}] Review reminder sent:`, recipient.email);
+  }
+
+  /**
+   * Send featured listing purchase confirmation to seller
+   */
+  async sendFeaturedListingConfirmation(
+    recipient: EmailRecipient,
+    data: FeaturedListingEmailData
+  ): Promise<void> {
+    const subject = `Featured Listing Confirmed - ${data.projectTitle}`;
+    const html = this.getFeaturedListingConfirmationHTML(data);
+    const text = this.getFeaturedListingConfirmationText(data);
+
+    await this.sendEmail(recipient, subject, html, text);
+
+    console.log(
+      `[${componentName}] Featured listing confirmation sent to seller:`,
+      recipient.email
+    );
+  }
+
+  /**
+   * Send featured listing expiration warning (3 days before expiry)
+   */
+  async sendFeaturedListingExpirationWarning(
+    recipient: EmailRecipient,
+    data: FeaturedListingEmailData
+  ): Promise<void> {
+    const subject = `Featured Listing Expiring Soon - ${data.projectTitle}`;
+    const html = this.getFeaturedListingExpirationWarningHTML(data);
+    const text = this.getFeaturedListingExpirationWarningText(data);
+
+    await this.sendEmail(recipient, subject, html, text);
+
+    console.log(
+      `[${componentName}] Featured listing expiration warning sent to seller:`,
+      recipient.email
+    );
+  }
+
+  /**
+   * Send featured listing expired notification
+   */
+  async sendFeaturedListingExpired(
+    recipient: EmailRecipient,
+    data: FeaturedListingEmailData
+  ): Promise<void> {
+    const subject = `Featured Listing Expired - ${data.projectTitle}`;
+    const html = this.getFeaturedListingExpiredHTML(data);
+    const text = this.getFeaturedListingExpiredText(data);
+
+    await this.sendEmail(recipient, subject, html, text);
+
+    console.log(`[${componentName}] Featured listing expired notification sent:`, recipient.email);
   }
 
   /**
@@ -674,6 +738,289 @@ Your feedback helps other buyers make informed decisions and helps sellers impro
 Leave a review: ${data.reviewUrl}
 
 Thank you for being part of the ProjectFinish community!
+    `.trim();
+  }
+
+  /**
+   * Email Templates - Featured Listing Confirmation
+   */
+  private getFeaturedListingConfirmationHTML(data: FeaturedListingEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #8b5cf6; border-bottom: 2px solid #8b5cf6; padding-bottom: 10px;">
+    Featured Listing Confirmed! ⭐
+  </h1>
+
+  <p>Hi ${data.sellerName},</p>
+
+  <p>Great news! Your project is now featured on ProjectFinish.</p>
+
+  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h2 style="margin-top: 0;">Featured Listing Details</h2>
+    <p><strong>Project:</strong> ${data.projectTitle}</p>
+    <p><strong>Duration:</strong> ${data.durationDays} days</p>
+    <p><strong>Amount Paid:</strong> ${this.formatPrice(data.costCents)}</p>
+    <p><strong>Featured Until:</strong> ${new Date(data.featuredUntil).toLocaleDateString()} at ${new Date(data.featuredUntil).toLocaleTimeString()}</p>
+  </div>
+
+  <h3>What This Means</h3>
+  <p>Your project will receive premium placement on our platform, including:</p>
+  <ul>
+    <li><strong>Homepage Carousel</strong> - Displayed prominently to all visitors</li>
+    <li><strong>Featured Badge</strong> - Stands out in search results</li>
+    <li><strong>Priority Sorting</strong> - Appears above non-featured projects</li>
+    <li><strong>Increased Visibility</strong> - Up to 5x more views on average</li>
+  </ul>
+
+  <a href="${data.projectUrl}" style="display: inline-block; background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0;">
+    View Your Featured Project
+  </a>
+
+  <h3>Maximize Your Featured Period</h3>
+  <p>To get the most out of your featured listing:</p>
+  <ul>
+    <li>Respond quickly to buyer inquiries</li>
+    <li>Keep your project description up-to-date</li>
+    <li>Add high-quality screenshots if you haven't already</li>
+    <li>Share your featured project on social media</li>
+  </ul>
+
+  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+  <p style="font-size: 14px; color: #666;">
+    Want to feature another project? Visit your <a href="${appUrl}/seller/dashboard">seller dashboard</a>.
+  </p>
+
+  <p style="font-size: 12px; color: #999;">
+    ProjectFinish - Marketplace for Incomplete Software Projects<br>
+    <a href="${appUrl}">Visit our website</a>
+  </p>
+</body>
+</html>
+    `.trim();
+  }
+
+  private getFeaturedListingConfirmationText(data: FeaturedListingEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+Featured Listing Confirmed!
+
+Hi ${data.sellerName},
+
+Great news! Your project is now featured on ProjectFinish.
+
+FEATURED LISTING DETAILS
+Project: ${data.projectTitle}
+Duration: ${data.durationDays} days
+Amount Paid: ${this.formatPrice(data.costCents)}
+Featured Until: ${new Date(data.featuredUntil).toLocaleDateString()} at ${new Date(data.featuredUntil).toLocaleTimeString()}
+
+WHAT THIS MEANS
+Your project will receive premium placement on our platform, including:
+- Homepage Carousel - Displayed prominently to all visitors
+- Featured Badge - Stands out in search results
+- Priority Sorting - Appears above non-featured projects
+- Increased Visibility - Up to 5x more views on average
+
+View your featured project: ${data.projectUrl}
+
+MAXIMIZE YOUR FEATURED PERIOD
+To get the most out of your featured listing:
+- Respond quickly to buyer inquiries
+- Keep your project description up-to-date
+- Add high-quality screenshots if you haven't already
+- Share your featured project on social media
+
+Want to feature another project? Visit your seller dashboard:
+${appUrl}/seller/dashboard
+
+ProjectFinish - Marketplace for Incomplete Software Projects
+${appUrl}
+    `.trim();
+  }
+
+  /**
+   * Email Templates - Featured Listing Expiration Warning
+   */
+  private getFeaturedListingExpirationWarningHTML(data: FeaturedListingEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #f59e0b; border-bottom: 2px solid #f59e0b; padding-bottom: 10px;">
+    Featured Listing Expiring Soon ⏰
+  </h1>
+
+  <p>Hi ${data.sellerName},</p>
+
+  <p>Your featured listing for <strong>${data.projectTitle}</strong> will expire in 3 days.</p>
+
+  <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0;">
+    <p style="margin: 0;"><strong>Expires On:</strong> ${new Date(data.featuredUntil).toLocaleDateString()} at ${new Date(data.featuredUntil).toLocaleTimeString()}</p>
+  </div>
+
+  <h3>Want to Stay Featured?</h3>
+  <p>Don't lose your premium placement! Extend your featured period to continue receiving increased visibility and more buyer interest.</p>
+
+  <a href="${data.projectUrl}" style="display: inline-block; background: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0;">
+    Extend Featured Period
+  </a>
+
+  <h3>What Happens After Expiration</h3>
+  <p>After your featured period ends:</p>
+  <ul>
+    <li>Your project will no longer appear in the featured carousel</li>
+    <li>The featured badge will be removed</li>
+    <li>Your project will return to standard search results</li>
+  </ul>
+
+  <p>You can renew your featured listing anytime from your seller dashboard.</p>
+
+  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+  <p style="font-size: 12px; color: #999;">
+    ProjectFinish - Marketplace for Incomplete Software Projects<br>
+    <a href="${appUrl}">Visit our website</a>
+  </p>
+</body>
+</html>
+    `.trim();
+  }
+
+  private getFeaturedListingExpirationWarningText(data: FeaturedListingEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+Featured Listing Expiring Soon
+
+Hi ${data.sellerName},
+
+Your featured listing for ${data.projectTitle} will expire in 3 days.
+
+EXPIRES ON: ${new Date(data.featuredUntil).toLocaleDateString()} at ${new Date(data.featuredUntil).toLocaleTimeString()}
+
+WANT TO STAY FEATURED?
+Don't lose your premium placement! Extend your featured period to continue receiving increased visibility and more buyer interest.
+
+Extend featured period: ${data.projectUrl}
+
+WHAT HAPPENS AFTER EXPIRATION
+After your featured period ends:
+- Your project will no longer appear in the featured carousel
+- The featured badge will be removed
+- Your project will return to standard search results
+
+You can renew your featured listing anytime from your seller dashboard.
+
+ProjectFinish - Marketplace for Incomplete Software Projects
+${appUrl}
+    `.trim();
+  }
+
+  /**
+   * Email Templates - Featured Listing Expired
+   */
+  private getFeaturedListingExpiredHTML(data: FeaturedListingEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #6b7280; border-bottom: 2px solid #6b7280; padding-bottom: 10px;">
+    Featured Listing Expired
+  </h1>
+
+  <p>Hi ${data.sellerName},</p>
+
+  <p>Your featured listing for <strong>${data.projectTitle}</strong> has expired.</p>
+
+  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <p><strong>Project:</strong> ${data.projectTitle}</p>
+    <p><strong>Featured Period:</strong> ${data.durationDays} days</p>
+    <p><strong>Expired On:</strong> ${new Date(data.featuredUntil).toLocaleDateString()}</p>
+  </div>
+
+  <p>Your project is still active and visible in search results, but it no longer has featured status.</p>
+
+  <h3>Feature Again?</h3>
+  <p>Ready to boost your project's visibility again? Feature your project to:</p>
+  <ul>
+    <li>Appear in the homepage carousel</li>
+    <li>Get priority in search results</li>
+    <li>Reach more potential buyers</li>
+    <li>Increase your chances of a sale</li>
+  </ul>
+
+  <a href="${data.projectUrl}" style="display: inline-block; background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0;">
+    Feature This Project Again
+  </a>
+
+  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+  <p style="font-size: 14px; color: #666;">
+    Questions? Visit your <a href="${appUrl}/seller/dashboard">seller dashboard</a> or contact support.
+  </p>
+
+  <p style="font-size: 12px; color: #999;">
+    ProjectFinish - Marketplace for Incomplete Software Projects<br>
+    <a href="${appUrl}">Visit our website</a>
+  </p>
+</body>
+</html>
+    `.trim();
+  }
+
+  private getFeaturedListingExpiredText(data: FeaturedListingEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+Featured Listing Expired
+
+Hi ${data.sellerName},
+
+Your featured listing for ${data.projectTitle} has expired.
+
+PROJECT DETAILS
+Project: ${data.projectTitle}
+Featured Period: ${data.durationDays} days
+Expired On: ${new Date(data.featuredUntil).toLocaleDateString()}
+
+Your project is still active and visible in search results, but it no longer has featured status.
+
+FEATURE AGAIN?
+Ready to boost your project's visibility again? Feature your project to:
+- Appear in the homepage carousel
+- Get priority in search results
+- Reach more potential buyers
+- Increase your chances of a sale
+
+Feature this project again: ${data.projectUrl}
+
+Questions? Visit your seller dashboard or contact support:
+${appUrl}/seller/dashboard
+
+ProjectFinish - Marketplace for Incomplete Software Projects
+${appUrl}
     `.trim();
   }
 }
