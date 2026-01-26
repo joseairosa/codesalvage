@@ -53,9 +53,6 @@ yarn-error.log*
 # Docker
 docker-compose.override.yml
 
-# Railway
-.railway
-
 # Turborepo
 .turbo
 
