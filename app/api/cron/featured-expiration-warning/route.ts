@@ -7,7 +7,7 @@
  * GET /api/cron/featured-expiration-warning
  *
  * Should be called via cron (Railway Cron, Vercel Cron, or external service):
- * Schedule: Every 12 hours (0 */12 * * *)
+ * Schedule: Every 12 hours (cron: 0 *\/12 * * *)
  *
  * @example
  * GET /api/cron/featured-expiration-warning

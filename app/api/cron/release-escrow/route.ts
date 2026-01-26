@@ -7,7 +7,7 @@
  * GET /api/cron/release-escrow
  *
  * Should be called via cron (Railway Cron, Vercel Cron, or external service):
- * Schedule: Every 6 hours (0 */6 * * *)
+ * Schedule: Every 6 hours (cron: 0 *\/6 * * *)
  *
  * @example
  * GET /api/cron/release-escrow
