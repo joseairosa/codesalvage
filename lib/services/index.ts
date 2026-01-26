@@ -35,3 +35,27 @@ export type {
   MessageEmailData,
   ReviewEmailData,
 } from './EmailService';
+
+export {
+  MessageService,
+  MessageValidationError,
+  MessagePermissionError,
+} from './MessageService';
+export type { SendMessageRequest } from './MessageService';
+export { MAX_MESSAGE_LENGTH } from './MessageService';
+
+export {
+  ReviewService,
+  ReviewValidationError,
+  ReviewPermissionError,
+  ReviewNotFoundError,
+} from './ReviewService';
+export type { CreateReviewRequest } from './ReviewService';
+export { MIN_RATING, MAX_RATING, MAX_COMMENT_LENGTH } from './ReviewService';
+
+export {
+  FavoriteService,
+  FavoriteValidationError,
+  FavoritePermissionError,
+} from './FavoriteService';
+export type { ToggleFavoriteResult } from './FavoriteService';

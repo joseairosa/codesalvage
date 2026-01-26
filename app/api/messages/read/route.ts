@@ -4,26 +4,41 @@
  * Mark specific messages or all messages from a user as read.
  *
  * POST /api/messages/read
- * Body: { messageIds?: string[], userId?: string }
+ * Body: { messageIds?: string[], userId?: string, projectId?: string }
  *
  * @example
  * POST /api/messages/read
  * { "messageIds": ["msg1", "msg2"] }
  * OR
- * { "userId": "user123" }
+ * { "userId": "user123", "projectId": "project456" }
  */
 
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import { MessageService } from '@/lib/services/MessageService';
+import { MessageRepository } from '@/lib/repositories/MessageRepository';
+import { UserRepository } from '@/lib/repositories/UserRepository';
+import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 import { z } from 'zod';
 
 const componentName = 'MarkReadAPI';
+
+// Initialize repositories and service
+const messageRepository = new MessageRepository(prisma);
+const userRepository = new UserRepository(prisma);
+const projectRepository = new ProjectRepository(prisma);
+const messageService = new MessageService(
+  messageRepository,
+  userRepository,
+  projectRepository
+);
 
 const markReadSchema = z
   .object({
     messageIds: z.array(z.string()).optional(),
     userId: z.string().optional(),
+    projectId: z.string().optional(),
   })
   .refine((data) => data.messageIds || data.userId, {
     message: 'Either messageIds or userId must be provided',
@@ -54,41 +69,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const { messageIds, userId } = validatedData.data;
+    const { messageIds, userId, projectId } = validatedData.data;
 
     let updatedCount = 0;
 
     if (messageIds && messageIds.length > 0) {
-      // Mark specific messages as read (only if recipient is current user)
-      const result = await prisma.message.updateMany({
-        where: {
-          id: { in: messageIds },
-          recipientId: session.user.id, // Can only mark own messages as read
-          isRead: false,
-        },
-        data: {
-          isRead: true,
-          readAt: new Date(),
-        },
-      });
-
-      updatedCount = result.count;
+      // Mark specific messages as read using repository directly
+      updatedCount = await messageRepository.markAsRead(messageIds);
       console.log(`[${componentName}] Marked ${updatedCount} messages as read by IDs`);
     } else if (userId) {
-      // Mark all messages from a specific user as read
-      const result = await prisma.message.updateMany({
-        where: {
-          senderId: userId,
-          recipientId: session.user.id,
-          isRead: false,
-        },
-        data: {
-          isRead: true,
-          readAt: new Date(),
-        },
-      });
-
-      updatedCount = result.count;
+      // Mark all messages from a specific user as read using service
+      updatedCount = await messageService.markConversationAsRead(
+        session.user.id,
+        userId,
+        projectId
+      );
       console.log(
         `[${componentName}] Marked ${updatedCount} messages as read from user: ${userId}`
       );

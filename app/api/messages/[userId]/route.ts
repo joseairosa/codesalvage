@@ -12,8 +12,22 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import { MessageService, MessagePermissionError } from '@/lib/services/MessageService';
+import { MessageRepository } from '@/lib/repositories/MessageRepository';
+import { UserRepository } from '@/lib/repositories/UserRepository';
+import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 
 const componentName = 'ConversationAPI';
+
+// Initialize repositories and service
+const messageRepository = new MessageRepository(prisma);
+const userRepository = new UserRepository(prisma);
+const projectRepository = new ProjectRepository(prisma);
+const messageService = new MessageService(
+  messageRepository,
+  userRepository,
+  projectRepository
+);
 
 /**
  * GET /api/messages/[userId]
@@ -32,7 +46,7 @@ export async function GET(
 
     const { userId } = params;
     const { searchParams } = new URL(request.url);
-    const projectId = searchParams.get('projectId');
+    const projectId = searchParams.get('projectId') || undefined;
 
     console.log(`[${componentName}] Fetching conversation:`, {
       currentUser: session.user.id,
@@ -40,106 +54,35 @@ export async function GET(
       projectId,
     });
 
-    // Cannot get conversation with yourself
-    if (userId === session.user.id) {
-      return NextResponse.json(
-        { error: 'Cannot view conversation with yourself' },
-        { status: 400 }
-      );
-    }
+    // Use MessageService to get conversation (automatically marks as read)
+    const result = await messageService.getConversation(
+      session.user.id,
+      userId,
+      projectId
+    );
 
-    // Validate other user exists
-    const otherUser = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        username: true,
-        fullName: true,
-        avatarUrl: true,
-        isSeller: true,
-      },
-    });
-
-    if (!otherUser) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // Get all messages in the conversation
-    const messages = await prisma.message.findMany({
-      where: {
-        OR: [
-          {
-            senderId: session.user.id,
-            recipientId: userId,
-            ...(projectId && { projectId }),
-          },
-          {
-            senderId: userId,
-            recipientId: session.user.id,
-            ...(projectId && { projectId }),
-          },
-        ],
-      },
-      orderBy: { createdAt: 'asc' },
-      include: {
-        sender: {
-          select: {
-            id: true,
-            username: true,
-            fullName: true,
-            avatarUrl: true,
-          },
-        },
-        project: {
-          select: {
-            id: true,
-            title: true,
-            thumbnailImageUrl: true,
-            priceCents: true,
-            status: true,
-          },
-        },
-        transaction: {
-          select: {
-            id: true,
-            paymentStatus: true,
-            completedAt: true,
-          },
-        },
-      },
-    });
-
-    console.log(`[${componentName}] Found ${messages.length} messages`);
-
-    // Mark unread messages from the other user as read
-    const unreadMessageIds = messages
-      .filter((msg) => msg.senderId === userId && !msg.isRead)
-      .map((msg) => msg.id);
-
-    if (unreadMessageIds.length > 0) {
-      await prisma.message.updateMany({
-        where: {
-          id: { in: unreadMessageIds },
-        },
-        data: {
-          isRead: true,
-          readAt: new Date(),
-        },
-      });
-
-      console.log(`[${componentName}] Marked ${unreadMessageIds.length} messages as read`);
-    }
+    console.log(`[${componentName}] Found ${result.messages.length} messages`);
 
     return NextResponse.json(
       {
-        messages,
-        partner: otherUser,
-        total: messages.length,
+        messages: result.messages,
+        partner: result.partner,
+        total: result.messages.length,
       },
       { status: 200 }
     );
   } catch (error) {
     console.error(`[${componentName}] Error fetching conversation:`, error);
+
+    // Map service errors to appropriate HTTP status codes
+    if (error instanceof MessagePermissionError) {
+      return NextResponse.json(
+        {
+          error: error.message,
+        },
+        { status: 403 }
+      );
+    }
 
     return NextResponse.json(
       {

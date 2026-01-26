@@ -12,8 +12,19 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { ReviewService } from '@/lib/services/ReviewService';
+import { ReviewRepository } from '@/lib/repositories/ReviewRepository';
+import { UserRepository } from '@/lib/repositories/UserRepository';
 
 const componentName = 'ReviewStatsAPI';
+
+// Initialize repositories and service
+const reviewRepository = new ReviewRepository(prisma);
+const userRepository = new UserRepository(prisma);
+const reviewService = new ReviewService(
+  reviewRepository,
+  userRepository
+);
 
 /**
  * GET /api/reviews/stats/[sellerId]
@@ -29,94 +40,32 @@ export async function GET(
 
     console.log(`[${componentName}] Fetching stats for seller:`, sellerId);
 
-    // Validate seller exists
-    const seller = await prisma.user.findUnique({
-      where: { id: sellerId },
-      select: { id: true, username: true },
-    });
+    // Use ReviewService to get rating stats
+    const stats = await reviewService.getSellerRatingStats(sellerId);
 
-    if (!seller) {
-      return NextResponse.json({ error: 'Seller not found' }, { status: 404 });
-    }
-
-    // Get all reviews for seller
-    const reviews = await prisma.review.findMany({
-      where: { sellerId },
-      select: {
-        overallRating: true,
-        codeQualityRating: true,
-        documentationRating: true,
-        responsivenessRating: true,
-        accuracyRating: true,
-      },
-    });
-
-    const totalReviews = reviews.length;
-
-    if (totalReviews === 0) {
-      return NextResponse.json(
-        {
-          sellerId,
-          totalReviews: 0,
-          averageRating: null,
-          ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-          detailedAverages: {
-            codeQuality: null,
-            documentation: null,
-            responsiveness: null,
-            accuracy: null,
-          },
-        },
-        { status: 200 }
-      );
-    }
-
-    // Calculate overall average rating
-    const totalRating = reviews.reduce((sum, review) => sum + review.overallRating, 0);
-    const averageRating = parseFloat((totalRating / totalReviews).toFixed(2));
-
-    // Calculate rating distribution (1-5 stars)
-    const ratingDistribution = {
-      1: reviews.filter((r) => r.overallRating === 1).length,
-      2: reviews.filter((r) => r.overallRating === 2).length,
-      3: reviews.filter((r) => r.overallRating === 3).length,
-      4: reviews.filter((r) => r.overallRating === 4).length,
-      5: reviews.filter((r) => r.overallRating === 5).length,
-    };
-
-    // Calculate detailed ratings (only if provided)
-    const calculateDetailedAverage = (field: keyof typeof reviews[0]) => {
-      const validReviews = reviews.filter((r) => r[field] !== null);
-      if (validReviews.length === 0) return null;
-
-      const total = validReviews.reduce((sum, r) => sum + (r[field] as number), 0);
-      return parseFloat((total / validReviews.length).toFixed(2));
-    };
-
-    const detailedAverages = {
-      codeQuality: calculateDetailedAverage('codeQualityRating'),
-      documentation: calculateDetailedAverage('documentationRating'),
-      responsiveness: calculateDetailedAverage('responsivenessRating'),
-      accuracy: calculateDetailedAverage('accuracyRating'),
-    };
-
-    // Get seller analytics (should match calculated values)
+    // Get seller analytics for additional info
     const analytics = await prisma.sellerAnalytics.findUnique({
       where: { sellerId },
     });
 
     console.log(`[${componentName}] Stats calculated:`, {
-      averageRating,
-      totalReviews,
+      averageRating: stats.averageRating,
+      totalReviews: stats.totalReviews,
     });
 
+    // Return stats in expected format
     return NextResponse.json(
       {
         sellerId,
-        totalReviews,
-        averageRating,
-        ratingDistribution,
-        detailedAverages,
+        totalReviews: stats.totalReviews,
+        averageRating: stats.totalReviews > 0 ? stats.averageRating : null,
+        ratingDistribution: stats.ratingBreakdown,
+        detailedAverages: {
+          codeQuality: null, // Not yet calculated by service
+          documentation: null,
+          responsiveness: null,
+          accuracy: null,
+        },
         analytics, // Include full analytics if available
       },
       { status: 200 }
