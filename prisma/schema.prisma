@@ -1,0 +1,358 @@
+// ProjectFinish Database Schema
+// Prisma ORM with PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER MANAGEMENT
+// ============================================
+
+model User {
+  id            String    @id @default(cuid()) // Uses CUID (sortable ULID alternative)
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  username      String    @unique
+  fullName      String?   @map("full_name")
+  bio           String?   @db.Text
+  avatarUrl     String?   @map("avatar_url")
+
+  // Role flags
+  isSeller Boolean @default(false) @map("is_seller")
+  isBuyer  Boolean @default(true) @map("is_buyer")
+
+  // GitHub OAuth
+  githubId        String? @unique @map("github_id")
+  githubUsername  String? @map("github_username")
+  githubAvatarUrl String? @map("github_avatar_url")
+
+  // Seller specific
+  payoutMethod    String? @map("payout_method") // 'stripe', 'paypal', 'bank_transfer'
+  payoutEmail     String? @map("payout_email")
+  stripeAccountId String? @unique @map("stripe_account_id")
+  taxId           String? @map("tax_id")
+
+  // Seller verification
+  isVerifiedSeller       Boolean   @default(false) @map("is_verified_seller")
+  sellerVerificationDate DateTime? @map("seller_verification_date")
+
+  // Metadata
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  lastLogin DateTime? @map("last_login")
+
+  // Relations
+  projectsCreated      Project[]         @relation("SellerProjects")
+  transactionsAsSeller Transaction[]     @relation("SellerTransactions")
+  transactionsAsBuyer  Transaction[]     @relation("BuyerTransactions")
+  messagesSent         Message[]         @relation("SentMessages")
+  messagesReceived     Message[]         @relation("ReceivedMessages")
+  reviews              Review[]          @relation("SellerReviews")
+  reviewsGiven         Review[]          @relation("BuyerReviews")
+  favorites            Favorite[]
+  sellerAnalytics      SellerAnalytics?
+  accounts             Account[]
+  sessions             Session[]
+
+  @@index([email])
+  @@index([githubId], map: "idx_github_id")
+  @@index([isSeller], map: "idx_is_seller")
+  @@map("users")
+}
+
+// ============================================
+// NEXT-AUTH TABLES (for Auth.js v5)
+// ============================================
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================
+// PROJECTS / LISTINGS
+// ============================================
+
+model Project {
+  id       String @id @default(cuid())
+  sellerId String @map("seller_id")
+  seller   User   @relation("SellerProjects", fields: [sellerId], references: [id], onDelete: Cascade)
+
+  // Basic info
+  title       String
+  description String @db.Text
+  category    String // 'web_app', 'mobile', 'backend', 'tool', 'dashboard', etc.
+
+  // Completion details
+  completionPercentage     Int     @map("completion_percentage") @db.Integer // 0-100
+  estimatedCompletionHours Int?    @map("estimated_completion_hours")
+  knownIssues              String? @map("known_issues") @db.Text
+
+  // Pricing
+  priceCents Int @map("price_cents") @db.Integer // Price in cents
+
+  // Licensing
+  licenseType String @map("license_type") // 'full_code', 'limited', 'custom'
+  accessLevel String @map("access_level") // 'full', 'read_only', 'zip_download'
+
+  // Tech details
+  techStack       String[] @map("tech_stack") // ['React', 'Node.js', 'PostgreSQL']
+  primaryLanguage String?  @map("primary_language") // 'JavaScript', 'Python', 'Go', etc.
+  frameworks      String[] // ['Next.js', 'Express', 'Tailwind']
+
+  // Links & media
+  githubUrl         String?   @map("github_url")
+  githubRepoName    String?   @map("github_repo_name")
+  demoUrl           String?   @map("demo_url")
+  documentationUrl  String?   @map("documentation_url")
+  thumbnailImageUrl String?   @map("thumbnail_image_url")
+  screenshotUrls    String[]  @map("screenshot_urls")
+  demoVideoUrl      String?   @map("demo_video_url")
+
+  // Status & visibility
+  status        String    @default("draft") // 'draft', 'active', 'sold', 'delisted'
+  isFeatured    Boolean   @default(false) @map("is_featured")
+  featuredUntil DateTime? @map("featured_until")
+
+  // Metrics
+  viewCount     Int @default(0) @map("view_count")
+  favoriteCount Int @default(0) @map("favorite_count")
+  messageCount  Int @default(0) @map("message_count")
+
+  // Moderation
+  isApproved      Boolean @default(true) @map("is_approved")
+  rejectionReason String? @map("rejection_reason") @db.Text
+
+  // Metadata
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  transactions Transaction[]
+  messages     Message[]
+  favorites    Favorite[]
+
+  @@index([sellerId], map: "idx_seller_id")
+  @@index([status], map: "idx_status")
+  @@index([category], map: "idx_category")
+  @@index([completionPercentage], map: "idx_completion")
+  @@index([primaryLanguage], map: "idx_primary_language")
+  @@index([priceCents], map: "idx_price")
+  @@map("projects")
+}
+
+// ============================================
+// TRANSACTIONS & PAYMENTS
+// ============================================
+
+model Transaction {
+  id String @id @default(cuid())
+
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
+
+  sellerId String @map("seller_id")
+  seller   User   @relation("SellerTransactions", fields: [sellerId], references: [id], onDelete: Restrict)
+
+  buyerId String @map("buyer_id")
+  buyer   User   @relation("BuyerTransactions", fields: [buyerId], references: [id], onDelete: Restrict)
+
+  // Payment amounts
+  amountCents         Int @map("amount_cents") // Total amount charged to buyer
+  commissionCents     Int @map("commission_cents") // Platform commission
+  sellerReceivesCents Int @map("seller_receives_cents") // Amount seller receives after commission
+
+  // Stripe details
+  stripePaymentIntentId String? @unique @map("stripe_payment_intent_id")
+  stripeChargeId        String? @map("stripe_charge_id")
+  paymentStatus         String  @default("pending") @map("payment_status") // 'pending', 'succeeded', 'failed', 'refunded'
+
+  // Escrow system
+  escrowStatus       String    @default("pending") @map("escrow_status") // 'pending', 'held', 'released', 'disputed'
+  escrowReleaseDate  DateTime? @map("escrow_release_date") // 7 days from payment success
+  releasedToSellerAt DateTime? @map("released_to_seller_at")
+
+  // Code delivery
+  codeDeliveryStatus    String    @default("pending") @map("code_delivery_status") // 'pending', 'delivered', 'accessed'
+  codeZipUrl            String?   @map("code_zip_url") // Cloudflare R2 signed URL
+  codeAccessedAt        DateTime? @map("code_accessed_at")
+  githubAccessGrantedAt DateTime? @map("github_access_granted_at")
+
+  // Notes & metadata
+  notes       String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at")
+  completedAt DateTime? @map("completed_at")
+
+  // Relations
+  review   Review?
+  messages Message[]
+
+  @@index([projectId], map: "idx_project_id")
+  @@index([sellerId], map: "idx_transaction_seller_id")
+  @@index([buyerId], map: "idx_buyer_id")
+  @@index([escrowStatus], map: "idx_escrow_status")
+  @@index([paymentStatus], map: "idx_payment_status")
+  @@map("transactions")
+}
+
+// ============================================
+// REVIEWS & RATINGS
+// ============================================
+
+model Review {
+  id String @id @default(cuid())
+
+  transactionId String      @unique @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  sellerId String @map("seller_id")
+  seller   User   @relation("SellerReviews", fields: [sellerId], references: [id])
+
+  buyerId String @map("buyer_id")
+  buyer   User   @relation("BuyerReviews", fields: [buyerId], references: [id])
+
+  // Overall rating
+  overallRating Int     @map("overall_rating") // 1-5 stars
+  comment       String? @db.Text
+
+  // Detailed ratings
+  codeQualityRating    Int? @map("code_quality_rating") // 1-5
+  documentationRating  Int? @map("documentation_rating") // 1-5
+  responsivenessRating Int? @map("responsiveness_rating") // 1-5
+  accuracyRating       Int? @map("accuracy_rating") // 1-5
+
+  // Visibility
+  isAnonymous  Boolean @default(false) @map("is_anonymous")
+  helpfulCount Int     @default(0) @map("helpful_count")
+
+  // Metadata
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([sellerId], map: "idx_review_seller_id")
+  @@index([buyerId], map: "idx_review_buyer_id")
+  @@map("reviews")
+}
+
+// ============================================
+// MESSAGING
+// ============================================
+
+model Message {
+  id String @id @default(cuid())
+
+  senderId String @map("sender_id")
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  recipientId String @map("recipient_id")
+  recipient   User   @relation("ReceivedMessages", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  projectId String?  @map("project_id")
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  transactionId String?      @map("transaction_id")
+  transaction   Transaction? @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  content String  @db.Text
+  isRead  Boolean @default(false) @map("is_read")
+  readAt  DateTime? @map("read_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([senderId], map: "idx_sender_id")
+  @@index([recipientId], map: "idx_recipient_id")
+  @@index([isRead], map: "idx_is_read")
+  @@index([projectId], map: "idx_message_project_id")
+  @@index([transactionId], map: "idx_message_transaction_id")
+  @@map("messages")
+}
+
+// ============================================
+// FAVORITES / WATCHLIST
+// ============================================
+
+model Favorite {
+  id String @id @default(cuid())
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, projectId])
+  @@index([userId], map: "idx_favorite_user_id")
+  @@index([projectId], map: "idx_favorite_project_id")
+  @@map("favorites")
+}
+
+// ============================================
+// SELLER ANALYTICS
+// ============================================
+
+model SellerAnalytics {
+  id String @id @default(cuid())
+
+  sellerId String @unique @map("seller_id")
+  seller   User   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  // Project stats
+  totalProjectsListed Int @default(0) @map("total_projects_listed")
+  totalProjectsSold   Int @default(0) @map("total_projects_sold")
+  totalRevenueCents   Int @default(0) @map("total_revenue_cents")
+
+  // Rating stats
+  averageRating Decimal? @map("average_rating") @db.Decimal(3, 2) // e.g., 4.75
+  totalReviews  Int      @default(0) @map("total_reviews")
+
+  // Engagement stats
+  totalFavorites Int @default(0) @map("total_favorites")
+  totalViews     Int @default(0) @map("total_views")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([sellerId], map: "idx_seller_analytics_seller_id")
+  @@map("seller_analytics")
+}
