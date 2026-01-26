@@ -1,13 +1,13 @@
 /**
- * Transaction Detail API Route
+ * Transaction Code Access API Route
  *
- * Get details of a specific transaction.
- * Only accessible by the buyer or seller of the transaction.
+ * Mark when a buyer accesses/downloads the purchased code.
+ * Only accessible by the buyer of the transaction.
  *
- * GET /api/transactions/[id] - Get transaction details
+ * POST /api/transactions/[id]/code-access - Mark code as accessed
  *
  * @example
- * GET /api/transactions/transaction123
+ * POST /api/transactions/transaction123/code-access
  */
 
 import { NextResponse } from 'next/server';
@@ -23,7 +23,7 @@ import { TransactionRepository } from '@/lib/repositories/TransactionRepository'
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 
-const componentName = 'TransactionDetailAPI';
+const componentName = 'TransactionCodeAccessAPI';
 
 // Initialize repositories and service
 const transactionRepository = new TransactionRepository(prisma);
@@ -36,12 +36,15 @@ const transactionService = new TransactionService(
 );
 
 /**
- * GET /api/transactions/[id]
+ * POST /api/transactions/[id]/code-access
  *
- * Get transaction details by ID
- * Access control: Only buyer or seller can view
+ * Mark code as accessed by buyer
+ * Access control: Only buyer can mark code as accessed
+ * Business rules:
+ * - Payment must be successful
+ * - Only buyer can access code
  */
-export async function GET(
+export async function POST(
   request: Request,
   { params }: { params: { id: string } }
 ) {
@@ -53,22 +56,25 @@ export async function GET(
 
     const { id } = params;
 
-    console.log(`[${componentName}] Fetching transaction:`, {
+    console.log(`[${componentName}] Marking code as accessed:`, {
       transactionId: id,
       userId: session.user.id,
     });
 
-    // Use TransactionService to get transaction with access validation
-    const transaction = await transactionService.getTransactionById(
-      id,
-      session.user.id
+    // Use TransactionService to mark code as accessed
+    await transactionService.markCodeAccessed(id, session.user.id);
+
+    console.log(`[${componentName}] Code access marked successfully`);
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Code access marked',
+      },
+      { status: 200 }
     );
-
-    console.log(`[${componentName}] Transaction found:`, transaction.id);
-
-    return NextResponse.json({ transaction }, { status: 200 });
   } catch (error) {
-    console.error(`[${componentName}] Error fetching transaction:`, error);
+    console.error(`[${componentName}] Error marking code access:`, error);
 
     // Map service errors to appropriate HTTP status codes
     if (error instanceof TransactionValidationError) {
@@ -101,7 +107,7 @@ export async function GET(
 
     return NextResponse.json(
       {
-        error: 'Failed to fetch transaction',
+        error: 'Failed to mark code access',
         message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
