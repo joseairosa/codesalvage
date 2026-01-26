@@ -59,3 +59,11 @@ export {
   FavoritePermissionError,
 } from './FavoriteService';
 export type { ToggleFavoriteResult } from './FavoriteService';
+
+export {
+  TransactionService,
+  TransactionValidationError,
+  TransactionPermissionError,
+  TransactionNotFoundError,
+} from './TransactionService';
+export type { CreateTransactionRequest } from './TransactionService';

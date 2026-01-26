@@ -40,3 +40,11 @@ export type {
   PaginatedFavorites,
   PaginationOptions as FavoritePaginationOptions,
 } from './FavoriteRepository';
+
+export { TransactionRepository } from './TransactionRepository';
+export type {
+  CreateTransactionInput,
+  TransactionWithRelations,
+  PaginatedTransactions,
+  PaginationOptions as TransactionPaginationOptions,
+} from './TransactionRepository';

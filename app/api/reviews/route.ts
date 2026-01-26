@@ -17,6 +17,7 @@ import { prisma } from '@/lib/prisma';
 import { ReviewService, ReviewValidationError, ReviewPermissionError } from '@/lib/services/ReviewService';
 import { ReviewRepository } from '@/lib/repositories/ReviewRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
+import { TransactionRepository } from '@/lib/repositories/TransactionRepository';
 import { z } from 'zod';
 
 const componentName = 'ReviewsAPI';
@@ -24,11 +25,11 @@ const componentName = 'ReviewsAPI';
 // Initialize repositories and service
 const reviewRepository = new ReviewRepository(prisma);
 const userRepository = new UserRepository(prisma);
-// Note: transactionRepository not yet implemented, ReviewService will handle mock
+const transactionRepository = new TransactionRepository(prisma);
 const reviewService = new ReviewService(
   reviewRepository,
   userRepository,
-  undefined, // transactionRepository - not yet implemented
+  transactionRepository,
   undefined  // emailService - service will handle
 );
 
