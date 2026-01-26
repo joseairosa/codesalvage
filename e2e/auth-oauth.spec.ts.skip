@@ -1,0 +1,190 @@
+/**
+ * GitHub OAuth E2E Tests
+ *
+ * ⚠️ IMPORTANT: These tests are skipped (.skip extension) because they require:
+ * 1. A test GitHub OAuth application
+ * 2. Test GitHub account credentials
+ * 3. OAuth flow mocking or real OAuth flow
+ *
+ * To enable these tests:
+ * 1. Create a test GitHub OAuth app at https://github.com/settings/developers
+ * 2. Set callback URL to http://localhost:3011/api/auth/callback/github
+ * 3. Add credentials to .env.test:
+ *    - AUTH_GITHUB_ID=<test-app-client-id>
+ *    - AUTH_GITHUB_SECRET=<test-app-client-secret>
+ *    - TEST_GITHUB_USERNAME=<test-account-username>
+ *    - TEST_GITHUB_PASSWORD=<test-account-password>
+ * 4. Rename this file to auth-oauth.spec.ts
+ *
+ * Alternative Approach:
+ * - Use Playwright's authentication state storage
+ * - Mock the OAuth callback endpoint
+ * - Use session manipulation for faster tests
+ *
+ * Test Coverage:
+ * - User can sign in with GitHub OAuth
+ * - User profile is created in database after sign-in
+ * - Existing users are recognized on subsequent sign-ins
+ * - User session persists across page reloads
+ */
+
+import { test, expect } from '@playwright/test';
+import { PrismaClient } from '@prisma/client';
+
+// Skip these tests by default - they require OAuth app setup
+test.describe.skip('GitHub OAuth Authentication', () => {
+  let prisma: PrismaClient;
+
+  test.beforeAll(async () => {
+    prisma = new PrismaClient();
+  });
+
+  test.afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
+  test.afterEach(async () => {
+    // Cleanup test user if created
+    if (process.env.TEST_GITHUB_EMAIL) {
+      await prisma.user.deleteMany({
+        where: { email: process.env.TEST_GITHUB_EMAIL },
+      });
+    }
+  });
+
+  test('should sign in with GitHub OAuth', async ({ page }) => {
+    // Navigate to sign-in page
+    await page.goto('/auth/signin');
+
+    // Click GitHub sign-in button
+    const githubButton = page.getByRole('button', { name: /sign in with github/i });
+    await githubButton.click();
+
+    // Wait for GitHub OAuth page
+    await page.waitForURL('**/github.com/login/**');
+
+    // Fill in GitHub credentials
+    await page.fill('input[name="login"]', process.env.TEST_GITHUB_USERNAME!);
+    await page.fill('input[name="password"]', process.env.TEST_GITHUB_PASSWORD!);
+    await page.click('input[name="commit"]');
+
+    // May need to authorize the app (first time only)
+    try {
+      const authorizeButton = page.locator('button[name="authorize"]');
+      if (await authorizeButton.isVisible({ timeout: 2000 })) {
+        await authorizeButton.click();
+      }
+    } catch {
+      // Authorization not needed
+    }
+
+    // Should be redirected back to app
+    await page.waitForURL('http://localhost:3011/**');
+
+    // Verify user is authenticated
+    const userMenu = page.locator('[role="button"] img[alt*="avatar"]');
+    await expect(userMenu).toBeVisible();
+
+    // Verify URL is not sign-in page
+    expect(page.url()).not.toContain('/auth/signin');
+  });
+
+  test('should create user profile in database after GitHub sign-in', async ({ page }) => {
+    // Sign in with GitHub (same as above test)
+    await page.goto('/auth/signin');
+    const githubButton = page.getByRole('button', { name: /sign in with github/i });
+    await githubButton.click();
+
+    // Complete OAuth flow (simplified)
+    await page.waitForURL('**/github.com/login/**');
+    await page.fill('input[name="login"]', process.env.TEST_GITHUB_USERNAME!);
+    await page.fill('input[name="password"]', process.env.TEST_GITHUB_PASSWORD!);
+    await page.click('input[name="commit"]');
+    await page.waitForURL('http://localhost:3011/**');
+
+    // Query database to verify user was created
+    const user = await prisma.user.findUnique({
+      where: { email: process.env.TEST_GITHUB_EMAIL },
+    });
+
+    expect(user).not.toBeNull();
+    expect(user?.email).toBe(process.env.TEST_GITHUB_EMAIL);
+    expect(user?.githubId).toBeTruthy();
+    expect(user?.githubUsername).toBeTruthy();
+    expect(user?.isBuyer).toBe(true);
+    expect(user?.isSeller).toBe(false);
+  });
+
+  test('should recognize existing user on subsequent sign-ins', async ({ page }) => {
+    // First sign-in
+    await page.goto('/auth/signin');
+    const githubButton = page.getByRole('button', { name: /sign in with github/i });
+    await githubButton.click();
+    await page.waitForURL('**/github.com/login/**');
+    await page.fill('input[name="login"]', process.env.TEST_GITHUB_USERNAME!);
+    await page.fill('input[name="password"]', process.env.TEST_GITHUB_PASSWORD!);
+    await page.click('input[name="commit"]');
+    await page.waitForURL('http://localhost:3011/**');
+
+    // Get user ID from first sign-in
+    const user1 = await prisma.user.findUnique({
+      where: { email: process.env.TEST_GITHUB_EMAIL },
+    });
+
+    // Sign out
+    const userMenu = page.locator('[role="button"]').first();
+    await userMenu.click();
+    const signOutButton = page.getByRole('menuitem', { name: /sign out/i });
+    await signOutButton.click();
+
+    // Sign in again
+    await page.goto('/auth/signin');
+    await githubButton.click();
+    // May auto-authorize if already authorized
+    await page.waitForURL('http://localhost:3011/**');
+
+    // Get user ID from second sign-in
+    const user2 = await prisma.user.findUnique({
+      where: { email: process.env.TEST_GITHUB_EMAIL },
+    });
+
+    // Should be the same user (not a duplicate)
+    expect(user1?.id).toBe(user2?.id);
+
+    // Last login should be updated
+    expect(user2?.lastLogin?.getTime()).toBeGreaterThan(user1?.lastLogin?.getTime() || 0);
+  });
+});
+
+/**
+ * Simplified OAuth Tests (Mocked)
+ *
+ * These tests use session mocking instead of real OAuth flow.
+ * They're faster and more reliable for CI/CD.
+ */
+test.describe('GitHub OAuth - Mocked', () => {
+  test.skip('should authenticate with mocked GitHub session', async ({ page }) => {
+    // This would use Playwright's authentication state storage
+    // or API route mocking to simulate OAuth success
+
+    // Example: Set authentication cookie manually
+    await page.context().addCookies([
+      {
+        name: 'next-auth.session-token',
+        value: 'mocked-session-token',
+        domain: 'localhost',
+        path: '/',
+        httpOnly: true,
+        sameSite: 'Lax',
+        expires: Date.now() / 1000 + 3600,
+      },
+    ]);
+
+    await page.goto('/dashboard');
+
+    // Should be able to access protected route
+    const url = page.url();
+    expect(url).toContain('/dashboard');
+    expect(url).not.toContain('/auth/signin');
+  });
+});
