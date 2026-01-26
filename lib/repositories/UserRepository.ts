@@ -49,11 +49,47 @@ export class UserRepository {
   }
 
   /**
+   * Find available username by appending numbers if conflicts exist
+   *
+   * @param baseUsername - Base username to check
+   * @returns Available username (may have number appended)
+   *
+   * @example
+   * const username = await userRepo.findAvailableUsername('testuser');
+   * // Returns 'testuser' if available, or 'testuser1', 'testuser2', etc.
+   */
+  private async findAvailableUsername(baseUsername: string): Promise<string> {
+    let username = baseUsername;
+    let counter = 1;
+    let exists = true;
+
+    while (exists) {
+      const existingUser = await this.prisma.user.findUnique({
+        where: { username },
+      });
+
+      if (!existingUser) {
+        exists = false;
+      } else {
+        username = `${baseUsername}${counter}`;
+        counter++;
+      }
+    }
+
+    console.log(
+      `[UserRepository] Found available username: ${username} (from ${baseUsername})`
+    );
+    return username;
+  }
+
+  /**
    * Create new user account
+   *
+   * Automatically handles username conflicts by appending numbers.
    *
    * @param userData - User data from auth provider
    * @returns Created user record
-   * @throws Error if email or username already exists
+   * @throws Error if email already exists
    *
    * @example
    * const user = await userRepo.createUser(authUserData);
@@ -65,10 +101,13 @@ export class UserRepository {
     });
 
     try {
+      // Handle username conflicts by appending numbers
+      const availableUsername = await this.findAvailableUsername(userData.username);
+
       const user = await this.prisma.user.create({
         data: {
           email: userData.email,
-          username: userData.username,
+          username: availableUsername,
           fullName: userData.fullName,
           bio: userData.bio,
           avatarUrl: userData.avatarUrl,
@@ -85,9 +124,7 @@ export class UserRepository {
       return user;
     } catch (error) {
       console.error('[UserRepository] createUser failed:', error);
-      throw new Error(
-        '[UserRepository] Failed to create user - email or username may already exist'
-      );
+      throw new Error('[UserRepository] Failed to create user - email may already exist');
     }
   }
 

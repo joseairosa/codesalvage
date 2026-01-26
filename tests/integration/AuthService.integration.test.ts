@@ -109,8 +109,7 @@ describe('AuthService (Integration)', () => {
       expect(dbUser?.githubUsername).toBe('newusername');
     });
 
-    // TODO: Implement automatic username conflict resolution
-    it.skip('should handle username conflicts by appending number', async () => {
+    it('should handle username conflicts by appending number', async () => {
       // Create existing user with username
       await createTestUser({ username: 'testuser' });
 

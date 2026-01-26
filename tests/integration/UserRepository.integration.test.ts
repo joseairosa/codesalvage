@@ -82,20 +82,22 @@ describe('UserRepository (Integration)', () => {
       ).rejects.toThrow();
     });
 
-    it('should throw error when username already exists', async () => {
+    it('should handle username conflicts by appending number', async () => {
       const username = 'duplicateuser';
 
       // Create first user
       await createTestUser({ username });
 
-      // Attempt to create user with same username
-      await expect(
-        userRepository.createUser({
-          email: 'different@example.com',
-          username,
-          fullName: 'Different User',
-        })
-      ).rejects.toThrow();
+      // Create user with same username - should append number
+      const secondUser = await userRepository.createUser({
+        email: 'different@example.com',
+        username,
+        fullName: 'Different User',
+      });
+
+      expect(secondUser.username).not.toBe(username);
+      expect(secondUser.username).toMatch(/^duplicateuser\d+$/);
+      expect(secondUser.email).toBe('different@example.com');
     });
 
     it('should create user with default values', async () => {
