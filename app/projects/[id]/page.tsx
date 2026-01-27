@@ -124,16 +124,6 @@ function formatPrice(cents: number): string {
 }
 
 /**
- * Get completion color based on percentage
- */
-function getCompletionColor(percentage: number): string {
-  if (percentage >= 90) return 'bg-green-500';
-  if (percentage >= 75) return 'bg-blue-500';
-  if (percentage >= 60) return 'bg-yellow-500';
-  return 'bg-orange-500';
-}
-
-/**
  * Format date
  */
 function formatDate(date: Date): string {
