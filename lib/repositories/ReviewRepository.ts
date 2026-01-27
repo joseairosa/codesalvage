@@ -501,7 +501,7 @@ export class ReviewRepository {
           responsivenessRating: data.responsivenessRating,
           accuracyRating: data.accuracyRating,
           isAnonymous: data.isAnonymous,
-        },
+        } as any,
       });
 
       console.log('[ReviewRepository] Review updated:', id);

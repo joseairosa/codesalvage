@@ -441,7 +441,7 @@ export class TransactionRepository {
           stripePaymentIntentId: data.stripePaymentIntentId,
           escrowReleaseDate: data.escrowReleaseDate,
           notes: data.notes,
-        },
+        } as any,
         include: {
           project: {
             select: {
