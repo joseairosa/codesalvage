@@ -35,7 +35,7 @@ const favoriteService = new FavoriteService(
  * Remove a project from favorites
  */
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: { projectId: string } }
 ) {
   try {
