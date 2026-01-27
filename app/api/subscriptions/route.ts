@@ -108,10 +108,13 @@ export async function POST(request: Request) {
       plan,
     });
 
-    const result = await subscriptionService.createSubscription(session.user.id, {
-      plan,
-      paymentMethodId,
-    });
+    // Build subscription request, filtering undefined values
+    const subscriptionRequest: any = { plan };
+    if (paymentMethodId !== undefined) {
+      subscriptionRequest.paymentMethodId = paymentMethodId;
+    }
+
+    const result = await subscriptionService.createSubscription(session.user.id, subscriptionRequest);
 
     console.log(`[${componentName}] Subscription created:`, result.subscriptionId);
 
