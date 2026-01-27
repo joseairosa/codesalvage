@@ -56,6 +56,7 @@ const authService = new AuthService(userRepository);
  * Auth.js v5 configuration
  */
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  // @ts-expect-error - Adapter type mismatch due to exactOptionalPropertyTypes
   adapter: PrismaAdapter(prisma),
 
   providers: [
@@ -67,6 +68,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
        * Transform GitHub profile to NextAuth user
        * Maps GitHub data to our User model fields
        */
+      // @ts-expect-error - ProfileCallback type mismatch with exactOptionalPropertyTypes
       profile(profile: GitHubProfile) {
         console.log('[Auth] GitHub profile received:', {
           id: profile.id,
@@ -112,10 +114,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       if (user) {
         // Initial sign in - add custom fields to token
-        token.id = user.id;
-        token.username = user.username;
-        token.isSeller = user.isSeller;
-        token.isVerifiedSeller = user.isVerifiedSeller;
+        token['id'] = user.id;
+        token['username'] = user.username;
+        token['isSeller'] = user.isSeller;
+        token['isVerifiedSeller'] = user.isVerifiedSeller;
       }
 
       return token;
@@ -159,7 +161,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           // Handle GitHub sign in via AuthService
           // This will create or update the user profile
-          await authService.handleGitHubSignIn(profile as GitHubProfile);
+          await authService.handleGitHubSignIn(profile as unknown as GitHubProfile);
           return true;
         } catch (error) {
           console.error('[Auth] GitHub sign in failed:', error);
@@ -218,7 +220,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
     },
 
-    async signOut({ session: _session, token: _token }) {
+    async signOut(_params) {
       console.log('[Auth] Sign out event');
     },
 
