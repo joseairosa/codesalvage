@@ -39,7 +39,7 @@ export default function ProjectDownloadPage({ params }: { params: { id: string }
   console.log(`[${componentName}] Page rendered for project:`, params.id);
 
   const router = useRouter();
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: _session, status: sessionStatus } = useSession();
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
