@@ -49,7 +49,8 @@ const featuredListingService = new FeaturedListingService(
 export async function GET() {
   try {
     // Verify cron secret (security)
-    const authHeader = headers().get('authorization');
+    const headersList = await headers();
+    const authHeader = headersList.get('authorization');
     const expectedAuth = `Bearer ${env.CRON_SECRET}`;
 
     if (authHeader !== expectedAuth) {
