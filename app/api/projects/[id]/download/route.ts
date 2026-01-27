@@ -14,7 +14,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { r2Service } from '@/lib/services';
+import { r2Service, FileType } from '@/lib/services';
 
 /**
  * POST /api/projects/[id]/download
@@ -81,9 +81,10 @@ export async function POST(
     if (transaction.codeZipUrl) {
       // Generate pre-signed URL for download
       const uploadConfig = await r2Service.getUploadUrl(
-        session.user.id,
         `${projectId}-code.zip`,
         'application/zip',
+        session.user.id,
+        FileType.ZIP,
         expiresIn
       );
 
