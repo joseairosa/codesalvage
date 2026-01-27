@@ -60,7 +60,7 @@ export default function CheckoutSuccessPage() {
   const { data: _session, status: sessionStatus } = useSession();
 
   const transactionId = searchParams.get('transactionId');
-  const paymentIntentId = searchParams.get('payment_intent');
+  const _paymentIntentId = searchParams.get('payment_intent');
 
   const [transaction, setTransaction] = React.useState<Transaction | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
