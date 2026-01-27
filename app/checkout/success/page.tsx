@@ -57,7 +57,7 @@ export default function CheckoutSuccessPage() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: _session, status: sessionStatus } = useSession();
 
   const transactionId = searchParams.get('transactionId');
   const paymentIntentId = searchParams.get('payment_intent');
