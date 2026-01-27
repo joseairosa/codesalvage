@@ -55,9 +55,7 @@ interface Message {
   project: Project | null;
 }
 
-export default function ConversationPage({ params }: { params: { userId: string } }) {
-  console.log(`[${componentName}] Page rendered for user:`, params.userId);
-
+function ConversationContent({ params }: { params: { userId: string } }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const projectId = searchParams.get('projectId');
@@ -364,5 +362,29 @@ export default function ConversationPage({ params }: { params: { userId: string 
         </Card>
       </div>
     </div>
+  );
+}
+
+/**
+ * Main page component with Suspense boundary
+ * Required for useSearchParams() in Next.js 15
+ */
+export default function ConversationPage({ params }: { params: { userId: string } }) {
+  console.log(`[${componentName}] Page rendered for user:`, params.userId);
+
+  return (
+    <React.Suspense
+      fallback={
+        <div className="container mx-auto max-w-4xl py-10">
+          <Card>
+            <CardContent className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </CardContent>
+          </Card>
+        </div>
+      }
+    >
+      <ConversationContent params={params} />
+    </React.Suspense>
   );
 }

@@ -238,9 +238,7 @@ const POPULAR_TECH_STACKS = [
   'Swift',
 ];
 
-export default function ProjectSearchPage() {
-  console.log(`[${componentName}] Page rendered`);
-
+function ProjectSearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -705,5 +703,29 @@ export default function ProjectSearchPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Main page component with Suspense boundary
+ * Required for useSearchParams() in Next.js 15
+ */
+export default function ProjectSearchPage() {
+  console.log(`[${componentName}] Page rendered`);
+
+  return (
+    <React.Suspense
+      fallback={
+        <div className="container mx-auto max-w-7xl py-10">
+          <Card>
+            <CardContent className="flex items-center justify-center py-12">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            </CardContent>
+          </Card>
+        </div>
+      }
+    >
+      <ProjectSearchContent />
+    </React.Suspense>
   );
 }
