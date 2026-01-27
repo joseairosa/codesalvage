@@ -323,7 +323,7 @@ describe('MessageRepository', () => {
 
       // Assert
       expect(result).toHaveLength(2);
-      expect(result[0].partnerId).toBe('user2'); // More recent message
+      expect(result[0]!.partnerId).toBe('user2'); // More recent message
       expect(result[0].unreadCount).toBe(2);
       expect(result[1].partnerId).toBe('user3'); // Older message
       expect(result[1].unreadCount).toBe(5);
@@ -387,7 +387,7 @@ describe('MessageRepository', () => {
       const result = await messageRepository.getConversations(userId);
 
       // Assert
-      expect(result[0].partnerId).toBe('user3'); // Newer message first
+      expect(result[0]!.partnerId).toBe('user3'); // Newer message first
       expect(result[1].partnerId).toBe('user2'); // Older message second
     });
 

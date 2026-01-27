@@ -202,9 +202,9 @@ describe('AnalyticsRepository', () => {
         'day'
       );
 
-      expect(result[0].date).toBe('2026-01-05');
-      expect(result[1].date).toBe('2026-01-15');
-      expect(result[2].date).toBe('2026-01-20');
+      expect(result[0]!.date).toBe('2026-01-05');
+      expect(result[1]!.date).toBe('2026-01-15');
+      expect(result[2]!.date).toBe('2026-01-20');
     });
 
     it('should return empty array when no transactions', async () => {
@@ -256,7 +256,7 @@ describe('AnalyticsRepository', () => {
       expect(result).toHaveLength(3);
       // Highest revenue first
       expect(result[0].projectId).toBe('proj3'); // 24600
-      expect(result[0].revenueCents).toBe(24600);
+      expect(result[0]!.revenueCents).toBe(24600);
       expect(result[0].purchaseCount).toBe(3);
       expect(result[1].projectId).toBe('proj1'); // 16400
       expect(result[2].projectId).toBe('proj2'); // 16400
