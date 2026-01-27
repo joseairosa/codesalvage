@@ -149,17 +149,20 @@ export async function POST(request: Request) {
 
     console.log(`[${componentName}] Creating review for transaction:`, transactionId);
 
-    // Use ReviewService to create review
-    const review = await reviewService.createReview(session.user.id, {
+    // Filter out undefined values for exactOptionalPropertyTypes
+    const reviewData: any = {
       transactionId,
       overallRating,
-      comment,
-      codeQualityRating,
-      documentationRating,
-      responsivenessRating,
-      accuracyRating,
-      isAnonymous,
-    });
+    };
+    if (comment !== undefined) reviewData.comment = comment;
+    if (codeQualityRating !== undefined) reviewData.codeQualityRating = codeQualityRating;
+    if (documentationRating !== undefined) reviewData.documentationRating = documentationRating;
+    if (responsivenessRating !== undefined) reviewData.responsivenessRating = responsivenessRating;
+    if (accuracyRating !== undefined) reviewData.accuracyRating = accuracyRating;
+    if (isAnonymous !== undefined) reviewData.isAnonymous = isAnonymous;
+
+    // Use ReviewService to create review
+    const review = await reviewService.createReview(session.user.id, reviewData);
 
     console.log(`[${componentName}] Review created:`, review.id);
 
