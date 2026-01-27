@@ -79,12 +79,6 @@ export async function POST(
     let expiresIn = 3600; // 1 hour
 
     if (transaction.codeZipUrl) {
-      // Extract key from R2 URL (not currently used, but available for future use)
-      const _key = transaction.codeZipUrl.replace(
-        `${process.env.R2_PUBLIC_URL}/`,
-        ''
-      );
-
       // Generate pre-signed URL for download
       const uploadConfig = await r2Service.getUploadUrl(
         session.user.id,
