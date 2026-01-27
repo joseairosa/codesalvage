@@ -17,6 +17,13 @@ import { mockGitHubAuth, cleanupTestUser } from './utils/test-helpers';
 // Test configuration
 const TEST_PAGE_URL = '/test/upload';
 const TEST_IMAGE_PATH = path.join(__dirname, 'fixtures', 'test-image.png');
+const TEST_USER_DATA = {
+  id: 'test-user-id',
+  email: 'test-upload@example.com',
+  login: 'testuploaduser',
+  name: 'Test Upload User',
+  avatar_url: 'https://example.com/avatar.jpg',
+};
 
 /**
  * Setup - Create test image if it doesn't exist
@@ -44,8 +51,8 @@ test.beforeAll(async () => {
 /**
  * Cleanup after each test
  */
-test.afterEach(async ({ page }) => {
-  await cleanupTestUser(page);
+test.afterEach(async () => {
+  await cleanupTestUser(TEST_USER_DATA.email);
 });
 
 test.describe('File Upload Component', () => {
@@ -56,7 +63,7 @@ test.describe('File Upload Component', () => {
     console.log('[File Upload E2E] Test 1: Component renders');
 
     // Mock authentication
-    await mockGitHubAuth(page);
+    await mockGitHubAuth(page, TEST_USER_DATA);
 
     // Navigate to test page
     await page.goto(TEST_PAGE_URL, { waitUntil: 'domcontentloaded' });
@@ -82,7 +89,7 @@ test.describe('File Upload Component', () => {
     console.log('[File Upload E2E] Test 2: File upload via input');
 
     // Mock authentication
-    await mockGitHubAuth(page);
+    await mockGitHubAuth(page, TEST_USER_DATA);
 
     // Navigate to test page
     await page.goto(TEST_PAGE_URL, { waitUntil: 'domcontentloaded' });
@@ -127,7 +134,7 @@ test.describe('File Upload Component', () => {
     console.log('[File Upload E2E] Test 3: File size validation');
 
     // Mock authentication
-    await mockGitHubAuth(page);
+    await mockGitHubAuth(page, TEST_USER_DATA);
 
     // Navigate to test page
     await page.goto(TEST_PAGE_URL, { waitUntil: 'domcontentloaded' });
@@ -171,7 +178,7 @@ test.describe('File Upload Component', () => {
     console.log('[File Upload E2E] Test 4: File type validation');
 
     // Mock authentication
-    await mockGitHubAuth(page);
+    await mockGitHubAuth(page, TEST_USER_DATA);
 
     // Navigate to test page
     await page.goto(TEST_PAGE_URL, { waitUntil: 'domcontentloaded' });
@@ -207,7 +214,7 @@ test.describe('File Upload Component', () => {
     console.log('[File Upload E2E] Test 5: Multiple file upload');
 
     // Mock authentication
-    await mockGitHubAuth(page);
+    await mockGitHubAuth(page, TEST_USER_DATA);
 
     // Navigate to test page
     await page.goto(TEST_PAGE_URL, { waitUntil: 'domcontentloaded' });
@@ -263,7 +270,7 @@ test.describe('File Upload Component', () => {
     console.log('[File Upload E2E] Test 6: Image preview');
 
     // Mock authentication
-    await mockGitHubAuth(page);
+    await mockGitHubAuth(page, TEST_USER_DATA);
 
     // Navigate to test page
     await page.goto(TEST_PAGE_URL, { waitUntil: 'domcontentloaded' });
@@ -300,7 +307,7 @@ test.describe('File Upload Component', () => {
     console.log('[File Upload E2E] Test 7: Remove file');
 
     // Mock authentication
-    await mockGitHubAuth(page);
+    await mockGitHubAuth(page, TEST_USER_DATA);
 
     // Navigate to test page
     await page.goto(TEST_PAGE_URL, { waitUntil: 'domcontentloaded' });
