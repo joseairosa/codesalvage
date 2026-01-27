@@ -22,7 +22,6 @@ export type {
   CreateMessageInput,
   MessageWithRelations,
   ConversationSummary,
-  PaginationOptions as MessagePaginationOptions,
 } from './MessageRepository';
 
 export { ReviewRepository } from './ReviewRepository';

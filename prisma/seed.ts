@@ -282,7 +282,7 @@ class DatabaseSeeder {
           codeDeliveryStatus: 'delivered',
           codeZipUrl: `https://r2.example.com/${faker.string.uuid()}.zip`,
           codeAccessedAt: faker.date.recent(),
-          createdAt: faker.date.past({ months: 6 }),
+          createdAt: faker.date.past({ years: 0.5 }),
           completedAt: faker.date.recent(),
         },
       });

@@ -80,7 +80,7 @@ export class EmailService {
   constructor() {
     // Read from process.env directly to support test environment variable injection
     this.fromEmail =
-      process.env.SENDGRID_FROM_EMAIL ||
+      process.env['SENDGRID_FROM_EMAIL'] ||
       env.SENDGRID_FROM_EMAIL ||
       'noreply@projectfinish.com';
     this.fromName = 'ProjectFinish';
@@ -98,7 +98,7 @@ export class EmailService {
     }
 
     // Read from process.env directly to support test environment variable injection
-    const apiKey = process.env.SENDGRID_API_KEY || env.SENDGRID_API_KEY;
+    const apiKey = process.env['SENDGRID_API_KEY'] || env.SENDGRID_API_KEY;
 
     if (apiKey) {
       sgMail.setApiKey(apiKey);
@@ -284,7 +284,7 @@ export class EmailService {
     this.initializeSendGrid();
 
     // Check for API key (read from process.env to support testing)
-    const apiKey = process.env.SENDGRID_API_KEY || env.SENDGRID_API_KEY;
+    const apiKey = process.env['SENDGRID_API_KEY'] || env.SENDGRID_API_KEY;
 
     if (!apiKey) {
       console.log(`[${componentName}] Email would be sent (dev mode):`, {

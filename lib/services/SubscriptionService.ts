@@ -95,7 +95,7 @@ export interface SubscriptionStatusResponse {
  */
 const SUBSCRIPTION_PRICING = {
   pro: {
-    priceId: process.env.STRIPE_PRO_PRICE_ID || 'price_pro_monthly', // From Stripe dashboard
+    priceId: process.env['STRIPE_PRO_PRICE_ID'] || 'price_pro_monthly', // From Stripe dashboard
     costCents: 999, // $9.99/month
     benefits: {
       unlimitedListings: true,
@@ -192,9 +192,7 @@ export class SubscriptionService {
         stripeCustomerId = customer.id;
 
         // Update user with Stripe customer ID
-        await this.userRepository.update(userId, {
-          stripeAccountId: stripeCustomerId, // TODO: Use separate stripeCustomerId field
-        });
+        await this.userRepository.updateStripeAccount(userId, stripeCustomerId);
       }
 
       // Attach payment method if provided
@@ -288,12 +286,9 @@ export class SubscriptionService {
 
     try {
       // Cancel subscription at end of period in Stripe
-      const _stripeSubscription = await stripe.subscriptions.update(
-        subscription.stripeSubscriptionId,
-        {
-          cancel_at_period_end: true,
-        }
-      );
+      await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+        cancel_at_period_end: true,
+      });
 
       // Update local database
       const updatedSubscription = await this.subscriptionRepository.update(userId, {
@@ -344,12 +339,9 @@ export class SubscriptionService {
 
     try {
       // Resume subscription in Stripe
-      const _stripeSubscription = await stripe.subscriptions.update(
-        subscription.stripeSubscriptionId,
-        {
-          cancel_at_period_end: false,
-        }
-      );
+      await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+        cancel_at_period_end: false,
+      });
 
       // Update local database
       const updatedSubscription = await this.subscriptionRepository.update(userId, {

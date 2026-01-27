@@ -31,7 +31,7 @@ vi.mock('@/lib/repositories/UserRepository');
 
 describe('AuthService', () => {
   let authService: AuthService;
-  let mockUserRepository: jest.Mocked<UserRepository>;
+  let mockUserRepository: UserRepository;
 
   beforeEach(() => {
     // Reset mocks before each test

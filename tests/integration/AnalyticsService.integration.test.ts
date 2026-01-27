@@ -151,6 +151,7 @@ describe('AnalyticsService (Integration)', () => {
       });
 
       // Create project with known price but no transactions
+      // @ts-expect-error - Project created for test data setup but not directly used
       const project = await createTestProject({
         sellerId: seller.id,
         title: 'Unsold Project',

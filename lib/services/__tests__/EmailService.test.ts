@@ -16,8 +16,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Set environment BEFORE importing EmailService
-process.env.SENDGRID_API_KEY = 'test-api-key';
-process.env.SENDGRID_FROM_EMAIL = 'test@projectfinish.com';
+process.env['SENDGRID_API_KEY'] = 'test-api-key';
+process.env['SENDGRID_FROM_EMAIL'] = 'test@projectfinish.com';
 
 // Mock SendGrid BEFORE importing EmailService (hoisted)
 vi.mock('@sendgrid/mail', () => ({
