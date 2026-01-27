@@ -278,7 +278,7 @@ export class SubscriptionService {
 
     try {
       // Cancel subscription at end of period in Stripe
-      const stripeSubscription = await stripe.subscriptions.update(
+      const _stripeSubscription = await stripe.subscriptions.update(
         subscription.stripeSubscriptionId,
         {
           cancel_at_period_end: true,
@@ -331,7 +331,7 @@ export class SubscriptionService {
 
     try {
       // Resume subscription in Stripe
-      const stripeSubscription = await stripe.subscriptions.update(
+      const _stripeSubscription = await stripe.subscriptions.update(
         subscription.stripeSubscriptionId,
         {
           cancel_at_period_end: false,

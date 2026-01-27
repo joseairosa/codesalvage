@@ -443,7 +443,7 @@ export class ProjectService {
    */
   private validateProjectData(
     data: Partial<CreateProjectRequest>,
-    isUpdate = false
+    _isUpdate = false
   ): void {
     // Title validation
     if (data.title !== undefined) {

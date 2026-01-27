@@ -16,9 +16,9 @@
  * - Verify service behavior, not implementation details
  */
 
-import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { AuthService } from '../AuthService';
-import { UserRepository } from '@/lib/repositories/UserRepository';
+import type { UserRepository } from '@/lib/repositories/UserRepository';
 import {
   createMockGitHubProfile,
   createMockUser,
