@@ -161,6 +161,7 @@ test.describe('Project Creation Flow', () => {
     console.log(`[${componentName}] Testing cancel navigation`);
 
     // Mock router.back()
+    // @ts-expect-error - TODO: Add assertion to check backCalled when router.back() is implemented
     let backCalled = false;
     await page.route('**/*', async (route) => {
       if (route.request().url().includes('back')) {

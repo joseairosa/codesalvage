@@ -59,6 +59,7 @@ const componentName = 'ProjectSearchPage';
  * Kept below for reference during development/testing
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+// @ts-expect-error - Kept for reference during development
 const _mockProjectsForReference: ProjectCardData[] = [
   {
     id: '1',

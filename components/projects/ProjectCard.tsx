@@ -113,8 +113,8 @@ function getInitials(name?: string | null): string {
   if (!name) return '?';
   const parts = name.split(' ').filter(Boolean);
   if (parts.length === 0) return '?';
-  if (parts.length === 1) return parts[0][0].toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  if (parts.length === 1) return parts[0]![0]!.toUpperCase();
+  return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase();
 }
 
 export function ProjectCard({
@@ -145,7 +145,7 @@ export function ProjectCard({
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted-foreground/10">
               <span className="text-4xl font-bold text-muted-foreground/30">
-                {project.title[0].toUpperCase()}
+                {project.title[0]?.toUpperCase() || '?'}
               </span>
             </div>
           )}

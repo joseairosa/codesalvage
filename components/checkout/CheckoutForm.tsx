@@ -15,7 +15,6 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -37,7 +36,6 @@ export function CheckoutForm({
 }: CheckoutFormProps) {
   console.log(`[${componentName}] Form rendered`);
 
-  const _router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
 

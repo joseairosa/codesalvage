@@ -99,6 +99,7 @@ interface SellerProject {
  * Mock seller projects (in production, fetch from API)
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+// @ts-expect-error - Kept for reference during development
 const _mockProjectsForReference: SellerProject[] = [
   {
     id: '1',

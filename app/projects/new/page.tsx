@@ -390,7 +390,9 @@ export default function NewProjectPage() {
                   <PriceInput
                     value={field.value}
                     onChange={field.onChange}
-                    error={errors.priceCents?.message}
+                    {...(errors.priceCents?.message && {
+                      error: errors.priceCents.message,
+                    })}
                   />
                 )}
               />
