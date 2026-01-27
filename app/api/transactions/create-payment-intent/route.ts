@@ -97,12 +97,14 @@ export async function POST(request: Request) {
 
     console.log(`[${componentName}] Payment Intent created:`, paymentIntent.id);
 
-    // Update transaction with Stripe Payment Intent ID
-    await transactionRepository.updatePaymentStatus(
-      transaction.id,
-      'pending',
-      paymentIntent.id
-    );
+    // Update transaction with Stripe Payment Intent ID and status
+    await prisma.transaction.update({
+      where: { id: transaction.id },
+      data: {
+        paymentStatus: 'pending',
+        stripePaymentIntentId: paymentIntent.id,
+      },
+    });
 
     console.log(
       `[${componentName}] Transaction updated with Payment Intent ID:`,
