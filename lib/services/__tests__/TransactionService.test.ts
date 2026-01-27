@@ -11,9 +11,9 @@ import {
   TransactionPermissionError,
   TransactionNotFoundError,
 } from '../TransactionService';
-import { TransactionRepository } from '../../repositories/TransactionRepository';
-import { UserRepository } from '../../repositories/UserRepository';
-import { ProjectRepository } from '../../repositories/ProjectRepository';
+import type { TransactionRepository } from '../../repositories/TransactionRepository';
+import type { UserRepository } from '../../repositories/UserRepository';
+import type { ProjectRepository } from '../../repositories/ProjectRepository';
 
 // Mock repositories
 const mockTransactionRepository = {

@@ -4,7 +4,7 @@
  * Tests all business logic for subscriptions including Stripe integration and validation.
  */
 
-import { describe, it, expect, beforeEach, vi, Mock } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   SubscriptionService,
   SubscriptionValidationError,

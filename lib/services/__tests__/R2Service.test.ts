@@ -4,7 +4,7 @@
  * Tests file validation, pre-signed URL generation, and Cloudflare R2 integration.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { R2Service, FileType } from '../R2Service';
 
 // Mock AWS SDK
