@@ -206,7 +206,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
  *
  * Delete project
  */
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_request: Request, { params }: { params: { id: string } }) {
   try {
     // Check authentication
     const session = await auth();
