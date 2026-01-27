@@ -16,7 +16,7 @@
  * - Comprehensive error logging with [TransactionRepository] prefix
  */
 
-import { PrismaClient, Transaction } from '@prisma/client';
+import type { PrismaClient, Transaction } from '@prisma/client';
 
 /**
  * Input data for creating a new transaction

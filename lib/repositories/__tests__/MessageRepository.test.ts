@@ -18,7 +18,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MessageRepository } from '../MessageRepository';
-import { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 
 // Mock Prisma Client
 vi.mock('@prisma/client', () => ({

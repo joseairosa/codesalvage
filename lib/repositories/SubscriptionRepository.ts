@@ -18,7 +18,7 @@
  * const subscription = await subscriptionRepo.findByUserId('user123');
  */
 
-import { PrismaClient, Subscription, Prisma } from '@prisma/client';
+import type { PrismaClient, Subscription, Prisma } from '@prisma/client';
 
 /**
  * Subscription with user details

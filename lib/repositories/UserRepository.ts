@@ -18,7 +18,7 @@
  * const user = await userRepo.findByEmail('user@example.com');
  */
 
-import { PrismaClient, User } from '@prisma/client';
+import type { PrismaClient, User } from '@prisma/client';
 import type { AuthUserData } from '@/lib/services/AuthService';
 
 /**
