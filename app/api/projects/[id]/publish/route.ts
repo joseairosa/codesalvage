@@ -44,7 +44,7 @@ const projectService = new ProjectService(
  *
  * Publish a project
  */
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(_request: Request, { params }: { params: { id: string } }) {
   try {
     // Check authentication
     const session = await auth();
