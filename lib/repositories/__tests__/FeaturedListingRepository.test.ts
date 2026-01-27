@@ -239,7 +239,9 @@ describe('FeaturedListingRepository', () => {
         featuredUntil: new Date('2026-12-31T23:59:59Z'), // Future date
       });
 
-      vi.mocked(mockPrismaClient.project.findUnique).mockResolvedValue(mockProject as any);
+      vi.mocked(mockPrismaClient.project.findUnique).mockResolvedValue(
+        mockProject as any
+      );
 
       const result = await featuredListingRepository.isFeatured('project123');
 
@@ -259,7 +261,9 @@ describe('FeaturedListingRepository', () => {
         featuredUntil: null,
       });
 
-      vi.mocked(mockPrismaClient.project.findUnique).mockResolvedValue(mockProject as any);
+      vi.mocked(mockPrismaClient.project.findUnique).mockResolvedValue(
+        mockProject as any
+      );
 
       const result = await featuredListingRepository.isFeatured('project123');
 
@@ -272,7 +276,9 @@ describe('FeaturedListingRepository', () => {
         featuredUntil: new Date('2020-01-01T00:00:00Z'), // Past date
       });
 
-      vi.mocked(mockPrismaClient.project.findUnique).mockResolvedValue(mockProject as any);
+      vi.mocked(mockPrismaClient.project.findUnique).mockResolvedValue(
+        mockProject as any
+      );
 
       const result = await featuredListingRepository.isFeatured('project123');
 
@@ -349,7 +355,9 @@ describe('FeaturedListingRepository', () => {
       });
 
       // Mock findUnique to return current project
-      vi.mocked(mockPrismaClient.project.findUnique).mockResolvedValue(mockProject as any);
+      vi.mocked(mockPrismaClient.project.findUnique).mockResolvedValue(
+        mockProject as any
+      );
 
       // Mock update to return extended project
       const extendedFeaturedUntil = new Date(currentFeaturedUntil);

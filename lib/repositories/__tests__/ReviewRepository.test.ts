@@ -411,7 +411,9 @@ describe('ReviewRepository', () => {
       };
 
       vi.mocked(mockPrismaClient.review.findMany).mockResolvedValue(mockReviews as any);
-      vi.mocked(mockPrismaClient.sellerAnalytics.upsert).mockResolvedValue(mockAnalytics as any);
+      vi.mocked(mockPrismaClient.sellerAnalytics.upsert).mockResolvedValue(
+        mockAnalytics as any
+      );
 
       const result = await reviewRepository.updateSellerAnalytics('seller123');
 
