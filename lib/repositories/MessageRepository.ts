@@ -368,11 +368,11 @@ export class MessageRepository {
 
       // Filter out nulls and sort by latest message
       const validConversations = conversations
-        .filter((c): c is ConversationSummary => c !== null)
+        .filter((c) => c !== null)
         .sort(
           (a, b) =>
-            b.latestMessage.createdAt.getTime() - a.latestMessage.createdAt.getTime()
-        );
+            b!.latestMessage.createdAt.getTime() - a!.latestMessage.createdAt.getTime()
+        ) as ConversationSummary[];
 
       console.log(
         '[MessageRepository] Found',

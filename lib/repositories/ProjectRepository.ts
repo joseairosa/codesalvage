@@ -385,14 +385,18 @@ export class ProjectRepository {
     if (filters.featured !== undefined) {
       if (filters.featured) {
         // Show featured projects that haven't expired (or have no expiration)
-        where.AND = where.AND || [];
-        where.AND.push({
-          isFeatured: true,
-          OR: [
-            { featuredUntil: null }, // No expiration
-            { featuredUntil: { gte: new Date() } }, // Not yet expired
-          ],
-        });
+        if (!where.AND) {
+          where.AND = [];
+        }
+        if (Array.isArray(where.AND)) {
+          where.AND.push({
+            isFeatured: true,
+            OR: [
+              { featuredUntil: null }, // No expiration
+              { featuredUntil: { gte: new Date() } }, // Not yet expired
+            ],
+          });
+        }
       } else {
         where.isFeatured = false;
       }
