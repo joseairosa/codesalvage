@@ -89,8 +89,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: 'Validation failed',
-          message: firstError.message,
-          field: firstError.path[0],
+          message: firstError?.message || 'Invalid request data',
+          field: firstError?.path[0],
         },
         { status: 400 }
       );
