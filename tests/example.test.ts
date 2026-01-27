@@ -34,6 +34,6 @@ describe('Vitest Setup', () => {
 describe('Environment Variables', () => {
   it('should have test environment variables', () => {
     expect(process.env.NODE_ENV).toBe('test');
-    expect(process.env.NEXT_PUBLIC_APP_URL).toBe('http://localhost:3011');
+    expect(process.env['NEXT_PUBLIC_APP_URL']).toBe('http://localhost:3011');
   });
 });

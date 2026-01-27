@@ -27,7 +27,10 @@ afterEach(() => {
  * Mock environment variables for tests
  * Uses dedicated test database from docker-compose.test.yml
  */
-process.env['NODE_ENV'] = 'test';
+Object.defineProperty(process.env, 'NODE_ENV', {
+  value: 'test',
+  writable: true,
+});
 process.env['NEXT_PUBLIC_APP_URL'] = 'http://localhost:3011';
 process.env['DATABASE_URL'] =
   'postgresql://projectfinish_test:password_test@localhost:5445/projectfinish_test';
