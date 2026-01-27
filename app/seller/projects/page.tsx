@@ -94,7 +94,8 @@ interface SellerProject {
 /**
  * Mock seller projects (in production, fetch from API)
  */
-const mockProjects: SellerProject[] = [
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _mockProjectsForReference: SellerProject[] = [
   {
     id: '1',
     title: 'E-commerce Dashboard with Analytics',

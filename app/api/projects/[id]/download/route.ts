@@ -76,7 +76,7 @@ export async function POST(
 
     // If codeZipUrl exists in transaction, generate pre-signed URL
     let downloadUrl: string | null = null;
-    let expiresIn = 3600; // 1 hour
+    const expiresIn = 3600; // 1 hour
 
     if (transaction.codeZipUrl) {
       // Generate pre-signed URL for download

@@ -152,7 +152,7 @@ export default function MessagesPage() {
   const formatTime = (dateString: string) => {
     try {
       return formatDistanceToNow(new Date(dateString), { addSuffix: true });
-    } catch (err) {
+    } catch {
       return dateString;
     }
   };
