@@ -465,17 +465,20 @@ export class ProjectRepository {
     console.log('[ProjectRepository] Finding projects by seller:', sellerId);
 
     try {
-      const projects = await this.prisma.project.findMany({
+      const options: any = {
         where: { sellerId },
         orderBy: { createdAt: 'desc' },
-        include: includeRelations
-          ? {
-              transactions: true,
-              favorites: true,
-              messages: true,
-            }
-          : undefined,
-      });
+      };
+
+      if (includeRelations) {
+        options.include = {
+          transactions: true,
+          favorites: true,
+          messages: true,
+        };
+      }
+
+      const projects = await this.prisma.project.findMany(options);
 
       console.log('[ProjectRepository] Found projects:', projects.length);
       return projects;
