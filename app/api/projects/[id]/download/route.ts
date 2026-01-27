@@ -79,8 +79,8 @@ export async function POST(
     let expiresIn = 3600; // 1 hour
 
     if (transaction.codeZipUrl) {
-      // Extract key from R2 URL
-      const key = transaction.codeZipUrl.replace(
+      // Extract key from R2 URL (not currently used, but available for future use)
+      const _key = transaction.codeZipUrl.replace(
         `${process.env.R2_PUBLIC_URL}/`,
         ''
       );
