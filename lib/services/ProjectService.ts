@@ -19,8 +19,8 @@
  * const project = await projectService.createProject(userId, data);
  */
 
-import { Project } from '@prisma/client';
-import {
+import type { Project } from '@prisma/client';
+import type {
   ProjectRepository,
   CreateProjectInput,
   UpdateProjectInput,
@@ -28,8 +28,8 @@ import {
   PaginationOptions,
   PaginatedProjects,
 } from '@/lib/repositories/ProjectRepository';
-import { R2Service, FileType } from './R2Service';
-import { SubscriptionService } from './SubscriptionService';
+import type { R2Service, FileType } from './R2Service';
+import type { SubscriptionService } from './SubscriptionService';
 
 /**
  * Project creation request (from user input)

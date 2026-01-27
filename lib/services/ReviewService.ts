@@ -25,7 +25,7 @@
  * });
  */
 
-import {
+import type {
   ReviewRepository,
   CreateReviewInput,
   ReviewWithRelations,
@@ -33,7 +33,7 @@ import {
   PaginationOptions,
   SellerRatingStats,
 } from '@/lib/repositories/ReviewRepository';
-import { UserRepository } from '@/lib/repositories/UserRepository';
+import type { UserRepository } from '@/lib/repositories/UserRepository';
 
 /**
  * Review creation request (from user input)

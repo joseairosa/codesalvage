@@ -17,8 +17,8 @@
  * - Returns formatted data for API consumption
  */
 
-import { SubscriptionRepository } from '../repositories/SubscriptionRepository';
-import { UserRepository } from '../repositories/UserRepository';
+import type { SubscriptionRepository } from '../repositories/SubscriptionRepository';
+import type { UserRepository } from '../repositories/UserRepository';
 import { stripe } from '../stripe';
 import Stripe from 'stripe';
 

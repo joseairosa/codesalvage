@@ -23,14 +23,14 @@
  * });
  */
 
-import {
+import type {
   MessageRepository,
   CreateMessageInput,
   MessageWithRelations,
   ConversationSummary,
 } from '@/lib/repositories/MessageRepository';
-import { UserRepository } from '@/lib/repositories/UserRepository';
-import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
+import type { UserRepository } from '@/lib/repositories/UserRepository';
+import type { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 
 /**
  * Message send request (from user input)

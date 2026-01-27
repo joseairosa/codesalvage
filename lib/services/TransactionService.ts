@@ -16,15 +16,15 @@
  * - Throws typed errors for HTTP status mapping
  */
 
-import {
+import type {
   TransactionRepository,
   TransactionWithRelations,
   PaginatedTransactions,
   PaginationOptions,
   CreateTransactionInput,
 } from '../repositories/TransactionRepository';
-import { UserRepository } from '../repositories/UserRepository';
-import { ProjectRepository } from '../repositories/ProjectRepository';
+import type { UserRepository } from '../repositories/UserRepository';
+import type { ProjectRepository } from '../repositories/ProjectRepository';
 
 /**
  * Transaction validation error

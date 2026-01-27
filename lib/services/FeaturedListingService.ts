@@ -17,14 +17,11 @@
  * - Returns formatted data for API consumption
  */
 
-import { FeaturedListingRepository } from '../repositories/FeaturedListingRepository';
-import type {
-  FeaturedProjectWithSeller,
-  PaginatedFeaturedProjects,
-} from '../repositories/FeaturedListingRepository';
-import { ProjectRepository } from '../repositories/ProjectRepository';
-import { UserRepository } from '../repositories/UserRepository';
-import { SubscriptionService } from './SubscriptionService';
+import type { FeaturedListingRepository } from '../repositories/FeaturedListingRepository';
+import type { PaginatedFeaturedProjects } from '../repositories/FeaturedListingRepository';
+import type { ProjectRepository } from '../repositories/ProjectRepository';
+import type { UserRepository } from '../repositories/UserRepository';
+import type { SubscriptionService } from './SubscriptionService';
 
 /**
  * Custom error for featured listing validation issues

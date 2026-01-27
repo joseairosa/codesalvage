@@ -19,14 +19,13 @@
  * const favorite = await favoriteService.addFavorite(userId, projectId);
  */
 
-import {
+import type {
   FavoriteRepository,
-  FavoriteWithProject,
   PaginatedFavorites,
   PaginationOptions,
 } from '@/lib/repositories/FavoriteRepository';
-import { UserRepository } from '@/lib/repositories/UserRepository';
-import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
+import type { UserRepository } from '@/lib/repositories/UserRepository';
+import type { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 import type { Favorite } from '@prisma/client';
 
 /**
