@@ -73,6 +73,7 @@ export async function GET() {
             stripeAccountId: true,
             email: true,
             fullName: true,
+            username: true,
           },
         },
         project: {
