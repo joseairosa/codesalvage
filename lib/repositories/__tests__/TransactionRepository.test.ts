@@ -80,6 +80,7 @@ const createMockTransactionWithRelations = (
     username: 'buyer_user',
     fullName: 'Buyer Name',
     avatarUrl: 'https://example.com/buyer.jpg',
+    email: 'buyer@example.com',
   },
   review: null,
   ...overrides,

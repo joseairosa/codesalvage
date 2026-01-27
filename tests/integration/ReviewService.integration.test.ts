@@ -314,7 +314,7 @@ describe('ReviewService (Integration)', () => {
 
       expect(result.reviews).toHaveLength(2);
       expect(result.total).toBe(2);
-      expect(result.reviews[0].sellerId).toBe(seller.id);
+      expect(result.reviews[0]!.sellerId).toBe(seller.id);
     });
   });
 

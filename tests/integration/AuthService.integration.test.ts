@@ -223,7 +223,7 @@ describe('AuthService (Integration)', () => {
 
   describe('updateLastLogin', () => {
     it('should update last login timestamp', async () => {
-      const user = await createTestUser({ lastLogin: null });
+      const user = await createTestUser({});
 
       await authService.updateLastLogin(user.id);
 

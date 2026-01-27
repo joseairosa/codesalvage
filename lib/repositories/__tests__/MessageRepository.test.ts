@@ -324,9 +324,9 @@ describe('MessageRepository', () => {
       // Assert
       expect(result).toHaveLength(2);
       expect(result[0]!.partnerId).toBe('user2'); // More recent message
-      expect(result[0].unreadCount).toBe(2);
+      expect(result[0]!.unreadCount).toBe(2);
       expect(result[1]!.partnerId).toBe('user3'); // Older message
-      expect(result[1].unreadCount).toBe(5);
+      expect(result[1]!.unreadCount).toBe(5);
     });
 
     it('should filter by projectId when provided', async () => {

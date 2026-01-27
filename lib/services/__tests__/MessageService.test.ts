@@ -434,8 +434,8 @@ describe('MessageService', () => {
       await messageService.getConversation(currentUserId, otherUserId);
 
       expect(mockMessageRepository.markAsRead).toHaveBeenCalledWith([
-        mockMessages[0].id,
-        mockMessages[1].id,
+        mockMessages[0]!.id,
+        mockMessages[1]!.id,
       ]);
     });
 

@@ -105,7 +105,7 @@ describe('ProjectService', () => {
         subscriptionId: 'sub_test',
         plan: 'pro',
         status: 'active',
-        currentPeriodEnd: new Date(),
+        currentPeriodEnd: new Date().toISOString(),
         cancelAtPeriodEnd: false,
         benefits: {
           unlimitedListings: true,

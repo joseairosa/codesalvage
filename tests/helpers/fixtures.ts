@@ -183,7 +183,26 @@ export async function createTestTransaction(
   let buyerId = overrides.buyerId;
 
   if (!projectId || !sellerId) {
-    const project = await createTestProject({ sellerId });
+    const projectOverrides: Partial<{
+      sellerId: string;
+      title: string;
+      description: string;
+      category: string;
+      completionPercentage: number;
+      priceCents: number;
+      status: string;
+      techStack: string[];
+      primaryLanguage: string;
+      githubUrl: string;
+      demoUrl: string;
+      thumbnailImageUrl: string;
+      screenshotUrls: string[];
+      isFeatured: boolean;
+    }> = {};
+    if (sellerId) {
+      projectOverrides.sellerId = sellerId;
+    }
+    const project = await createTestProject(projectOverrides);
     projectId = project.id;
     sellerId = project.sellerId;
   }

@@ -326,7 +326,7 @@ describe('FeaturedListingService', () => {
         subscriptionId: 'sub_pro123',
         plan: 'pro',
         status: 'active',
-        currentPeriodEnd: new Date('2026-03-01'),
+        currentPeriodEnd: new Date('2026-03-01').toISOString(),
         cancelAtPeriodEnd: false,
         benefits: {
           unlimitedListings: true,
