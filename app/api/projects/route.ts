@@ -211,8 +211,13 @@ export async function GET(request: Request) {
 
     console.log('[Projects API] Searching projects:', { filters, pagination });
 
+    // Filter out undefined values for exactOptionalPropertyTypes
+    const cleanFilters = Object.fromEntries(
+      Object.entries(filters).filter(([_, value]) => value !== undefined)
+    );
+
     // Search projects
-    const results = await projectService.searchProjects(filters, pagination);
+    const results = await projectService.searchProjects(cleanFilters as any, pagination);
 
     console.log('[Projects API] Search completed:', {
       count: results.projects.length,
