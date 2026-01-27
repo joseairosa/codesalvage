@@ -155,7 +155,7 @@ describe('FeaturedListingRepository', () => {
         createMockFeaturedProject({ id: 'project2' }),
       ];
 
-      vi.mocked(mockPrismaClient.project.findMany).mockResolvedValue(mockProjects);
+      vi.mocked(mockPrismaClient.project.findMany).mockResolvedValue(mockProjects as any);
       vi.mocked(mockPrismaClient.project.count).mockResolvedValue(2);
 
       const result = await featuredListingRepository.getFeaturedProjects({
@@ -357,7 +357,7 @@ describe('FeaturedListingRepository', () => {
       vi.mocked(mockPrismaClient.project.update).mockResolvedValue({
         ...mockProject,
         featuredUntil: extendedFeaturedUntil,
-      });
+      } as any);
 
       const result = await featuredListingRepository.extendFeaturedPeriod(
         'project123',

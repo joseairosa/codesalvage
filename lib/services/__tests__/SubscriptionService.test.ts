@@ -143,7 +143,7 @@ describe('SubscriptionService', () => {
       const mockStripeSubscription = createMockStripeSubscription();
       const mockSubscription = createMockSubscription();
 
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser as any);
       vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(null);
       vi.mocked(stripe.customers.create).mockResolvedValue(mockCustomer as any);
       vi.mocked(stripe.paymentMethods.attach).mockResolvedValue({} as any);
@@ -184,7 +184,7 @@ describe('SubscriptionService', () => {
 
     it('should throw error when user is not a seller', async () => {
       const mockUser = createMockUser({ isSeller: false });
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser as any);
 
       await expect(
         subscriptionService.createSubscription('user123', { plan: 'pro' })
@@ -195,7 +195,7 @@ describe('SubscriptionService', () => {
       const mockUser = createMockUser();
       const mockActiveSubscription = createMockSubscription({ status: 'active' });
 
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser as any);
       vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(
         mockActiveSubscription
       );
@@ -210,7 +210,7 @@ describe('SubscriptionService', () => {
       const mockStripeSubscription = createMockStripeSubscription();
       const mockSubscription = createMockSubscription();
 
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser as any);
       vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(null);
       vi.mocked(stripe.subscriptions.create).mockResolvedValue(
         mockStripeSubscription as any
@@ -229,7 +229,7 @@ describe('SubscriptionService', () => {
 
     it('should handle Stripe errors', async () => {
       const mockUser = createMockUser();
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser as any);
       vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(null);
       vi.mocked(stripe.customers.create).mockRejectedValue(
         new MockStripeError('Card declined')

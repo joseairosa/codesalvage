@@ -231,7 +231,7 @@ describe('TransactionService', () => {
         totalPages: 1,
         hasNext: false,
         hasPrev: false,
-      });
+      } as any);
 
       await expect(
         transactionService.createTransaction('buyer012', { projectId: 'project456' })
@@ -290,7 +290,7 @@ describe('TransactionService', () => {
 
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockBuyer as any);
       vi.mocked(mockTransactionRepository.findByBuyerId).mockResolvedValue(
-        mockTransactions
+        mockTransactions as any
       );
 
       const result = await transactionService.getBuyerTransactions('buyer012');
@@ -329,7 +329,7 @@ describe('TransactionService', () => {
 
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockSeller as any);
       vi.mocked(mockTransactionRepository.findBySellerId).mockResolvedValue(
-        mockTransactions
+        mockTransactions as any
       );
 
       const result = await transactionService.getSellerTransactions('seller789');
