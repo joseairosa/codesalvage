@@ -302,7 +302,7 @@ export default function NewProjectPage() {
                   <TechStackSelector
                     value={field.value}
                     onChange={field.onChange}
-                    error={errors.techStack?.message}
+                    {...(errors.techStack?.message && { error: errors.techStack.message })}
                   />
                 )}
               />
