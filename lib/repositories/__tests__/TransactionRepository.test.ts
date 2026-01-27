@@ -73,6 +73,7 @@ const createMockTransactionWithRelations = (
     fullName: 'Seller Name',
     avatarUrl: 'https://example.com/seller.jpg',
     stripeAccountId: 'acct_123',
+    email: 'seller@example.com',
   },
   buyer: {
     id: 'buyer012',

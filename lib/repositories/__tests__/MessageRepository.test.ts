@@ -325,7 +325,7 @@ describe('MessageRepository', () => {
       expect(result).toHaveLength(2);
       expect(result[0]!.partnerId).toBe('user2'); // More recent message
       expect(result[0].unreadCount).toBe(2);
-      expect(result[1].partnerId).toBe('user3'); // Older message
+      expect(result[1]!.partnerId).toBe('user3'); // Older message
       expect(result[1].unreadCount).toBe(5);
     });
 
@@ -388,7 +388,7 @@ describe('MessageRepository', () => {
 
       // Assert
       expect(result[0]!.partnerId).toBe('user3'); // Newer message first
-      expect(result[1].partnerId).toBe('user2'); // Older message second
+      expect(result[1]!.partnerId).toBe('user2'); // Older message second
     });
 
     it('should return empty array when user has no conversations', async () => {
