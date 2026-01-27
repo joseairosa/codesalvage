@@ -50,7 +50,12 @@ const nextConfig: NextConfig = {
     // Server Actions
     serverActions: {
       bodySizeLimit: '10mb',
-      allowedOrigins: ['localhost:3011'],
+      allowedOrigins: [
+        'localhost:3011',
+        'codesalvage.com',
+        'www.codesalvage.com',
+        '*.railway.app',
+      ],
     },
   },
 
