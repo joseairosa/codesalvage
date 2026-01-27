@@ -97,17 +97,27 @@ export class AnalyticsRepository {
     });
 
     // Get sold projects count and revenue (filtered by date range)
+    const where: {
+      sellerId: string;
+      paymentStatus: string;
+      completedAt?: {
+        gte?: Date;
+        lte?: Date;
+      };
+    } = {
+      sellerId,
+      paymentStatus: 'succeeded',
+    };
+
+    if (dateRange) {
+      where.completedAt = {
+        gte: dateRange.startDate,
+        lte: dateRange.endDate,
+      };
+    }
+
     const transactions = await this.prisma.transaction.findMany({
-      where: {
-        sellerId,
-        paymentStatus: 'succeeded',
-        ...(dateRange && {
-          completedAt: {
-            gte: dateRange.startDate,
-            lte: dateRange.endDate,
-          },
-        }),
-      },
+      where,
       select: {
         sellerReceivesCents: true,
         projectId: true,
@@ -164,14 +174,23 @@ export class AnalyticsRepository {
     dateRange: DateRangeFilter,
     granularity: 'day' | 'week' | 'month' = 'day'
   ): Promise<RevenueDataPoint[]> {
+    const whereCompletedAt: {
+      gte?: Date;
+      lte?: Date;
+    } = {};
+
+    if (dateRange.startDate) {
+      whereCompletedAt.gte = dateRange.startDate;
+    }
+    if (dateRange.endDate) {
+      whereCompletedAt.lte = dateRange.endDate;
+    }
+
     const transactions = await this.prisma.transaction.findMany({
       where: {
         sellerId,
         paymentStatus: 'succeeded',
-        completedAt: {
-          gte: dateRange.startDate,
-          lte: dateRange.endDate,
-        },
+        completedAt: whereCompletedAt,
       },
       select: {
         completedAt: true,
@@ -221,6 +240,23 @@ export class AnalyticsRepository {
     limit: number = 10,
     dateRange?: DateRangeFilter
   ): Promise<ProjectPerformanceMetrics[]> {
+    const transactionsWhere: {
+      paymentStatus: string;
+      completedAt?: {
+        gte?: Date;
+        lte?: Date;
+      };
+    } = {
+      paymentStatus: 'succeeded',
+    };
+
+    if (dateRange) {
+      transactionsWhere.completedAt = {
+        gte: dateRange.startDate,
+        lte: dateRange.endDate,
+      };
+    }
+
     const projects = await this.prisma.project.findMany({
       where: {
         sellerId,
@@ -231,15 +267,7 @@ export class AnalyticsRepository {
         viewCount: true,
         favoriteCount: true,
         transactions: {
-          where: {
-            paymentStatus: 'succeeded',
-            ...(dateRange && {
-              completedAt: {
-                gte: dateRange.startDate,
-                lte: dateRange.endDate,
-              },
-            }),
-          },
+          where: transactionsWhere,
           select: {
             sellerReceivesCents: true,
           },
@@ -248,10 +276,10 @@ export class AnalyticsRepository {
     });
 
     // Calculate metrics for each project
-    const projectMetrics: ProjectPerformanceMetrics[] = projects.map((project) => {
+    const projectMetrics: ProjectPerformanceMetrics[] = projects.map((project: any) => {
       const purchaseCount = project.transactions.length;
       const revenueCents = project.transactions.reduce(
-        (sum, t) => sum + t.sellerReceivesCents,
+        (sum: number, t: any) => sum + t.sellerReceivesCents,
         0
       );
       const conversionRate =
