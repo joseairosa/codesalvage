@@ -32,7 +32,9 @@ export class FeaturedListingValidationError extends Error {
   constructor(message: string, field?: string) {
     super(message);
     this.name = 'FeaturedListingValidationError';
-    this.field = field;
+    if (field !== undefined) {
+      this.field = field;
+    }
   }
 }
 
@@ -218,10 +220,11 @@ export class FeaturedListingService {
       limit,
     });
 
-    return await this.featuredListingRepository.getFeaturedProjects({
-      page,
-      limit,
-    });
+    const options: { page?: number; limit?: number } = {};
+    if (page !== undefined) options.page = page;
+    if (limit !== undefined) options.limit = limit;
+
+    return await this.featuredListingRepository.getFeaturedProjects(options);
   }
 
   /**

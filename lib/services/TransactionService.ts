@@ -163,10 +163,15 @@ export class TransactionService {
       amountCents,
       commissionCents,
       sellerReceivesCents,
-      stripePaymentIntentId: data.stripePaymentIntentId,
       escrowReleaseDate,
-      notes: data.notes,
     };
+
+    if (data.stripePaymentIntentId !== undefined) {
+      transactionInput.stripePaymentIntentId = data.stripePaymentIntentId;
+    }
+    if (data.notes !== undefined) {
+      transactionInput.notes = data.notes;
+    }
 
     const transaction = await this.transactionRepository.create(transactionInput);
 

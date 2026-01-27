@@ -31,7 +31,9 @@ export class SubscriptionValidationError extends Error {
   constructor(message: string, field?: string) {
     super(message);
     this.name = 'SubscriptionValidationError';
-    this.field = field;
+    if (field !== undefined) {
+      this.field = field;
+    }
   }
 }
 
@@ -244,7 +246,7 @@ export class SubscriptionService {
 
       return {
         subscriptionId: stripeSubscription.id,
-        clientSecret: paymentIntent?.client_secret,
+        clientSecret: paymentIntent?.client_secret ?? undefined,
         status: stripeSubscription.status,
         currentPeriodEnd: new Date(
           stripeSubscription.current_period_end * 1000

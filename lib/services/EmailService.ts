@@ -296,11 +296,13 @@ export class EmailService {
     }
 
     try {
+      const toData: { email: string; name?: string } = { email: recipient.email };
+      if (recipient.name) {
+        toData.name = recipient.name;
+      }
+
       await sgMail.send({
-        to: {
-          email: recipient.email,
-          name: recipient.name,
-        },
+        to: toData,
         from: {
           email: this.fromEmail,
           name: this.fromName,

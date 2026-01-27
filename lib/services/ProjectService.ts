@@ -430,6 +430,10 @@ export class ProjectService {
       fileType,
     });
 
+    if (!this.r2Service) {
+      throw new Error('[ProjectService] R2Service not available');
+    }
+
     return await this.r2Service.getUploadUrl(filename, mimeType, userId, fileType);
   }
 

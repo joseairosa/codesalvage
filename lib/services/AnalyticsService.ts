@@ -39,7 +39,9 @@ export class AnalyticsValidationError extends Error {
   constructor(message: string, field?: string) {
     super(message);
     this.name = 'AnalyticsValidationError';
-    this.field = field;
+    if (field !== undefined) {
+      this.field = field;
+    }
   }
 }
 
