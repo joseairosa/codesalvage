@@ -341,7 +341,7 @@ describe('ReviewService (Integration)', () => {
 
         await reviewService.createReview(buyer.id, {
           transactionId: transaction.id,
-          overallRating: ratings[i],
+          overallRating: ratings[i]!,
         });
       }
 

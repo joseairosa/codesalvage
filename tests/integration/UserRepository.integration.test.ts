@@ -46,7 +46,11 @@ describe('UserRepository (Integration)', () => {
         email: 'test@example.com',
         username: 'testuser',
         fullName: 'Test User',
+        bio: null,
+        avatarUrl: 'https://example.com/avatar.jpg',
         githubId: '12345',
+        githubUsername: 'testuser',
+        githubAvatarUrl: 'https://example.com/avatar.jpg',
       };
 
       const user = await userRepository.createUser(userData);
@@ -78,6 +82,11 @@ describe('UserRepository (Integration)', () => {
           email,
           username: 'differentuser',
           fullName: 'Different User',
+          bio: null,
+          avatarUrl: 'https://example.com/avatar.jpg',
+          githubId: '67890',
+          githubUsername: 'differentuser',
+          githubAvatarUrl: 'https://example.com/avatar.jpg',
         })
       ).rejects.toThrow();
     });
@@ -93,6 +102,11 @@ describe('UserRepository (Integration)', () => {
         email: 'different@example.com',
         username,
         fullName: 'Different User',
+        bio: null,
+        avatarUrl: 'https://example.com/avatar.jpg',
+        githubId: '99999',
+        githubUsername: username,
+        githubAvatarUrl: 'https://example.com/avatar.jpg',
       });
 
       expect(secondUser.username).not.toBe(username);
@@ -104,6 +118,12 @@ describe('UserRepository (Integration)', () => {
       const user = await userRepository.createUser({
         email: 'minimal@example.com',
         username: 'minimaluser',
+        fullName: null,
+        bio: null,
+        avatarUrl: 'https://example.com/avatar.jpg',
+        githubId: '11111',
+        githubUsername: 'minimaluser',
+        githubAvatarUrl: 'https://example.com/avatar.jpg',
       });
 
       expect(user.isBuyer).toBe(true);

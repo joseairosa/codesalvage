@@ -313,9 +313,9 @@ describe('FeaturedListingService (Integration)', () => {
 
       expect(result.total).toBe(1);
       expect(result.projects).toHaveLength(1);
-      expect(result.projects[0].id).toBe(project1.id);
-      expect(result.projects[0].seller).toBeDefined();
-      expect(result.projects[0].seller.username).toBe('featured-seller');
+      expect(result.projects[0]!.id).toBe(project1.id);
+      expect(result.projects[0]!.seller).toBeDefined();
+      expect(result.projects[0]!.seller.username).toBe('featured-seller');
     });
 
     it('should handle pagination correctly', async () => {
@@ -668,10 +668,10 @@ describe('FeaturedListingService (Integration)', () => {
       expect(pricing).toHaveLength(3);
       expect(pricing[0].durationDays).toBe(7);
       expect(pricing[0].costCents).toBe(2999);
-      expect(pricing[1].durationDays).toBe(14);
-      expect(pricing[1].costCents).toBe(4999);
-      expect(pricing[2].durationDays).toBe(30);
-      expect(pricing[2].costCents).toBe(7999);
+      expect(pricing[1]!.durationDays).toBe(14);
+      expect(pricing[1]!.costCents).toBe(4999);
+      expect(pricing[2]!.durationDays).toBe(30);
+      expect(pricing[2]!.costCents).toBe(7999);
     });
   });
 });

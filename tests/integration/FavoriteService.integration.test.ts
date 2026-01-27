@@ -225,8 +225,8 @@ describe('FavoriteService (Integration)', () => {
 
       expect(result.favorites).toHaveLength(2);
       expect(result.total).toBe(2);
-      expect(result.favorites[0].project).toBeDefined();
-      expect(result.favorites[0].project.seller).toBeDefined();
+      expect(result.favorites[0]!.project).toBeDefined();
+      expect(result.favorites[0]!.project.seller).toBeDefined();
     });
 
     it('should return empty list when no favorites', async () => {

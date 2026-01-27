@@ -58,7 +58,7 @@ export function render(
 ) {
   return rtlRender(ui, {
     wrapper: ({ children }) => (
-      <AllTheProviders session={session}>{children}</AllTheProviders>
+      <AllTheProviders session={session ?? null}>{children}</AllTheProviders>
     ),
     ...renderOptions,
   });

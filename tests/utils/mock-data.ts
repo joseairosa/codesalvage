@@ -17,6 +17,7 @@
 import { type User } from '@prisma/client';
 import type { Session } from 'next-auth';
 import type { GitHubProfile, AuthUserData } from '@/lib/services/AuthService';
+import { vi } from 'vitest';
 
 /**
  * Counter for generating unique IDs in tests

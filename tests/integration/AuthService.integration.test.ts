@@ -39,11 +39,12 @@ describe('AuthService (Integration)', () => {
   describe('handleGitHubSignIn', () => {
     it('should create new user on first GitHub sign-in', async () => {
       const githubProfile = {
-        id: '12345',
+        id: 12345,
         login: 'testuser',
         name: 'Test User',
         email: 'test@example.com',
         avatar_url: 'https://github.com/avatar.jpg',
+        bio: null,
       };
 
       const result = await authService.handleGitHubSignIn(githubProfile);
@@ -69,11 +70,12 @@ describe('AuthService (Integration)', () => {
       });
 
       const githubProfile = {
-        id: '67890',
+        id: 67890,
         login: 'existinguser',
         name: 'Existing User',
         email: 'existing@example.com',
         avatar_url: 'https://github.com/avatar.jpg',
+        bio: null,
       };
 
       const result = await authService.handleGitHubSignIn(githubProfile);
@@ -90,11 +92,12 @@ describe('AuthService (Integration)', () => {
       });
 
       const githubProfile = {
-        id: '99999',
+        id: 99999,
         login: 'newusername',
         name: 'Updated Name',
         email: user.email!,
         avatar_url: 'https://new-avatar.jpg',
+        bio: null,
       };
 
       const result = await authService.handleGitHubSignIn(githubProfile);
@@ -114,11 +117,12 @@ describe('AuthService (Integration)', () => {
       await createTestUser({ username: 'testuser' });
 
       const githubProfile = {
-        id: '11111',
+        id: 11111,
         login: 'testuser',
         name: 'Test User',
         email: 'newuser@example.com',
         avatar_url: 'https://github.com/avatar.jpg',
+        bio: null,
       };
 
       const result = await authService.handleGitHubSignIn(githubProfile);
@@ -134,11 +138,12 @@ describe('AuthService (Integration)', () => {
       });
 
       const githubProfile = {
-        id: '22222',
+        id: 22222,
         login: user.username!,
         name: user.fullName || 'Test',
         email: user.email!,
         avatar_url: user.githubAvatarUrl || '',
+        bio: null,
       };
 
       const result = await authService.handleGitHubSignIn(githubProfile);

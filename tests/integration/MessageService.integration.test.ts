@@ -177,9 +177,9 @@ describe('MessageService (Integration)', () => {
       );
 
       expect(conversation.messages).toHaveLength(3);
-      expect(conversation.messages[0].content).toBe('Message 1');
-      expect(conversation.messages[1].content).toBe('Message 2');
-      expect(conversation.messages[2].content).toBe('Message 3');
+      expect(conversation.messages[0]!.content).toBe('Message 1');
+      expect(conversation.messages[1]!.content).toBe('Message 2');
+      expect(conversation.messages[2]!.content).toBe('Message 3');
     });
 
     it('should auto-mark messages as read when conversation viewed', async () => {
@@ -225,7 +225,7 @@ describe('MessageService (Integration)', () => {
 
       expect(conversations).toHaveLength(2);
       expect(conversations[0].unreadCount).toBe(1); // Latest conversation first
-      expect(conversations[1].unreadCount).toBe(1);
+      expect(conversations[1]!.unreadCount).toBe(1);
     });
 
     it('should show latest message in each conversation', async () => {

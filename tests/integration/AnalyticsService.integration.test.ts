@@ -580,12 +580,12 @@ describe('AnalyticsService (Integration)', () => {
 
       // Verify top projects are ranked by revenue
       expect(analytics.topProjects.length).toBe(3);
-      expect(analytics.topProjects[0].title).toBe('High Revenue Project');
-      expect(analytics.topProjects[0].revenue).toBe('$410.00');
-      expect(analytics.topProjects[1].title).toBe('Mid Revenue Project');
-      expect(analytics.topProjects[1].revenue).toBe('$246.00');
-      expect(analytics.topProjects[2].title).toBe('Low Revenue Project');
-      expect(analytics.topProjects[2].revenue).toBe('$82.00');
+      expect(analytics.topProjects[0]!.title).toBe('High Revenue Project');
+      expect(analytics.topProjects[0]!.revenue).toBe('$410.00');
+      expect(analytics.topProjects[1]!.title).toBe('Mid Revenue Project');
+      expect(analytics.topProjects[1]!.revenue).toBe('$246.00');
+      expect(analytics.topProjects[2]!.title).toBe('Low Revenue Project');
+      expect(analytics.topProjects[2]!.revenue).toBe('$82.00');
     });
 
     it('should include view counts in top projects', async () => {
@@ -624,8 +624,8 @@ describe('AnalyticsService (Integration)', () => {
         seller.id
       );
 
-      expect(analytics.topProjects[0].views).toBe(250);
-      expect(analytics.topProjects[0].purchases).toBe(1);
+      expect(analytics.topProjects[0]!.views).toBe(250);
+      expect(analytics.topProjects[0]!.purchases).toBe(1);
     });
   });
 
@@ -680,7 +680,7 @@ describe('AnalyticsService (Integration)', () => {
       expect(analytics.revenueChart.length).toBeGreaterThan(0);
 
       // Verify chart data includes dates and revenue values
-      const firstDataPoint = analytics.revenueChart[0];
+      const firstDataPoint = analytics.revenueChart[0]!;
       expect(firstDataPoint.date).toBeDefined();
       expect(firstDataPoint.revenue).toBeDefined();
       expect(typeof firstDataPoint.revenue).toBe('string'); // Formatted as currency

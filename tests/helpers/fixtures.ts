@@ -31,6 +31,9 @@ export async function createTestUser(
     isVerifiedSeller: boolean;
     stripeAccountId: string;
     githubId: string;
+    githubUsername: string;
+    githubAvatarUrl: string;
+    lastLogin: Date;
   }> = {}
 ): Promise<User> {
   const username = overrides.username || faker.internet.username().toLowerCase();
@@ -47,8 +50,9 @@ export async function createTestUser(
       isVerifiedSeller: overrides.isVerifiedSeller ?? false,
       stripeAccountId: overrides.stripeAccountId || null,
       githubId: overrides.githubId || faker.string.numeric(8),
-      githubUsername: username,
-      githubAvatarUrl: faker.image.avatar(),
+      githubUsername: overrides.githubUsername || username,
+      githubAvatarUrl: overrides.githubAvatarUrl || faker.image.avatar(),
+      lastLogin: overrides.lastLogin || null,
     },
   });
 }

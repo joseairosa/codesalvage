@@ -270,10 +270,10 @@ describe('ProjectService (Integration)', () => {
 
       const retrieved = await projectService.getProject(project.id, {
         includeSeller: true,
-      });
+      }) as any;
 
       expect(retrieved.seller).toBeDefined();
-      expect(retrieved.seller.username).toBe('johndoe');
+      expect(retrieved.seller?.username).toBe('johndoe');
     });
 
     it('should throw error for non-existent project', async () => {
@@ -322,7 +322,7 @@ describe('ProjectService (Integration)', () => {
       );
 
       expect(result.projects.length).toBe(1);
-      expect(result.projects[0].title).toBe('React Dashboard');
+      expect(result.projects[0]!.title).toBe('React Dashboard');
     });
 
     it('should only return active projects by default', async () => {

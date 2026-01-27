@@ -13,7 +13,7 @@ import {
   teardownTestDatabase,
   cleanDatabase,
 } from '@/tests/helpers/db';
-import { createTestUser, createTestSeller, createTestProject } from '@/tests/helpers/fixtures';
+import { createTestSeller, createTestProject } from '@/tests/helpers/fixtures';
 import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 import { prisma } from '@/lib/prisma';
 
@@ -140,11 +140,11 @@ describe('ProjectRepository (Integration)', () => {
       const seller = await createTestSeller({ username: 'johndoe' });
       const project = await createTestProject({ sellerId: seller.id });
 
-      const foundProject = await projectRepository.findById(project.id, true);
+      const foundProject = await projectRepository.findById(project.id, true) as any;
 
       expect(foundProject).toBeTruthy();
       expect(foundProject?.seller).toBeDefined();
-      expect(foundProject?.seller.username).toBe('johndoe');
+      expect(foundProject?.seller?.username).toBe('johndoe');
     });
 
     it('should return null for non-existent project', async () => {
@@ -306,7 +306,7 @@ describe('ProjectRepository (Integration)', () => {
       );
 
       expect(result.projects.length).toBe(1);
-      expect(result.projects[0].category).toBe('tool');
+      expect(result.projects[0]!.category).toBe('tool');
     });
 
     it('should filter by tech stack', async () => {
@@ -326,7 +326,7 @@ describe('ProjectRepository (Integration)', () => {
       );
 
       expect(result.projects.length).toBe(1);
-      expect(result.projects[0].primaryLanguage).toBe('Python');
+      expect(result.projects[0]!.primaryLanguage).toBe('Python');
     });
 
     it('should filter by completion percentage range', async () => {
@@ -360,7 +360,7 @@ describe('ProjectRepository (Integration)', () => {
       );
 
       expect(result.projects.length).toBe(1);
-      expect(result.projects[0].status).toBe('draft');
+      expect(result.projects[0]!.status).toBe('draft');
     });
 
     it('should filter featured projects', async () => {
@@ -370,7 +370,7 @@ describe('ProjectRepository (Integration)', () => {
       );
 
       expect(result.projects.length).toBe(1);
-      expect(result.projects[0].isFeatured).toBe(true);
+      expect(result.projects[0]!.isFeatured).toBe(true);
     });
 
     it('should combine multiple filters', async () => {
@@ -384,7 +384,7 @@ describe('ProjectRepository (Integration)', () => {
       );
 
       expect(result.projects.length).toBe(1);
-      expect(result.projects[0].title).toBe('React Dashboard');
+      expect(result.projects[0]!.title).toBe('React Dashboard');
     });
 
     it('should paginate results', async () => {
@@ -410,8 +410,8 @@ describe('ProjectRepository (Integration)', () => {
       );
 
       if (result.projects.length > 1) {
-        expect(result.projects[0].priceCents).toBeGreaterThanOrEqual(
-          result.projects[1].priceCents
+        expect(result.projects[0]!.priceCents).toBeGreaterThanOrEqual(
+          result.projects[1]!.priceCents
         );
       }
     });
@@ -423,8 +423,8 @@ describe('ProjectRepository (Integration)', () => {
       );
 
       if (result.projects.length > 1) {
-        expect(result.projects[0].completionPercentage).toBeLessThanOrEqual(
-          result.projects[1].completionPercentage
+        expect(result.projects[0]!.completionPercentage).toBeLessThanOrEqual(
+          result.projects[1]!.completionPercentage
         );
       }
     });

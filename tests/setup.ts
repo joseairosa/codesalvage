@@ -12,7 +12,7 @@
  */
 
 import '@testing-library/jest-dom';
-import { expect, afterEach, vi } from 'vitest';
+import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
 /**
@@ -27,14 +27,14 @@ afterEach(() => {
  * Mock environment variables for tests
  * Uses dedicated test database from docker-compose.test.yml
  */
-process.env.NODE_ENV = 'test';
-process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3011';
-process.env.DATABASE_URL = 'postgresql://projectfinish_test:password_test@localhost:5445/projectfinish_test';
-process.env.REDIS_URL = 'redis://localhost:6391';
-process.env.AUTH_SECRET = 'test-secret-key-for-testing-only';
-process.env.AUTH_GITHUB_ID = 'test-github-id';
-process.env.AUTH_GITHUB_SECRET = 'test-github-secret';
-process.env.NEXTAUTH_URL = 'http://localhost:3011';
+process.env['NODE_ENV'] = 'test';
+process.env['NEXT_PUBLIC_APP_URL'] = 'http://localhost:3011';
+process.env['DATABASE_URL'] = 'postgresql://projectfinish_test:password_test@localhost:5445/projectfinish_test';
+process.env['REDIS_URL'] = 'redis://localhost:6391';
+process.env['AUTH_SECRET'] = 'test-secret-key-for-testing-only';
+process.env['AUTH_GITHUB_ID'] = 'test-github-id';
+process.env['AUTH_GITHUB_SECRET'] = 'test-github-secret';
+process.env['NEXTAUTH_URL'] = 'http://localhost:3011';
 
 /**
  * Mock Next.js router
