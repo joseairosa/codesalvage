@@ -221,7 +221,7 @@ describe('MessageService (Integration)', () => {
       const conversations = await messageService.getConversations(user.id);
 
       expect(conversations).toHaveLength(2);
-      expect(conversations[0].unreadCount).toBe(1); // Latest conversation first
+      expect(conversations[0]!.unreadCount).toBe(1); // Latest conversation first
       expect(conversations[1]!.unreadCount).toBe(1);
     });
 
@@ -241,7 +241,7 @@ describe('MessageService (Integration)', () => {
       const conversations = await messageService.getConversations(user.id);
 
       expect(conversations).toHaveLength(1);
-      expect(conversations[0].latestMessage.content).toBe('Latest message');
+      expect(conversations[0]!.latestMessage.content).toBe('Latest message');
     });
   });
 

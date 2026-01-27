@@ -277,8 +277,11 @@ describe('EmailService', () => {
 
     it('should handle message without project title', async () => {
       const dataNoProject: MessageEmailData = {
-        ...data,
-        projectTitle: undefined,
+        recipientName: data.recipientName,
+        senderName: data.senderName,
+        messagePreview: data.messagePreview,
+        conversationUrl: data.conversationUrl,
+        // projectTitle intentionally omitted
       };
 
       await emailService.sendNewMessageNotification(recipient, dataNoProject);
@@ -343,8 +346,12 @@ describe('EmailService', () => {
 
     it('should handle review without comment', async () => {
       const dataNoComment: ReviewEmailData = {
-        ...data,
-        comment: undefined,
+        sellerName: data.sellerName,
+        buyerName: data.buyerName,
+        projectTitle: data.projectTitle,
+        rating: data.rating,
+        reviewUrl: data.reviewUrl,
+        // comment intentionally omitted
       };
 
       await emailService.sendReviewNotification(recipient, dataNoComment);

@@ -190,7 +190,7 @@ describe('TransactionService (Integration)', () => {
 
       expect(result.transactions).toHaveLength(2);
       expect(result.total).toBe(2);
-      expect(result.transactions[0].buyerId).toBe(buyer.id);
+      expect(result.transactions[0]!.buyerId).toBe(buyer.id);
     });
   });
 
@@ -212,7 +212,7 @@ describe('TransactionService (Integration)', () => {
 
       expect(result.transactions).toHaveLength(2);
       expect(result.total).toBe(2);
-      expect(result.transactions[0].sellerId).toBe(seller.id);
+      expect(result.transactions[0]!.sellerId).toBe(seller.id);
     });
   });
 

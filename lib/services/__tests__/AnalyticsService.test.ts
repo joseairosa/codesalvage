@@ -176,10 +176,10 @@ describe('AnalyticsService', () => {
 
       // Verify date range is approximately 30 days
       const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock
-        .calls[0];
-      const dateRange = call[1];
+        .calls[0]!;
+      const dateRange = call[1]!;
       const daysDiff = Math.round(
-        (dateRange.endDate.getTime() - dateRange.startDate.getTime()) /
+        (dateRange.endDate!.getTime() - dateRange.startDate!.getTime()) /
           (1000 * 60 * 60 * 24)
       );
       expect(daysDiff).toBeCloseTo(30, 0);
@@ -252,10 +252,10 @@ describe('AnalyticsService', () => {
 
       // Verify start date was adjusted to 1 year ago
       const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock
-        .calls[0];
-      const dateRange = call[1];
+        .calls[0]!;
+      const dateRange = call[1]!;
       const yearsDiff =
-        (dateRange.endDate.getTime() - dateRange.startDate.getTime()) /
+        (dateRange.endDate!.getTime() - dateRange.startDate!.getTime()) /
         (1000 * 60 * 60 * 24 * 365);
       expect(yearsDiff).toBeLessThanOrEqual(1.1); // Allow small margin
     });
@@ -324,13 +324,13 @@ describe('AnalyticsService', () => {
       });
 
       expect(result).toHaveLength(2);
-      expect(result[0].projectId).toBe('proj1');
-      expect(result[0].title).toBe('Project 1');
-      expect(result[0].views).toBe(100);
-      expect(result[0].favorites).toBe(10);
-      expect(result[0].purchases).toBe(2);
-      expect(result[0].revenue).toBe('$200.00');
-      expect(result[0].conversionRate).toBe('2.00%');
+      expect(result[0]!.projectId).toBe('proj1');
+      expect(result[0]!.title).toBe('Project 1');
+      expect(result[0]!.views).toBe(100);
+      expect(result[0]!.favorites).toBe(10);
+      expect(result[0]!.purchases).toBe(2);
+      expect(result[0]!.revenue).toBe('$200.00');
+      expect(result[0]!.conversionRate).toBe('2.00%');
     });
 
     it('should throw AnalyticsPermissionError if user is not a seller', async () => {
@@ -409,13 +409,13 @@ describe('AnalyticsService', () => {
       });
 
       const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock
-        .calls[0];
-      const dateRange = call[1];
+        .calls[0]!;
+      const dateRange = call[1]!;
 
-      expect(dateRange.startDate).toBeInstanceOf(Date);
-      expect(dateRange.endDate).toBeInstanceOf(Date);
-      expect(dateRange.startDate.getMonth()).toBe(5); // June (0-indexed)
-      expect(dateRange.endDate.getMonth()).toBe(5); // June
+      expect(dateRange.startDate!).toBeInstanceOf(Date);
+      expect(dateRange.endDate!).toBeInstanceOf(Date);
+      expect(dateRange.startDate!.getMonth()).toBe(5); // June (0-indexed)
+      expect(dateRange.endDate!.getMonth()).toBe(5); // June
     });
 
     it('should handle date-only strings (without time)', async () => {
@@ -430,11 +430,11 @@ describe('AnalyticsService', () => {
       });
 
       const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock
-        .calls[0];
-      const dateRange = call[1];
+        .calls[0]!;
+      const dateRange = call[1]!;
 
-      expect(dateRange.startDate).toBeInstanceOf(Date);
-      expect(dateRange.endDate).toBeInstanceOf(Date);
+      expect(dateRange.startDate!).toBeInstanceOf(Date);
+      expect(dateRange.endDate!).toBeInstanceOf(Date);
     });
   });
 
