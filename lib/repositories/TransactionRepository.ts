@@ -51,12 +51,14 @@ export interface TransactionWithRelations extends Transaction {
     fullName: string | null;
     avatarUrl: string | null;
     stripeAccountId: string | null;
+    email: string | null;
   };
   buyer: {
     id: string;
     username: string;
     fullName: string | null;
     avatarUrl: string | null;
+    email: string | null;
   };
   review?: {
     id: string;
