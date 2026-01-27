@@ -18,7 +18,7 @@
  * const project = await projectRepo.create({...});
  */
 
-import { PrismaClient, Project, Prisma } from '@prisma/client';
+import type { PrismaClient, Project, Prisma } from '@prisma/client';
 
 /**
  * Project creation input (without auto-generated fields)

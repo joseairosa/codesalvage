@@ -18,7 +18,7 @@
  * const message = await messageRepo.create({...});
  */
 
-import { PrismaClient, Message, Prisma } from '@prisma/client';
+import type { PrismaClient, Message, Prisma } from '@prisma/client';
 
 /**
  * Message creation input

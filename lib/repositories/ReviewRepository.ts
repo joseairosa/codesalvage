@@ -19,7 +19,7 @@
  * const review = await reviewRepo.create({...});
  */
 
-import { PrismaClient, Review, Prisma } from '@prisma/client';
+import type { PrismaClient, Review } from '@prisma/client';
 
 /**
  * Review creation input

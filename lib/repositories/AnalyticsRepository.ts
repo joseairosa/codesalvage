@@ -17,7 +17,7 @@
  * - Supports date range filtering
  */
 
-import { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 
 /**
  * Seller revenue summary

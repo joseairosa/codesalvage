@@ -16,7 +16,7 @@
  * - Returns typed project data
  */
 
-import { PrismaClient, Project } from '@prisma/client';
+import type { PrismaClient, Project } from '@prisma/client';
 
 /**
  * Featured project with seller info

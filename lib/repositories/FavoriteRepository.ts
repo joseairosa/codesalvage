@@ -19,7 +19,7 @@
  * const favorite = await favoriteRepo.create('user123', 'project456');
  */
 
-import { PrismaClient, Favorite, Prisma } from '@prisma/client';
+import type { PrismaClient, Favorite } from '@prisma/client';
 
 /**
  * Favorite with project details
