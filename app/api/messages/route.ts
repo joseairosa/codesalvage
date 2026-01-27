@@ -119,13 +119,22 @@ export async function POST(request: Request) {
       projectId,
     });
 
-    // Use MessageService to send message
-    const message = await messageService.sendMessage(session.user.id, {
+    // Build request object conditionally to handle exactOptionalPropertyTypes
+    const requestData: {
+      recipientId: string;
+      content: string;
+      projectId?: string;
+      transactionId?: string;
+    } = {
       recipientId,
-      projectId,
-      transactionId,
       content,
-    });
+    };
+
+    if (projectId) requestData.projectId = projectId;
+    if (transactionId) requestData.transactionId = transactionId;
+
+    // Use MessageService to send message
+    const message = await messageService.sendMessage(session.user.id, requestData);
 
     console.log(`[${componentName}] Message sent:`, message.id);
 
