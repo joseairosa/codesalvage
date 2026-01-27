@@ -280,7 +280,7 @@ export default function NewProjectPage() {
                   <CategorySelector
                     value={field.value}
                     onChange={field.onChange}
-                    error={errors.category?.message}
+                    {...(errors.category?.message && { error: errors.category.message })}
                   />
                 )}
               />
