@@ -121,7 +121,7 @@ export default async function SubscriptionManagementPage() {
             )}
 
             {/* Cancellation Notice */}
-            {isCanceling && (
+            {isCanceling && subscription.currentPeriodEnd && (
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>

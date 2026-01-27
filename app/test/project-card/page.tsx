@@ -199,32 +199,40 @@ export default function ProjectCardTestPage() {
           <h2 className="text-2xl font-bold">Completion Percentage Variations</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             <ProjectCard
-              project={{
-                ...mockProjects[0],
-                id: 'completion-50',
-                completionPercentage: 50,
-              }}
+              project={
+                {
+                  ...mockProjects[0],
+                  id: 'completion-50',
+                  completionPercentage: 50,
+                } as ProjectCardData
+              }
             />
             <ProjectCard
-              project={{
-                ...mockProjects[0],
-                id: 'completion-65',
-                completionPercentage: 65,
-              }}
+              project={
+                {
+                  ...mockProjects[0],
+                  id: 'completion-65',
+                  completionPercentage: 65,
+                } as ProjectCardData
+              }
             />
             <ProjectCard
-              project={{
-                ...mockProjects[0],
-                id: 'completion-80',
-                completionPercentage: 80,
-              }}
+              project={
+                {
+                  ...mockProjects[0],
+                  id: 'completion-80',
+                  completionPercentage: 80,
+                } as ProjectCardData
+              }
             />
             <ProjectCard
-              project={{
-                ...mockProjects[0],
-                id: 'completion-95',
-                completionPercentage: 95,
-              }}
+              project={
+                {
+                  ...mockProjects[0],
+                  id: 'completion-95',
+                  completionPercentage: 95,
+                } as ProjectCardData
+              }
             />
           </div>
         </div>
