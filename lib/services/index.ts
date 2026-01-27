@@ -43,7 +43,7 @@ export {
   MessagePermissionError,
 } from './MessageService';
 export type { SendMessageRequest } from './MessageService';
-export { MAX_MESSAGE_LENGTH } from './MessageService';
+export { MAX_CONTENT_LENGTH, MIN_CONTENT_LENGTH } from './MessageService';
 
 export {
   ReviewService,
