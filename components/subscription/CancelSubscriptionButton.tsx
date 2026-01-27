@@ -63,8 +63,8 @@ export function CancelSubscriptionButton() {
             <AlertDialogTitle>Cancel Pro Subscription?</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <p>
-                Your subscription will be canceled at the end of your current billing period. You'll
-                continue to have access to Pro features until then.
+                Your subscription will be canceled at the end of your current billing
+                period. You'll continue to have access to Pro features until then.
               </p>
               <p className="font-semibold">You'll lose access to:</p>
               <ul className="list-inside list-disc space-y-1 pl-4">

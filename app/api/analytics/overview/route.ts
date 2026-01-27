@@ -30,10 +30,7 @@ const componentName = 'AnalyticsOverviewAPI';
 // Initialize repositories and service
 const analyticsRepository = new AnalyticsRepository(prisma);
 const userRepository = new UserRepository(prisma);
-const analyticsService = new AnalyticsService(
-  analyticsRepository,
-  userRepository
-);
+const analyticsService = new AnalyticsService(analyticsRepository, userRepository);
 
 /**
  * GET /api/analytics/overview
@@ -56,7 +53,11 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const startDateParam = searchParams.get('startDate');
     const endDateParam = searchParams.get('endDate');
-    const granularityParam = searchParams.get('granularity') as 'day' | 'week' | 'month' | null;
+    const granularityParam = searchParams.get('granularity') as
+      | 'day'
+      | 'week'
+      | 'month'
+      | null;
 
     // Build request object with only defined values
     const requestData: {

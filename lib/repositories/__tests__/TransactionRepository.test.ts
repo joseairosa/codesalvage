@@ -7,7 +7,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { PrismaClient } from '@prisma/client';
 import { TransactionRepository } from '../TransactionRepository';
-import type { CreateTransactionInput, TransactionWithRelations } from '../TransactionRepository';
+import type {
+  CreateTransactionInput,
+  TransactionWithRelations,
+} from '../TransactionRepository';
 
 // Mock Prisma Client
 vi.mock('@/lib/prisma', () => ({
@@ -210,9 +213,9 @@ describe('TransactionRepository', () => {
         new Error('Database error')
       );
 
-      await expect(
-        transactionRepository.findByBuyerId('buyer012')
-      ).rejects.toThrow('[TransactionRepository] Failed to find transactions by buyer');
+      await expect(transactionRepository.findByBuyerId('buyer012')).rejects.toThrow(
+        '[TransactionRepository] Failed to find transactions by buyer'
+      );
     });
   });
 
@@ -261,9 +264,9 @@ describe('TransactionRepository', () => {
         new Error('Database error')
       );
 
-      await expect(
-        transactionRepository.findBySellerId('seller789')
-      ).rejects.toThrow('[TransactionRepository] Failed to find transactions by seller');
+      await expect(transactionRepository.findBySellerId('seller789')).rejects.toThrow(
+        '[TransactionRepository] Failed to find transactions by seller'
+      );
     });
   });
 
@@ -293,9 +296,9 @@ describe('TransactionRepository', () => {
         new Error('Database error')
       );
 
-      await expect(
-        transactionRepository.findByProjectId('project456')
-      ).rejects.toThrow('[TransactionRepository] Failed to find transactions by project');
+      await expect(transactionRepository.findByProjectId('project456')).rejects.toThrow(
+        '[TransactionRepository] Failed to find transactions by project'
+      );
     });
   });
 
@@ -503,9 +506,7 @@ describe('TransactionRepository', () => {
 
       await expect(
         transactionRepository.updateCodeDeliveryStatus('transaction123', 'accessed')
-      ).rejects.toThrow(
-        '[TransactionRepository] Failed to update code delivery status'
-      );
+      ).rejects.toThrow('[TransactionRepository] Failed to update code delivery status');
     });
   });
 

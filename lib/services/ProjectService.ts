@@ -166,7 +166,8 @@ export class ProjectService {
     }
 
     // Check project limit for free tier users
-    const subscriptionStatus = await this.subscriptionService.getSubscriptionStatus(sellerId);
+    const subscriptionStatus =
+      await this.subscriptionService.getSubscriptionStatus(sellerId);
     if (!subscriptionStatus.benefits.unlimitedListings) {
       // Free tier: enforce 3-project limit
       const activeProjectCount = await this.projectRepository.countByUser(sellerId, {

@@ -153,11 +153,9 @@ export class ReviewService {
     const review = await this.reviewRepository.create(createInput);
 
     // Update seller analytics (async, don't wait)
-    this.reviewRepository
-      .updateSellerAnalytics(transaction.sellerId)
-      .catch((err) => {
-        console.error('[ReviewService] Failed to update seller analytics:', err);
-      });
+    this.reviewRepository.updateSellerAnalytics(transaction.sellerId).catch((err) => {
+      console.error('[ReviewService] Failed to update seller analytics:', err);
+    });
 
     // Send email notification (async, don't wait)
     if (this.emailService) {
@@ -398,9 +396,7 @@ export class ReviewService {
    * @private
    */
   private isValidRating(rating: number): boolean {
-    return (
-      Number.isInteger(rating) && rating >= MIN_RATING && rating <= MAX_RATING
-    );
+    return Number.isInteger(rating) && rating >= MIN_RATING && rating <= MAX_RATING;
   }
 
   /**

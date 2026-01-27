@@ -508,9 +508,9 @@ describe('SubscriptionService (Integration)', () => {
     });
 
     it('should throw error when subscription not found', async () => {
-      await expect(subscriptionService.cancelImmediately('sub_nonexistent')).rejects.toThrow(
-        SubscriptionNotFoundError
-      );
+      await expect(
+        subscriptionService.cancelImmediately('sub_nonexistent')
+      ).rejects.toThrow(SubscriptionNotFoundError);
     });
   });
 });

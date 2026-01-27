@@ -60,7 +60,9 @@ describe('ProjectRepository', () => {
         updatedAt: new Date(),
       };
 
-      vi.mocked(mockPrismaClient.project.create).mockResolvedValue(mockCreatedProject as any);
+      vi.mocked(mockPrismaClient.project.create).mockResolvedValue(
+        mockCreatedProject as any
+      );
 
       const result = await projectRepository.create(projectData);
 
@@ -90,7 +92,9 @@ describe('ProjectRepository', () => {
         sellerId: 'seller123',
       };
 
-      vi.mocked(mockPrismaClient.project.findUnique).mockResolvedValue(mockProject as any);
+      vi.mocked(mockPrismaClient.project.findUnique).mockResolvedValue(
+        mockProject as any
+      );
 
       const result = await projectRepository.findById('project123');
 
@@ -111,7 +115,9 @@ describe('ProjectRepository', () => {
         },
       };
 
-      vi.mocked(mockPrismaClient.project.findUnique).mockResolvedValue(mockProject as any);
+      vi.mocked(mockPrismaClient.project.findUnique).mockResolvedValue(
+        mockProject as any
+      );
 
       const result = await projectRepository.findById('project123', true);
 
@@ -148,7 +154,9 @@ describe('ProjectRepository', () => {
         updatedAt: new Date(),
       };
 
-      vi.mocked(mockPrismaClient.project.update).mockResolvedValue(mockUpdatedProject as any);
+      vi.mocked(mockPrismaClient.project.update).mockResolvedValue(
+        mockUpdatedProject as any
+      );
 
       const result = await projectRepository.update('project123', updateData);
 
@@ -171,7 +179,9 @@ describe('ProjectRepository', () => {
         title: 'Deleted Project',
       };
 
-      vi.mocked(mockPrismaClient.project.delete).mockResolvedValue(mockDeletedProject as any);
+      vi.mocked(mockPrismaClient.project.delete).mockResolvedValue(
+        mockDeletedProject as any
+      );
 
       const result = await projectRepository.delete('project123');
 
@@ -193,7 +203,10 @@ describe('ProjectRepository', () => {
         { id: 'project2', title: 'Project 2' },
       ];
 
-      vi.mocked(mockPrismaClient.$transaction).mockResolvedValue([mockProjects, 2] as any);
+      vi.mocked(mockPrismaClient.$transaction).mockResolvedValue([
+        mockProjects,
+        2,
+      ] as any);
 
       const result = await projectRepository.search();
 
@@ -254,12 +267,12 @@ describe('ProjectRepository', () => {
 
     it('should handle pagination correctly', async () => {
       const mockProjects = Array(5).fill({ id: 'project' });
-      vi.mocked(mockPrismaClient.$transaction).mockResolvedValue([mockProjects, 25] as any);
+      vi.mocked(mockPrismaClient.$transaction).mockResolvedValue([
+        mockProjects,
+        25,
+      ] as any);
 
-      const result = await projectRepository.search(
-        {},
-        { page: 2, limit: 20 }
-      );
+      const result = await projectRepository.search({}, { page: 2, limit: 20 });
 
       expect(result.page).toBe(2);
       expect(result.limit).toBe(20);
@@ -271,10 +284,7 @@ describe('ProjectRepository', () => {
     it('should sort by different fields', async () => {
       vi.mocked(mockPrismaClient.$transaction).mockResolvedValue([[], 0] as any);
 
-      await projectRepository.search(
-        {},
-        { sortBy: 'priceCents', sortOrder: 'asc' }
-      );
+      await projectRepository.search({}, { sortBy: 'priceCents', sortOrder: 'asc' });
 
       expect(mockPrismaClient.$transaction).toHaveBeenCalled();
     });
@@ -341,7 +351,9 @@ describe('ProjectRepository', () => {
         { id: 'project2', isFeatured: true },
       ];
 
-      vi.mocked(mockPrismaClient.project.findMany).mockResolvedValue(mockFeaturedProjects as any);
+      vi.mocked(mockPrismaClient.project.findMany).mockResolvedValue(
+        mockFeaturedProjects as any
+      );
 
       const result = await projectRepository.getFeatured(10);
 
@@ -350,10 +362,7 @@ describe('ProjectRepository', () => {
         where: {
           isFeatured: true,
           status: 'active',
-          OR: [
-            { featuredUntil: null },
-            { featuredUntil: { gte: expect.any(Date) } },
-          ],
+          OR: [{ featuredUntil: null }, { featuredUntil: { gte: expect.any(Date) } }],
         },
         take: 10,
         orderBy: { createdAt: 'desc' },

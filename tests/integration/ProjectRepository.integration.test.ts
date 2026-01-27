@@ -140,7 +140,7 @@ describe('ProjectRepository (Integration)', () => {
       const seller = await createTestSeller({ username: 'johndoe' });
       const project = await createTestProject({ sellerId: seller.id });
 
-      const foundProject = await projectRepository.findById(project.id, true) as any;
+      const foundProject = (await projectRepository.findById(project.id, true)) as any;
 
       expect(foundProject).toBeTruthy();
       expect(foundProject?.seller).toBeDefined();
@@ -295,7 +295,9 @@ describe('ProjectRepository (Integration)', () => {
 
       expect(result.projects.length).toBeGreaterThanOrEqual(2);
       expect(
-        result.projects.some((p) => p.title.includes('React') || p.description.includes('React'))
+        result.projects.some(
+          (p) => p.title.includes('React') || p.description.includes('React')
+        )
       ).toBe(true);
     });
 
@@ -337,7 +339,9 @@ describe('ProjectRepository (Integration)', () => {
 
       expect(result.projects.length).toBeGreaterThanOrEqual(1);
       expect(
-        result.projects.every((p) => p.completionPercentage >= 80 && p.completionPercentage <= 95)
+        result.projects.every(
+          (p) => p.completionPercentage >= 80 && p.completionPercentage <= 95
+        )
       ).toBe(true);
     });
 
@@ -348,9 +352,9 @@ describe('ProjectRepository (Integration)', () => {
       );
 
       expect(result.projects.length).toBeGreaterThanOrEqual(1);
-      expect(result.projects.every((p) => p.priceCents >= 50000 && p.priceCents <= 150000)).toBe(
-        true
-      );
+      expect(
+        result.projects.every((p) => p.priceCents >= 50000 && p.priceCents <= 150000)
+      ).toBe(true);
     });
 
     it('should filter by status', async () => {
@@ -509,9 +513,21 @@ describe('ProjectRepository (Integration)', () => {
     it('should respect limit parameter', async () => {
       const seller = await createTestSeller();
 
-      await createTestProject({ sellerId: seller.id, isFeatured: true, status: 'active' });
-      await createTestProject({ sellerId: seller.id, isFeatured: true, status: 'active' });
-      await createTestProject({ sellerId: seller.id, isFeatured: true, status: 'active' });
+      await createTestProject({
+        sellerId: seller.id,
+        isFeatured: true,
+        status: 'active',
+      });
+      await createTestProject({
+        sellerId: seller.id,
+        isFeatured: true,
+        status: 'active',
+      });
+      await createTestProject({
+        sellerId: seller.id,
+        isFeatured: true,
+        status: 'active',
+      });
 
       const featured = await projectRepository.getFeatured(2);
       expect(featured.length).toBe(2);

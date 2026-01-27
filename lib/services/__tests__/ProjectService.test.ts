@@ -6,7 +6,11 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ProjectService, ProjectValidationError, ProjectPermissionError } from '../ProjectService';
+import {
+  ProjectService,
+  ProjectValidationError,
+  ProjectPermissionError,
+} from '../ProjectService';
 import type { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 import type { UserRepository } from '@/lib/repositories/UserRepository';
 import type { SubscriptionService } from '../SubscriptionService';
@@ -123,7 +127,9 @@ describe('ProjectService', () => {
         updatedAt: new Date(),
       };
 
-      vi.mocked(mockProjectRepository.create).mockResolvedValue(mockCreatedProject as any);
+      vi.mocked(mockProjectRepository.create).mockResolvedValue(
+        mockCreatedProject as any
+      );
 
       const result = await projectService.createProject(sellerId, validProjectData);
 
@@ -443,7 +449,11 @@ describe('ProjectService', () => {
 
       vi.mocked(mockProjectRepository.update).mockResolvedValue(updatedProject as any);
 
-      const result = await projectService.updateProject('project123', 'seller123', updateData);
+      const result = await projectService.updateProject(
+        'project123',
+        'seller123',
+        updateData
+      );
 
       expect(result).toEqual(updatedProject);
       expect(mockProjectRepository.update).toHaveBeenCalledWith('project123', updateData);
@@ -451,7 +461,9 @@ describe('ProjectService', () => {
 
     it('should reject update when user is not the seller', async () => {
       await expect(
-        projectService.updateProject('project123', 'different-user', { title: 'New Title' })
+        projectService.updateProject('project123', 'different-user', {
+          title: 'New Title',
+        })
       ).rejects.toThrow(ProjectPermissionError);
 
       expect(mockProjectRepository.update).not.toHaveBeenCalled();
@@ -588,7 +600,9 @@ describe('ProjectService', () => {
         description: undefined,
       };
 
-      vi.mocked(mockProjectRepository.findById).mockResolvedValue(incompleteProject as any);
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
+        incompleteProject as any
+      );
 
       await expect(
         projectService.publishProject('project123', 'seller123')
@@ -614,7 +628,9 @@ describe('ProjectService', () => {
         viewCount: 1,
       } as any);
 
-      const result = await projectService.getProject('project123', { incrementView: true });
+      const result = await projectService.getProject('project123', {
+        incrementView: true,
+      });
 
       expect(mockProjectRepository.incrementViewCount).toHaveBeenCalledWith('project123');
       expect(result).toBeDefined();

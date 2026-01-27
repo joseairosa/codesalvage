@@ -115,7 +115,10 @@ export class ReviewRepository {
    * });
    */
   async create(data: CreateReviewInput): Promise<ReviewWithRelations> {
-    console.log('[ReviewRepository] Creating review for transaction:', data.transactionId);
+    console.log(
+      '[ReviewRepository] Creating review for transaction:',
+      data.transactionId
+    );
 
     try {
       const review = await this.prisma.review.create({

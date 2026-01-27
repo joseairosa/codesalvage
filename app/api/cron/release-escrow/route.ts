@@ -86,7 +86,9 @@ export async function GET() {
       take: 50, // Process max 50 at a time
     });
 
-    console.log(`[${componentName}] Found ${transactions.length} transactions to release`);
+    console.log(
+      `[${componentName}] Found ${transactions.length} transactions to release`
+    );
 
     let successCount = 0;
     let errorCount = 0;

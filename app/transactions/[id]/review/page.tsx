@@ -18,7 +18,13 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -153,7 +159,8 @@ export default function ReviewSubmissionPage({ params }: { params: { id: string 
         <Alert className="border-green-500">
           <CheckCircle2 className="h-5 w-5 text-green-500" />
           <AlertDescription>
-            <strong>Review submitted!</strong> Thank you for your feedback. Redirecting to your purchases...
+            <strong>Review submitted!</strong> Thank you for your feedback. Redirecting to
+            your purchases...
           </AlertDescription>
         </Alert>
       </div>

@@ -29,7 +29,8 @@ afterEach(() => {
  */
 process.env['NODE_ENV'] = 'test';
 process.env['NEXT_PUBLIC_APP_URL'] = 'http://localhost:3011';
-process.env['DATABASE_URL'] = 'postgresql://projectfinish_test:password_test@localhost:5445/projectfinish_test';
+process.env['DATABASE_URL'] =
+  'postgresql://projectfinish_test:password_test@localhost:5445/projectfinish_test';
 process.env['REDIS_URL'] = 'redis://localhost:6391';
 process.env['AUTH_SECRET'] = 'test-secret-key-for-testing-only';
 process.env['AUTH_GITHUB_ID'] = 'test-github-id';

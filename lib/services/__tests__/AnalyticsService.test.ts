@@ -5,7 +5,11 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { AnalyticsService, AnalyticsPermissionError, AnalyticsValidationError } from '../AnalyticsService';
+import {
+  AnalyticsService,
+  AnalyticsPermissionError,
+  AnalyticsValidationError,
+} from '../AnalyticsService';
 import type { AnalyticsRepository } from '../../repositories/AnalyticsRepository';
 import type { UserRepository } from '../../repositories/UserRepository';
 
@@ -77,17 +81,12 @@ describe('AnalyticsService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    analyticsService = new AnalyticsService(
-      mockAnalyticsRepository,
-      mockUserRepository
-    );
+    analyticsService = new AnalyticsService(mockAnalyticsRepository, mockUserRepository);
   });
 
   describe('getSellerAnalyticsOverview', () => {
     it('should return formatted analytics overview', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue(
         mockAnalyticsOverview
       );
@@ -108,9 +107,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should format currency correctly', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue({
         ...mockAnalyticsOverview,
         summary: {
@@ -125,9 +122,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should format percentages correctly', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue({
         ...mockAnalyticsOverview,
         summary: {
@@ -164,9 +159,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should use default date range (last 30 days) if not provided', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue(
         mockAnalyticsOverview
       );
@@ -182,18 +175,18 @@ describe('AnalyticsService', () => {
       );
 
       // Verify date range is approximately 30 days
-      const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock.calls[0];
+      const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock
+        .calls[0];
       const dateRange = call[1];
       const daysDiff = Math.round(
-        (dateRange.endDate.getTime() - dateRange.startDate.getTime()) / (1000 * 60 * 60 * 24)
+        (dateRange.endDate.getTime() - dateRange.startDate.getTime()) /
+          (1000 * 60 * 60 * 24)
       );
       expect(daysDiff).toBeCloseTo(30, 0);
     });
 
     it('should throw AnalyticsValidationError for invalid start date', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
 
       await expect(
         analyticsService.getSellerAnalyticsOverview('user123', {
@@ -209,9 +202,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should throw AnalyticsValidationError for invalid end date', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
 
       await expect(
         analyticsService.getSellerAnalyticsOverview('user123', {
@@ -227,9 +218,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should throw AnalyticsValidationError if start date is after end date', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
 
       await expect(
         analyticsService.getSellerAnalyticsOverview('user123', {
@@ -247,9 +236,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should limit date range to 1 year', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue(
         mockAnalyticsOverview
       );
@@ -264,7 +251,8 @@ describe('AnalyticsService', () => {
       });
 
       // Verify start date was adjusted to 1 year ago
-      const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock.calls[0];
+      const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock
+        .calls[0];
       const dateRange = call[1];
       const yearsDiff =
         (dateRange.endDate.getTime() - dateRange.startDate.getTime()) /
@@ -275,9 +263,7 @@ describe('AnalyticsService', () => {
 
   describe('getSellerRevenueSummary', () => {
     it('should return formatted revenue summary', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerRevenueSummary).mockResolvedValue(
         mockRevenueSummary
       );
@@ -299,15 +285,13 @@ describe('AnalyticsService', () => {
         createMockUser({ isSeller: false }) as any
       );
 
-      await expect(
-        analyticsService.getSellerRevenueSummary('user123')
-      ).rejects.toThrow(AnalyticsPermissionError);
+      await expect(analyticsService.getSellerRevenueSummary('user123')).rejects.toThrow(
+        AnalyticsPermissionError
+      );
     });
 
     it('should apply date range filter', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerRevenueSummary).mockResolvedValue(
         mockRevenueSummary
       );
@@ -329,9 +313,7 @@ describe('AnalyticsService', () => {
 
   describe('getTopProjects', () => {
     it('should return formatted top projects', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getTopProjects).mockResolvedValue(
         mockTopProjects
       );
@@ -356,15 +338,13 @@ describe('AnalyticsService', () => {
         createMockUser({ isSeller: false }) as any
       );
 
-      await expect(
-        analyticsService.getTopProjects('user123', 10)
-      ).rejects.toThrow(AnalyticsPermissionError);
+      await expect(analyticsService.getTopProjects('user123', 10)).rejects.toThrow(
+        AnalyticsPermissionError
+      );
     });
 
     it('should pass limit parameter to repository', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getTopProjects).mockResolvedValue(
         mockTopProjects
       );
@@ -379,9 +359,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should default to 10 projects if limit not provided', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getTopProjects).mockResolvedValue(
         mockTopProjects
       );
@@ -396,9 +374,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should apply date range filter', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getTopProjects).mockResolvedValue(
         mockTopProjects
       );
@@ -421,9 +397,7 @@ describe('AnalyticsService', () => {
 
   describe('Date Range Normalization', () => {
     it('should parse valid ISO date strings', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue(
         mockAnalyticsOverview
       );
@@ -434,7 +408,8 @@ describe('AnalyticsService', () => {
         endDate: '2025-06-30',
       });
 
-      const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock.calls[0];
+      const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock
+        .calls[0];
       const dateRange = call[1];
 
       expect(dateRange.startDate).toBeInstanceOf(Date);
@@ -444,9 +419,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should handle date-only strings (without time)', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue(
         mockAnalyticsOverview
       );
@@ -456,7 +429,8 @@ describe('AnalyticsService', () => {
         endDate: '2026-01-31',
       });
 
-      const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock.calls[0];
+      const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock
+        .calls[0];
       const dateRange = call[1];
 
       expect(dateRange.startDate).toBeInstanceOf(Date);
@@ -466,9 +440,7 @@ describe('AnalyticsService', () => {
 
   describe('Currency Formatting', () => {
     it('should format zero cents as $0.00', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue({
         ...mockAnalyticsOverview,
         summary: {
@@ -483,9 +455,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should format large amounts with commas', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue({
         ...mockAnalyticsOverview,
         summary: {
@@ -502,9 +472,7 @@ describe('AnalyticsService', () => {
 
   describe('Percentage Formatting', () => {
     it('should format zero as 0.00%', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue({
         ...mockAnalyticsOverview,
         summary: {
@@ -519,9 +487,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should format very small percentages correctly', async () => {
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(
-        createMockUser() as any
-      );
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue({
         ...mockAnalyticsOverview,
         summary: {

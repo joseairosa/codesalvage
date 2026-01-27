@@ -69,7 +69,9 @@ export class AuthService {
    * @example
    * const { user, isNewUser } = await authService.handleGitHubSignIn(githubProfile);
    */
-  async handleGitHubSignIn(profile: GitHubProfile): Promise<{ user: any; isNewUser: boolean }> {
+  async handleGitHubSignIn(
+    profile: GitHubProfile
+  ): Promise<{ user: any; isNewUser: boolean }> {
     console.log('[AuthService] handleGitHubSignIn called:', {
       githubId: profile.id,
       username: profile.login,

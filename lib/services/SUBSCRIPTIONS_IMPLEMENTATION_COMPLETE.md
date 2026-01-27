@@ -18,12 +18,14 @@ Implemented Premium Seller Subscriptions feature allowing sellers to upgrade fro
 ### 3-Layer Pattern (Repository → Service → API Routes)
 
 **Layer 1: Data Access (SubscriptionRepository)**
+
 - 11 repository methods for CRUD operations
 - Type-safe Prisma operations
 - Comprehensive error handling
 - 100% test coverage (32 unit tests passing)
 
 **Layer 2: Business Logic (SubscriptionService)**
+
 - Stripe subscription management
 - Customer creation/reuse logic
 - Validation and permission checks
@@ -31,6 +33,7 @@ Implemented Premium Seller Subscriptions feature allowing sellers to upgrade fro
 - 93.8% test coverage (24 unit tests passing)
 
 **Layer 3: HTTP Interface (API Routes)**
+
 - 3 REST endpoints: `/api/subscriptions`, `/api/subscriptions/portal`, `/api/subscriptions/pricing`
 - Zod schema validation
 - Auth via NextAuth session
@@ -43,12 +46,14 @@ Implemented Premium Seller Subscriptions feature allowing sellers to upgrade fro
 ### Subscription Plans
 
 **Free Plan** (default):
+
 - 3 listing limit
 - Basic analytics
 - No featured listing discounts
 - No verification badge
 
 **Pro Plan** ($9.99/month):
+
 - Unlimited listings
 - Advanced analytics
 - 20% off featured listings
@@ -120,6 +125,7 @@ model Subscription {
 ## API Endpoints
 
 ### POST /api/subscriptions
+
 **Create new subscription**
 
 ```typescript
@@ -147,6 +153,7 @@ model Subscription {
 ```
 
 **Validation**:
+
 - User must be authenticated
 - User must be a seller (`isSeller: true`)
 - Cannot create duplicate active subscriptions
@@ -154,6 +161,7 @@ model Subscription {
 - Plan must be 'free' or 'pro'
 
 ### GET /api/subscriptions
+
 **Get subscription status**
 
 ```typescript
@@ -182,6 +190,7 @@ model Subscription {
 **Note**: Returns free plan details if no subscription exists.
 
 ### DELETE /api/subscriptions
+
 **Cancel subscription**
 
 ```typescript
@@ -204,6 +213,7 @@ model Subscription {
 **Behavior**: Subscription remains active until current period ends.
 
 ### POST /api/subscriptions/portal
+
 **Create Stripe Customer Portal session**
 
 ```typescript
@@ -226,6 +236,7 @@ model Subscription {
 **Portal Features**: Update payment method, view invoices, cancel subscription, download receipts.
 
 ### GET /api/subscriptions/pricing
+
 **Get pricing tiers (public endpoint)**
 
 ```typescript
@@ -297,21 +308,26 @@ Enhanced `/api/webhooks/stripe/route.ts` with 5 new subscription event handlers:
 ```typescript
 class SubscriptionRepository {
   // Core CRUD
-  async create(data: CreateSubscriptionInput): Promise<Subscription>
-  async findByUserId(userId: string): Promise<Subscription | null>
-  async findByStripeSubscriptionId(stripeSubscriptionId: string): Promise<Subscription | null>
-  async update(userId: string, data: UpdateSubscriptionInput): Promise<Subscription>
-  async updateByStripeId(stripeSubscriptionId: string, data: UpdateSubscriptionInput): Promise<Subscription>
-  async delete(userId: string): Promise<Subscription>
+  async create(data: CreateSubscriptionInput): Promise<Subscription>;
+  async findByUserId(userId: string): Promise<Subscription | null>;
+  async findByStripeSubscriptionId(
+    stripeSubscriptionId: string
+  ): Promise<Subscription | null>;
+  async update(userId: string, data: UpdateSubscriptionInput): Promise<Subscription>;
+  async updateByStripeId(
+    stripeSubscriptionId: string,
+    data: UpdateSubscriptionInput
+  ): Promise<Subscription>;
+  async delete(userId: string): Promise<Subscription>;
 
   // Queries
-  async isActive(userId: string): Promise<boolean>
-  async findAllActive(): Promise<Subscription[]>
-  async findByStatus(status: string): Promise<Subscription[]>
+  async isActive(userId: string): Promise<boolean>;
+  async findAllActive(): Promise<Subscription[]>;
+  async findByStatus(status: string): Promise<Subscription[]>;
 
   // Counting
-  async count(status?: string): Promise<number>
-  async countByUser(userId: string): Promise<number>
+  async count(status?: string): Promise<number>;
+  async countByUser(userId: string): Promise<number>;
 }
 ```
 
@@ -370,20 +386,24 @@ export class SubscriptionNotFoundError extends Error
 ### Error Scenarios
 
 **Validation Errors (400)**:
+
 - Invalid plan name
 - Missing payment method for paid plan
 - Already has active subscription
 - Stripe validation errors
 
 **Permission Errors (403)**:
+
 - User is not a seller
 - Cannot subscribe as buyer
 
 **Not Found Errors (404)**:
+
 - Subscription doesn't exist
 - User not found
 
 **Stripe Errors (500)**:
+
 - Customer creation failed
 - Payment method attachment failed
 - Subscription creation failed
@@ -396,6 +416,7 @@ export class SubscriptionNotFoundError extends Error
 ### Unit Tests
 
 **SubscriptionRepository.test.ts** (32 tests):
+
 - CRUD operations
 - Query methods
 - Error handling
@@ -403,6 +424,7 @@ export class SubscriptionNotFoundError extends Error
 - 100% coverage
 
 **SubscriptionService.test.ts** (24 tests):
+
 - Subscription creation flow
 - Cancel/resume operations
 - Status checks
@@ -412,6 +434,7 @@ export class SubscriptionNotFoundError extends Error
 - 93.8% coverage
 
 **Mock Setup**:
+
 ```typescript
 vi.mock('@/lib/stripe', () => ({
   stripe: {
@@ -434,24 +457,26 @@ class MockStripeError extends Error {
 ### Integration Tests
 
 **SubscriptionService.integration.test.ts** (comprehensive):
+
 - Real database operations (setupTestDatabase/cleanDatabase)
 - Mocked Stripe API calls
 - Tests all service methods end-to-end
 - Verifies database state after operations
 
 **Test Patterns**:
+
 ```typescript
 it('should create subscription successfully for seller', async () => {
   const seller = await createTestUser({ username: 'pro-seller', isSeller: true });
 
   const result = await subscriptionService.createSubscription(seller.id, {
     plan: 'pro',
-    paymentMethodId: 'pm_test123'
+    paymentMethodId: 'pm_test123',
   });
 
   expect(result).toMatchObject({
     subscriptionId: 'sub_test123',
-    status: 'active'
+    status: 'active',
   });
 
   const dbSubscription = await subscriptionRepository.findByUserId(seller.id);
@@ -466,37 +491,46 @@ it('should create subscription successfully for seller', async () => {
 ### Created Files (11 new files)
 
 **Database**:
+
 - `prisma/migrations/20260126_add_subscriptions/migration.sql` - Subscriptions table migration
 
 **Repositories**:
+
 - `lib/repositories/SubscriptionRepository.ts` (434 lines) - Data access layer
 - `lib/repositories/__tests__/SubscriptionRepository.test.ts` (667 lines) - 32 unit tests
 
 **Services**:
+
 - `lib/services/SubscriptionService.ts` (516 lines) - Business logic + Stripe
 - `lib/services/__tests__/SubscriptionService.test.ts` (598 lines) - 24 unit tests
 
 **API Routes**:
+
 - `app/api/subscriptions/route.ts` - GET (status), POST (create), DELETE (cancel)
 - `app/api/subscriptions/portal/route.ts` - POST (Stripe portal session)
 - `app/api/subscriptions/pricing/route.ts` - GET (public pricing)
 
 **Integration Tests**:
+
 - `tests/integration/SubscriptionService.integration.test.ts` - End-to-end tests
 
 **Documentation**:
+
 - `lib/services/SUBSCRIPTIONS_IMPLEMENTATION_COMPLETE.md` - This document
 
 ### Modified Files (5 files)
 
 **Database Schema**:
+
 - `prisma/schema.prisma` - Added Subscription model and User relation
 
 **Barrel Exports**:
+
 - `lib/repositories/index.ts` - Export SubscriptionRepository and types
 - `lib/services/index.ts` - Export SubscriptionService, errors, and types
 
 **Webhooks**:
+
 - `app/api/webhooks/stripe/route.ts` - Added 5 subscription event handlers
 
 ---
@@ -520,6 +554,7 @@ NEXT_PUBLIC_APP_URL="https://yourapp.com"
 ### Frontend Requirements
 
 **Subscription UI Components** (to be implemented):
+
 - Pricing page at `/pricing`
 - Subscription management at `/settings/subscription`
 - Pro badge display on seller profiles
@@ -527,43 +562,48 @@ NEXT_PUBLIC_APP_URL="https://yourapp.com"
 - Featured listing discount applied at checkout
 
 **API Integration**:
+
 ```typescript
 // Get pricing
-const { pricing } = await fetch('/api/subscriptions/pricing').then(r => r.json());
+const { pricing } = await fetch('/api/subscriptions/pricing').then((r) => r.json());
 
 // Subscribe to Pro
 const { subscription } = await fetch('/api/subscriptions', {
   method: 'POST',
-  body: JSON.stringify({ plan: 'pro', paymentMethodId: 'pm_xxx' })
-}).then(r => r.json());
+  body: JSON.stringify({ plan: 'pro', paymentMethodId: 'pm_xxx' }),
+}).then((r) => r.json());
 
 // Check status
-const { subscription } = await fetch('/api/subscriptions').then(r => r.json());
+const { subscription } = await fetch('/api/subscriptions').then((r) => r.json());
 if (subscription.benefits.unlimitedListings) {
   // Allow unlimited project creation
 }
 
 // Open Customer Portal
 const { url } = await fetch('/api/subscriptions/portal', {
-  method: 'POST'
-}).then(r => r.json());
+  method: 'POST',
+}).then((r) => r.json());
 window.location.href = url;
 ```
 
 ### Business Logic Integration
 
 **Project Creation** (to be implemented):
+
 ```typescript
 // In ProjectService.createProject()
 const status = await subscriptionService.getSubscriptionStatus(userId);
 const projectCount = await projectRepository.countByUser(userId);
 
 if (!status.benefits.unlimitedListings && projectCount >= 3) {
-  throw new ProjectValidationError('Free plan limited to 3 projects. Upgrade to Pro for unlimited listings.');
+  throw new ProjectValidationError(
+    'Free plan limited to 3 projects. Upgrade to Pro for unlimited listings.'
+  );
 }
 ```
 
 **Featured Listing Discount** (to be implemented):
+
 ```typescript
 // In FeaturedListingService.calculateCost()
 const status = await subscriptionService.getSubscriptionStatus(userId);
@@ -572,6 +612,7 @@ const finalCost = baseCost * (1 - discountPercent / 100);
 ```
 
 **Seller Verification Badge** (to be implemented):
+
 ```typescript
 // In Seller Profile UI
 if (subscription.benefits.verificationBadge && user.isVerifiedSeller) {
@@ -586,6 +627,7 @@ if (subscription.benefits.verificationBadge && user.isVerifiedSeller) {
 ### Immediate TODOs
 
 1. **Separate Stripe Customer ID Field**
+
    ```typescript
    // Currently reusing stripeAccountId (Stripe Connect)
    // TODO: Add separate stripeCustomerId field on User model
@@ -626,6 +668,7 @@ if (subscription.benefits.verificationBadge && user.isVerifiedSeller) {
 ## Success Metrics
 
 ### Test Results
+
 - ✅ **498/501 tests passing** (99.4% pass rate)
 - ✅ **+56 new tests** added (32 repository + 24 service)
 - ✅ **3 pre-existing failures** (not subscription-related)
@@ -633,11 +676,13 @@ if (subscription.benefits.verificationBadge && user.isVerifiedSeller) {
   - UserRepository duplicate email/username error messages
 
 ### Coverage
+
 - ✅ **SubscriptionRepository**: 100% coverage
 - ✅ **SubscriptionService**: 93.8% lines, 89.13% branches
 - ✅ **Overall business logic**: 79-82% (above 80% target)
 
 ### Architecture Compliance
+
 - ✅ **3-layer architecture** maintained
 - ✅ **Single Responsibility Principle** followed
 - ✅ **Dependency injection** pattern used
@@ -651,6 +696,7 @@ if (subscription.benefits.verificationBadge && user.isVerifiedSeller) {
 Before deploying to production:
 
 ### Stripe Configuration
+
 - [ ] Create Pro plan price in Stripe Dashboard
 - [ ] Set `STRIPE_PRO_PRICE_ID` environment variable
 - [ ] Configure webhook endpoint: `https://yourapp.com/api/webhooks/stripe`
@@ -663,17 +709,20 @@ Before deploying to production:
 - [ ] Test webhooks with Stripe CLI: `stripe listen --forward-to localhost:3011/api/webhooks/stripe`
 
 ### Database
+
 - [ ] Run Prisma migration: `npx prisma migrate deploy`
 - [ ] Verify subscriptions table created
 - [ ] Check indexes created correctly
 
 ### Environment
+
 - [ ] Set `STRIPE_PRO_PRICE_ID` in production
 - [ ] Verify `STRIPE_SECRET_KEY` is live key (not test key)
 - [ ] Verify `STRIPE_WEBHOOK_SECRET` matches production webhook
 - [ ] Verify `NEXT_PUBLIC_APP_URL` is production URL
 
 ### Testing
+
 - [ ] Test subscription creation in staging
 - [ ] Test payment failure scenario
 - [ ] Test cancellation flow
@@ -681,6 +730,7 @@ Before deploying to production:
 - [ ] Verify webhooks received and processed
 
 ### Frontend
+
 - [ ] Deploy pricing page
 - [ ] Deploy subscription management UI
 - [ ] Add Pro badge to seller profiles
@@ -688,6 +738,7 @@ Before deploying to production:
 - [ ] Implement featured listing discounts
 
 ### Monitoring
+
 - [ ] Setup Stripe webhook monitoring
 - [ ] Setup subscription creation alerts
 - [ ] Setup payment failure alerts
@@ -704,6 +755,7 @@ Before deploying to production:
 **Tests Written**: 56
 
 **Phase Breakdown**:
+
 1. Database schema (30 min) ✅
 2. SubscriptionRepository + tests (90 min) ✅
 3. SubscriptionService + tests (120 min) ✅
@@ -745,11 +797,13 @@ Before deploying to production:
 ## References
 
 **Stripe Documentation**:
+
 - [Subscriptions Overview](https://stripe.com/docs/billing/subscriptions/overview)
 - [Customer Portal](https://stripe.com/docs/billing/subscriptions/integrating-customer-portal)
 - [Webhooks](https://stripe.com/docs/webhooks)
 
 **Project Documentation**:
+
 - Architecture Overview: `/Users/joseairosa/.claude/plans/wiggly-toasting-puffin.md`
 - Featured Listings: `/Users/joseairosa/Development/recycleai/app/api/featured/IMPLEMENTATION_COMPLETE.md`
 - Prisma Schema: `/Users/joseairosa/Development/recycleai/prisma/schema.prisma`
@@ -762,4 +816,4 @@ Before deploying to production:
 
 ---
 
-*Generated on January 26, 2026*
+_Generated on January 26, 2026_

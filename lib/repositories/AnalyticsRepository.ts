@@ -134,9 +134,7 @@ export class AnalyticsRepository {
     const totalViews = projects.reduce((sum, p) => sum + p.viewCount, 0);
     const averageProjectPriceCents =
       projects.length > 0
-        ? Math.round(
-            projects.reduce((sum, p) => sum + p.priceCents, 0) / projects.length
-          )
+        ? Math.round(projects.reduce((sum, p) => sum + p.priceCents, 0) / projects.length)
         : 0;
 
     const conversionRate =
@@ -191,10 +189,7 @@ export class AnalyticsRepository {
       // Skip transactions without completedAt date
       if (!transaction.completedAt) continue;
 
-      const date = this.formatDateByGranularity(
-        transaction.completedAt,
-        granularity
-      );
+      const date = this.formatDateByGranularity(transaction.completedAt, granularity);
 
       const existing = revenueByDate.get(date) || { revenue: 0, count: 0 };
       revenueByDate.set(date, {
@@ -253,29 +248,27 @@ export class AnalyticsRepository {
     });
 
     // Calculate metrics for each project
-    const projectMetrics: ProjectPerformanceMetrics[] = projects.map(
-      (project) => {
-        const purchaseCount = project.transactions.length;
-        const revenueCents = project.transactions.reduce(
-          (sum, t) => sum + t.sellerReceivesCents,
-          0
-        );
-        const conversionRate =
-          project.viewCount > 0
-            ? Number((purchaseCount / project.viewCount).toFixed(4))
-            : 0;
+    const projectMetrics: ProjectPerformanceMetrics[] = projects.map((project) => {
+      const purchaseCount = project.transactions.length;
+      const revenueCents = project.transactions.reduce(
+        (sum, t) => sum + t.sellerReceivesCents,
+        0
+      );
+      const conversionRate =
+        project.viewCount > 0
+          ? Number((purchaseCount / project.viewCount).toFixed(4))
+          : 0;
 
-        return {
-          projectId: project.id,
-          title: project.title,
-          viewCount: project.viewCount,
-          favoriteCount: project.favoriteCount,
-          purchaseCount,
-          revenueCents,
-          conversionRate,
-        };
-      }
-    );
+      return {
+        projectId: project.id,
+        title: project.title,
+        viewCount: project.viewCount,
+        favoriteCount: project.favoriteCount,
+        purchaseCount,
+        revenueCents,
+        conversionRate,
+      };
+    });
 
     // Filter out projects with no revenue, sort by revenue (descending), and take top N
     return projectMetrics

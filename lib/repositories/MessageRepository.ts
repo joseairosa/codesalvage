@@ -374,7 +374,11 @@ export class MessageRepository {
             b.latestMessage.createdAt.getTime() - a.latestMessage.createdAt.getTime()
         );
 
-      console.log('[MessageRepository] Found', validConversations.length, 'conversations');
+      console.log(
+        '[MessageRepository] Found',
+        validConversations.length,
+        'conversations'
+      );
       return validConversations;
     } catch (error) {
       console.error('[MessageRepository] getConversations failed:', error);

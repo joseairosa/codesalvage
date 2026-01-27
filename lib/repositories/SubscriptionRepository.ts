@@ -157,7 +157,9 @@ export class SubscriptionRepository {
    * @example
    * const subscription = await subscriptionRepo.findByStripeSubscriptionId('sub_xxx');
    */
-  async findByStripeSubscriptionId(stripeSubscriptionId: string): Promise<Subscription | null> {
+  async findByStripeSubscriptionId(
+    stripeSubscriptionId: string
+  ): Promise<Subscription | null> {
     console.log(
       '[SubscriptionRepository] Finding subscription by Stripe ID:',
       stripeSubscriptionId
@@ -215,7 +217,10 @@ export class SubscriptionRepository {
       });
 
       if (subscription) {
-        console.log('[SubscriptionRepository] Subscription with user found:', subscription.id);
+        console.log(
+          '[SubscriptionRepository] Subscription with user found:',
+          subscription.id
+        );
       } else {
         console.log('[SubscriptionRepository] Subscription not found:', id);
       }
@@ -300,7 +305,9 @@ export class SubscriptionRepository {
           throw new Error('[SubscriptionRepository] Subscription not found');
         }
       }
-      throw new Error('[SubscriptionRepository] Failed to update subscription by Stripe ID');
+      throw new Error(
+        '[SubscriptionRepository] Failed to update subscription by Stripe ID'
+      );
     }
   }
 
@@ -353,7 +360,8 @@ export class SubscriptionRepository {
         select: { status: true },
       });
 
-      const isActive = subscription?.status === 'active' || subscription?.status === 'trialing';
+      const isActive =
+        subscription?.status === 'active' || subscription?.status === 'trialing';
       console.log('[SubscriptionRepository] Subscription active status:', isActive);
 
       return isActive;
@@ -381,7 +389,10 @@ export class SubscriptionRepository {
         },
       });
 
-      console.log('[SubscriptionRepository] Found active subscriptions:', subscriptions.length);
+      console.log(
+        '[SubscriptionRepository] Found active subscriptions:',
+        subscriptions.length
+      );
       return subscriptions;
     } catch (error) {
       console.error('[SubscriptionRepository] findAllActive failed:', error);

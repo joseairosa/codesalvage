@@ -29,7 +29,10 @@ const componentName = 'SubscriptionsAPI';
 // Initialize repositories and service
 const subscriptionRepository = new SubscriptionRepository(prisma);
 const userRepository = new UserRepository(prisma);
-const subscriptionService = new SubscriptionService(subscriptionRepository, userRepository);
+const subscriptionService = new SubscriptionService(
+  subscriptionRepository,
+  userRepository
+);
 
 const createSubscriptionSchema = z.object({
   plan: z.enum(['pro']),
@@ -114,7 +117,10 @@ export async function POST(request: Request) {
       subscriptionRequest.paymentMethodId = paymentMethodId;
     }
 
-    const result = await subscriptionService.createSubscription(session.user.id, subscriptionRequest);
+    const result = await subscriptionService.createSubscription(
+      session.user.id,
+      subscriptionRequest
+    );
 
     console.log(`[${componentName}] Subscription created:`, result.subscriptionId);
 

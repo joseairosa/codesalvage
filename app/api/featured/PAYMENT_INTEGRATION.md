@@ -13,12 +13,14 @@ Sellers can purchase featured placement for their projects using Stripe. The pay
 ## Payment Flow
 
 ### 1. **Create Payment Intent**
+
 ```
 POST /api/featured/create-payment-intent
 Body: { projectId: "project123", durationDays: 7 }
 ```
 
 **What happens:**
+
 - Validates seller authentication and permissions
 - Validates project ownership and status
 - Calculates cost based on duration (7/14/30 days)
@@ -28,15 +30,18 @@ Body: { projectId: "project123", durationDays: 7 }
 **Does NOT immediately set featured status** - waits for webhook confirmation.
 
 ### 2. **User Completes Payment**
+
 Frontend uses Stripe Elements with `clientSecret` to collect payment.
 
 ### 3. **Webhook Confirms Payment**
+
 ```
 POST /api/webhooks/stripe
 Event: payment_intent.succeeded
 ```
 
 **What happens:**
+
 - Stripe sends `payment_intent.succeeded` event
 - Webhook checks `metadata.featuredListingPurchase === 'true'`
 - Calls `featuredListingService.purchaseFeaturedPlacement()`
@@ -54,25 +59,28 @@ Creates Stripe Payment Intent for featured listing purchase.
 **Authentication:** Required (seller only)
 
 **Request Body:**
+
 ```typescript
 {
-  projectId: string;    // Project to feature
+  projectId: string; // Project to feature
   durationDays: number; // Must be 7, 14, or 30
 }
 ```
 
 **Response (201):**
+
 ```typescript
 {
-  clientSecret: string;      // For Stripe Elements
-  paymentIntentId: string;   // Stripe Payment Intent ID
-  amount: number;            // Cost in cents
-  durationDays: number;      // Duration purchased
-  projectId: string;         // Project ID
+  clientSecret: string; // For Stripe Elements
+  paymentIntentId: string; // Stripe Payment Intent ID
+  amount: number; // Cost in cents
+  durationDays: number; // Duration purchased
+  projectId: string; // Project ID
 }
 ```
 
 **Validation Rules:**
+
 - User must be authenticated
 - User must be a seller (`isSeller === true`)
 - User must own the project
@@ -80,6 +88,7 @@ Creates Stripe Payment Intent for featured listing purchase.
 - Duration must be 7, 14, or 30 days
 
 **Error Responses:**
+
 - `401` - Unauthorized (no session)
 - `403` - Forbidden (not a seller, or not project owner)
 - `404` - Project not found
@@ -87,6 +96,7 @@ Creates Stripe Payment Intent for featured listing purchase.
 - `500` - Server error (Stripe error, etc.)
 
 **Example:**
+
 ```bash
 curl -X POST http://localhost:3011/api/featured/create-payment-intent \
   -H "Content-Type: application/json" \
@@ -106,6 +116,7 @@ curl -X POST http://localhost:3011/api/featured/create-payment-intent \
 Manually sets project as featured WITHOUT payment.
 
 **Use cases:**
+
 - Promotional featured placements
 - Refunds/compensations
 - Testing
@@ -121,10 +132,12 @@ Regular sellers should use `POST /api/featured/create-payment-intent`.
 Handles Stripe webhook events, including featured listing payments.
 
 **Event Handling:**
+
 - `payment_intent.succeeded` - Confirms payment and sets featured status
 - `payment_intent.payment_failed` - Logs failure (no featured status set)
 
 **Metadata Required:**
+
 ```typescript
 {
   featuredListingPurchase: 'true',  // Identifies featured listing
@@ -140,7 +153,7 @@ Handles Stripe webhook events, including featured listing payments.
 ## Pricing Tiers
 
 | Duration | Cost (USD) | Cost (Cents) |
-|----------|------------|--------------|
+| -------- | ---------- | ------------ |
 | 7 days   | $29.99     | 2999         |
 | 14 days  | $49.99     | 4999         |
 | 30 days  | $79.99     | 7999         |
@@ -163,6 +176,7 @@ model Project {
 ```
 
 **How it works:**
+
 1. Payment Intent created - project not yet featured
 2. Payment succeeds - webhook sets `isFeatured = true`, `featuredUntil = now + duration`
 3. Cron job runs hourly - unfeatures expired projects (`featuredUntil <= now`)
@@ -172,6 +186,7 @@ model Project {
 ## Stripe Payment Intent Metadata
 
 **Transaction Purchases** (existing):
+
 ```typescript
 {
   transactionId: string,
@@ -184,6 +199,7 @@ model Project {
 ```
 
 **Featured Listing Purchases** (new):
+
 ```typescript
 {
   featuredListingPurchase: 'true',  // ← Distinguishes from transactions
@@ -201,16 +217,19 @@ The webhook handler checks `metadata.featuredListingPurchase === 'true'` to dete
 ## Security Considerations
 
 ### **Authorization**
+
 - Only sellers can purchase featured placements
 - Sellers can only feature their own projects
 - Payment Intent metadata immutable (signed by Stripe)
 
 ### **Validation**
+
 - Project must be active (not draft, not sold)
 - Duration must be valid (7, 14, or 30 days)
 - Double-purchase prevention handled by webhook idempotency
 
 ### **Webhook Verification**
+
 - Stripe signature verification via `stripe.webhooks.constructEvent()`
 - `STRIPE_WEBHOOK_SECRET` must be configured
 - Webhook returns 200 even if processing fails (Stripe retry logic)
@@ -222,6 +241,7 @@ The webhook handler checks `metadata.featuredListingPurchase === 'true'` to dete
 ### **Manual Testing (Test Mode)**
 
 1. **Create Payment Intent:**
+
 ```bash
 curl -X POST http://localhost:3011/api/featured/create-payment-intent \
   -H "Content-Type: application/json" \
@@ -230,15 +250,18 @@ curl -X POST http://localhost:3011/api/featured/create-payment-intent \
 ```
 
 2. **Use Stripe Test Card:**
+
 - Card: `4242 4242 4242 4242`
 - Expiry: Any future date
 - CVC: Any 3 digits
 
 3. **Verify in Stripe Dashboard:**
+
 - Check Payment Intent created
 - Check webhook event `payment_intent.succeeded` sent
 
 4. **Verify Database:**
+
 ```sql
 SELECT id, title, isFeatured, featuredUntil
 FROM projects
@@ -248,21 +271,25 @@ WHERE id = 'project123';
 ### **Webhook Testing (Local)**
 
 Use Stripe CLI to forward webhooks:
+
 ```bash
 stripe listen --forward-to http://localhost:3011/api/webhooks/stripe
 ```
 
 Get webhook signing secret:
+
 ```bash
 stripe listen --print-secret
 ```
 
 Add to `.env.local`:
+
 ```
 STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
 Trigger test event:
+
 ```bash
 stripe trigger payment_intent.succeeded
 ```
@@ -273,16 +300,16 @@ stripe trigger payment_intent.succeeded
 
 ### **Payment Intent Creation Errors**
 
-| Error Type | HTTP Status | Example |
-|------------|-------------|---------|
-| Not authenticated | 401 | No session |
-| Not a seller | 403 | `isSeller === false` |
-| Not project owner | 403 | Different seller ID |
-| Project not found | 404 | Invalid project ID |
-| Invalid duration | 400 | `durationDays = 5` |
-| Inactive project | 400 | `status = 'draft'` |
-| Stripe card error | 400 | Card declined |
-| Stripe API error | 400/500 | Network error |
+| Error Type        | HTTP Status | Example              |
+| ----------------- | ----------- | -------------------- |
+| Not authenticated | 401         | No session           |
+| Not a seller      | 403         | `isSeller === false` |
+| Not project owner | 403         | Different seller ID  |
+| Project not found | 404         | Invalid project ID   |
+| Invalid duration  | 400         | `durationDays = 5`   |
+| Inactive project  | 400         | `status = 'draft'`   |
+| Stripe card error | 400         | Card declined        |
+| Stripe API error  | 400/500     | Network error        |
 
 ### **Webhook Processing Errors**
 
@@ -307,6 +334,7 @@ Three email notification types are now fully implemented in [lib/services/EmailS
 **Recipient:** Seller who purchased featured placement
 
 **Template includes:**
+
 - Project title and featured duration (7/14/30 days)
 - Amount paid ($29.99/$49.99/$79.99)
 - Featured until date/time
@@ -319,6 +347,7 @@ Three email notification types are now fully implemented in [lib/services/EmailS
 - Call-to-action button to view project
 
 **Code example:**
+
 ```typescript
 await emailService.sendFeaturedListingConfirmation(
   { email: seller.email, name: seller.fullName },
@@ -328,8 +357,8 @@ await emailService.sendFeaturedListingConfirmation(
     projectId: project.id,
     durationDays: 7,
     costCents: 2999,
-    featuredUntil: "2026-02-02T10:00:00.000Z",
-    projectUrl: "https://app.com/projects/project123",
+    featuredUntil: '2026-02-02T10:00:00.000Z',
+    projectUrl: 'https://app.com/projects/project123',
   }
 );
 ```
@@ -343,6 +372,7 @@ await emailService.sendFeaturedListingConfirmation(
 **Recipient:** Seller whose featured listing is expiring soon
 
 **Template includes:**
+
 - Expiration date/time reminder
 - Warning banner (yellow) with expiration countdown
 - Call-to-action to extend featured period
@@ -350,6 +380,7 @@ await emailService.sendFeaturedListingConfirmation(
 - Link to project page to renew
 
 **Implementation:**
+
 ```typescript
 // TODO: Add to cron job (see Future Enhancements)
 await emailService.sendFeaturedListingExpirationWarning(
@@ -360,8 +391,8 @@ await emailService.sendFeaturedListingExpirationWarning(
     projectId: project.id,
     durationDays: 7,
     costCents: 2999,
-    featuredUntil: "2026-02-02T10:00:00.000Z",
-    projectUrl: "https://app.com/projects/project123",
+    featuredUntil: '2026-02-02T10:00:00.000Z',
+    projectUrl: 'https://app.com/projects/project123',
   }
 );
 ```
@@ -375,6 +406,7 @@ await emailService.sendFeaturedListingExpirationWarning(
 **Recipient:** Seller whose featured listing just expired
 
 **Template includes:**
+
 - Expiration confirmation
 - Featured period summary (duration, cost)
 - Expired date
@@ -383,6 +415,7 @@ await emailService.sendFeaturedListingExpirationWarning(
 - Link to re-purchase featured placement
 
 **Implementation:**
+
 ```typescript
 // TODO: Add to cleanup-featured cron job
 await emailService.sendFeaturedListingExpired(
@@ -393,8 +426,8 @@ await emailService.sendFeaturedListingExpired(
     projectId: project.id,
     durationDays: 7,
     costCents: 2999,
-    featuredUntil: "2026-02-02T10:00:00.000Z",
-    projectUrl: "https://app.com/projects/project123",
+    featuredUntil: '2026-02-02T10:00:00.000Z',
+    projectUrl: 'https://app.com/projects/project123',
   }
 );
 ```
@@ -402,6 +435,7 @@ await emailService.sendFeaturedListingExpired(
 ### **Email Template Features**
 
 All emails include:
+
 - **HTML version:** Styled with inline CSS, responsive design
 - **Plain text version:** Clean fallback for email clients
 - **Branded headers:** Color-coded by email type:
@@ -415,6 +449,7 @@ All emails include:
 ### **Testing Email Notifications**
 
 **Development mode (no SENDGRID_API_KEY):**
+
 ```bash
 # Emails are logged to console
 [EmailService] Email would be sent (dev mode):
@@ -423,6 +458,7 @@ All emails include:
 ```
 
 **With SendGrid configured:**
+
 ```bash
 # Set environment variable
 export SENDGRID_API_KEY="SG.xxx"
@@ -441,6 +477,7 @@ stripe trigger payment_intent.succeeded
 Runs every 1 hour to unfeature expired projects.
 
 **How it works:**
+
 1. Finds projects where `isFeatured = true` AND `featuredUntil <= now`
 2. Sets `isFeatured = false` for expired projects
 3. Logs unfeatured projects
@@ -533,14 +570,17 @@ See [app/api/cron/README.md](../cron/README.md) for Railway/Vercel/external cron
 ## Files Modified/Created
 
 ### **Created:**
+
 - `app/api/featured/create-payment-intent/route.ts` - Payment Intent endpoint
 - `app/api/featured/PAYMENT_INTEGRATION.md` - This documentation
 
 ### **Modified:**
+
 - `app/api/webhooks/stripe/route.ts` - Added featured listing payment handling
 - `app/api/featured/route.ts` - Deprecated POST endpoint (marked as admin-only)
 
 ### **No Changes Required:**
+
 - `lib/services/FeaturedListingService.ts` - Already has `purchaseFeaturedPlacement()`
 - `lib/repositories/FeaturedListingRepository.ts` - Already has `setFeatured()`
 - Database schema - Uses existing `projects.isFeatured` and `projects.featuredUntil`
@@ -638,21 +678,25 @@ Before deploying to production:
 ### **Payment failed but webhook not received**
 
 **Check:**
+
 1. Stripe Dashboard → Webhooks → Check event sent
 2. Webhook endpoint responding (check Railway/Vercel logs)
 3. `STRIPE_WEBHOOK_SECRET` matches Stripe Dashboard
 
 **Fix:**
+
 - Retry webhook from Stripe Dashboard
 - Or manually feature project via `POST /api/featured` (admin)
 
 ### **Project not featured after payment succeeded**
 
 **Check:**
+
 1. Webhook event logs: `[StripeWebhook] Featured listing payment succeeded`
 2. Database: `SELECT isFeatured, featuredUntil FROM projects WHERE id = '...'`
 
 **Fix:**
+
 - Check webhook logs for errors
 - Manually feature via `POST /api/featured` if needed
 
@@ -661,6 +705,7 @@ Before deploying to production:
 **Error:** `Webhook Error: No signatures found matching the expected signature`
 
 **Fix:**
+
 - Verify `STRIPE_WEBHOOK_SECRET` in environment variables
 - Check Stripe Dashboard → Webhooks → Signing secret matches
 - Ensure webhook endpoint URL is correct

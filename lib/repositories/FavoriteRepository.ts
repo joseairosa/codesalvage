@@ -294,10 +294,7 @@ export class FavoriteRepository {
    * @example
    * await favoriteRepo.updateProjectFavoriteCount('project456', true);
    */
-  async updateProjectFavoriteCount(
-    projectId: string,
-    increment: boolean
-  ): Promise<void> {
+  async updateProjectFavoriteCount(projectId: string, increment: boolean): Promise<void> {
     console.log('[FavoriteRepository] Updating project favorite count:', {
       projectId,
       increment,

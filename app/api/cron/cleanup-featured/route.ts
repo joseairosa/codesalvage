@@ -33,7 +33,10 @@ const featuredListingRepository = new FeaturedListingRepository(prisma);
 const projectRepository = new ProjectRepository(prisma);
 const userRepository = new UserRepository(prisma);
 const subscriptionRepository = new SubscriptionRepository(prisma);
-const subscriptionService = new SubscriptionService(subscriptionRepository, userRepository);
+const subscriptionService = new SubscriptionService(
+  subscriptionRepository,
+  userRepository
+);
 const featuredListingService = new FeaturedListingService(
   featuredListingRepository,
   projectRepository,
@@ -65,7 +68,9 @@ export async function GET() {
     // Get expired featured projects before cleanup (for logging)
     const expiredProjects = await featuredListingRepository.getExpiredFeaturedProjects();
 
-    console.log(`[${componentName}] Found ${expiredProjects.length} expired featured projects`);
+    console.log(
+      `[${componentName}] Found ${expiredProjects.length} expired featured projects`
+    );
 
     // Cleanup expired featured projects
     const unfeaturedCount = await featuredListingService.cleanupExpiredFeatured();
@@ -85,7 +90,10 @@ export async function GET() {
           const seller = await userRepository.findById(project.sellerId);
 
           if (!seller || !seller.email) {
-            console.warn(`[${componentName}] Seller not found or no email:`, project.sellerId);
+            console.warn(
+              `[${componentName}] Seller not found or no email:`,
+              project.sellerId
+            );
             emailsFailed++;
             continue;
           }
@@ -121,7 +129,9 @@ export async function GET() {
         }
       }
 
-      console.log(`[${componentName}] Expired notifications: ${emailsSent} sent, ${emailsFailed} failed`);
+      console.log(
+        `[${componentName}] Expired notifications: ${emailsSent} sent, ${emailsFailed} failed`
+      );
 
       // Log project details
       const projectDetails = expiredProjects.map((p) => ({

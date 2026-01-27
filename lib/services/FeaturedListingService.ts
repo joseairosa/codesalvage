@@ -142,16 +142,12 @@ export class FeaturedListingService {
     // Validate project exists
     const project = await this.projectRepository.findById(request.projectId);
     if (!project) {
-      throw new FeaturedListingNotFoundError(
-        `Project ${request.projectId} not found`
-      );
+      throw new FeaturedListingNotFoundError(`Project ${request.projectId} not found`);
     }
 
     // Validate seller owns the project
     if (project.sellerId !== userId) {
-      throw new FeaturedListingPermissionError(
-        'You can only feature your own projects'
-      );
+      throw new FeaturedListingPermissionError('You can only feature your own projects');
     }
 
     // Validate project is active
@@ -163,7 +159,8 @@ export class FeaturedListingService {
     }
 
     // Check subscription status for discount
-    const subscriptionStatus = await this.subscriptionService.getSubscriptionStatus(userId);
+    const subscriptionStatus =
+      await this.subscriptionService.getSubscriptionStatus(userId);
     const discountPercent = subscriptionStatus.benefits.featuredListingDiscount; // 0 for free, 20 for pro
 
     // Calculate cost with discount
@@ -248,10 +245,7 @@ export class FeaturedListingService {
    * @throws FeaturedListingPermissionError if user doesn't own project
    * @throws FeaturedListingNotFoundError if project not found
    */
-  async removeFeaturedStatus(
-    userId: string,
-    projectId: string
-  ): Promise<void> {
+  async removeFeaturedStatus(userId: string, projectId: string): Promise<void> {
     console.log('[FeaturedListingService] Removing featured status:', {
       userId,
       projectId,
@@ -260,9 +254,7 @@ export class FeaturedListingService {
     // Validate project exists
     const project = await this.projectRepository.findById(projectId);
     if (!project) {
-      throw new FeaturedListingNotFoundError(
-        `Project ${projectId} not found`
-      );
+      throw new FeaturedListingNotFoundError(`Project ${projectId} not found`);
     }
 
     // Validate seller owns the project
@@ -288,9 +280,7 @@ export class FeaturedListingService {
    * @returns Count of featured projects
    */
   async getSellerFeaturedCount(sellerId: string): Promise<number> {
-    return await this.featuredListingRepository.countFeaturedBySeller(
-      sellerId
-    );
+    return await this.featuredListingRepository.countFeaturedBySeller(sellerId);
   }
 
   /**
@@ -329,9 +319,7 @@ export class FeaturedListingService {
     // Validate project exists
     const project = await this.projectRepository.findById(projectId);
     if (!project) {
-      throw new FeaturedListingNotFoundError(
-        `Project ${projectId} not found`
-      );
+      throw new FeaturedListingNotFoundError(`Project ${projectId} not found`);
     }
 
     // Validate seller owns the project
@@ -341,11 +329,10 @@ export class FeaturedListingService {
       );
     }
 
-    const updatedProject =
-      await this.featuredListingRepository.extendFeaturedPeriod(
-        projectId,
-        additionalDays
-      );
+    const updatedProject = await this.featuredListingRepository.extendFeaturedPeriod(
+      projectId,
+      additionalDays
+    );
 
     console.log('[FeaturedListingService] Featured period extended:', {
       projectId,
@@ -387,8 +374,7 @@ export class FeaturedListingService {
   async cleanupExpiredFeatured(): Promise<number> {
     console.log('[FeaturedListingService] Cleaning up expired featured projects');
 
-    const count =
-      await this.featuredListingRepository.cleanupExpiredFeatured();
+    const count = await this.featuredListingRepository.cleanupExpiredFeatured();
 
     console.log('[FeaturedListingService] Expired featured cleanup complete:', {
       unfeaturedCount: count,

@@ -14,7 +14,11 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { MessageService, MessageValidationError, MessagePermissionError } from '@/lib/services/MessageService';
+import {
+  MessageService,
+  MessageValidationError,
+  MessagePermissionError,
+} from '@/lib/services/MessageService';
 import { MessageRepository } from '@/lib/repositories/MessageRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { ProjectRepository } from '@/lib/repositories/ProjectRepository';

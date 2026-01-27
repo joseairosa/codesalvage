@@ -304,9 +304,9 @@ describe('TransactionService (Integration)', () => {
         projectId: project.id,
       });
 
-      await expect(
-        transactionService.releaseEscrow(transaction.id)
-      ).rejects.toThrow('Cannot release escrow for unsuccessful payment');
+      await expect(transactionService.releaseEscrow(transaction.id)).rejects.toThrow(
+        'Cannot release escrow for unsuccessful payment'
+      );
     });
 
     it('should skip if escrow already released', async () => {

@@ -295,9 +295,9 @@ describe('MessageService', () => {
         .mockResolvedValueOnce(createMockUser(recipientId, 'recipient') as any) // Recipient exists
         .mockResolvedValueOnce(null); // Sender not found
 
-      await expect(messageService.sendMessage(senderId, validMessageData)).rejects.toThrow(
-        MessagePermissionError
-      );
+      await expect(
+        messageService.sendMessage(senderId, validMessageData)
+      ).rejects.toThrow(MessagePermissionError);
 
       // Verify create was NOT called
       expect(mockMessageRepository.create).not.toHaveBeenCalled();
@@ -305,13 +305,11 @@ describe('MessageService', () => {
 
     it('should reject if recipient does not exist', async () => {
       // Override beforeEach user mocks - recipient does not exist
-      vi.mocked(mockUserRepository.findById)
-        .mockReset()
-        .mockResolvedValueOnce(null); // Recipient not found
+      vi.mocked(mockUserRepository.findById).mockReset().mockResolvedValueOnce(null); // Recipient not found
 
-      await expect(messageService.sendMessage(senderId, validMessageData)).rejects.toThrow(
-        MessagePermissionError
-      );
+      await expect(
+        messageService.sendMessage(senderId, validMessageData)
+      ).rejects.toThrow(MessagePermissionError);
 
       // Verify create was NOT called
       expect(mockMessageRepository.create).not.toHaveBeenCalled();
@@ -341,9 +339,7 @@ describe('MessageService', () => {
         ...createMockProject(projectId, 'seller123'),
         status: 'draft', // Not active
       };
-      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
-        inactiveProject as any
-      );
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(inactiveProject as any);
 
       await expect(
         messageService.sendMessage(senderId, messageWithProject)
@@ -459,9 +455,7 @@ describe('MessageService', () => {
 
     it('should throw if current user not found', async () => {
       // Override beforeEach user mocks - current user not found
-      vi.mocked(mockUserRepository.findById)
-        .mockReset()
-        .mockResolvedValueOnce(null); // Current user not found
+      vi.mocked(mockUserRepository.findById).mockReset().mockResolvedValueOnce(null); // Current user not found
 
       await expect(
         messageService.getConversation(currentUserId, otherUserId)
@@ -548,10 +542,7 @@ describe('MessageService', () => {
 
       vi.mocked(mockMessageRepository.markConversationAsRead).mockResolvedValue(5);
 
-      const result = await messageService.markConversationAsRead(
-        recipientId,
-        senderId
-      );
+      const result = await messageService.markConversationAsRead(recipientId, senderId);
 
       expect(result).toBe(5);
       expect(mockMessageRepository.markConversationAsRead).toHaveBeenCalledWith(

@@ -154,11 +154,9 @@ export class MessageService {
 
     // Send email notification (async, don't wait)
     if (this.emailService) {
-      this.emailService
-        .sendNewMessageNotification(message)
-        .catch((err: Error) => {
-          console.error('[MessageService] Failed to send email notification:', err);
-        });
+      this.emailService.sendNewMessageNotification(message).catch((err: Error) => {
+        console.error('[MessageService] Failed to send email notification:', err);
+      });
     }
 
     console.log('[MessageService] Message sent successfully:', message.id);

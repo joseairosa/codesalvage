@@ -219,18 +219,17 @@ export default function ConversationPage({ params }: { params: { userId: string 
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.push('/messages')}
-          >
+          <Button variant="ghost" size="icon" onClick={() => router.push('/messages')}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
 
           {partner && (
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={partner.avatarUrl || undefined} alt={partner.username} />
+                <AvatarImage
+                  src={partner.avatarUrl || undefined}
+                  alt={partner.username}
+                />
                 <AvatarFallback>{getInitials(partner)}</AvatarFallback>
               </Avatar>
               <div>
@@ -301,9 +300,7 @@ export default function ConversationPage({ params }: { params: { userId: string 
                         <div className="space-y-1">
                           <div
                             className={`rounded-lg px-4 py-3 ${
-                              isOwn
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted'
+                              isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'
                             }`}
                           >
                             <p className="whitespace-pre-wrap break-words text-sm">

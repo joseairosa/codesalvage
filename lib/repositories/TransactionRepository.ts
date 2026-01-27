@@ -672,10 +672,7 @@ export class TransactionRepository {
 
       return transaction as TransactionWithRelations | null;
     } catch (error) {
-      console.error(
-        '[TransactionRepository] findByStripePaymentIntentId failed:',
-        error
-      );
+      console.error('[TransactionRepository] findByStripePaymentIntentId failed:', error);
       throw new Error(
         '[TransactionRepository] Failed to find transaction by Stripe Payment Intent ID'
       );

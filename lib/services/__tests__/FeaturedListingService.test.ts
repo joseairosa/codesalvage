@@ -472,7 +472,9 @@ describe('FeaturedListingService', () => {
 
       await featuredListingService.removeFeaturedStatus('user123', 'project456');
 
-      expect(mockFeaturedListingRepository.unsetFeatured).toHaveBeenCalledWith('project456');
+      expect(mockFeaturedListingRepository.unsetFeatured).toHaveBeenCalledWith(
+        'project456'
+      );
     });
 
     it('should throw error if project not found', async () => {
@@ -623,7 +625,9 @@ describe('FeaturedListingService', () => {
 
   describe('cleanupExpiredFeatured', () => {
     it('should return count of cleaned up projects', async () => {
-      vi.mocked(mockFeaturedListingRepository.cleanupExpiredFeatured).mockResolvedValue(5);
+      vi.mocked(mockFeaturedListingRepository.cleanupExpiredFeatured).mockResolvedValue(
+        5
+      );
 
       const result = await featuredListingService.cleanupExpiredFeatured();
 
@@ -632,7 +636,9 @@ describe('FeaturedListingService', () => {
     });
 
     it('should return 0 if no expired projects', async () => {
-      vi.mocked(mockFeaturedListingRepository.cleanupExpiredFeatured).mockResolvedValue(0);
+      vi.mocked(mockFeaturedListingRepository.cleanupExpiredFeatured).mockResolvedValue(
+        0
+      );
 
       const result = await featuredListingService.cleanupExpiredFeatured();
 

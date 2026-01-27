@@ -80,7 +80,9 @@ export class EmailService {
   constructor() {
     // Read from process.env directly to support test environment variable injection
     this.fromEmail =
-      process.env.SENDGRID_FROM_EMAIL || env.SENDGRID_FROM_EMAIL || 'noreply@projectfinish.com';
+      process.env.SENDGRID_FROM_EMAIL ||
+      env.SENDGRID_FROM_EMAIL ||
+      'noreply@projectfinish.com';
     this.fromName = 'ProjectFinish';
   }
 
@@ -123,7 +125,10 @@ export class EmailService {
 
     await this.sendEmail(recipient, subject, html, text);
 
-    console.log(`[${componentName}] Purchase confirmation sent to buyer:`, recipient.email);
+    console.log(
+      `[${componentName}] Purchase confirmation sent to buyer:`,
+      recipient.email
+    );
   }
 
   /**
@@ -139,7 +144,10 @@ export class EmailService {
 
     await this.sendEmail(recipient, subject, html, text);
 
-    console.log(`[${componentName}] Purchase notification sent to seller:`, recipient.email);
+    console.log(
+      `[${componentName}] Purchase notification sent to seller:`,
+      recipient.email
+    );
   }
 
   /**
@@ -193,7 +201,10 @@ export class EmailService {
   /**
    * Send review reminder to buyer
    */
-  async sendReviewReminder(recipient: EmailRecipient, data: ReviewEmailData): Promise<void> {
+  async sendReviewReminder(
+    recipient: EmailRecipient,
+    data: ReviewEmailData
+  ): Promise<void> {
     const subject = `How was your experience with ${data.projectTitle}?`;
     const html = this.getReviewReminderHTML(data);
     const text = this.getReviewReminderText(data);
@@ -254,7 +265,10 @@ export class EmailService {
 
     await this.sendEmail(recipient, subject, html, text);
 
-    console.log(`[${componentName}] Featured listing expired notification sent:`, recipient.email);
+    console.log(
+      `[${componentName}] Featured listing expired notification sent:`,
+      recipient.email
+    );
   }
 
   /**
@@ -851,7 +865,9 @@ ${appUrl}
   /**
    * Email Templates - Featured Listing Expiration Warning
    */
-  private getFeaturedListingExpirationWarningHTML(data: FeaturedListingEmailData): string {
+  private getFeaturedListingExpirationWarningHTML(
+    data: FeaturedListingEmailData
+  ): string {
     const appUrl = env.NEXT_PUBLIC_APP_URL;
 
     return `
@@ -902,7 +918,9 @@ ${appUrl}
     `.trim();
   }
 
-  private getFeaturedListingExpirationWarningText(data: FeaturedListingEmailData): string {
+  private getFeaturedListingExpirationWarningText(
+    data: FeaturedListingEmailData
+  ): string {
     const appUrl = env.NEXT_PUBLIC_APP_URL;
 
     return `

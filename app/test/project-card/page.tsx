@@ -20,7 +20,8 @@ const mockProjects: ProjectCardData[] = [
     completionPercentage: 85,
     priceCents: 75000, // $750
     techStack: ['React', 'Node.js', 'PostgreSQL', 'Tailwind CSS', 'Stripe'],
-    thumbnailImageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
+    thumbnailImageUrl:
+      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
     isFeatured: true,
     viewCount: 245,
     favoriteCount: 32,
@@ -40,7 +41,8 @@ const mockProjects: ProjectCardData[] = [
     completionPercentage: 70,
     priceCents: 125000, // $1,250
     techStack: ['React Native', 'Django', 'PostgreSQL', 'Redis'],
-    thumbnailImageUrl: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&h=450&fit=crop',
+    thumbnailImageUrl:
+      'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&h=450&fit=crop',
     isFeatured: false,
     viewCount: 178,
     favoriteCount: 21,
@@ -79,8 +81,16 @@ const mockProjects: ProjectCardData[] = [
     category: 'web_app',
     completionPercentage: 78,
     priceCents: 95000, // $950
-    techStack: ['Next.js', 'Socket.io', 'MongoDB', 'TypeScript', 'Tailwind CSS', 'WebRTC'],
-    thumbnailImageUrl: 'https://images.unsplash.com/photo-1611606063065-ee7946f0787a?w=800&h=450&fit=crop',
+    techStack: [
+      'Next.js',
+      'Socket.io',
+      'MongoDB',
+      'TypeScript',
+      'Tailwind CSS',
+      'WebRTC',
+    ],
+    thumbnailImageUrl:
+      'https://images.unsplash.com/photo-1611606063065-ee7946f0787a?w=800&h=450&fit=crop',
     isFeatured: true,
     viewCount: 312,
     favoriteCount: 45,
@@ -100,7 +110,8 @@ const mockProjects: ProjectCardData[] = [
     completionPercentage: 65,
     priceCents: 180000, // $1,800
     techStack: ['Python', 'FastAPI', 'React', 'TensorFlow', 'PyTorch', 'PostgreSQL'],
-    thumbnailImageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
+    thumbnailImageUrl:
+      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
     isFeatured: false,
     viewCount: 156,
     favoriteCount: 28,
@@ -120,7 +131,8 @@ const mockProjects: ProjectCardData[] = [
     completionPercentage: 55,
     priceCents: 220000, // $2,200
     techStack: ['Unity', 'C#', 'Blender'],
-    thumbnailImageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=450&fit=crop',
+    thumbnailImageUrl:
+      'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=450&fit=crop',
     isFeatured: false,
     viewCount: 203,
     favoriteCount: 37,
@@ -159,7 +171,11 @@ export default function ProjectCardTestPage() {
           <h2 className="text-2xl font-bold">Without Seller Info</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {mockProjects.slice(0, 3).map((project) => (
-              <ProjectCard key={`no-seller-${project.id}`} project={project} showSellerInfo={false} />
+              <ProjectCard
+                key={`no-seller-${project.id}`}
+                project={project}
+                showSellerInfo={false}
+              />
             ))}
           </div>
         </div>
@@ -169,7 +185,11 @@ export default function ProjectCardTestPage() {
           <h2 className="text-2xl font-bold">Without Stats</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {mockProjects.slice(0, 3).map((project) => (
-              <ProjectCard key={`no-stats-${project.id}`} project={project} showStats={false} />
+              <ProjectCard
+                key={`no-stats-${project.id}`}
+                project={project}
+                showStats={false}
+              />
             ))}
           </div>
         </div>

@@ -24,7 +24,8 @@ export default async function PricingPage() {
       <div className="mb-12 text-center">
         <h1 className="mb-4 text-4xl font-bold">Choose Your Plan</h1>
         <p className="text-lg text-gray-600">
-          Start with our free plan or upgrade to Pro for unlimited projects and advanced features
+          Start with our free plan or upgrade to Pro for unlimited projects and advanced
+          features
         </p>
       </div>
 
@@ -185,27 +186,41 @@ export default async function PricingPage() {
                     <th className="py-2 text-left">Duration</th>
                     <th className="py-2 text-right">Free Plan</th>
                     <th className="py-2 text-right">Pro Plan (20% off)</th>
-                    <th className="py-2 text-right font-semibold text-green-600">You Save</th>
+                    <th className="py-2 text-right font-semibold text-green-600">
+                      You Save
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b">
                     <td className="py-3">7 days</td>
                     <td className="py-3 text-right">$29.99</td>
-                    <td className="py-3 text-right font-semibold text-blue-600">$23.99</td>
-                    <td className="py-3 text-right font-semibold text-green-600">$6.00</td>
+                    <td className="py-3 text-right font-semibold text-blue-600">
+                      $23.99
+                    </td>
+                    <td className="py-3 text-right font-semibold text-green-600">
+                      $6.00
+                    </td>
                   </tr>
                   <tr className="border-b">
                     <td className="py-3">14 days</td>
                     <td className="py-3 text-right">$49.99</td>
-                    <td className="py-3 text-right font-semibold text-blue-600">$39.99</td>
-                    <td className="py-3 text-right font-semibold text-green-600">$10.00</td>
+                    <td className="py-3 text-right font-semibold text-blue-600">
+                      $39.99
+                    </td>
+                    <td className="py-3 text-right font-semibold text-green-600">
+                      $10.00
+                    </td>
                   </tr>
                   <tr>
                     <td className="py-3">30 days</td>
                     <td className="py-3 text-right">$79.99</td>
-                    <td className="py-3 text-right font-semibold text-blue-600">$63.99</td>
-                    <td className="py-3 text-right font-semibold text-green-600">$16.00</td>
+                    <td className="py-3 text-right font-semibold text-blue-600">
+                      $63.99
+                    </td>
+                    <td className="py-3 text-right font-semibold text-green-600">
+                      $16.00
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -219,7 +234,9 @@ export default async function PricingPage() {
 
       {/* FAQ Section */}
       <div className="mx-auto mt-16 max-w-3xl">
-        <h2 className="mb-8 text-center text-3xl font-bold">Frequently Asked Questions</h2>
+        <h2 className="mb-8 text-center text-3xl font-bold">
+          Frequently Asked Questions
+        </h2>
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -227,44 +244,53 @@ export default async function PricingPage() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                Yes! You can upgrade to Pro instantly or cancel your Pro subscription at any time. When
-                you cancel, you'll continue to have Pro benefits until the end of your billing period.
+                Yes! You can upgrade to Pro instantly or cancel your Pro subscription at
+                any time. When you cancel, you'll continue to have Pro benefits until the
+                end of your billing period.
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">What happens if I hit the 3-project limit?</CardTitle>
+              <CardTitle className="text-lg">
+                What happens if I hit the 3-project limit?
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                On the Free plan, you can have up to 3 active listings. To create more, you'll need to
-                either delist an existing project or upgrade to Pro for unlimited listings.
+                On the Free plan, you can have up to 3 active listings. To create more,
+                you'll need to either delist an existing project or upgrade to Pro for
+                unlimited listings.
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">How does the featured listing discount work?</CardTitle>
+              <CardTitle className="text-lg">
+                How does the featured listing discount work?
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                Pro subscribers automatically receive 20% off all featured placement purchases. The
-                discount is applied at checkout, and there's no limit to how many times you can use it.
+                Pro subscribers automatically receive 20% off all featured placement
+                purchases. The discount is applied at checkout, and there's no limit to
+                how many times you can use it.
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Is there a contract or commitment?</CardTitle>
+              <CardTitle className="text-lg">
+                Is there a contract or commitment?
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                No! Pro is billed monthly with no long-term commitment. Cancel anytime from your
-                subscription settings.
+                No! Pro is billed monthly with no long-term commitment. Cancel anytime
+                from your subscription settings.
               </p>
             </CardContent>
           </Card>

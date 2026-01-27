@@ -21,10 +21,7 @@ const componentName = 'ReviewStatsAPI';
 // Initialize repositories and service
 const reviewRepository = new ReviewRepository(prisma);
 const userRepository = new UserRepository(prisma);
-const reviewService = new ReviewService(
-  reviewRepository,
-  userRepository
-);
+const reviewService = new ReviewService(reviewRepository, userRepository);
 
 /**
  * GET /api/reviews/stats/[sellerId]

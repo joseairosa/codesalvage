@@ -28,10 +28,7 @@ describe('AnalyticsService (Integration)', () => {
     await setupTestDatabase();
     analyticsRepository = new AnalyticsRepository(prisma);
     userRepository = new UserRepository(prisma);
-    analyticsService = new AnalyticsService(
-      analyticsRepository,
-      userRepository
-    );
+    analyticsService = new AnalyticsService(analyticsRepository, userRepository);
   });
 
   beforeEach(async () => {
@@ -112,14 +109,11 @@ describe('AnalyticsService (Integration)', () => {
       });
 
       // Get analytics overview
-      const analytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id,
-        {
-          startDate: '2025-06-01',
-          endDate: '2025-06-30',
-          granularity: 'day',
-        }
-      );
+      const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
+        startDate: '2025-06-01',
+        endDate: '2025-06-30',
+        granularity: 'day',
+      });
 
       // Verify summary metrics
       expect(analytics.userId).toBe(seller.id);
@@ -145,9 +139,9 @@ describe('AnalyticsService (Integration)', () => {
     it('should enforce seller-only permission', async () => {
       const buyer = await createTestUser({ username: 'buyer', isSeller: false });
 
-      await expect(
-        analyticsService.getSellerAnalyticsOverview(buyer.id)
-      ).rejects.toThrow('Only sellers can access analytics');
+      await expect(analyticsService.getSellerAnalyticsOverview(buyer.id)).rejects.toThrow(
+        'Only sellers can access analytics'
+      );
     });
 
     it('should return zero metrics for seller with no sales', async () => {
@@ -163,9 +157,7 @@ describe('AnalyticsService (Integration)', () => {
         priceCents: 10000, // $100
       });
 
-      const analytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id
-      );
+      const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id);
 
       expect(analytics.summary.totalProjects).toBe(1);
       expect(analytics.summary.totalSold).toBe(0);
@@ -223,39 +215,30 @@ describe('AnalyticsService (Integration)', () => {
       });
 
       // Query only June data
-      const juneAnalytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id,
-        {
-          startDate: '2025-06-01',
-          endDate: '2025-06-30',
-        }
-      );
+      const juneAnalytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
+        startDate: '2025-06-01',
+        endDate: '2025-06-30',
+      });
 
       // Should only include June transaction
       expect(juneAnalytics.summary.totalSold).toBe(1);
       expect(juneAnalytics.summary.totalRevenue).toBe('$82.00');
 
       // Query only July data
-      const julyAnalytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id,
-        {
-          startDate: '2025-07-01',
-          endDate: '2025-07-31',
-        }
-      );
+      const julyAnalytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
+        startDate: '2025-07-01',
+        endDate: '2025-07-31',
+      });
 
       // Should only include July transaction
       expect(julyAnalytics.summary.totalSold).toBe(1);
       expect(julyAnalytics.summary.totalRevenue).toBe('$164.00');
 
       // Query entire range
-      const allAnalytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id,
-        {
-          startDate: '2025-06-01',
-          endDate: '2025-07-31',
-        }
-      );
+      const allAnalytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
+        startDate: '2025-06-01',
+        endDate: '2025-07-31',
+      });
 
       // Should include both transactions
       expect(allAnalytics.summary.totalSold).toBe(2);
@@ -325,9 +308,7 @@ describe('AnalyticsService (Integration)', () => {
         },
       });
 
-      const analytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id
-      );
+      const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id);
 
       // Conversion rate: 2 sales / 200 total views = 1.00%
       expect(analytics.summary.conversionRate).toBe('1.00%');
@@ -385,9 +366,7 @@ describe('AnalyticsService (Integration)', () => {
         },
       });
 
-      const analytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id
-      );
+      const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id);
 
       // Should only count the succeeded transaction
       expect(analytics.summary.totalSold).toBe(1);
@@ -418,25 +397,19 @@ describe('AnalyticsService (Integration)', () => {
       });
 
       // Test with 'day' granularity
-      const dayAnalytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id,
-        {
-          startDate: '2025-06-01',
-          endDate: '2025-06-30',
-          granularity: 'day',
-        }
-      );
+      const dayAnalytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
+        startDate: '2025-06-01',
+        endDate: '2025-06-30',
+        granularity: 'day',
+      });
       expect(dayAnalytics.revenueChart.length).toBeGreaterThan(0);
 
       // Test with 'week' granularity
-      const weekAnalytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id,
-        {
-          startDate: '2025-06-01',
-          endDate: '2025-06-30',
-          granularity: 'week',
-        }
-      );
+      const weekAnalytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
+        startDate: '2025-06-01',
+        endDate: '2025-06-30',
+        granularity: 'week',
+      });
       expect(weekAnalytics.revenueChart.length).toBeGreaterThan(0);
 
       // Test with 'month' granularity
@@ -474,13 +447,10 @@ describe('AnalyticsService (Integration)', () => {
       });
 
       // Service should not throw error, but cap the start date instead
-      const analytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id,
-        {
-          startDate: '2024-01-01', // Very old date
-          endDate: '2025-06-01',
-        }
-      );
+      const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
+        startDate: '2024-01-01', // Very old date
+        endDate: '2025-06-01',
+      });
 
       // Should still return valid analytics (capped to 1 year)
       expect(analytics.userId).toBe(seller.id);
@@ -493,9 +463,7 @@ describe('AnalyticsService (Integration)', () => {
         isSeller: true,
       });
 
-      const analytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id
-      );
+      const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id);
 
       // Verify analytics returned successfully with defaults
       expect(analytics.userId).toBe(seller.id);
@@ -574,9 +542,7 @@ describe('AnalyticsService (Integration)', () => {
         },
       });
 
-      const analytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id
-      );
+      const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id);
 
       // Verify top projects are ranked by revenue
       expect(analytics.topProjects.length).toBe(3);
@@ -620,9 +586,7 @@ describe('AnalyticsService (Integration)', () => {
         },
       });
 
-      const analytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id
-      );
+      const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id);
 
       expect(analytics.topProjects[0]!.views).toBe(250);
       expect(analytics.topProjects[0]!.purchases).toBe(1);
@@ -667,14 +631,11 @@ describe('AnalyticsService (Integration)', () => {
         },
       });
 
-      const analytics = await analyticsService.getSellerAnalyticsOverview(
-        seller.id,
-        {
-          startDate: '2025-06-01',
-          endDate: '2025-06-30',
-          granularity: 'day',
-        }
-      );
+      const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
+        startDate: '2025-06-01',
+        endDate: '2025-06-30',
+        granularity: 'day',
+      });
 
       // Verify revenue chart has data points
       expect(analytics.revenueChart.length).toBeGreaterThan(0);

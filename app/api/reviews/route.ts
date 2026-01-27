@@ -14,7 +14,11 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { ReviewService, ReviewValidationError, ReviewPermissionError } from '@/lib/services/ReviewService';
+import {
+  ReviewService,
+  ReviewValidationError,
+  ReviewPermissionError,
+} from '@/lib/services/ReviewService';
 import { ReviewRepository } from '@/lib/repositories/ReviewRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { TransactionRepository } from '@/lib/repositories/TransactionRepository';
@@ -30,7 +34,7 @@ const reviewService = new ReviewService(
   reviewRepository,
   userRepository,
   transactionRepository,
-  undefined  // emailService - service will handle
+  undefined // emailService - service will handle
 );
 
 const createReviewSchema = z.object({
@@ -156,8 +160,10 @@ export async function POST(request: Request) {
     };
     if (comment !== undefined) reviewData.comment = comment;
     if (codeQualityRating !== undefined) reviewData.codeQualityRating = codeQualityRating;
-    if (documentationRating !== undefined) reviewData.documentationRating = documentationRating;
-    if (responsivenessRating !== undefined) reviewData.responsivenessRating = responsivenessRating;
+    if (documentationRating !== undefined)
+      reviewData.documentationRating = documentationRating;
+    if (responsivenessRating !== undefined)
+      reviewData.responsivenessRating = responsivenessRating;
     if (accuracyRating !== undefined) reviewData.accuracyRating = accuracyRating;
     if (isAnonymous !== undefined) reviewData.isAnonymous = isAnonymous;
 

@@ -23,7 +23,13 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -70,12 +76,21 @@ The backend is built with Node.js and Express, using PostgreSQL for data storage
   category: 'web_app',
   completionPercentage: 85,
   priceCents: 75000, // $750
-  techStack: ['React', 'Node.js', 'PostgreSQL', 'Tailwind CSS', 'Stripe', 'Redis', 'TypeScript'],
+  techStack: [
+    'React',
+    'Node.js',
+    'PostgreSQL',
+    'Tailwind CSS',
+    'Stripe',
+    'Redis',
+    'TypeScript',
+  ],
   primaryLanguage: 'TypeScript',
   frameworks: ['Next.js', 'Express', 'Prisma'],
   licenseType: 'full_code',
   accessLevel: 'full',
-  thumbnailImageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
+  thumbnailImageUrl:
+    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
   screenshotUrls: [
     'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
     'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop',
@@ -208,12 +223,12 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     <div className="container mx-auto max-w-7xl py-10">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Main Content - Left Column (2/3 width) */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           {/* Header */}
           <div>
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="mb-2 flex items-center gap-2">
                   {project.isFeatured && (
                     <Badge variant="default" className="bg-yellow-500 text-white">
                       <Star className="mr-1 h-3 w-3" fill="currentColor" />
@@ -222,7 +237,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                   )}
                   <Badge variant="outline">{project.category.replace('_', ' ')}</Badge>
                 </div>
-                <h1 className="text-4xl font-bold mb-2">{project.title}</h1>
+                <h1 className="mb-2 text-4xl font-bold">{project.title}</h1>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <Eye className="h-4 w-4" />
@@ -244,7 +259,10 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                   onClick={handleToggleFavorite}
                   className={isFavorited ? 'text-red-500' : ''}
                 >
-                  <Heart className="h-4 w-4" fill={isFavorited ? 'currentColor' : 'none'} />
+                  <Heart
+                    className="h-4 w-4"
+                    fill={isFavorited ? 'currentColor' : 'none'}
+                  />
                 </Button>
                 <Button variant="outline" size="icon" onClick={handleShare}>
                   <Share2 className="h-4 w-4" />
@@ -259,7 +277,11 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               {/* Main Image */}
               <div className="relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted">
                 <img
-                  src={project.screenshotUrls[selectedImage] || project.thumbnailImageUrl || ''}
+                  src={
+                    project.screenshotUrls[selectedImage] ||
+                    project.thumbnailImageUrl ||
+                    ''
+                  }
                   alt={`Screenshot ${selectedImage + 1}`}
                   className="h-full w-full object-cover"
                 />
@@ -267,17 +289,18 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
               {/* Thumbnail Strip */}
               {project.screenshotUrls.length > 1 && (
-                <div className="flex gap-2 p-4 overflow-x-auto">
+                <div className="flex gap-2 overflow-x-auto p-4">
                   {project.screenshotUrls.map((url, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`
-                        relative aspect-video w-24 shrink-0 overflow-hidden rounded border-2 transition-all
-                        ${selectedImage === index ? 'border-primary' : 'border-transparent hover:border-muted-foreground/50'}
-                      `}
+                      className={`relative aspect-video w-24 shrink-0 overflow-hidden rounded border-2 transition-all ${selectedImage === index ? 'border-primary' : 'border-transparent hover:border-muted-foreground/50'} `}
                     >
-                      <img src={url} alt={`Thumbnail ${index + 1}`} className="h-full w-full object-cover" />
+                      <img
+                        src={url}
+                        alt={`Thumbnail ${index + 1}`}
+                        className="h-full w-full object-cover"
+                      />
                     </button>
                   ))}
                 </div>
@@ -291,9 +314,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               <CardTitle>Project Description</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-sm max-w-none dark:prose-invert">
+              <div className="prose prose-sm dark:prose-invert max-w-none">
                 {project.description.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4 last:mb-0 whitespace-pre-line">
+                  <p key={index} className="mb-4 whitespace-pre-line last:mb-0">
                     {paragraph}
                   </p>
                 ))}
@@ -305,12 +328,14 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           <Card>
             <CardHeader>
               <CardTitle>Tech Stack</CardTitle>
-              <CardDescription>Technologies and frameworks used in this project</CardDescription>
+              <CardDescription>
+                Technologies and frameworks used in this project
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm font-medium mb-2">Primary Language</p>
-                <Badge variant="default" className="text-base px-3 py-1">
+                <p className="mb-2 text-sm font-medium">Primary Language</p>
+                <Badge variant="default" className="px-3 py-1 text-base">
                   {project.primaryLanguage}
                 </Badge>
               </div>
@@ -318,7 +343,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               <Separator />
 
               <div>
-                <p className="text-sm font-medium mb-2">Frameworks</p>
+                <p className="mb-2 text-sm font-medium">Frameworks</p>
                 <div className="flex flex-wrap gap-2">
                   {project.frameworks.map((framework) => (
                     <Badge key={framework} variant="secondary" className="text-sm">
@@ -331,7 +356,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               <Separator />
 
               <div>
-                <p className="text-sm font-medium mb-2">All Technologies</p>
+                <p className="mb-2 text-sm font-medium">All Technologies</p>
                 <div className="flex flex-wrap gap-2">
                   {project.techStack.map((tech) => (
                     <Badge key={tech} variant="outline" className="text-sm">
@@ -354,7 +379,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                 <CardDescription>What still needs to be completed</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-sm max-w-none dark:prose-invert">
+                <div className="prose prose-sm dark:prose-invert max-w-none">
                   {project.knownIssues.split('\n').map((issue, index) => (
                     <p key={index} className="mb-2 last:mb-0">
                       {issue}
@@ -416,18 +441,22 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           {/* Purchase Card */}
           <Card className="sticky top-4">
             <CardHeader>
-              <CardTitle className="text-3xl">{formatPrice(project.priceCents)}</CardTitle>
+              <CardTitle className="text-3xl">
+                {formatPrice(project.priceCents)}
+              </CardTitle>
               <CardDescription>One-time purchase</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Completion Progress */}
               <div>
-                <div className="flex items-center justify-between mb-2">
+                <div className="mb-2 flex items-center justify-between">
                   <span className="text-sm font-medium">Completion Status</span>
-                  <span className="text-sm font-bold">{project.completionPercentage}%</span>
+                  <span className="text-sm font-bold">
+                    {project.completionPercentage}%
+                  </span>
                 </div>
                 <Progress value={project.completionPercentage} className="h-2" />
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {project.estimatedCompletionHours && (
                     <>Estimated {project.estimatedCompletionHours} hours to complete</>
                   )}
@@ -439,25 +468,33 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               {/* License & Access */}
               <div className="space-y-2 text-sm">
                 <div className="flex items-start gap-2">
-                  <ShieldCheck className="h-4 w-4 mt-0.5 shrink-0" />
+                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
                   <div>
                     <p className="font-medium">{getLicenseLabel(project.licenseType)}</p>
-                    <p className="text-xs text-muted-foreground">Full ownership of code</p>
+                    <p className="text-xs text-muted-foreground">
+                      Full ownership of code
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Download className="h-4 w-4 mt-0.5 shrink-0" />
+                  <Download className="mt-0.5 h-4 w-4 shrink-0" />
                   <div>
                     <p className="font-medium">{getAccessLabel(project.accessLevel)}</p>
-                    <p className="text-xs text-muted-foreground">Complete source code & assets</p>
+                    <p className="text-xs text-muted-foreground">
+                      Complete source code & assets
+                    </p>
                   </div>
                 </div>
                 {project.estimatedCompletionHours && (
                   <div className="flex items-start gap-2">
-                    <Clock className="h-4 w-4 mt-0.5 shrink-0" />
+                    <Clock className="mt-0.5 h-4 w-4 shrink-0" />
                     <div>
-                      <p className="font-medium">{project.estimatedCompletionHours} hours estimated</p>
-                      <p className="text-xs text-muted-foreground">To finish remaining work</p>
+                      <p className="font-medium">
+                        {project.estimatedCompletionHours} hours estimated
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        To finish remaining work
+                      </p>
                     </div>
                   </div>
                 )}
@@ -471,14 +508,19 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                   <DollarSign className="mr-2 h-4 w-4" />
                   Buy Now
                 </Button>
-                <Button onClick={handleContactSeller} variant="outline" size="lg" className="w-full">
+                <Button
+                  onClick={handleContactSeller}
+                  variant="outline"
+                  size="lg"
+                  className="w-full"
+                >
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Contact Seller
                 </Button>
               </div>
 
               {/* Trust Indicators */}
-              <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground pt-2">
+              <div className="flex items-center justify-center gap-4 pt-2 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <CheckCircle2 className="h-3 w-3 text-green-500" />
                   <span>Secure Payment</span>
@@ -499,18 +541,27 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             <CardContent className="space-y-4">
               <div className="flex items-start gap-3">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src={project.seller.avatarUrl || undefined} alt={project.seller.username} />
+                  <AvatarImage
+                    src={project.seller.avatarUrl || undefined}
+                    alt={project.seller.username}
+                  />
                   <AvatarFallback>
                     {getInitials(project.seller.fullName || project.seller.username)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p className="font-semibold">{project.seller.fullName || project.seller.username}</p>
-                  <p className="text-sm text-muted-foreground">@{project.seller.username}</p>
+                  <p className="font-semibold">
+                    {project.seller.fullName || project.seller.username}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    @{project.seller.username}
+                  </p>
                 </div>
               </div>
 
-              {project.seller.bio && <p className="text-sm text-muted-foreground">{project.seller.bio}</p>}
+              {project.seller.bio && (
+                <p className="text-sm text-muted-foreground">{project.seller.bio}</p>
+              )}
 
               <Separator />
 

@@ -25,7 +25,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ProjectCard, type ProjectCardData } from '@/components/projects/ProjectCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
@@ -63,7 +69,8 @@ const _mockProjectsForReference: ProjectCardData[] = [
     completionPercentage: 85,
     priceCents: 75000,
     techStack: ['React', 'Node.js', 'PostgreSQL', 'Tailwind CSS', 'Stripe'],
-    thumbnailImageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
+    thumbnailImageUrl:
+      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
     isFeatured: true,
     viewCount: 245,
     favoriteCount: 32,
@@ -83,7 +90,8 @@ const _mockProjectsForReference: ProjectCardData[] = [
     completionPercentage: 70,
     priceCents: 125000,
     techStack: ['React Native', 'Django', 'PostgreSQL', 'Redis'],
-    thumbnailImageUrl: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&h=450&fit=crop',
+    thumbnailImageUrl:
+      'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&h=450&fit=crop',
     isFeatured: false,
     viewCount: 178,
     favoriteCount: 21,
@@ -123,7 +131,8 @@ const _mockProjectsForReference: ProjectCardData[] = [
     completionPercentage: 78,
     priceCents: 95000,
     techStack: ['Next.js', 'Socket.io', 'MongoDB', 'TypeScript', 'Tailwind CSS'],
-    thumbnailImageUrl: 'https://images.unsplash.com/photo-1611606063065-ee7946f0787a?w=800&h=450&fit=crop',
+    thumbnailImageUrl:
+      'https://images.unsplash.com/photo-1611606063065-ee7946f0787a?w=800&h=450&fit=crop',
     isFeatured: true,
     viewCount: 312,
     favoriteCount: 45,
@@ -143,7 +152,8 @@ const _mockProjectsForReference: ProjectCardData[] = [
     completionPercentage: 65,
     priceCents: 180000,
     techStack: ['Python', 'FastAPI', 'React', 'TensorFlow', 'PyTorch'],
-    thumbnailImageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
+    thumbnailImageUrl:
+      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
     isFeatured: false,
     viewCount: 156,
     favoriteCount: 28,
@@ -163,7 +173,8 @@ const _mockProjectsForReference: ProjectCardData[] = [
     completionPercentage: 55,
     priceCents: 220000,
     techStack: ['Unity', 'C#', 'Blender'],
-    thumbnailImageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=450&fit=crop',
+    thumbnailImageUrl:
+      'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=450&fit=crop',
     isFeatured: false,
     viewCount: 203,
     favoriteCount: 37,
@@ -236,9 +247,13 @@ export default function ProjectSearchPage() {
   const [searchQuery, setSearchQuery] = React.useState(searchParams.get('query') || '');
   const [category, setCategory] = React.useState(searchParams.get('category') || 'all');
   const [selectedTechStack, setSelectedTechStack] = React.useState<string[]>([]);
-  const [completionRange, setCompletionRange] = React.useState<[number, number]>([50, 95]);
+  const [completionRange, setCompletionRange] = React.useState<[number, number]>([
+    50, 95,
+  ]);
   const [priceRange, setPriceRange] = React.useState<[number, number]>([100, 100000]);
-  const [sortBy, setSortBy] = React.useState(searchParams.get('sortBy') || 'createdAt-desc');
+  const [sortBy, setSortBy] = React.useState(
+    searchParams.get('sortBy') || 'createdAt-desc'
+  );
   const [showFilters, setShowFilters] = React.useState(true);
 
   // State for results
@@ -263,7 +278,8 @@ export default function ProjectSearchPage() {
       const params = new URLSearchParams();
       if (searchQuery) params.set('query', searchQuery);
       if (category !== 'all') params.set('category', category);
-      if (selectedTechStack.length > 0) params.set('techStack', selectedTechStack.join(','));
+      if (selectedTechStack.length > 0)
+        params.set('techStack', selectedTechStack.join(','));
       params.set('minCompletion', completionRange[0].toString());
       params.set('maxCompletion', completionRange[1].toString());
       params.set('minPrice', (priceRange[0] * 100).toString()); // Convert to cents
@@ -305,7 +321,16 @@ export default function ProjectSearchPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, category, selectedTechStack, completionRange, priceRange, sortBy, currentPage, itemsPerPage]);
+  }, [
+    searchQuery,
+    category,
+    selectedTechStack,
+    completionRange,
+    priceRange,
+    sortBy,
+    currentPage,
+    itemsPerPage,
+  ]);
 
   /**
    * Fetch projects on mount and when filters change
@@ -435,7 +460,7 @@ export default function ProjectSearchPage() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
           {/* Filters Sidebar */}
           {showFilters && (
-            <div className="lg:col-span-1 space-y-6">
+            <div className="space-y-6 lg:col-span-1">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base">Filters</CardTitle>
@@ -468,7 +493,9 @@ export default function ProjectSearchPage() {
                       {POPULAR_TECH_STACKS.map((tech) => (
                         <Badge
                           key={tech}
-                          variant={selectedTechStack.includes(tech) ? 'default' : 'outline'}
+                          variant={
+                            selectedTechStack.includes(tech) ? 'default' : 'outline'
+                          }
                           className="cursor-pointer"
                           onClick={() => toggleTechStack(tech)}
                         >
@@ -493,7 +520,9 @@ export default function ProjectSearchPage() {
                       max={95}
                       step={5}
                       value={completionRange}
-                      onValueChange={(value) => setCompletionRange(value as [number, number])}
+                      onValueChange={(value) =>
+                        setCompletionRange(value as [number, number])
+                      }
                       className="w-full"
                     />
                   </div>
@@ -537,7 +566,8 @@ export default function ProjectSearchPage() {
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm text-muted-foreground">
                   <p>
-                    Featured projects are hand-picked by our team for quality and completeness.
+                    Featured projects are hand-picked by our team for quality and
+                    completeness.
                   </p>
                   <div className="flex items-center gap-2 text-xs">
                     <CheckCircle2 className="h-3 w-3 text-green-500" />

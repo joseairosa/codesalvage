@@ -103,7 +103,9 @@ test.describe('Project Creation Flow', () => {
     await page.waitForTimeout(300);
 
     // Check character counter
-    await expect(page.locator(`text=/${testText.length} \\/ 5000 characters/i`)).toBeVisible();
+    await expect(
+      page.locator(`text=/${testText.length} \\/ 5000 characters/i`)
+    ).toBeVisible();
   });
 
   test('should allow filling all form fields', async ({ page }) => {

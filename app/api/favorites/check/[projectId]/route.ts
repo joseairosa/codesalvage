@@ -57,10 +57,7 @@ export async function GET(
 
     console.log(`[${componentName}] Favorite status:`, isFavorited);
 
-    return NextResponse.json(
-      { isFavorited },
-      { status: 200 }
-    );
+    return NextResponse.json({ isFavorited }, { status: 200 });
   } catch (error) {
     console.error(`[${componentName}] Error checking favorite status:`, error);
 

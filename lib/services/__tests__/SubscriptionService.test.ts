@@ -126,7 +126,10 @@ describe('SubscriptionService', () => {
     vi.clearAllMocks();
 
     // Create fresh instance
-    subscriptionService = new SubscriptionService(mockSubscriptionRepository, mockUserRepository);
+    subscriptionService = new SubscriptionService(
+      mockSubscriptionRepository,
+      mockUserRepository
+    );
   });
 
   // ============================================
@@ -145,7 +148,9 @@ describe('SubscriptionService', () => {
       vi.mocked(stripe.customers.create).mockResolvedValue(mockCustomer as any);
       vi.mocked(stripe.paymentMethods.attach).mockResolvedValue({} as any);
       vi.mocked(stripe.customers.update).mockResolvedValue({} as any);
-      vi.mocked(stripe.subscriptions.create).mockResolvedValue(mockStripeSubscription as any);
+      vi.mocked(stripe.subscriptions.create).mockResolvedValue(
+        mockStripeSubscription as any
+      );
       vi.mocked(mockSubscriptionRepository.create).mockResolvedValue(mockSubscription);
 
       const result = await subscriptionService.createSubscription('user123', {
@@ -207,7 +212,9 @@ describe('SubscriptionService', () => {
 
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
       vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(null);
-      vi.mocked(stripe.subscriptions.create).mockResolvedValue(mockStripeSubscription as any);
+      vi.mocked(stripe.subscriptions.create).mockResolvedValue(
+        mockStripeSubscription as any
+      );
       vi.mocked(mockSubscriptionRepository.create).mockResolvedValue(mockSubscription);
 
       await subscriptionService.createSubscription('user123', { plan: 'pro' });
@@ -224,7 +231,9 @@ describe('SubscriptionService', () => {
       const mockUser = createMockUser();
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser);
       vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(null);
-      vi.mocked(stripe.customers.create).mockRejectedValue(new MockStripeError('Card declined'));
+      vi.mocked(stripe.customers.create).mockRejectedValue(
+        new MockStripeError('Card declined')
+      );
 
       await expect(
         subscriptionService.createSubscription('user123', { plan: 'pro' })
@@ -242,9 +251,15 @@ describe('SubscriptionService', () => {
       const mockStripeSubscription = { ...createMockStripeSubscription() };
       const mockUpdatedSubscription = createMockSubscription({ cancelAtPeriodEnd: true });
 
-      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(mockSubscription);
-      vi.mocked(stripe.subscriptions.update).mockResolvedValue(mockStripeSubscription as any);
-      vi.mocked(mockSubscriptionRepository.update).mockResolvedValue(mockUpdatedSubscription);
+      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(
+        mockSubscription
+      );
+      vi.mocked(stripe.subscriptions.update).mockResolvedValue(
+        mockStripeSubscription as any
+      );
+      vi.mocked(mockSubscriptionRepository.update).mockResolvedValue(
+        mockUpdatedSubscription
+      );
 
       const result = await subscriptionService.cancelSubscription('user123');
 
@@ -273,7 +288,9 @@ describe('SubscriptionService', () => {
 
     it('should handle Stripe errors', async () => {
       const mockSubscription = createMockSubscription();
-      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(mockSubscription);
+      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(
+        mockSubscription
+      );
       vi.mocked(stripe.subscriptions.update).mockRejectedValue(
         new MockStripeError('Invalid subscription')
       );
@@ -292,11 +309,19 @@ describe('SubscriptionService', () => {
     it('should resume canceled subscription', async () => {
       const mockSubscription = createMockSubscription({ cancelAtPeriodEnd: true });
       const mockStripeSubscription = { ...createMockStripeSubscription() };
-      const mockUpdatedSubscription = createMockSubscription({ cancelAtPeriodEnd: false });
+      const mockUpdatedSubscription = createMockSubscription({
+        cancelAtPeriodEnd: false,
+      });
 
-      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(mockSubscription);
-      vi.mocked(stripe.subscriptions.update).mockResolvedValue(mockStripeSubscription as any);
-      vi.mocked(mockSubscriptionRepository.update).mockResolvedValue(mockUpdatedSubscription);
+      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(
+        mockSubscription
+      );
+      vi.mocked(stripe.subscriptions.update).mockResolvedValue(
+        mockStripeSubscription as any
+      );
+      vi.mocked(mockSubscriptionRepository.update).mockResolvedValue(
+        mockUpdatedSubscription
+      );
 
       const result = await subscriptionService.resumeSubscription('user123');
 
@@ -328,7 +353,9 @@ describe('SubscriptionService', () => {
   describe('getSubscriptionStatus', () => {
     it('should return active subscription status with pro benefits', async () => {
       const mockSubscription = createMockSubscription();
-      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(mockSubscription);
+      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(
+        mockSubscription
+      );
 
       const result = await subscriptionService.getSubscriptionStatus('user123');
 
@@ -369,7 +396,9 @@ describe('SubscriptionService', () => {
 
     it('should return free plan benefits when subscription is not active', async () => {
       const mockSubscription = createMockSubscription({ status: 'canceled' });
-      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(mockSubscription);
+      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(
+        mockSubscription
+      );
 
       const result = await subscriptionService.getSubscriptionStatus('user123');
 
@@ -394,7 +423,9 @@ describe('SubscriptionService', () => {
         url: 'https://billing.stripe.com/session/xxx',
       };
 
-      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(mockSubscription);
+      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(
+        mockSubscription
+      );
       vi.mocked(stripe.billingPortal.sessions.create).mockResolvedValue(
         mockPortalSession as any
       );
@@ -421,7 +452,9 @@ describe('SubscriptionService', () => {
 
     it('should handle Stripe errors', async () => {
       const mockSubscription = createMockSubscription();
-      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(mockSubscription);
+      vi.mocked(mockSubscriptionRepository.findByUserId).mockResolvedValue(
+        mockSubscription
+      );
       vi.mocked(stripe.billingPortal.sessions.create).mockRejectedValue(
         new MockStripeError('API Error')
       );
@@ -517,15 +550,20 @@ describe('SubscriptionService', () => {
       );
 
       expect(result).toEqual(mockUpdatedSubscription);
-      expect(mockSubscriptionRepository.updateByStripeId).toHaveBeenCalledWith('sub_stripe123', {
-        status: 'past_due',
-        currentPeriodStart: new Date('2026-02-01T00:00:00Z'),
-        currentPeriodEnd: new Date('2026-03-01T00:00:00Z'),
-      });
+      expect(mockSubscriptionRepository.updateByStripeId).toHaveBeenCalledWith(
+        'sub_stripe123',
+        {
+          status: 'past_due',
+          currentPeriodStart: new Date('2026-02-01T00:00:00Z'),
+          currentPeriodEnd: new Date('2026-03-01T00:00:00Z'),
+        }
+      );
     });
 
     it('should throw error when subscription not found', async () => {
-      vi.mocked(mockSubscriptionRepository.findByStripeSubscriptionId).mockResolvedValue(null);
+      vi.mocked(mockSubscriptionRepository.findByStripeSubscriptionId).mockResolvedValue(
+        null
+      );
 
       await expect(
         subscriptionService.updateFromWebhook(
@@ -560,14 +598,19 @@ describe('SubscriptionService', () => {
       const result = await subscriptionService.cancelImmediately('sub_stripe123');
 
       expect(result).toEqual(mockCanceledSubscription);
-      expect(mockSubscriptionRepository.updateByStripeId).toHaveBeenCalledWith('sub_stripe123', {
-        status: 'canceled',
-        canceledAt: expect.any(Date),
-      });
+      expect(mockSubscriptionRepository.updateByStripeId).toHaveBeenCalledWith(
+        'sub_stripe123',
+        {
+          status: 'canceled',
+          canceledAt: expect.any(Date),
+        }
+      );
     });
 
     it('should throw error when subscription not found', async () => {
-      vi.mocked(mockSubscriptionRepository.findByStripeSubscriptionId).mockResolvedValue(null);
+      vi.mocked(mockSubscriptionRepository.findByStripeSubscriptionId).mockResolvedValue(
+        null
+      );
 
       await expect(subscriptionService.cancelImmediately('nonexistent')).rejects.toThrow(
         SubscriptionNotFoundError

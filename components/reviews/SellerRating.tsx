@@ -102,7 +102,15 @@ export function SellerRating({ sellerId }: SellerRatingProps) {
   /**
    * Rating Distribution Bar
    */
-  const RatingBar = ({ stars, count, total }: { stars: number; count: number; total: number }) => {
+  const RatingBar = ({
+    stars,
+    count,
+    total,
+  }: {
+    stars: number;
+    count: number;
+    total: number;
+  }) => {
     const percentage = total > 0 ? (count / total) * 100 : 0;
 
     return (
@@ -180,11 +188,31 @@ export function SellerRating({ sellerId }: SellerRatingProps) {
 
           {/* Rating Distribution */}
           <div className="flex-1 space-y-2">
-            <RatingBar stars={5} count={stats.ratingDistribution[5]} total={stats.totalReviews} />
-            <RatingBar stars={4} count={stats.ratingDistribution[4]} total={stats.totalReviews} />
-            <RatingBar stars={3} count={stats.ratingDistribution[3]} total={stats.totalReviews} />
-            <RatingBar stars={2} count={stats.ratingDistribution[2]} total={stats.totalReviews} />
-            <RatingBar stars={1} count={stats.ratingDistribution[1]} total={stats.totalReviews} />
+            <RatingBar
+              stars={5}
+              count={stats.ratingDistribution[5]}
+              total={stats.totalReviews}
+            />
+            <RatingBar
+              stars={4}
+              count={stats.ratingDistribution[4]}
+              total={stats.totalReviews}
+            />
+            <RatingBar
+              stars={3}
+              count={stats.ratingDistribution[3]}
+              total={stats.totalReviews}
+            />
+            <RatingBar
+              stars={2}
+              count={stats.ratingDistribution[2]}
+              total={stats.totalReviews}
+            />
+            <RatingBar
+              stars={1}
+              count={stats.ratingDistribution[1]}
+              total={stats.totalReviews}
+            />
           </div>
         </div>
 

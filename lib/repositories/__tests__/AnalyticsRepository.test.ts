@@ -62,9 +62,7 @@ describe('AnalyticsRepository', () => {
         { viewCount: 125, priceCents: 8000 },
       ] as any);
 
-      const result = await analyticsRepository.getSellerRevenueSummary(
-        sellerId
-      );
+      const result = await analyticsRepository.getSellerRevenueSummary(sellerId);
 
       expect(result.totalProjects).toBe(5);
       expect(result.totalSold).toBe(2); // 2 unique projects sold
@@ -82,9 +80,7 @@ describe('AnalyticsRepository', () => {
         { viewCount: 50, priceCents: 15000 },
       ] as any);
 
-      const result = await analyticsRepository.getSellerRevenueSummary(
-        'seller123'
-      );
+      const result = await analyticsRepository.getSellerRevenueSummary('seller123');
 
       expect(result.totalProjects).toBe(3);
       expect(result.totalSold).toBe(0);
@@ -102,9 +98,7 @@ describe('AnalyticsRepository', () => {
         { viewCount: 0, priceCents: 20000 },
       ] as any);
 
-      const result = await analyticsRepository.getSellerRevenueSummary(
-        'seller123'
-      );
+      const result = await analyticsRepository.getSellerRevenueSummary('seller123');
 
       expect(result.conversionRate).toBe(0); // 0 views = 0 conversion
     });
@@ -221,10 +215,7 @@ describe('AnalyticsRepository', () => {
 
       vi.mocked(mockPrismaClient.transaction.findMany).mockResolvedValue([]);
 
-      const result = await analyticsRepository.getRevenueOverTime(
-        'seller123',
-        dateRange
-      );
+      const result = await analyticsRepository.getRevenueOverTime('seller123', dateRange);
 
       expect(result).toEqual([]);
     });
@@ -238,10 +229,7 @@ describe('AnalyticsRepository', () => {
           title: 'Project 1',
           viewCount: 100,
           favoriteCount: 10,
-          transactions: [
-            { sellerReceivesCents: 8200 },
-            { sellerReceivesCents: 8200 },
-          ],
+          transactions: [{ sellerReceivesCents: 8200 }, { sellerReceivesCents: 8200 }],
         },
         {
           id: 'proj2',
@@ -299,9 +287,7 @@ describe('AnalyticsRepository', () => {
         transactions: [{ sellerReceivesCents: 8200 }],
       }));
 
-      vi.mocked(mockPrismaClient.project.findMany).mockResolvedValue(
-        projects as any
-      );
+      vi.mocked(mockPrismaClient.project.findMany).mockResolvedValue(projects as any);
 
       const result = await analyticsRepository.getTopProjects('seller123', 5);
 

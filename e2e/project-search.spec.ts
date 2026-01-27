@@ -194,7 +194,10 @@ test.describe('Project Search - Filters', () => {
     await expect(page.getByText('Search: Dashboard')).toBeVisible();
 
     // Click the X button on the badge
-    const removeButton = page.locator('[class*="gap-1"]').filter({ hasText: 'Search: Dashboard' }).locator('button');
+    const removeButton = page
+      .locator('[class*="gap-1"]')
+      .filter({ hasText: 'Search: Dashboard' })
+      .locator('button');
     await removeButton.click();
     await page.waitForTimeout(300);
 
@@ -239,7 +242,11 @@ test.describe('Project Search - Sort and Pagination', () => {
     console.log(`[${componentName}] Testing sort order change`);
 
     // Click sort dropdown
-    const sortSelect = page.locator('text=Sort by:').locator('..').locator('button').first();
+    const sortSelect = page
+      .locator('text=Sort by:')
+      .locator('..')
+      .locator('button')
+      .first();
     await sortSelect.click();
     await page.waitForTimeout(300);
 
@@ -288,7 +295,7 @@ test.describe('Project Search - Sort and Pagination', () => {
 
     const nextButton = page.getByRole('button', { name: /next/i });
 
-    if (await nextButton.isVisible() && !(await nextButton.isDisabled())) {
+    if ((await nextButton.isVisible()) && !(await nextButton.isDisabled())) {
       await nextButton.click();
       await page.waitForTimeout(500);
 
@@ -309,7 +316,10 @@ test.describe('Project Search - Project Cards', () => {
     await page.waitForTimeout(500);
 
     // Click first project card
-    const firstCard = page.locator('[class*="group"]').filter({ hasText: /\$\d+/ }).first();
+    const firstCard = page
+      .locator('[class*="group"]')
+      .filter({ hasText: /\$\d+/ })
+      .first();
 
     if (await firstCard.isVisible()) {
       await firstCard.click();
@@ -326,7 +336,10 @@ test.describe('Project Search - Project Cards', () => {
     await page.waitForTimeout(500);
 
     // First card should show key information
-    const firstCard = page.locator('[class*="group"]').filter({ hasText: /\$\d+/ }).first();
+    const firstCard = page
+      .locator('[class*="group"]')
+      .filter({ hasText: /\$\d+/ })
+      .first();
 
     if (await firstCard.isVisible()) {
       // Should contain price

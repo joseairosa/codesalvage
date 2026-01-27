@@ -493,10 +493,7 @@ export class ProjectRepository {
    * @example
    * const activeCount = await projectRepo.countByUser('user123', { status: 'active' });
    */
-  async countByUser(
-    sellerId: string,
-    options?: { status?: string }
-  ): Promise<number> {
+  async countByUser(sellerId: string, options?: { status?: string }): Promise<number> {
     console.log('[ProjectRepository] Counting projects for seller:', sellerId);
 
     try {

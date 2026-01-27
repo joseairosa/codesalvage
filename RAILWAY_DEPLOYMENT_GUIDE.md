@@ -112,6 +112,7 @@ openssl rand -hex 32
 Once deployed, Railway will automatically run migrations during build (via `npm run build` which includes `prisma generate`). However, you need to push the schema to the database:
 
 **Option 1: Via Railway CLI**
+
 ```bash
 # Install Railway CLI
 npm install -g @railway/cli
@@ -127,6 +128,7 @@ railway run npx prisma migrate deploy
 ```
 
 **Option 2: Via Railway Dashboard**
+
 1. Go to your app service in Railway
 2. Click "Settings" → "Deploy"
 3. Add a deployment command: `npx prisma migrate deploy`
@@ -157,6 +159,7 @@ railway run npx prisma db seed
 In Cloudflare DNS settings for `codesalvage.com`:
 
 **Add CNAME record:**
+
 ```
 Type: CNAME
 Name: @ (or codesalvage.com)
@@ -165,6 +168,7 @@ Proxy: Enabled (orange cloud)
 ```
 
 **Add www redirect (optional):**
+
 ```
 Type: CNAME
 Name: www
@@ -183,6 +187,7 @@ Railway automatically provisions SSL certificates via Let's Encrypt. Wait 5-10 m
 ### 5.1 Update GitHub OAuth
 
 In GitHub OAuth app settings:
+
 - **Homepage URL**: `https://codesalvage.com`
 - **Authorization callback URL**: `https://codesalvage.com/api/auth/callback/github`
 
@@ -242,7 +247,7 @@ Use a service like cron-job.org or EasyCron:
 2. **URL**: `https://codesalvage.com/api/cron/release-escrow`
 3. **Method**: GET
 4. **Headers**: `Authorization: Bearer <CRON_SECRET>`
-5. **Schedule**: Every 6 hours (0 */6 * * *)
+5. **Schedule**: Every 6 hours (0 _/6 _ \* \*)
 
 ### Option 3: GitHub Actions
 
@@ -276,6 +281,7 @@ Add `CRON_SECRET` to GitHub repository secrets.
 Visit `https://codesalvage.com/api/health`
 
 Expected response:
+
 ```json
 {
   "status": "ok",
@@ -312,6 +318,7 @@ Expected response:
 ### 7.3 Monitor Logs
 
 In Railway dashboard:
+
 1. Go to your app service
 2. Click "Deployments"
 3. Select latest deployment
@@ -346,6 +353,7 @@ Before announcing launch:
 **Issue**: Build fails with TypeScript errors
 
 **Solution**:
+
 ```bash
 # Run locally to check
 npm run build
@@ -357,6 +365,7 @@ npx tsc --noEmit
 **Issue**: Prisma client generation fails
 
 **Solution**: Ensure `prisma generate` runs during build. Check `package.json`:
+
 ```json
 {
   "scripts": {
@@ -370,6 +379,7 @@ npx tsc --noEmit
 **Issue**: Health check shows `database: false`
 
 **Solution**:
+
 1. Verify `DATABASE_URL` environment variable set
 2. Check Prisma connection in Railway logs
 3. Ensure database service is running
@@ -380,6 +390,7 @@ npx tsc --noEmit
 **Issue**: Webhooks not receiving events
 
 **Solution**:
+
 1. Verify webhook URL is correct: `https://codesalvage.com/api/webhooks/stripe`
 2. Check `STRIPE_WEBHOOK_SECRET` matches Stripe dashboard
 3. Review Railway logs for webhook errors
@@ -393,6 +404,7 @@ npx tsc --noEmit
 **Issue**: R2 uploads failing with CORS errors
 
 **Solution**:
+
 1. Verify R2 CORS configuration includes `https://codesalvage.com`
 2. Check `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` in Railway variables
 3. Test R2 connection with AWS CLI
@@ -404,6 +416,7 @@ npx tsc --noEmit
 ### Railway Metrics
 
 Monitor in Railway dashboard:
+
 - **CPU Usage**: Should stay below 80%
 - **Memory Usage**: Should stay below 512MB
 - **Request Volume**: Track trends
@@ -431,6 +444,7 @@ SELECT count(*) FROM pg_stat_activity;
 ### Log Monitoring
 
 Key log patterns to monitor:
+
 - `[HealthCheck] Database check failed` - Database connectivity issues
 - `[StripeWebhook] Failed to process` - Payment processing errors
 - `[ProjectService] Validation error` - User input errors
@@ -439,11 +453,13 @@ Key log patterns to monitor:
 ### Backup Strategy
 
 **Database Backups**:
+
 - Railway provides automatic daily backups
 - Configure retention period in Railway settings
 - Test backup restoration periodically
 
 **Code Backups**:
+
 - GitHub repository serves as code backup
 - Tag releases: `git tag v1.0.0 && git push --tags`
 
@@ -454,11 +470,13 @@ Key log patterns to monitor:
 ### Horizontal Scaling
 
 Railway supports horizontal scaling:
+
 1. Go to service settings
 2. Increase replica count
 3. Railway load balances automatically
 
 **When to scale**:
+
 - CPU usage consistently >80%
 - Response times >1s p95
 - High request volume (>1000 req/min)
@@ -466,11 +484,13 @@ Railway supports horizontal scaling:
 ### Database Scaling
 
 **Upgrade Plan**:
+
 - Railway offers larger database instances
 - Upgrade in database service settings
 
 **Connection Pooling**:
 Already configured via Prisma:
+
 ```typescript
 datasource db {
   provider = "postgresql"
@@ -481,6 +501,7 @@ datasource db {
 ### Redis Caching
 
 Implement caching for expensive queries:
+
 - Project listings
 - Seller profiles
 - Rating calculations
@@ -490,6 +511,7 @@ Implement caching for expensive queries:
 ## Cost Estimation
 
 **Railway Pricing** (estimated monthly):
+
 - **Starter Plan**: $5/month (includes $5 credit)
 - **PostgreSQL Add-on**: $5/month
 - **Redis Add-on**: $5/month
@@ -498,6 +520,7 @@ Implement caching for expensive queries:
 **Total**: ~$25-35/month initially
 
 **Third-Party Services**:
+
 - Stripe: Pay-as-you-go (2.9% + $0.30 per transaction)
 - SendGrid: Free tier (100 emails/day) or $15/month (40k emails)
 - Cloudflare R2: $0.015/GB stored, zero egress fees

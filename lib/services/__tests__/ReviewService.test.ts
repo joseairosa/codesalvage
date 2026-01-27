@@ -217,9 +217,7 @@ describe('ReviewService', () => {
 
       await reviewService.createReview(buyerId, validReviewData);
 
-      expect(mockEmailService.sendNewReviewNotification).toHaveBeenCalledWith(
-        mockReview
-      );
+      expect(mockEmailService.sendNewReviewNotification).toHaveBeenCalledWith(mockReview);
     });
 
     it('should not throw if email notification fails', async () => {
@@ -322,18 +320,16 @@ describe('ReviewService', () => {
       const mockReview = createMockReview();
       vi.mocked(mockReviewRepository.create).mockResolvedValue(mockReview as any);
 
-      await expect(
-        reviewService.createReview(buyerId, validData)
-      ).resolves.toBeDefined();
+      await expect(reviewService.createReview(buyerId, validData)).resolves.toBeDefined();
     });
 
     // Permission error tests
     it('should reject if transaction not found', async () => {
       vi.mocked(mockTransactionRepository.findById).mockResolvedValue(null);
 
-      await expect(
-        reviewService.createReview(buyerId, validReviewData)
-      ).rejects.toThrow(ReviewValidationError);
+      await expect(reviewService.createReview(buyerId, validReviewData)).rejects.toThrow(
+        ReviewValidationError
+      );
     });
 
     it('should reject if buyer is not the transaction buyer', async () => {
@@ -341,9 +337,9 @@ describe('ReviewService', () => {
         createMockTransaction({ buyerId: 'differentbuyer' })
       );
 
-      await expect(
-        reviewService.createReview(buyerId, validReviewData)
-      ).rejects.toThrow(ReviewPermissionError);
+      await expect(reviewService.createReview(buyerId, validReviewData)).rejects.toThrow(
+        ReviewPermissionError
+      );
     });
 
     it('should reject if payment not succeeded', async () => {
@@ -351,9 +347,9 @@ describe('ReviewService', () => {
         createMockTransaction({ paymentStatus: 'pending' })
       );
 
-      await expect(
-        reviewService.createReview(buyerId, validReviewData)
-      ).rejects.toThrow(ReviewValidationError);
+      await expect(reviewService.createReview(buyerId, validReviewData)).rejects.toThrow(
+        ReviewValidationError
+      );
     });
 
     it('should reject if transaction already reviewed', async () => {
@@ -361,19 +357,17 @@ describe('ReviewService', () => {
         createMockReview() as any
       );
 
-      await expect(
-        reviewService.createReview(buyerId, validReviewData)
-      ).rejects.toThrow(ReviewValidationError);
+      await expect(reviewService.createReview(buyerId, validReviewData)).rejects.toThrow(
+        ReviewValidationError
+      );
     });
 
     it('should reject if buyer does not exist', async () => {
-      vi.mocked(mockUserRepository.findById)
-        .mockReset()
-        .mockResolvedValueOnce(null); // Buyer not found
+      vi.mocked(mockUserRepository.findById).mockReset().mockResolvedValueOnce(null); // Buyer not found
 
-      await expect(
-        reviewService.createReview(buyerId, validReviewData)
-      ).rejects.toThrow(ReviewPermissionError);
+      await expect(reviewService.createReview(buyerId, validReviewData)).rejects.toThrow(
+        ReviewPermissionError
+      );
     });
 
     it('should reject if seller does not exist', async () => {
@@ -382,9 +376,9 @@ describe('ReviewService', () => {
         .mockResolvedValueOnce(createMockUser('buyer123') as any) // Buyer exists
         .mockResolvedValueOnce(null); // Seller not found
 
-      await expect(
-        reviewService.createReview(buyerId, validReviewData)
-      ).rejects.toThrow(ReviewPermissionError);
+      await expect(reviewService.createReview(buyerId, validReviewData)).rejects.toThrow(
+        ReviewPermissionError
+      );
     });
   });
 
@@ -431,10 +425,10 @@ describe('ReviewService', () => {
 
       await reviewService.getSellerReviews(sellerId, { page: 2, limit: 10 });
 
-      expect(mockReviewRepository.getSellerReviews).toHaveBeenCalledWith(
-        sellerId,
-        { page: 2, limit: 10 }
-      );
+      expect(mockReviewRepository.getSellerReviews).toHaveBeenCalledWith(sellerId, {
+        page: 2,
+        limit: 10,
+      });
     });
 
     it('should throw if seller not found', async () => {
@@ -462,24 +456,20 @@ describe('ReviewService', () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(
         createMockUser(sellerId) as any
       );
-      vi.mocked(mockReviewRepository.getSellerRatingStats).mockResolvedValue(
-        mockStats
-      );
+      vi.mocked(mockReviewRepository.getSellerRatingStats).mockResolvedValue(mockStats);
 
       const result = await reviewService.getSellerRatingStats(sellerId);
 
       expect(result).toEqual(mockStats);
-      expect(mockReviewRepository.getSellerRatingStats).toHaveBeenCalledWith(
-        sellerId
-      );
+      expect(mockReviewRepository.getSellerRatingStats).toHaveBeenCalledWith(sellerId);
     });
 
     it('should throw if seller not found', async () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
 
-      await expect(
-        reviewService.getSellerRatingStats('nonexistent')
-      ).rejects.toThrow(ReviewNotFoundError);
+      await expect(reviewService.getSellerRatingStats('nonexistent')).rejects.toThrow(
+        ReviewNotFoundError
+      );
     });
   });
 

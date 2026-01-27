@@ -76,13 +76,10 @@ describe('FeaturedListingService (Integration)', () => {
       });
 
       // Purchase 7-day featured placement
-      const result = await featuredListingService.purchaseFeaturedPlacement(
-        seller.id,
-        {
-          projectId: project.id,
-          durationDays: 7,
-        }
-      );
+      const result = await featuredListingService.purchaseFeaturedPlacement(seller.id, {
+        projectId: project.id,
+        durationDays: 7,
+      });
 
       // Verify result
       expect(result.projectId).toBe(project.id);
@@ -116,13 +113,10 @@ describe('FeaturedListingService (Integration)', () => {
         status: 'active',
       });
 
-      const result = await featuredListingService.purchaseFeaturedPlacement(
-        seller.id,
-        {
-          projectId: project.id,
-          durationDays: 14,
-        }
-      );
+      const result = await featuredListingService.purchaseFeaturedPlacement(seller.id, {
+        projectId: project.id,
+        durationDays: 14,
+      });
 
       expect(result.costCents).toBe(4999); // $49.99
       expect(result.durationDays).toBe(14);
@@ -138,13 +132,10 @@ describe('FeaturedListingService (Integration)', () => {
         status: 'active',
       });
 
-      const result = await featuredListingService.purchaseFeaturedPlacement(
-        seller.id,
-        {
-          projectId: project.id,
-          durationDays: 30,
-        }
-      );
+      const result = await featuredListingService.purchaseFeaturedPlacement(seller.id, {
+        projectId: project.id,
+        durationDays: 30,
+      });
 
       expect(result.costCents).toBe(7999); // $79.99
       expect(result.durationDays).toBe(30);

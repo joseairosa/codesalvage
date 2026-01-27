@@ -20,7 +20,13 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
@@ -150,7 +156,8 @@ export default function ProjectDownloadPage({ params }: { params: { id: string }
               </Button>
 
               <p className="text-xs text-muted-foreground">
-                The download link expires after 1 hour. You can generate a new link anytime.
+                The download link expires after 1 hour. You can generate a new link
+                anytime.
               </p>
             </CardContent>
           </Card>
@@ -181,7 +188,7 @@ export default function ProjectDownloadPage({ params }: { params: { id: string }
                   </Button>
 
                   <div className="rounded-lg bg-muted p-3">
-                    <code className="text-xs break-all">{downloadInfo.githubUrl}</code>
+                    <code className="break-all text-xs">{downloadInfo.githubUrl}</code>
                   </div>
                 </>
               ) : (
@@ -207,7 +214,8 @@ export default function ProjectDownloadPage({ params }: { params: { id: string }
                 <div>
                   <h4 className="font-semibold">Download the Code</h4>
                   <p className="text-sm text-muted-foreground">
-                    Download the ZIP file or clone the GitHub repository to your local machine.
+                    Download the ZIP file or clone the GitHub repository to your local
+                    machine.
                   </p>
                 </div>
               </div>
@@ -219,7 +227,8 @@ export default function ProjectDownloadPage({ params }: { params: { id: string }
                 <div>
                   <h4 className="font-semibold">Install Dependencies</h4>
                   <p className="text-sm text-muted-foreground">
-                    Follow the README instructions to install dependencies (npm install, etc.)
+                    Follow the README instructions to install dependencies (npm install,
+                    etc.)
                   </p>
                 </div>
               </div>
@@ -243,17 +252,15 @@ export default function ProjectDownloadPage({ params }: { params: { id: string }
         <Alert>
           <FileCode className="h-4 w-4" />
           <AlertDescription>
-            <strong>Need help?</strong> Contact the seller via the messaging system if you have
-            questions about the code. For technical support, reach out to our support team.
+            <strong>Need help?</strong> Contact the seller via the messaging system if you
+            have questions about the code. For technical support, reach out to our support
+            team.
           </AlertDescription>
         </Alert>
 
         {/* Back Button */}
         <div className="flex justify-center">
-          <Button
-            onClick={() => router.push('/buyer/purchases')}
-            variant="outline"
-          >
+          <Button onClick={() => router.push('/buyer/purchases')} variant="outline">
             View All Purchases
           </Button>
         </div>

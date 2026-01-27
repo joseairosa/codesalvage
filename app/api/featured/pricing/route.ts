@@ -28,7 +28,10 @@ const featuredListingRepository = new FeaturedListingRepository(prisma);
 const projectRepository = new ProjectRepository(prisma);
 const userRepository = new UserRepository(prisma);
 const subscriptionRepository = new SubscriptionRepository(prisma);
-const subscriptionService = new SubscriptionService(subscriptionRepository, userRepository);
+const subscriptionService = new SubscriptionService(
+  subscriptionRepository,
+  userRepository
+);
 const featuredListingService = new FeaturedListingService(
   featuredListingRepository,
   projectRepository,

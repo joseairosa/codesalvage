@@ -18,7 +18,10 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createProjectSchema, type CreateProjectFormData } from '@/lib/validations/project';
+import {
+  createProjectSchema,
+  type CreateProjectFormData,
+} from '@/lib/validations/project';
 import { TechStackSelector } from '@/components/projects/TechStackSelector';
 import { PriceInput } from '@/components/projects/PriceInput';
 import { CompletionSlider } from '@/components/projects/CompletionSlider';
@@ -198,7 +201,9 @@ export default function NewProjectPage() {
       router.push(`/projects/${publishedProject.id}`);
     } catch (error) {
       console.error(`[${componentName}] Publish submission error:`, error);
-      setSubmitError(error instanceof Error ? error.message : 'Failed to publish project');
+      setSubmitError(
+        error instanceof Error ? error.message : 'Failed to publish project'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -266,9 +271,7 @@ export default function NewProjectPage() {
                 />
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>{errors.description?.message || 'Minimum 50 characters'}</span>
-                  <span>
-                    {description?.length || 0} / 5000 characters
-                  </span>
+                  <span>{description?.length || 0} / 5000 characters</span>
                 </div>
               </div>
 
@@ -302,7 +305,9 @@ export default function NewProjectPage() {
                   <TechStackSelector
                     value={field.value}
                     onChange={field.onChange}
-                    {...(errors.techStack?.message && { error: errors.techStack.message })}
+                    {...(errors.techStack?.message && {
+                      error: errors.techStack.message,
+                    })}
                   />
                 )}
               />
@@ -334,7 +339,9 @@ export default function NewProjectPage() {
                   <CompletionSlider
                     value={field.value}
                     onChange={field.onChange}
-                    error={errors.completionPercentage?.message}
+                    {...(errors.completionPercentage?.message && {
+                      error: errors.completionPercentage.message,
+                    })}
                   />
                 )}
               />
@@ -408,7 +415,9 @@ export default function NewProjectPage() {
                         <SelectItem value="limited">
                           Limited License - Buyer can use but not resell
                         </SelectItem>
-                        <SelectItem value="custom">Custom License - Negotiable terms</SelectItem>
+                        <SelectItem value="custom">
+                          Custom License - Negotiable terms
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -450,7 +459,9 @@ export default function NewProjectPage() {
           <Card>
             <CardHeader>
               <CardTitle>Media & Links</CardTitle>
-              <CardDescription>Add screenshots, demos, and repository links</CardDescription>
+              <CardDescription>
+                Add screenshots, demos, and repository links
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Screenshots */}

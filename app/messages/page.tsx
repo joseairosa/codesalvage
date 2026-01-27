@@ -186,7 +186,11 @@ export default function MessagesPage() {
                 <AlertCircle className="h-5 w-5" />
                 <p className="font-medium">{error}</p>
               </div>
-              <Button onClick={() => fetchConversations()} variant="outline" className="mt-4">
+              <Button
+                onClick={() => fetchConversations()}
+                variant="outline"
+                className="mt-4"
+              >
                 Try Again
               </Button>
             </CardContent>
@@ -218,7 +222,10 @@ export default function MessagesPage() {
                 key={`${conversation.partnerId}-${conversation.project?.id || 'general'}`}
                 className="cursor-pointer transition-colors hover:bg-muted/50"
                 onClick={() =>
-                  handleConversationClick(conversation.partnerId, conversation.project?.id)
+                  handleConversationClick(
+                    conversation.partnerId,
+                    conversation.project?.id
+                  )
                 }
               >
                 <CardContent className="flex items-start gap-4 p-6">
@@ -229,7 +236,10 @@ export default function MessagesPage() {
                       alt={conversation.partner.username}
                     />
                     <AvatarFallback>
-                      {getInitials(conversation.partner.fullName, conversation.partner.username)}
+                      {getInitials(
+                        conversation.partner.fullName,
+                        conversation.partner.username
+                      )}
                     </AvatarFallback>
                   </Avatar>
 
@@ -267,7 +277,8 @@ export default function MessagesPage() {
                           : 'text-muted-foreground'
                       }`}
                     >
-                      {conversation.latestMessage.senderId === session?.user?.id && 'You: '}
+                      {conversation.latestMessage.senderId === session?.user?.id &&
+                        'You: '}
                       {truncateMessage(conversation.latestMessage.content)}
                     </p>
                   </div>
@@ -286,8 +297,8 @@ export default function MessagesPage() {
               </div>
               <h3 className="mb-2 text-lg font-semibold">No messages yet</h3>
               <p className="mb-6 max-w-sm text-sm text-muted-foreground">
-                Start a conversation by contacting a seller on a project page, or wait for buyers
-                to reach out to you.
+                Start a conversation by contacting a seller on a project page, or wait for
+                buyers to reach out to you.
               </p>
               <Button onClick={() => router.push('/projects')}>Browse Projects</Button>
             </CardContent>

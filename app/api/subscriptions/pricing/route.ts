@@ -21,7 +21,10 @@ const componentName = 'SubscriptionPricingAPI';
 // Initialize repositories and service
 const subscriptionRepository = new SubscriptionRepository(prisma);
 const userRepository = new UserRepository(prisma);
-const subscriptionService = new SubscriptionService(subscriptionRepository, userRepository);
+const subscriptionService = new SubscriptionService(
+  subscriptionRepository,
+  userRepository
+);
 
 /**
  * GET /api/subscriptions/pricing

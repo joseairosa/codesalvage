@@ -108,23 +108,17 @@ export class AnalyticsService {
     // Validate user is a seller
     const user = await this.userRepository.findById(userId);
     if (!user || !user.isSeller) {
-      throw new AnalyticsPermissionError(
-        'Only sellers can access analytics'
-      );
+      throw new AnalyticsPermissionError('Only sellers can access analytics');
     }
 
     // Normalize and validate date range
-    const dateRange = this.normalizeDateRange(
-      request.startDate,
-      request.endDate
-    );
+    const dateRange = this.normalizeDateRange(request.startDate, request.endDate);
 
     // Fetch analytics data from repository
-    const analytics =
-      await this.analyticsRepository.getSellerAnalyticsOverview(
-        userId,
-        dateRange
-      );
+    const analytics = await this.analyticsRepository.getSellerAnalyticsOverview(
+      userId,
+      dateRange
+    );
 
     // Format for frontend presentation
     return this.formatAnalyticsOverview(analytics, request.granularity);
@@ -148,16 +142,11 @@ export class AnalyticsService {
     // Validate user is a seller
     const user = await this.userRepository.findById(userId);
     if (!user || !user.isSeller) {
-      throw new AnalyticsPermissionError(
-        'Only sellers can access analytics'
-      );
+      throw new AnalyticsPermissionError('Only sellers can access analytics');
     }
 
     // Normalize date range
-    const dateRange = this.normalizeDateRange(
-      request.startDate,
-      request.endDate
-    );
+    const dateRange = this.normalizeDateRange(request.startDate, request.endDate);
 
     // Fetch summary data
     const summary = await this.analyticsRepository.getSellerRevenueSummary(
@@ -170,9 +159,7 @@ export class AnalyticsService {
       totalProjects: summary.totalProjects,
       totalSold: summary.totalSold,
       totalRevenue: this.formatCurrency(summary.totalRevenueCents),
-      averageProjectPrice: this.formatCurrency(
-        summary.averageProjectPriceCents
-      ),
+      averageProjectPrice: this.formatCurrency(summary.averageProjectPriceCents),
       conversionRate: this.formatPercentage(summary.conversionRate),
     };
   }
@@ -195,16 +182,11 @@ export class AnalyticsService {
     // Validate user is a seller
     const user = await this.userRepository.findById(userId);
     if (!user || !user.isSeller) {
-      throw new AnalyticsPermissionError(
-        'Only sellers can access analytics'
-      );
+      throw new AnalyticsPermissionError('Only sellers can access analytics');
     }
 
     // Normalize date range
-    const dateRange = this.normalizeDateRange(
-      request.startDate,
-      request.endDate
-    );
+    const dateRange = this.normalizeDateRange(request.startDate, request.endDate);
 
     // Fetch top projects
     const projects = await this.analyticsRepository.getTopProjects(
@@ -250,17 +232,11 @@ export class AnalyticsService {
 
     // Validate dates
     if (isNaN(start.getTime())) {
-      throw new AnalyticsValidationError(
-        'Invalid start date format',
-        'startDate'
-      );
+      throw new AnalyticsValidationError('Invalid start date format', 'startDate');
     }
 
     if (isNaN(end.getTime())) {
-      throw new AnalyticsValidationError(
-        'Invalid end date format',
-        'endDate'
-      );
+      throw new AnalyticsValidationError('Invalid end date format', 'endDate');
     }
 
     if (start > end) {
@@ -299,15 +275,11 @@ export class AnalyticsService {
       summary: {
         totalProjects: analytics.summary.totalProjects,
         totalSold: analytics.summary.totalSold,
-        totalRevenue: this.formatCurrency(
-          analytics.summary.totalRevenueCents
-        ),
+        totalRevenue: this.formatCurrency(analytics.summary.totalRevenueCents),
         averageProjectPrice: this.formatCurrency(
           analytics.summary.averageProjectPriceCents
         ),
-        conversionRate: this.formatPercentage(
-          analytics.summary.conversionRate
-        ),
+        conversionRate: this.formatPercentage(analytics.summary.conversionRate),
       },
       revenueChart: analytics.revenueOverTime.map((point) => ({
         date: point.date,

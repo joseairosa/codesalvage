@@ -30,6 +30,7 @@ npm run test:integration:coverage
 ### Test Types
 
 #### 1. Unit Tests (`lib/**/__tests__/*.test.ts`)
+
 - **Purpose**: Test individual functions/classes in isolation
 - **Database**: Mocked (no real database)
 - **Speed**: Very fast (~10-50ms per test)
@@ -43,7 +44,7 @@ import { EmailService } from '../EmailService';
 
 // Mock external dependencies
 vi.mock('@sendgrid/mail', () => ({
-  default: { send: vi.fn() }
+  default: { send: vi.fn() },
 }));
 
 describe('EmailService', () => {
@@ -54,6 +55,7 @@ describe('EmailService', () => {
 ```
 
 #### 2. Integration Tests (`tests/integration/*.integration.test.ts`)
+
 - **Purpose**: Test database operations and API interactions
 - **Database**: Real PostgreSQL test database
 - **Speed**: Medium (~100-500ms per test)
@@ -83,6 +85,7 @@ describe('UserRepository (Integration)', () => {
 ```
 
 #### 3. E2E Tests (`e2e/*.spec.ts`)
+
 - **Purpose**: Test complete user journeys
 - **Browser**: Real browser (Playwright)
 - **Speed**: Slow (~1-5s per test)
@@ -92,6 +95,7 @@ describe('UserRepository (Integration)', () => {
 ## Test Database Setup
 
 ### Architecture
+
 - **Separate database**: `projectfinish_test` (port 5445)
 - **Separate Redis**: `redis://localhost:6391`
 - **Ephemeral storage**: Uses tmpfs (in-memory) for speed
@@ -116,6 +120,7 @@ DATABASE_URL="postgresql://projectfinish_test:password_test@localhost:5445/proje
 ```
 
 ### Connection Details
+
 - **Host**: localhost
 - **Port**: 5445 (dev is 5444)
 - **Database**: projectfinish_test
@@ -128,7 +133,11 @@ DATABASE_URL="postgresql://projectfinish_test:password_test@localhost:5445/proje
 ### Database Helpers (`tests/helpers/db.ts`)
 
 ```typescript
-import { setupTestDatabase, cleanDatabase, teardownTestDatabase } from '@/tests/helpers/db';
+import {
+  setupTestDatabase,
+  cleanDatabase,
+  teardownTestDatabase,
+} from '@/tests/helpers/db';
 
 // Setup connection (call in beforeAll)
 await setupTestDatabase();
@@ -148,7 +157,11 @@ await withTransaction(async (tx) => {
 ### Test Fixtures (`tests/helpers/fixtures.ts`)
 
 ```typescript
-import { createTestUser, createTestSeller, createTestProject } from '@/tests/helpers/fixtures';
+import {
+  createTestUser,
+  createTestSeller,
+  createTestProject,
+} from '@/tests/helpers/fixtures';
 
 // Create test user with defaults
 const user = await createTestUser();
@@ -156,17 +169,18 @@ const user = await createTestUser();
 // Create with overrides
 const seller = await createTestSeller({
   email: 'custom@example.com',
-  username: 'customuser'
+  username: 'customuser',
 });
 
 // Create project
 const project = await createTestProject({
   sellerId: seller.id,
-  priceCents: 50000
+  priceCents: 50000,
 });
 
 // Create complete scenario
-const { seller, buyer, project, transaction, review } = await createCompleteTestScenario();
+const { seller, buyer, project, transaction, review } =
+  await createCompleteTestScenario();
 ```
 
 ## Test Patterns
@@ -208,7 +222,11 @@ describe('ServiceName', () => {
 
 ```typescript
 import { describe, it, expect, beforeAll, beforeEach, afterAll } from 'vitest';
-import { setupTestDatabase, cleanDatabase, teardownTestDatabase } from '@/tests/helpers/db';
+import {
+  setupTestDatabase,
+  cleanDatabase,
+  teardownTestDatabase,
+} from '@/tests/helpers/db';
 
 describe('Repository (Integration)', () => {
   beforeAll(async () => {
@@ -324,6 +342,7 @@ npm run test:integration:watch
 ## Best Practices
 
 ### ✅ DO:
+
 - Write tests BEFORE implementation (TDD)
 - Use descriptive test names ("should create user when valid data provided")
 - Test both happy paths and error cases
@@ -334,6 +353,7 @@ npm run test:integration:watch
 - Keep tests fast (unit tests < 50ms, integration < 500ms)
 
 ### ❌ DON'T:
+
 - Run tests against development database
 - Run tests against production database
 - Share test data between test cases
@@ -346,6 +366,7 @@ npm run test:integration:watch
 ## Troubleshooting
 
 ### Test database connection failed
+
 ```bash
 # Verify test database is running
 docker ps | grep postgres-test
@@ -358,17 +379,20 @@ docker logs recycleai-postgres-test-1
 ```
 
 ### Tests fail with "Connection refused"
+
 - Test database not started: Run `npm run test:db:setup`
 - Wrong port: Test DB is on 5445, not 5444
 - Check `tests/setup.ts` has correct DATABASE_URL
 
 ### Tests are slow
+
 - Use unit tests instead of integration tests where possible
 - Clean database efficiently (truncate instead of delete)
 - Use transactions for test isolation
 - Run integration tests sequentially (configured in vitest.integration.config.ts)
 
 ### Coverage not meeting threshold
+
 - Write more tests for uncovered code
 - Check coverage report: `open coverage/index.html`
 - Focus on critical paths first (authentication, payments, etc.)

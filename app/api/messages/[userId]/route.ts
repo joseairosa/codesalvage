@@ -34,10 +34,7 @@ const messageService = new MessageService(
  *
  * Get all messages in a conversation with a specific user
  */
-export async function GET(
-  request: Request,
-  { params }: { params: { userId: string } }
-) {
+export async function GET(request: Request, { params }: { params: { userId: string } }) {
   try {
     const session = await auth();
     if (!session?.user?.id) {

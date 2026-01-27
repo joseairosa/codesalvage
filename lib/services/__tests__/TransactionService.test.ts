@@ -130,9 +130,7 @@ describe('TransactionService', () => {
       const mockTransaction = createMockTransaction();
 
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockBuyer as any);
-      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
-        mockProject as any
-      );
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(mockProject as any);
       vi.mocked(mockTransactionRepository.findByProjectId).mockResolvedValue({
         transactions: [],
         total: 0,
@@ -191,9 +189,7 @@ describe('TransactionService', () => {
       const mockBuyer = createMockUser();
       const mockProject = createMockProject({ status: 'draft' });
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockBuyer as any);
-      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
-        mockProject as any
-      );
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(mockProject as any);
 
       await expect(
         transactionService.createTransaction('buyer012', { projectId: 'project456' })
@@ -207,9 +203,7 @@ describe('TransactionService', () => {
       const mockBuyer = createMockUser({ id: 'seller789' });
       const mockProject = createMockProject({ sellerId: 'seller789' });
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockBuyer as any);
-      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
-        mockProject as any
-      );
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(mockProject as any);
 
       await expect(
         transactionService.createTransaction('seller789', { projectId: 'project456' })
@@ -228,9 +222,7 @@ describe('TransactionService', () => {
       });
 
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockBuyer as any);
-      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
-        mockProject as any
-      );
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(mockProject as any);
       vi.mocked(mockTransactionRepository.findByProjectId).mockResolvedValue({
         transactions: [existingTransaction],
         total: 1,
@@ -255,9 +247,7 @@ describe('TransactionService', () => {
       const mockTransaction = createMockTransaction();
 
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockBuyer as any);
-      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
-        mockProject as any
-      );
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(mockProject as any);
       vi.mocked(mockTransactionRepository.findByProjectId).mockResolvedValue({
         transactions: [],
         total: 0,
@@ -315,12 +305,12 @@ describe('TransactionService', () => {
     it('should throw error if buyer not found', async () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
 
-      await expect(
-        transactionService.getBuyerTransactions('buyer012')
-      ).rejects.toThrow(TransactionValidationError);
-      await expect(
-        transactionService.getBuyerTransactions('buyer012')
-      ).rejects.toThrow('Buyer not found');
+      await expect(transactionService.getBuyerTransactions('buyer012')).rejects.toThrow(
+        TransactionValidationError
+      );
+      await expect(transactionService.getBuyerTransactions('buyer012')).rejects.toThrow(
+        'Buyer not found'
+      );
     });
   });
 
@@ -354,12 +344,12 @@ describe('TransactionService', () => {
     it('should throw error if seller not found', async () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
 
-      await expect(
-        transactionService.getSellerTransactions('seller789')
-      ).rejects.toThrow(TransactionValidationError);
-      await expect(
-        transactionService.getSellerTransactions('seller789')
-      ).rejects.toThrow('Seller not found');
+      await expect(transactionService.getSellerTransactions('seller789')).rejects.toThrow(
+        TransactionValidationError
+      );
+      await expect(transactionService.getSellerTransactions('seller789')).rejects.toThrow(
+        'Seller not found'
+      );
     });
   });
 
@@ -586,20 +576,20 @@ describe('TransactionService', () => {
         mockTransaction as any
       );
 
-      await expect(
-        transactionService.releaseEscrow('transaction123')
-      ).rejects.toThrow(TransactionValidationError);
-      await expect(
-        transactionService.releaseEscrow('transaction123')
-      ).rejects.toThrow('Cannot release escrow for unsuccessful payment');
+      await expect(transactionService.releaseEscrow('transaction123')).rejects.toThrow(
+        TransactionValidationError
+      );
+      await expect(transactionService.releaseEscrow('transaction123')).rejects.toThrow(
+        'Cannot release escrow for unsuccessful payment'
+      );
     });
 
     it('should throw error if transaction not found', async () => {
       vi.mocked(mockTransactionRepository.findById).mockResolvedValue(null);
 
-      await expect(
-        transactionService.releaseEscrow('transaction123')
-      ).rejects.toThrow(TransactionNotFoundError);
+      await expect(transactionService.releaseEscrow('transaction123')).rejects.toThrow(
+        TransactionNotFoundError
+      );
     });
   });
 

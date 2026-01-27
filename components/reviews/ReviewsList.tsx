@@ -107,7 +107,13 @@ export function ReviewsList({ sellerId, limit = 10 }: ReviewsListProps) {
   /**
    * Star Rating Display
    */
-  const StarRating = ({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'lg' }) => {
+  const StarRating = ({
+    rating,
+    size = 'sm',
+  }: {
+    rating: number;
+    size?: 'sm' | 'lg';
+  }) => {
     const starClass = size === 'lg' ? 'h-5 w-5' : 'h-4 w-4';
 
     return (

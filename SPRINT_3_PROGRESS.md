@@ -897,7 +897,7 @@ curl -X DELETE /api/projects/abc123
    - Hook up seller dashboard to GET /api/projects?sellerId=xxx
 
 2. **Authentication Integration** - Add Auth.js session checks
-   - Protect /seller/* routes (require authentication)
+   - Protect /seller/\* routes (require authentication)
    - Protect /projects/new (sellers only)
    - Add user context to API calls
    - Show/hide UI based on auth state

@@ -100,22 +100,15 @@ describe('FavoriteService', () => {
       const mockFavorite = createMockFavorite();
 
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser as any);
-      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
-        mockProject as any
-      );
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(mockProject as any);
       vi.mocked(mockFavoriteRepository.isFavorited).mockResolvedValue(false);
-      vi.mocked(mockFavoriteRepository.create).mockResolvedValue(
-        mockFavorite as any
-      );
+      vi.mocked(mockFavoriteRepository.create).mockResolvedValue(mockFavorite as any);
       vi.mocked(mockFavoriteRepository.updateProjectFavoriteCount).mockResolvedValue();
 
       const result = await favoriteService.addFavorite('user123', 'project456');
 
       expect(result).toEqual(mockFavorite);
-      expect(mockFavoriteRepository.create).toHaveBeenCalledWith(
-        'user123',
-        'project456'
-      );
+      expect(mockFavoriteRepository.create).toHaveBeenCalledWith('user123', 'project456');
       expect(mockFavoriteRepository.updateProjectFavoriteCount).toHaveBeenCalledWith(
         'project456',
         true
@@ -127,17 +120,15 @@ describe('FavoriteService', () => {
       const mockProject = createMockProject();
 
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser as any);
-      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
-        mockProject as any
-      );
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(mockProject as any);
       vi.mocked(mockFavoriteRepository.isFavorited).mockResolvedValue(true);
 
-      await expect(
-        favoriteService.addFavorite('user123', 'project456')
-      ).rejects.toThrow(FavoriteValidationError);
-      await expect(
-        favoriteService.addFavorite('user123', 'project456')
-      ).rejects.toThrow('Project is already in favorites');
+      await expect(favoriteService.addFavorite('user123', 'project456')).rejects.toThrow(
+        FavoriteValidationError
+      );
+      await expect(favoriteService.addFavorite('user123', 'project456')).rejects.toThrow(
+        'Project is already in favorites'
+      );
 
       expect(mockFavoriteRepository.create).not.toHaveBeenCalled();
     });
@@ -145,12 +136,12 @@ describe('FavoriteService', () => {
     it('should throw error if user not found', async () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
 
-      await expect(
-        favoriteService.addFavorite('user123', 'project456')
-      ).rejects.toThrow(FavoriteValidationError);
-      await expect(
-        favoriteService.addFavorite('user123', 'project456')
-      ).rejects.toThrow('User not found');
+      await expect(favoriteService.addFavorite('user123', 'project456')).rejects.toThrow(
+        FavoriteValidationError
+      );
+      await expect(favoriteService.addFavorite('user123', 'project456')).rejects.toThrow(
+        'User not found'
+      );
     });
 
     it('should throw error if project not found', async () => {
@@ -159,12 +150,12 @@ describe('FavoriteService', () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser as any);
       vi.mocked(mockProjectRepository.findById).mockResolvedValue(null);
 
-      await expect(
-        favoriteService.addFavorite('user123', 'project456')
-      ).rejects.toThrow(FavoriteValidationError);
-      await expect(
-        favoriteService.addFavorite('user123', 'project456')
-      ).rejects.toThrow('Project not found');
+      await expect(favoriteService.addFavorite('user123', 'project456')).rejects.toThrow(
+        FavoriteValidationError
+      );
+      await expect(favoriteService.addFavorite('user123', 'project456')).rejects.toThrow(
+        'Project not found'
+      );
     });
 
     it('should throw error if project is not active', async () => {
@@ -172,16 +163,14 @@ describe('FavoriteService', () => {
       const mockProject = createMockProject({ status: 'draft' });
 
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser as any);
-      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
-        mockProject as any
-      );
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(mockProject as any);
 
-      await expect(
-        favoriteService.addFavorite('user123', 'project456')
-      ).rejects.toThrow(FavoriteValidationError);
-      await expect(
-        favoriteService.addFavorite('user123', 'project456')
-      ).rejects.toThrow('Cannot favorite inactive projects');
+      await expect(favoriteService.addFavorite('user123', 'project456')).rejects.toThrow(
+        FavoriteValidationError
+      );
+      await expect(favoriteService.addFavorite('user123', 'project456')).rejects.toThrow(
+        'Cannot favorite inactive projects'
+      );
     });
 
     it('should throw error if trying to favorite own project', async () => {
@@ -189,9 +178,7 @@ describe('FavoriteService', () => {
       const mockProject = createMockProject({ sellerId: 'seller123' });
 
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser as any);
-      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
-        mockProject as any
-      );
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(mockProject as any);
 
       await expect(
         favoriteService.addFavorite('seller123', 'project456')
@@ -202,21 +189,21 @@ describe('FavoriteService', () => {
     });
 
     it('should throw error if userId is empty', async () => {
-      await expect(
-        favoriteService.addFavorite('', 'project456')
-      ).rejects.toThrow(FavoriteValidationError);
-      await expect(
-        favoriteService.addFavorite('', 'project456')
-      ).rejects.toThrow('User ID is required');
+      await expect(favoriteService.addFavorite('', 'project456')).rejects.toThrow(
+        FavoriteValidationError
+      );
+      await expect(favoriteService.addFavorite('', 'project456')).rejects.toThrow(
+        'User ID is required'
+      );
     });
 
     it('should throw error if projectId is empty', async () => {
-      await expect(
-        favoriteService.addFavorite('user123', '')
-      ).rejects.toThrow(FavoriteValidationError);
-      await expect(
-        favoriteService.addFavorite('user123', '')
-      ).rejects.toThrow('Project ID is required');
+      await expect(favoriteService.addFavorite('user123', '')).rejects.toThrow(
+        FavoriteValidationError
+      );
+      await expect(favoriteService.addFavorite('user123', '')).rejects.toThrow(
+        'Project ID is required'
+      );
     });
   });
 
@@ -229,18 +216,13 @@ describe('FavoriteService', () => {
       const mockFavorite = createMockFavorite();
 
       vi.mocked(mockFavoriteRepository.isFavorited).mockResolvedValue(true);
-      vi.mocked(mockFavoriteRepository.delete).mockResolvedValue(
-        mockFavorite as any
-      );
+      vi.mocked(mockFavoriteRepository.delete).mockResolvedValue(mockFavorite as any);
       vi.mocked(mockFavoriteRepository.updateProjectFavoriteCount).mockResolvedValue();
 
       const result = await favoriteService.removeFavorite('user123', 'project456');
 
       expect(result).toBe(true);
-      expect(mockFavoriteRepository.delete).toHaveBeenCalledWith(
-        'user123',
-        'project456'
-      );
+      expect(mockFavoriteRepository.delete).toHaveBeenCalledWith('user123', 'project456');
       expect(mockFavoriteRepository.updateProjectFavoriteCount).toHaveBeenCalledWith(
         'project456',
         false
@@ -269,22 +251,15 @@ describe('FavoriteService', () => {
 
       vi.mocked(mockFavoriteRepository.isFavorited).mockResolvedValue(false);
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser as any);
-      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
-        mockProject as any
-      );
-      vi.mocked(mockFavoriteRepository.create).mockResolvedValue(
-        mockFavorite as any
-      );
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(mockProject as any);
+      vi.mocked(mockFavoriteRepository.create).mockResolvedValue(mockFavorite as any);
       vi.mocked(mockFavoriteRepository.updateProjectFavoriteCount).mockResolvedValue();
 
       const result = await favoriteService.toggleFavorite('user123', 'project456');
 
       expect(result.isFavorited).toBe(true);
       expect(result.favorite).toEqual(mockFavorite);
-      expect(mockFavoriteRepository.create).toHaveBeenCalledWith(
-        'user123',
-        'project456'
-      );
+      expect(mockFavoriteRepository.create).toHaveBeenCalledWith('user123', 'project456');
     });
 
     it('should remove favorite if already favorited', async () => {
@@ -294,19 +269,14 @@ describe('FavoriteService', () => {
       vi.mocked(mockFavoriteRepository.isFavorited)
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(true);
-      vi.mocked(mockFavoriteRepository.delete).mockResolvedValue(
-        mockFavorite as any
-      );
+      vi.mocked(mockFavoriteRepository.delete).mockResolvedValue(mockFavorite as any);
       vi.mocked(mockFavoriteRepository.updateProjectFavoriteCount).mockResolvedValue();
 
       const result = await favoriteService.toggleFavorite('user123', 'project456');
 
       expect(result.isFavorited).toBe(false);
       expect(result.favorite).toBeUndefined();
-      expect(mockFavoriteRepository.delete).toHaveBeenCalledWith(
-        'user123',
-        'project456'
-      );
+      expect(mockFavoriteRepository.delete).toHaveBeenCalledWith('user123', 'project456');
     });
   });
 
@@ -343,21 +313,21 @@ describe('FavoriteService', () => {
       });
 
       expect(result).toEqual(mockPaginatedResult);
-      expect(mockFavoriteRepository.getUserFavorites).toHaveBeenCalledWith(
-        'user123',
-        { page: 1, limit: 20 }
-      );
+      expect(mockFavoriteRepository.getUserFavorites).toHaveBeenCalledWith('user123', {
+        page: 1,
+        limit: 20,
+      });
     });
 
     it('should throw error if user not found', async () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
 
-      await expect(
-        favoriteService.getUserFavorites('user123')
-      ).rejects.toThrow(FavoriteValidationError);
-      await expect(
-        favoriteService.getUserFavorites('user123')
-      ).rejects.toThrow('User not found');
+      await expect(favoriteService.getUserFavorites('user123')).rejects.toThrow(
+        FavoriteValidationError
+      );
+      await expect(favoriteService.getUserFavorites('user123')).rejects.toThrow(
+        'User not found'
+      );
     });
   });
 

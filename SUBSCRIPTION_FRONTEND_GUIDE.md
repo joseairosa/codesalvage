@@ -13,6 +13,7 @@ Complete frontend implementation for Premium Seller Subscriptions (Sprint 9-10).
 **Access**: Public (anyone can view)
 
 **Features**:
+
 - Free vs Pro plan comparison
 - Detailed benefits list for each tier
 - Featured listing savings calculator
@@ -31,6 +32,7 @@ Complete frontend implementation for Premium Seller Subscriptions (Sprint 9-10).
 **Access**: Protected (sellers only)
 
 **Features**:
+
 - Current subscription status display
 - Subscription benefits breakdown
 - Upgrade/cancel functionality
@@ -49,6 +51,7 @@ Complete frontend implementation for Premium Seller Subscriptions (Sprint 9-10).
 **Location**: `components/subscription/UpgradeToProButton.tsx`
 
 **Functionality**:
+
 - Creates Pro subscription via `/api/subscriptions` POST
 - Integrates with Stripe for payment collection
 - Shows loading state during processing
@@ -56,10 +59,11 @@ Complete frontend implementation for Premium Seller Subscriptions (Sprint 9-10).
 - Redirects on success
 
 **Usage**:
+
 ```tsx
 import { UpgradeToProButton } from '@/components/subscription/UpgradeToProButton';
 
-<UpgradeToProButton />
+<UpgradeToProButton />;
 ```
 
 #### 2. `CancelSubscriptionButton`
@@ -67,16 +71,18 @@ import { UpgradeToProButton } from '@/components/subscription/UpgradeToProButton
 **Location**: `components/subscription/CancelSubscriptionButton.tsx`
 
 **Functionality**:
+
 - Cancels Pro subscription via `/api/subscriptions` DELETE
 - Shows confirmation dialog before canceling
 - Explains what happens after cancellation
 - Subscription continues until end of billing period
 
 **Usage**:
+
 ```tsx
 import { CancelSubscriptionButton } from '@/components/subscription/CancelSubscriptionButton';
 
-<CancelSubscriptionButton />
+<CancelSubscriptionButton />;
 ```
 
 #### 3. `BillingPortalButton`
@@ -84,6 +90,7 @@ import { CancelSubscriptionButton } from '@/components/subscription/CancelSubscr
 **Location**: `components/subscription/BillingPortalButton.tsx`
 
 **Functionality**:
+
 - Opens Stripe Customer Portal via `/api/subscriptions/portal` POST
 - Allows users to:
   - View/download invoices
@@ -91,10 +98,11 @@ import { CancelSubscriptionButton } from '@/components/subscription/CancelSubscr
   - View billing history
 
 **Usage**:
+
 ```tsx
 import { BillingPortalButton } from '@/components/subscription/BillingPortalButton';
 
-<BillingPortalButton />
+<BillingPortalButton />;
 ```
 
 ### Server Components (Display)
@@ -104,11 +112,13 @@ import { BillingPortalButton } from '@/components/subscription/BillingPortalButt
 **Location**: `components/subscription/SubscriptionBadge.tsx`
 
 **Functionality**:
+
 - Displays subscription tier badge (Free/Pro)
 - Pro badge includes crown icon
 - Customizable styling
 
 **Usage**:
+
 ```tsx
 import { SubscriptionBadge } from '@/components/subscription/SubscriptionBadge';
 
@@ -121,19 +131,23 @@ import { SubscriptionBadge } from '@/components/subscription/SubscriptionBadge';
 All components use the following API endpoints:
 
 ### GET `/api/subscriptions`
+
 - Fetch current subscription status
 - Returns: `{ subscription: SubscriptionStatus }`
 
 ### POST `/api/subscriptions`
+
 - Create new Pro subscription
 - Body: `{ plan: 'pro', paymentMethodId?: string }`
 - Returns: `{ subscription: { subscriptionId, clientSecret, ... } }`
 
 ### DELETE `/api/subscriptions`
+
 - Cancel subscription (at end of period)
 - Returns: `{ subscription: { status, cancelAtPeriodEnd, ... } }`
 
 ### POST `/api/subscriptions/portal`
+
 - Generate Stripe billing portal URL
 - Returns: `{ url: string }`
 
@@ -147,6 +161,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
 ```
 
 Also required (server-side):
+
 ```bash
 STRIPE_SECRET_KEY="sk_test_..."
 STRIPE_WEBHOOK_SECRET="whsec_..."
@@ -191,11 +206,13 @@ Add subscription badge to seller navigation:
 import { SubscriptionBadge } from '@/components/subscription/SubscriptionBadge';
 
 // In navigation component
-{session?.user?.isSeller && (
-  <Link href="/seller/subscription">
-    <SubscriptionBadge plan={subscriptionPlan} />
-  </Link>
-)}
+{
+  session?.user?.isSeller && (
+    <Link href="/seller/subscription">
+      <SubscriptionBadge plan={subscriptionPlan} />
+    </Link>
+  );
+}
 ```
 
 ### Seller Dashboard
@@ -285,6 +302,7 @@ Use any future expiry date and any 3-digit CVC.
 ## Support
 
 For issues or questions about the subscription frontend:
+
 - Backend API documentation: `lib/services/SUBSCRIPTIONS_IMPLEMENTATION_COMPLETE.md`
 - Stripe webhook handling: `app/api/webhooks/stripe/route.ts`
 - Service logic: `lib/services/SubscriptionService.ts`

@@ -56,18 +56,21 @@ The `CRON_SECRET` must be set in environment variables.
 3. Configure schedule and endpoint:
 
 **Escrow Release:**
+
 ```
 Schedule: 0 */6 * * *
 Command: curl -H "Authorization: Bearer $CRON_SECRET" https://your-app.railway.app/api/cron/release-escrow
 ```
 
 **Featured Cleanup:**
+
 ```
 Schedule: 0 * * * *
 Command: curl -H "Authorization: Bearer $CRON_SECRET" https://your-app.railway.app/api/cron/cleanup-featured
 ```
 
 **Featured Expiration Warning:**
+
 ```
 Schedule: 0 */12 * * *
 Command: curl -H "Authorization: Bearer $CRON_SECRET" https://your-app.railway.app/api/cron/featured-expiration-warning
@@ -142,6 +145,7 @@ curl -H "Authorization: Bearer your-local-cron-secret" \
 All cron jobs return JSON with execution details:
 
 **Success Response (200):**
+
 ```json
 {
   "processed": 5,
@@ -152,6 +156,7 @@ All cron jobs return JSON with execution details:
 ```
 
 **Error Response (401/500):**
+
 ```json
 {
   "error": "Unauthorized" | "Job failed",
@@ -176,6 +181,7 @@ vercel logs --filter="cron"
 ## Environment Variables
 
 Required:
+
 - `CRON_SECRET` - Secret token for authenticating cron requests
 
 ## Error Handling

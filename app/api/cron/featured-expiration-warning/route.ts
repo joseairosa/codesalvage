@@ -74,7 +74,9 @@ export async function GET() {
       },
     });
 
-    console.log(`[${componentName}] Found ${expiringProjects.length} projects expiring soon`);
+    console.log(
+      `[${componentName}] Found ${expiringProjects.length} projects expiring soon`
+    );
 
     let emailsSent = 0;
     let emailsFailed = 0;
@@ -88,7 +90,10 @@ export async function GET() {
           const seller = await userRepository.findById(project.sellerId);
 
           if (!seller || !seller.email) {
-            console.warn(`[${componentName}] Seller not found or no email:`, project.sellerId);
+            console.warn(
+              `[${componentName}] Seller not found or no email:`,
+              project.sellerId
+            );
             emailsFailed++;
             continue;
           }

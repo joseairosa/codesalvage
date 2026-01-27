@@ -12,7 +12,13 @@
 
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -30,7 +36,10 @@ async function getSubscriptionStatus(userId: string) {
   try {
     const subscriptionRepository = new SubscriptionRepository(prisma);
     const userRepository = new UserRepository(prisma);
-    const subscriptionService = new SubscriptionService(subscriptionRepository, userRepository);
+    const subscriptionService = new SubscriptionService(
+      subscriptionRepository,
+      userRepository
+    );
 
     const status = await subscriptionService.getSubscriptionStatus(userId);
     return status;
@@ -61,7 +70,9 @@ export default async function SubscriptionManagementPage() {
     <div className="container mx-auto py-10">
       <div className="mb-8">
         <h1 className="mb-2 text-3xl font-bold">Subscription Management</h1>
-        <p className="text-gray-600">Manage your ProjectFinish subscription and billing</p>
+        <p className="text-gray-600">
+          Manage your ProjectFinish subscription and billing
+        </p>
       </div>
 
       {/* Current Plan Status */}
@@ -94,7 +105,9 @@ export default async function SubscriptionManagementPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <p className="text-sm text-gray-600">Status</p>
-                  <p className="text-lg font-semibold capitalize">{subscription.status}</p>
+                  <p className="text-lg font-semibold capitalize">
+                    {subscription.status}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Next Billing Date</p>
@@ -113,8 +126,8 @@ export default async function SubscriptionManagementPage() {
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   Your subscription will be canceled on{' '}
-                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}. You'll continue to
-                  have Pro access until then.
+                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}. You'll
+                  continue to have Pro access until then.
                 </AlertDescription>
               </Alert>
             )}
@@ -222,8 +235,8 @@ export default async function SubscriptionManagementPage() {
                   <div>
                     <h4 className="font-semibold">20% Featured Listing Discount</h4>
                     <p className="text-sm text-gray-600">
-                      Save up to $16 per featured placement. Feature 2 projects/month and Pro pays for
-                      itself!
+                      Save up to $16 per featured placement. Feature 2 projects/month and
+                      Pro pays for itself!
                     </p>
                   </div>
                 </div>
@@ -235,7 +248,8 @@ export default async function SubscriptionManagementPage() {
                   <div>
                     <h4 className="font-semibold">Advanced Analytics</h4>
                     <p className="text-sm text-gray-600">
-                      Track revenue, views, and sales trends with detailed analytics dashboard
+                      Track revenue, views, and sales trends with detailed analytics
+                      dashboard
                     </p>
                   </div>
                 </div>
@@ -275,8 +289,8 @@ export default async function SubscriptionManagementPage() {
             </CardHeader>
             <CardContent>
               <p className="mb-4 text-gray-600">
-                View past invoices, update payment methods, and manage your billing information through
-                our secure billing portal powered by Stripe.
+                View past invoices, update payment methods, and manage your billing
+                information through our secure billing portal powered by Stripe.
               </p>
               <BillingPortalButton />
             </CardContent>

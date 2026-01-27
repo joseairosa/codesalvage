@@ -16,11 +16,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  PaymentElement,
-  useStripe,
-  useElements,
-} from '@stripe/react-stripe-js';
+import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle } from 'lucide-react';
@@ -34,7 +30,11 @@ interface CheckoutFormProps {
   amount: number;
 }
 
-export function CheckoutForm({ projectId: _projectId, transactionId, amount }: CheckoutFormProps) {
+export function CheckoutForm({
+  projectId: _projectId,
+  transactionId,
+  amount,
+}: CheckoutFormProps) {
   console.log(`[${componentName}] Form rendered`);
 
   const _router = useRouter();
@@ -119,7 +119,8 @@ export function CheckoutForm({ projectId: _projectId, transactionId, amount }: C
 
       {/* Security Notice */}
       <p className="text-center text-xs text-muted-foreground">
-        Your payment information is encrypted and secure. We never store your card details.
+        Your payment information is encrypted and secure. We never store your card
+        details.
       </p>
     </form>
   );

@@ -171,10 +171,7 @@ describe('MessageService (Integration)', () => {
         content: 'Message 3',
       });
 
-      const conversation = await messageService.getConversation(
-        user1.id,
-        user2.id
-      );
+      const conversation = await messageService.getConversation(user1.id, user2.id);
 
       expect(conversation.messages).toHaveLength(3);
       expect(conversation.messages[0]!.content).toBe('Message 1');

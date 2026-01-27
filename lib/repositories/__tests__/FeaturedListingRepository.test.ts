@@ -74,7 +74,10 @@ describe('FeaturedListingRepository', () => {
 
       vi.mocked(mockPrismaClient.project.update).mockResolvedValue(mockProject);
 
-      const result = await featuredListingRepository.setFeatured('project123', featuredUntil);
+      const result = await featuredListingRepository.setFeatured(
+        'project123',
+        featuredUntil
+      );
 
       expect(result).toEqual(mockProject);
       expect(mockPrismaClient.project.update).toHaveBeenCalledWith({
@@ -97,9 +100,7 @@ describe('FeaturedListingRepository', () => {
     });
 
     it('should throw error when database operation fails', async () => {
-      vi.mocked(mockPrismaClient.project.update).mockRejectedValue(
-        new Error('DB Error')
-      );
+      vi.mocked(mockPrismaClient.project.update).mockRejectedValue(new Error('DB Error'));
 
       await expect(
         featuredListingRepository.setFeatured('project123', new Date())
@@ -137,9 +138,9 @@ describe('FeaturedListingRepository', () => {
         new Error('Record not found')
       );
 
-      await expect(
-        featuredListingRepository.unsetFeatured('project999')
-      ).rejects.toThrow('[FeaturedListingRepository] Failed to unset featured status');
+      await expect(featuredListingRepository.unsetFeatured('project999')).rejects.toThrow(
+        '[FeaturedListingRepository] Failed to unset featured status'
+      );
     });
   });
 
@@ -221,9 +222,9 @@ describe('FeaturedListingRepository', () => {
         new Error('DB Error')
       );
 
-      await expect(
-        featuredListingRepository.getFeaturedProjects()
-      ).rejects.toThrow('[FeaturedListingRepository] Failed to get featured projects');
+      await expect(featuredListingRepository.getFeaturedProjects()).rejects.toThrow(
+        '[FeaturedListingRepository] Failed to get featured projects'
+      );
     });
   });
 
@@ -291,9 +292,9 @@ describe('FeaturedListingRepository', () => {
         new Error('DB Error')
       );
 
-      await expect(
-        featuredListingRepository.isFeatured('project123')
-      ).rejects.toThrow('[FeaturedListingRepository] Failed to check featured status');
+      await expect(featuredListingRepository.isFeatured('project123')).rejects.toThrow(
+        '[FeaturedListingRepository] Failed to check featured status'
+      );
     });
   });
 
@@ -327,9 +328,7 @@ describe('FeaturedListingRepository', () => {
     });
 
     it('should throw error when database operation fails', async () => {
-      vi.mocked(mockPrismaClient.project.count).mockRejectedValue(
-        new Error('DB Error')
-      );
+      vi.mocked(mockPrismaClient.project.count).mockRejectedValue(new Error('DB Error'));
 
       await expect(
         featuredListingRepository.countFeaturedBySeller('seller123')
@@ -360,7 +359,10 @@ describe('FeaturedListingRepository', () => {
         featuredUntil: extendedFeaturedUntil,
       });
 
-      const result = await featuredListingRepository.extendFeaturedPeriod('project123', 7);
+      const result = await featuredListingRepository.extendFeaturedPeriod(
+        'project123',
+        7
+      );
 
       expect(result.featuredUntil).toEqual(extendedFeaturedUntil);
       expect(mockPrismaClient.project.findUnique).toHaveBeenCalledWith({
@@ -427,9 +429,9 @@ describe('FeaturedListingRepository', () => {
         new Error('DB Error')
       );
 
-      await expect(
-        featuredListingRepository.cleanupExpiredFeatured()
-      ).rejects.toThrow('[FeaturedListingRepository] Failed to cleanup expired featured projects');
+      await expect(featuredListingRepository.cleanupExpiredFeatured()).rejects.toThrow(
+        '[FeaturedListingRepository] Failed to cleanup expired featured projects'
+      );
     });
   });
 });

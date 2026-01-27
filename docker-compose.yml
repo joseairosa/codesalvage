@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - '3011:3000'  # Host:Container - Port 3011 to avoid conflicts
+      - '3011:3000' # Host:Container - Port 3011 to avoid conflicts
     volumes:
       - .:/app
       - /app/node_modules
@@ -29,7 +29,7 @@ services:
   postgres:
     image: postgres:16-alpine
     ports:
-      - '5444:5432'  # Host:Container - Port 5444 to avoid conflicts
+      - '5444:5432' # Host:Container - Port 5444 to avoid conflicts
     environment:
       - POSTGRES_USER=projectfinish
       - POSTGRES_PASSWORD=password
@@ -48,7 +48,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - '6390:6379'  # Host:Container - Port 6390 to avoid conflicts
+      - '6390:6379' # Host:Container - Port 6390 to avoid conflicts
     volumes:
       - redis_data:/data
     healthcheck:

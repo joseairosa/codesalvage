@@ -14,7 +14,11 @@ interface SubscriptionBadgeProps {
   showIcon?: boolean;
 }
 
-export function SubscriptionBadge({ plan, className = '', showIcon = true }: SubscriptionBadgeProps) {
+export function SubscriptionBadge({
+  plan,
+  className = '',
+  showIcon = true,
+}: SubscriptionBadgeProps) {
   if (plan === 'pro') {
     return (
       <Badge className={`bg-blue-600 text-white ${className}`}>

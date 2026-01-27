@@ -73,7 +73,10 @@ export const createProjectSchema = z.object({
 
   estimatedCompletionHours: z.number().int().positive().optional(),
 
-  knownIssues: z.string().max(2000, 'Known issues must be less than 2000 characters').optional(),
+  knownIssues: z
+    .string()
+    .max(2000, 'Known issues must be less than 2000 characters')
+    .optional(),
 
   // Pricing
   priceCents: z
@@ -110,7 +113,8 @@ export const createProjectSchema = z.object({
         try {
           const parsed = new URL(url);
           return (
-            parsed.hostname === 'github.com' && parsed.pathname.split('/').filter(Boolean).length >= 2
+            parsed.hostname === 'github.com' &&
+            parsed.pathname.split('/').filter(Boolean).length >= 2
           );
         } catch {
           return false;
@@ -129,7 +133,10 @@ export const createProjectSchema = z.object({
 
   thumbnailImageUrl: z.string().url().optional(),
 
-  screenshotUrls: z.array(z.string().url()).max(10, 'Maximum 10 screenshots allowed').default([]),
+  screenshotUrls: z
+    .array(z.string().url())
+    .max(10, 'Maximum 10 screenshots allowed')
+    .default([]),
 
   demoVideoUrl: z.string().url('Invalid URL format').optional().or(z.literal('')),
 });

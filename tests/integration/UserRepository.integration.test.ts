@@ -16,7 +16,11 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { setupTestDatabase, teardownTestDatabase, cleanDatabase } from '@/tests/helpers/db';
+import {
+  setupTestDatabase,
+  teardownTestDatabase,
+  cleanDatabase,
+} from '@/tests/helpers/db';
 import { createTestUser } from '@/tests/helpers/fixtures';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { prisma } from '@/lib/prisma';
@@ -239,7 +243,10 @@ describe('UserRepository (Integration)', () => {
       const user = await createTestUser();
       const stripeAccountId = 'acct_test123456';
 
-      const updatedUser = await userRepository.updateStripeAccount(user.id, stripeAccountId);
+      const updatedUser = await userRepository.updateStripeAccount(
+        user.id,
+        stripeAccountId
+      );
 
       expect(updatedUser.stripeAccountId).toBe(stripeAccountId);
 
@@ -309,7 +316,9 @@ describe('UserRepository (Integration)', () => {
         fullName: 'New Name',
       });
 
-      expect(updatedUser.updatedAt.getTime()).toBeGreaterThan(originalUpdatedAt.getTime());
+      expect(updatedUser.updatedAt.getTime()).toBeGreaterThan(
+        originalUpdatedAt.getTime()
+      );
     });
   });
 });

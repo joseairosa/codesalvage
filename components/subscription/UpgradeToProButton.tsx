@@ -47,7 +47,9 @@ export function UpgradeToProButton() {
         }
 
         // Redirect to Stripe Checkout
-        const { error: stripeError } = await stripe.confirmCardPayment(subscription.clientSecret);
+        const { error: stripeError } = await stripe.confirmCardPayment(
+          subscription.clientSecret
+        );
 
         if (stripeError) {
           throw new Error(stripeError.message || 'Payment failed');

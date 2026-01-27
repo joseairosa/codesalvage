@@ -45,7 +45,10 @@ const featuredListingRepository = new FeaturedListingRepository(prisma);
 const projectRepository = new ProjectRepository(prisma);
 const userRepository = new UserRepository(prisma);
 const subscriptionRepository = new SubscriptionRepository(prisma);
-const subscriptionService = new SubscriptionService(subscriptionRepository, userRepository);
+const subscriptionService = new SubscriptionService(
+  subscriptionRepository,
+  userRepository
+);
 const featuredListingService = new FeaturedListingService(
   featuredListingRepository,
   projectRepository,
@@ -133,10 +136,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (error) {
     console.error(`[${componentName}] Error handling webhook:`, error);
-    return NextResponse.json(
-      { error: 'Webhook handler failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }
 
@@ -152,7 +152,8 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   console.log(`[${componentName}] Payment succeeded:`, paymentIntent.id);
 
   // Check if this is a featured listing purchase
-  const isFeaturedListingPurchase = paymentIntent.metadata['featuredListingPurchase'] === 'true';
+  const isFeaturedListingPurchase =
+    paymentIntent.metadata['featuredListingPurchase'] === 'true';
 
   if (isFeaturedListingPurchase) {
     await handleFeaturedListingPayment(paymentIntent);
@@ -180,13 +181,19 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   // Update escrow status to held
   await transactionRepository.updateEscrowStatus(transactionId, 'held');
 
-  console.log(`[${componentName}] Transaction updated to succeeded with escrow held:`, transactionId);
+  console.log(
+    `[${componentName}] Transaction updated to succeeded with escrow held:`,
+    transactionId
+  );
 
   // Fetch transaction details for email notifications
   const transaction = await transactionRepository.findById(transactionId);
 
   if (!transaction) {
-    console.error(`[${componentName}] Transaction not found after update:`, transactionId);
+    console.error(
+      `[${componentName}] Transaction not found after update:`,
+      transactionId
+    );
     return;
   }
 
@@ -378,7 +385,9 @@ async function handleFeaturedListingPayment(paymentIntent: Stripe.PaymentIntent)
     const seller = await userRepository.findById(sellerId);
 
     if (!project || !seller) {
-      console.error(`[${componentName}] Project or seller not found for email notification`);
+      console.error(
+        `[${componentName}] Project or seller not found for email notification`
+      );
       return;
     }
 
@@ -401,15 +410,23 @@ async function handleFeaturedListingPayment(paymentIntent: Stripe.PaymentIntent)
         }
       );
 
-      console.log(`[${componentName}] Featured listing confirmation email sent to seller`);
+      console.log(
+        `[${componentName}] Featured listing confirmation email sent to seller`
+      );
     } catch (emailError) {
-      console.error(`[${componentName}] Failed to send featured listing email:`, emailError);
+      console.error(
+        `[${componentName}] Failed to send featured listing email:`,
+        emailError
+      );
       // Don't fail webhook if email fails
     }
 
     console.log(`[${componentName}] Featured listing payment processed successfully`);
   } catch (error) {
-    console.error(`[${componentName}] Failed to process featured listing payment:`, error);
+    console.error(
+      `[${componentName}] Failed to process featured listing payment:`,
+      error
+    );
     // Don't throw - webhook should still return 200 to Stripe
   }
 }
@@ -433,7 +450,10 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
       new Date(subscription.current_period_end * 1000)
     );
 
-    console.log(`[${componentName}] Subscription creation confirmed via webhook:`, subscription.id);
+    console.log(
+      `[${componentName}] Subscription creation confirmed via webhook:`,
+      subscription.id
+    );
   } catch (error) {
     console.error(`[${componentName}] Failed to update subscription on creation:`, error);
     // Don't throw - webhook should still return 200 to Stripe

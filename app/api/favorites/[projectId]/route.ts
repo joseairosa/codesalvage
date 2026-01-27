@@ -55,10 +55,7 @@ export async function DELETE(
     const removed = await favoriteService.removeFavorite(session.user.id, projectId);
 
     if (!removed) {
-      return NextResponse.json(
-        { error: 'Favorite not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Favorite not found' }, { status: 404 });
     }
 
     console.log(`[${componentName}] Favorite removed successfully`);

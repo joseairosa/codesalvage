@@ -23,7 +23,13 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Star, Eye, Heart } from 'lucide-react';
@@ -126,11 +132,7 @@ export function ProjectCard({
   return (
     <Link href={`/projects/${project.id}`}>
       <Card
-        className={`
-          group h-full cursor-pointer transition-all duration-200
-          hover:shadow-lg hover:scale-[1.02] hover:border-primary/50
-          ${className}
-        `}
+        className={`group h-full cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:border-primary/50 hover:shadow-lg ${className} `}
       >
         {/* Thumbnail Image */}
         <div className="relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted">
@@ -200,7 +202,9 @@ export function ProjectCard({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-2xl font-bold">{formatPrice(project.priceCents)}</p>
-              <p className={`text-xs ${getCompletionColor(project.completionPercentage)}`}>
+              <p
+                className={`text-xs ${getCompletionColor(project.completionPercentage)}`}
+              >
                 {getCompletionLabel(project.completionPercentage)}
               </p>
             </div>
@@ -224,7 +228,10 @@ export function ProjectCard({
           {showSellerInfo && (
             <div className="flex items-center gap-2 border-t pt-3">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={project.seller.avatarUrl || undefined} alt={project.seller.username} />
+                <AvatarImage
+                  src={project.seller.avatarUrl || undefined}
+                  alt={project.seller.username}
+                />
                 <AvatarFallback className="text-xs">
                   {getInitials(project.seller.fullName || project.seller.username)}
                 </AvatarFallback>
@@ -233,7 +240,9 @@ export function ProjectCard({
                 <p className="truncate text-sm font-medium">
                   {project.seller.fullName || project.seller.username}
                 </p>
-                <p className="truncate text-xs text-muted-foreground">@{project.seller.username}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  @{project.seller.username}
+                </p>
               </div>
             </div>
           )}

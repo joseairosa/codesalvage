@@ -41,10 +41,7 @@ const transactionService = new TransactionService(
  * Get transaction details by ID
  * Access control: Only buyer or seller can view
  */
-export async function GET(
-  _request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_request: Request, { params }: { params: { id: string } }) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -59,10 +56,7 @@ export async function GET(
     });
 
     // Use TransactionService to get transaction with access validation
-    const transaction = await transactionService.getTransactionById(
-      id,
-      session.user.id
-    );
+    const transaction = await transactionService.getTransactionById(id, session.user.id);
 
     console.log(`[${componentName}] Transaction found:`, transaction.id);
 

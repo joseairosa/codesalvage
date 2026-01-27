@@ -144,7 +144,10 @@ export class SubscriptionService {
     userId: string,
     data: CreateSubscriptionRequest
   ): Promise<CreateSubscriptionResponse> {
-    console.log('[SubscriptionService] Creating subscription:', { userId, plan: data.plan });
+    console.log('[SubscriptionService] Creating subscription:', {
+      userId,
+      plan: data.plan,
+    });
 
     // Validate user is a seller
     const user = await this.userRepository.findById(userId);
@@ -237,17 +240,24 @@ export class SubscriptionService {
 
       // Extract payment intent details if payment requires action
       const latestInvoice = stripeSubscription.latest_invoice as Stripe.Invoice;
-      const paymentIntent = latestInvoice?.payment_intent as Stripe.PaymentIntent | undefined;
+      const paymentIntent = latestInvoice?.payment_intent as
+        | Stripe.PaymentIntent
+        | undefined;
 
       return {
         subscriptionId: stripeSubscription.id,
         clientSecret: paymentIntent?.client_secret,
         status: stripeSubscription.status,
-        currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000).toISOString(),
+        currentPeriodEnd: new Date(
+          stripeSubscription.current_period_end * 1000
+        ).toISOString(),
       };
     } catch (error) {
       console.error('[SubscriptionService] createSubscription failed:', error);
-      if (error instanceof Stripe.errors.StripeError || (error as any)?.type?.includes('Stripe')) {
+      if (
+        error instanceof Stripe.errors.StripeError ||
+        (error as any)?.type?.includes('Stripe')
+      ) {
         throw new SubscriptionValidationError(
           `[SubscriptionService] Stripe error: ${(error as Error).message}`,
           'stripe'
@@ -300,7 +310,10 @@ export class SubscriptionService {
       };
     } catch (error) {
       console.error('[SubscriptionService] cancelSubscription failed:', error);
-      if (error instanceof Stripe.errors.StripeError || (error as any)?.type?.includes('Stripe')) {
+      if (
+        error instanceof Stripe.errors.StripeError ||
+        (error as any)?.type?.includes('Stripe')
+      ) {
         throw new SubscriptionValidationError(
           `[SubscriptionService] Stripe error: ${(error as Error).message}`,
           'stripe'
@@ -353,7 +366,10 @@ export class SubscriptionService {
       };
     } catch (error) {
       console.error('[SubscriptionService] resumeSubscription failed:', error);
-      if (error instanceof Stripe.errors.StripeError || (error as any)?.type?.includes('Stripe')) {
+      if (
+        error instanceof Stripe.errors.StripeError ||
+        (error as any)?.type?.includes('Stripe')
+      ) {
         throw new SubscriptionValidationError(
           `[SubscriptionService] Stripe error: ${(error as Error).message}`,
           'stripe'
@@ -435,7 +451,10 @@ export class SubscriptionService {
       return session.url;
     } catch (error) {
       console.error('[SubscriptionService] createPortalSession failed:', error);
-      if (error instanceof Stripe.errors.StripeError || (error as any)?.type?.includes('Stripe')) {
+      if (
+        error instanceof Stripe.errors.StripeError ||
+        (error as any)?.type?.includes('Stripe')
+      ) {
         throw new SubscriptionValidationError(
           `[SubscriptionService] Stripe error: ${(error as Error).message}`,
           'stripe'
@@ -505,7 +524,10 @@ export class SubscriptionService {
     currentPeriodStart: Date,
     currentPeriodEnd: Date
   ) {
-    console.log('[SubscriptionService] Updating subscription from webhook:', stripeSubscriptionId);
+    console.log(
+      '[SubscriptionService] Updating subscription from webhook:',
+      stripeSubscriptionId
+    );
 
     const subscription =
       await this.subscriptionRepository.findByStripeSubscriptionId(stripeSubscriptionId);
@@ -524,7 +546,10 @@ export class SubscriptionService {
       }
     );
 
-    console.log('[SubscriptionService] Subscription updated from webhook:', updatedSubscription.id);
+    console.log(
+      '[SubscriptionService] Subscription updated from webhook:',
+      updatedSubscription.id
+    );
 
     return updatedSubscription;
   }
@@ -540,7 +565,10 @@ export class SubscriptionService {
    * await subscriptionService.cancelImmediately('sub_xxx');
    */
   async cancelImmediately(stripeSubscriptionId: string) {
-    console.log('[SubscriptionService] Canceling subscription immediately:', stripeSubscriptionId);
+    console.log(
+      '[SubscriptionService] Canceling subscription immediately:',
+      stripeSubscriptionId
+    );
 
     const subscription =
       await this.subscriptionRepository.findByStripeSubscriptionId(stripeSubscriptionId);
@@ -558,7 +586,10 @@ export class SubscriptionService {
       }
     );
 
-    console.log('[SubscriptionService] Subscription canceled immediately:', updatedSubscription.id);
+    console.log(
+      '[SubscriptionService] Subscription canceled immediately:',
+      updatedSubscription.id
+    );
 
     return updatedSubscription;
   }

@@ -96,10 +96,10 @@ describe('SubscriptionRepository', () => {
     });
 
     it('should throw error when duplicate subscription (unique constraint)', async () => {
-      const error = new Prisma.PrismaClientKnownRequestError(
-        'Unique constraint failed',
-        { code: 'P2002', clientVersion: '5.0.0' }
-      );
+      const error = new Prisma.PrismaClientKnownRequestError('Unique constraint failed', {
+        code: 'P2002',
+        clientVersion: '5.0.0',
+      });
       vi.mocked(mockPrismaClient.subscription.create).mockRejectedValue(error);
 
       await expect(
@@ -145,7 +145,9 @@ describe('SubscriptionRepository', () => {
   describe('findByUserId', () => {
     it('should find subscription by user ID', async () => {
       const mockSubscription = createMockSubscription();
-      vi.mocked(mockPrismaClient.subscription.findUnique).mockResolvedValue(mockSubscription);
+      vi.mocked(mockPrismaClient.subscription.findUnique).mockResolvedValue(
+        mockSubscription
+      );
 
       const result = await subscriptionRepository.findByUserId('user123');
 
@@ -181,9 +183,12 @@ describe('SubscriptionRepository', () => {
   describe('findByStripeSubscriptionId', () => {
     it('should find subscription by Stripe subscription ID', async () => {
       const mockSubscription = createMockSubscription();
-      vi.mocked(mockPrismaClient.subscription.findUnique).mockResolvedValue(mockSubscription);
+      vi.mocked(mockPrismaClient.subscription.findUnique).mockResolvedValue(
+        mockSubscription
+      );
 
-      const result = await subscriptionRepository.findByStripeSubscriptionId('sub_stripe123');
+      const result =
+        await subscriptionRepository.findByStripeSubscriptionId('sub_stripe123');
 
       expect(result).toEqual(mockSubscription);
       expect(mockPrismaClient.subscription.findUnique).toHaveBeenCalledWith({
@@ -194,7 +199,8 @@ describe('SubscriptionRepository', () => {
     it('should return null when subscription not found', async () => {
       vi.mocked(mockPrismaClient.subscription.findUnique).mockResolvedValue(null);
 
-      const result = await subscriptionRepository.findByStripeSubscriptionId('nonexistent');
+      const result =
+        await subscriptionRepository.findByStripeSubscriptionId('nonexistent');
 
       expect(result).toBeNull();
     });
@@ -288,10 +294,10 @@ describe('SubscriptionRepository', () => {
     });
 
     it('should throw error when subscription not found', async () => {
-      const error = new Prisma.PrismaClientKnownRequestError(
-        'Record not found',
-        { code: 'P2025', clientVersion: '5.0.0' }
-      );
+      const error = new Prisma.PrismaClientKnownRequestError('Record not found', {
+        code: 'P2025',
+        clientVersion: '5.0.0',
+      });
       vi.mocked(mockPrismaClient.subscription.update).mockRejectedValue(error);
 
       await expect(
@@ -333,10 +339,10 @@ describe('SubscriptionRepository', () => {
     });
 
     it('should throw error when subscription not found', async () => {
-      const error = new Prisma.PrismaClientKnownRequestError(
-        'Record not found',
-        { code: 'P2025', clientVersion: '5.0.0' }
-      );
+      const error = new Prisma.PrismaClientKnownRequestError('Record not found', {
+        code: 'P2025',
+        clientVersion: '5.0.0',
+      });
       vi.mocked(mockPrismaClient.subscription.update).mockRejectedValue(error);
 
       await expect(
@@ -351,7 +357,9 @@ describe('SubscriptionRepository', () => {
 
       await expect(
         subscriptionRepository.updateByStripeId('sub_stripe123', { status: 'canceled' })
-      ).rejects.toThrow('[SubscriptionRepository] Failed to update subscription by Stripe ID');
+      ).rejects.toThrow(
+        '[SubscriptionRepository] Failed to update subscription by Stripe ID'
+      );
     });
   });
 
@@ -373,10 +381,10 @@ describe('SubscriptionRepository', () => {
     });
 
     it('should throw error when subscription not found', async () => {
-      const error = new Prisma.PrismaClientKnownRequestError(
-        'Record not found',
-        { code: 'P2025', clientVersion: '5.0.0' }
-      );
+      const error = new Prisma.PrismaClientKnownRequestError('Record not found', {
+        code: 'P2025',
+        clientVersion: '5.0.0',
+      });
       vi.mocked(mockPrismaClient.subscription.delete).mockRejectedValue(error);
 
       await expect(subscriptionRepository.delete('nonexistent')).rejects.toThrow(
@@ -459,7 +467,9 @@ describe('SubscriptionRepository', () => {
         createMockSubscription({ status: 'active' }),
         createMockSubscription({ status: 'trialing', userId: 'user456' }),
       ];
-      vi.mocked(mockPrismaClient.subscription.findMany).mockResolvedValue(mockSubscriptions);
+      vi.mocked(mockPrismaClient.subscription.findMany).mockResolvedValue(
+        mockSubscriptions
+      );
 
       const result = await subscriptionRepository.findAllActive();
 
@@ -500,7 +510,9 @@ describe('SubscriptionRepository', () => {
         createMockSubscription({ status: 'past_due' }),
         createMockSubscription({ status: 'past_due', userId: 'user456' }),
       ];
-      vi.mocked(mockPrismaClient.subscription.findMany).mockResolvedValue(mockSubscriptions);
+      vi.mocked(mockPrismaClient.subscription.findMany).mockResolvedValue(
+        mockSubscriptions
+      );
 
       const result = await subscriptionRepository.findByStatus('past_due');
 

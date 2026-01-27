@@ -44,10 +44,7 @@ const transactionService = new TransactionService(
  * - Payment must be successful
  * - Only buyer can access code
  */
-export async function POST(
-  _request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function POST(_request: Request, { params }: { params: { id: string } }) {
   try {
     const session = await auth();
     if (!session?.user?.id) {

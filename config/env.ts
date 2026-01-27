@@ -25,7 +25,9 @@ export const env = {
   NEXT_PUBLIC_APP_URL: getEnvVar('NEXT_PUBLIC_APP_URL', 'http://localhost:3011'),
 
   // Public Stripe key (client-side)
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: getOptionalEnvVar('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY'),
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: getOptionalEnvVar(
+    'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY'
+  ),
 
   // Database
   DATABASE_URL: getEnvVar(

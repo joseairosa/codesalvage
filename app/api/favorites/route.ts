@@ -14,7 +14,11 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { FavoriteService, FavoriteValidationError, FavoritePermissionError } from '@/lib/services/FavoriteService';
+import {
+  FavoriteService,
+  FavoriteValidationError,
+  FavoritePermissionError,
+} from '@/lib/services/FavoriteService';
 import { FavoriteRepository } from '@/lib/repositories/FavoriteRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { ProjectRepository } from '@/lib/repositories/ProjectRepository';

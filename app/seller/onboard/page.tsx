@@ -19,7 +19,13 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
@@ -231,7 +237,8 @@ export default function SellerOnboardPage() {
               <CardHeader>
                 <CardTitle>Set Up Your Seller Account</CardTitle>
                 <CardDescription>
-                  Connect your bank account to receive payouts. This takes about 5 minutes.
+                  Connect your bank account to receive payouts. This takes about 5
+                  minutes.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -247,9 +254,9 @@ export default function SellerOnboardPage() {
 
                 <div className="rounded-lg bg-muted p-4">
                   <p className="text-sm">
-                    <strong>Platform Fee:</strong> We charge a 15% platform fee on all sales.
-                    You'll receive 85% of the project price after Stripe payment processing fees
-                    (2.9% + $0.30).
+                    <strong>Platform Fee:</strong> We charge a 15% platform fee on all
+                    sales. You'll receive 85% of the project price after Stripe payment
+                    processing fees (2.9% + $0.30).
                   </p>
                   <p className="mt-2 text-xs text-muted-foreground">
                     Example: $1,000 project = $820.70 payout to you

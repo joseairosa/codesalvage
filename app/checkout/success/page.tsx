@@ -19,7 +19,13 @@
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
@@ -180,7 +186,9 @@ export default function CheckoutSuccessPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <p className="text-sm text-muted-foreground">Amount Paid</p>
-                    <p className="font-semibold">{formatPrice(transaction.amountCents)}</p>
+                    <p className="font-semibold">
+                      {formatPrice(transaction.amountCents)}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Transaction ID</p>
@@ -188,11 +196,15 @@ export default function CheckoutSuccessPage() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Payment Status</p>
-                    <p className="font-semibold capitalize">{transaction.paymentStatus}</p>
+                    <p className="font-semibold capitalize">
+                      {transaction.paymentStatus}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Escrow Release</p>
-                    <p className="font-semibold">{formatDate(transaction.escrowReleaseDate)}</p>
+                    <p className="font-semibold">
+                      {formatDate(transaction.escrowReleaseDate)}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -211,7 +223,8 @@ export default function CheckoutSuccessPage() {
                   <div>
                     <h4 className="font-semibold">Code Access</h4>
                     <p className="text-sm text-muted-foreground">
-                      You now have immediate access to download the project code and repository.
+                      You now have immediate access to download the project code and
+                      repository.
                     </p>
                   </div>
                 </div>
@@ -223,8 +236,9 @@ export default function CheckoutSuccessPage() {
                   <div>
                     <h4 className="font-semibold">7-Day Review Period</h4>
                     <p className="text-sm text-muted-foreground">
-                      Your payment is held in escrow until {formatDate(transaction.escrowReleaseDate)}.
-                      If you're not satisfied, request a refund within this period.
+                      Your payment is held in escrow until{' '}
+                      {formatDate(transaction.escrowReleaseDate)}. If you're not
+                      satisfied, request a refund within this period.
                     </p>
                   </div>
                 </div>
@@ -236,7 +250,8 @@ export default function CheckoutSuccessPage() {
                   <div>
                     <h4 className="font-semibold">Funds Released</h4>
                     <p className="text-sm text-muted-foreground">
-                      After the review period, funds are automatically released to the seller.
+                      After the review period, funds are automatically released to the
+                      seller.
                     </p>
                   </div>
                 </div>
@@ -246,7 +261,9 @@ export default function CheckoutSuccessPage() {
             {/* Action Buttons */}
             <div className="flex gap-4">
               <Button
-                onClick={() => router.push(`/projects/${transaction.project.id}/download`)}
+                onClick={() =>
+                  router.push(`/projects/${transaction.project.id}/download`)
+                }
                 className="flex-1"
                 size="lg"
               >
@@ -268,8 +285,8 @@ export default function CheckoutSuccessPage() {
             <Alert>
               <FileCode className="h-4 w-4" />
               <AlertDescription>
-                Need help? Contact the seller via the messaging system or reach out to our support
-                team.
+                Need help? Contact the seller via the messaging system or reach out to our
+                support team.
               </AlertDescription>
             </Alert>
           </>

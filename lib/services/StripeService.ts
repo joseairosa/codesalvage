@@ -236,10 +236,7 @@ export class StripeService {
    * @param reason - Refund reason
    * @returns Stripe refund
    */
-  async refundPayment(
-    paymentIntentId: string,
-    reason?: string
-  ): Promise<Stripe.Refund> {
+  async refundPayment(paymentIntentId: string, reason?: string): Promise<Stripe.Refund> {
     console.log(`[${componentName}] Refunding payment:`, {
       paymentIntentId,
       reason,

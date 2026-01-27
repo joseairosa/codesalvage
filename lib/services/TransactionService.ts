@@ -168,8 +168,7 @@ export class TransactionService {
       notes: data.notes,
     };
 
-    const transaction =
-      await this.transactionRepository.create(transactionInput);
+    const transaction = await this.transactionRepository.create(transactionInput);
 
     console.log('[TransactionService] Transaction created:', transaction.id);
 
@@ -243,9 +242,7 @@ export class TransactionService {
 
     // Validate user has access (must be buyer or seller)
     if (transaction.buyerId !== userId && transaction.sellerId !== userId) {
-      throw new TransactionPermissionError(
-        'You do not have access to this transaction'
-      );
+      throw new TransactionPermissionError('You do not have access to this transaction');
     }
 
     return transaction;
@@ -258,10 +255,7 @@ export class TransactionService {
    * @param userId - User ID to check
    * @returns True if user is buyer or seller
    */
-  async isUserBuyerOrSeller(
-    transactionId: string,
-    userId: string
-  ): Promise<boolean> {
+  async isUserBuyerOrSeller(transactionId: string, userId: string): Promise<boolean> {
     console.log('[TransactionService] Checking user access:', {
       transactionId,
       userId,
@@ -286,10 +280,7 @@ export class TransactionService {
    * @throws TransactionNotFoundError if transaction doesn't exist
    * @throws TransactionPermissionError if user is not the buyer
    */
-  async validateUserIsBuyer(
-    transactionId: string,
-    userId: string
-  ): Promise<boolean> {
+  async validateUserIsBuyer(transactionId: string, userId: string): Promise<boolean> {
     console.log('[TransactionService] Validating user is buyer:', {
       transactionId,
       userId,
@@ -301,9 +292,7 @@ export class TransactionService {
     }
 
     if (transaction.buyerId !== userId) {
-      throw new TransactionPermissionError(
-        'Only the buyer can perform this action'
-      );
+      throw new TransactionPermissionError('Only the buyer can perform this action');
     }
 
     return true;

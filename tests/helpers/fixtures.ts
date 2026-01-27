@@ -114,8 +114,11 @@ export async function createTestProject(
         faker.lorem.paragraphs(3, '\n\n') +
           '\n\n## Features\n' +
           Array.from({ length: 5 }, () => `- ${faker.lorem.sentence()}`).join('\n'),
-      category: overrides.category || faker.helpers.arrayElement(['web_app', 'mobile', 'backend', 'tool', 'dashboard']),
-      completionPercentage: overrides.completionPercentage ?? faker.number.int({ min: 50, max: 95 }),
+      category:
+        overrides.category ||
+        faker.helpers.arrayElement(['web_app', 'mobile', 'backend', 'tool', 'dashboard']),
+      completionPercentage:
+        overrides.completionPercentage ?? faker.number.int({ min: 50, max: 95 }),
       estimatedCompletionHours: faker.number.int({ min: 10, max: 200 }),
       knownIssues: faker.lorem.paragraph(),
       priceCents: overrides.priceCents ?? faker.number.int({ min: 5000, max: 500000 }),
@@ -124,14 +127,25 @@ export async function createTestProject(
       techStack:
         overrides.techStack ||
         faker.helpers.arrayElements(
-          ['React', 'Next.js', 'TypeScript', 'Node.js', 'PostgreSQL', 'Tailwind CSS', 'Prisma'],
+          [
+            'React',
+            'Next.js',
+            'TypeScript',
+            'Node.js',
+            'PostgreSQL',
+            'Tailwind CSS',
+            'Prisma',
+          ],
           { min: 3, max: 5 }
         ),
       primaryLanguage: overrides.primaryLanguage || 'TypeScript',
       frameworks: ['Next.js', 'Tailwind CSS'],
-      githubUrl: overrides.githubUrl || `https://github.com/${faker.internet.username()}/${faker.lorem.slug()}`,
+      githubUrl:
+        overrides.githubUrl ||
+        `https://github.com/${faker.internet.username()}/${faker.lorem.slug()}`,
       demoUrl: overrides.demoUrl || faker.internet.url(),
-      thumbnailImageUrl: overrides.thumbnailImageUrl || faker.image.urlLoremFlickr({ category: 'tech' }),
+      thumbnailImageUrl:
+        overrides.thumbnailImageUrl || faker.image.urlLoremFlickr({ category: 'tech' }),
       screenshotUrls: overrides.screenshotUrls || [
         faker.image.urlLoremFlickr({ category: 'tech' }),
         faker.image.urlLoremFlickr({ category: 'tech' }),
@@ -181,7 +195,8 @@ export async function createTestTransaction(
 
   const amountCents = overrides.amountCents ?? 100000; // $1,000.00
   const commissionCents = overrides.commissionCents ?? Math.round(amountCents * 0.18);
-  const sellerReceivesCents = overrides.sellerReceivesCents ?? amountCents - commissionCents;
+  const sellerReceivesCents =
+    overrides.sellerReceivesCents ?? amountCents - commissionCents;
 
   return await prisma.transaction.create({
     data: {
@@ -193,7 +208,8 @@ export async function createTestTransaction(
       sellerReceivesCents,
       paymentStatus: overrides.paymentStatus || 'succeeded',
       escrowStatus: overrides.escrowStatus || 'held',
-      stripePaymentIntentId: overrides.stripePaymentIntentId || `pi_${faker.string.alphanumeric(24)}`,
+      stripePaymentIntentId:
+        overrides.stripePaymentIntentId || `pi_${faker.string.alphanumeric(24)}`,
       stripeChargeId: `ch_${faker.string.alphanumeric(24)}`,
       escrowReleaseDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       codeDeliveryStatus: 'delivered',
@@ -237,9 +253,12 @@ export async function createTestReview(
       buyerId: buyerId!,
       overallRating: overrides.overallRating ?? faker.number.int({ min: 3, max: 5 }),
       comment: overrides.comment || faker.lorem.paragraph(),
-      codeQualityRating: overrides.codeQualityRating ?? faker.number.int({ min: 3, max: 5 }),
-      documentationRating: overrides.documentationRating ?? faker.number.int({ min: 3, max: 5 }),
-      responsivenessRating: overrides.responsivenessRating ?? faker.number.int({ min: 3, max: 5 }),
+      codeQualityRating:
+        overrides.codeQualityRating ?? faker.number.int({ min: 3, max: 5 }),
+      documentationRating:
+        overrides.documentationRating ?? faker.number.int({ min: 3, max: 5 }),
+      responsivenessRating:
+        overrides.responsivenessRating ?? faker.number.int({ min: 3, max: 5 }),
       accuracyRating: overrides.accuracyRating ?? faker.number.int({ min: 3, max: 5 }),
       isAnonymous: false,
       helpfulCount: faker.number.int({ min: 0, max: 10 }),

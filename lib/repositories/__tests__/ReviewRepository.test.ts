@@ -160,9 +160,7 @@ describe('ReviewRepository', () => {
         overallRating: 5,
       };
 
-      vi.mocked(mockPrismaClient.review.create).mockRejectedValue(
-        new Error('DB Error')
-      );
+      vi.mocked(mockPrismaClient.review.create).mockRejectedValue(new Error('DB Error'));
 
       await expect(reviewRepository.create(reviewData)).rejects.toThrow(
         '[ReviewRepository] Failed to create review'
@@ -200,9 +198,9 @@ describe('ReviewRepository', () => {
         new Error('DB Error')
       );
 
-      await expect(
-        reviewRepository.findByTransactionId('txn123')
-      ).rejects.toThrow('[ReviewRepository] Failed to find review');
+      await expect(reviewRepository.findByTransactionId('txn123')).rejects.toThrow(
+        '[ReviewRepository] Failed to find review'
+      );
     });
   });
 
@@ -270,9 +268,9 @@ describe('ReviewRepository', () => {
         new Error('DB Error')
       );
 
-      await expect(
-        reviewRepository.getSellerReviews('seller123')
-      ).rejects.toThrow('[ReviewRepository] Failed to get seller reviews');
+      await expect(reviewRepository.getSellerReviews('seller123')).rejects.toThrow(
+        '[ReviewRepository] Failed to get seller reviews'
+      );
     });
   });
 
@@ -313,9 +311,9 @@ describe('ReviewRepository', () => {
         new Error('DB Error')
       );
 
-      await expect(
-        reviewRepository.getBuyerReviews('buyer123')
-      ).rejects.toThrow('[ReviewRepository] Failed to get buyer reviews');
+      await expect(reviewRepository.getBuyerReviews('buyer123')).rejects.toThrow(
+        '[ReviewRepository] Failed to get buyer reviews'
+      );
     });
   });
 
@@ -385,9 +383,9 @@ describe('ReviewRepository', () => {
         new Error('DB Error')
       );
 
-      await expect(
-        reviewRepository.getSellerRatingStats('seller123')
-      ).rejects.toThrow('[ReviewRepository] Failed to get seller rating stats');
+      await expect(reviewRepository.getSellerRatingStats('seller123')).rejects.toThrow(
+        '[ReviewRepository] Failed to get seller rating stats'
+      );
     });
   });
 
@@ -397,10 +395,7 @@ describe('ReviewRepository', () => {
 
   describe('updateSellerAnalytics', () => {
     it('should update seller analytics with rating stats', async () => {
-      const mockReviews = [
-        { overallRating: 5 },
-        { overallRating: 4 },
-      ];
+      const mockReviews = [{ overallRating: 5 }, { overallRating: 4 }];
 
       const mockAnalytics = {
         id: 'analytics123',
@@ -416,9 +411,7 @@ describe('ReviewRepository', () => {
       };
 
       vi.mocked(mockPrismaClient.review.findMany).mockResolvedValue(mockReviews as any);
-      vi.mocked(mockPrismaClient.sellerAnalytics.upsert).mockResolvedValue(
-        mockAnalytics
-      );
+      vi.mocked(mockPrismaClient.sellerAnalytics.upsert).mockResolvedValue(mockAnalytics);
 
       const result = await reviewRepository.updateSellerAnalytics('seller123');
 
@@ -462,9 +455,9 @@ describe('ReviewRepository', () => {
         new Error('DB Error')
       );
 
-      await expect(
-        reviewRepository.updateSellerAnalytics('seller123')
-      ).rejects.toThrow('[ReviewRepository] Failed to update seller analytics');
+      await expect(reviewRepository.updateSellerAnalytics('seller123')).rejects.toThrow(
+        '[ReviewRepository] Failed to update seller analytics'
+      );
     });
   });
 

@@ -13,7 +13,11 @@ import {
   teardownTestDatabase,
   cleanDatabase,
 } from '@/tests/helpers/db';
-import { createTestUser, createTestSeller, createTestProject } from '@/tests/helpers/fixtures';
+import {
+  createTestUser,
+  createTestSeller,
+  createTestProject,
+} from '@/tests/helpers/fixtures';
 import { ProjectService } from '@/lib/services/ProjectService';
 import { SubscriptionService } from '@/lib/services/SubscriptionService';
 import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
@@ -68,7 +72,8 @@ describe('ProjectService (Integration)', () => {
 
       const projectData = {
         title: 'New E-commerce Platform',
-        description: 'A full-featured online store with product catalog, shopping cart, checkout, and payment processing capabilities.',
+        description:
+          'A full-featured online store with product catalog, shopping cart, checkout, and payment processing capabilities.',
         category: 'web_app' as const,
         completionPercentage: 80,
         estimatedCompletionHours: 50,
@@ -103,7 +108,8 @@ describe('ProjectService (Integration)', () => {
 
       const projectData = {
         title: 'Test Project',
-        description: 'This is a test project description that meets the minimum length requirement of 50 characters.',
+        description:
+          'This is a test project description that meets the minimum length requirement of 50 characters.',
         category: 'web_app' as const,
         completionPercentage: 50,
         priceCents: 10000,
@@ -124,7 +130,8 @@ describe('ProjectService (Integration)', () => {
 
       const projectData = {
         title: 'Test Project',
-        description: 'This is a test project description that meets the minimum length requirement of 50 characters.',
+        description:
+          'This is a test project description that meets the minimum length requirement of 50 characters.',
         completionPercentage: 150, // Invalid
         category: 'web_app' as const,
         priceCents: 10000,
@@ -268,9 +275,9 @@ describe('ProjectService (Integration)', () => {
       const seller = await createTestSeller({ username: 'johndoe' });
       const project = await createTestProject({ sellerId: seller.id });
 
-      const retrieved = await projectService.getProject(project.id, {
+      const retrieved = (await projectService.getProject(project.id, {
         includeSeller: true,
-      }) as any;
+      })) as any;
 
       expect(retrieved.seller).toBeDefined();
       expect(retrieved.seller?.username).toBe('johndoe');
@@ -326,19 +333,13 @@ describe('ProjectService (Integration)', () => {
     });
 
     it('should only return active projects by default', async () => {
-      const result = await projectService.searchProjects(
-        {},
-        { page: 1, limit: 10 }
-      );
+      const result = await projectService.searchProjects({}, { page: 1, limit: 10 });
 
       expect(result.projects.every((p) => p.status === 'active')).toBe(true);
     });
 
     it('should paginate results', async () => {
-      const result = await projectService.searchProjects(
-        {},
-        { page: 1, limit: 1 }
-      );
+      const result = await projectService.searchProjects({}, { page: 1, limit: 1 });
 
       expect(result.projects.length).toBe(1);
       expect(result.limit).toBe(1);
@@ -425,7 +426,8 @@ describe('ProjectService (Integration)', () => {
       await expect(
         projectService.createProject(seller.id, {
           title: 'Test Project',
-          description: 'This is a test project description that meets the minimum length requirement of 50 characters.',
+          description:
+            'This is a test project description that meets the minimum length requirement of 50 characters.',
           category: 'web_app',
           completionPercentage: -10, // Invalid
           priceCents: 10000,
@@ -440,7 +442,8 @@ describe('ProjectService (Integration)', () => {
       await expect(
         projectService.createProject(seller.id, {
           title: 'Test Project',
-          description: 'This is a test project description that meets the minimum length requirement of 50 characters.',
+          description:
+            'This is a test project description that meets the minimum length requirement of 50 characters.',
           category: 'web_app',
           completionPercentage: 110, // Invalid
           priceCents: 10000,
@@ -459,7 +462,8 @@ describe('ProjectService (Integration)', () => {
       await expect(
         projectService.createProject(seller.id, {
           title: 'Test Project', // At least 5 characters
-          description: 'This is a test project description that meets the minimum length requirement of 50 characters.',
+          description:
+            'This is a test project description that meets the minimum length requirement of 50 characters.',
           category: 'web_app',
           completionPercentage: 50,
           priceCents: 100, // Too low (< $5)
@@ -478,7 +482,8 @@ describe('ProjectService (Integration)', () => {
       await expect(
         projectService.createProject(seller.id, {
           title: '', // Empty
-          description: 'This is a test project description that meets the minimum length requirement of 50 characters.',
+          description:
+            'This is a test project description that meets the minimum length requirement of 50 characters.',
           category: 'web_app',
           completionPercentage: 50,
           priceCents: 10000,

@@ -65,10 +65,7 @@ export class FeaturedListingRepository {
    * @param featuredUntil - Date when featured period ends
    * @returns Updated project
    */
-  async setFeatured(
-    projectId: string,
-    featuredUntil: Date
-  ): Promise<Project> {
+  async setFeatured(projectId: string, featuredUntil: Date): Promise<Project> {
     try {
       return await this.prisma.project.update({
         where: { id: projectId },
@@ -288,7 +285,9 @@ export class FeaturedListingRepository {
       return result.count;
     } catch (error) {
       console.error('[FeaturedListingRepository] cleanupExpiredFeatured failed:', error);
-      throw new Error('[FeaturedListingRepository] Failed to cleanup expired featured projects');
+      throw new Error(
+        '[FeaturedListingRepository] Failed to cleanup expired featured projects'
+      );
     }
   }
 

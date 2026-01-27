@@ -222,5 +222,4 @@ describe('R2Service', () => {
       expect(publicUrl).toBe('https://pub-test.r2.dev/image/user123/12345-test.jpg');
     });
   });
-
 });

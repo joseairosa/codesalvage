@@ -24,7 +24,13 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -59,9 +65,7 @@ import {
   Eye,
   Edit,
   Trash2,
-  
   CheckCircle2,
-  
   DollarSign,
   TrendingUp,
   FileText,
@@ -172,8 +176,13 @@ function formatDate(date: Date): string {
 /**
  * Get status badge variant
  */
-function getStatusVariant(status: ProjectStatus): 'default' | 'secondary' | 'outline' | 'destructive' {
-  const variants: Record<ProjectStatus, 'default' | 'secondary' | 'outline' | 'destructive'> = {
+function getStatusVariant(
+  status: ProjectStatus
+): 'default' | 'secondary' | 'outline' | 'destructive' {
+  const variants: Record<
+    ProjectStatus,
+    'default' | 'secondary' | 'outline' | 'destructive'
+  > = {
     draft: 'secondary',
     active: 'default',
     sold: 'outline',
@@ -456,7 +465,10 @@ export default function SellerProjectsPage() {
               className="pl-9"
             />
           </div>
-          <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as ProjectStatus | 'all')}>
+          <Select
+            value={statusFilter}
+            onValueChange={(value) => setStatusFilter(value as ProjectStatus | 'all')}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue />
             </SelectTrigger>
@@ -612,7 +624,8 @@ export default function SellerProjectsPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>Delete Project</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete this project? This action cannot be undone.
+                Are you sure you want to delete this project? This action cannot be
+                undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

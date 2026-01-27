@@ -94,9 +94,9 @@ describe('FavoriteService (Integration)', () => {
       const seller = await createTestUser({ isSeller: true });
       const project = await createTestProject({ sellerId: seller.id, status: 'active' });
 
-      await expect(
-        favoriteService.addFavorite(seller.id, project.id)
-      ).rejects.toThrow('Cannot favorite your own project');
+      await expect(favoriteService.addFavorite(seller.id, project.id)).rejects.toThrow(
+        'Cannot favorite your own project'
+      );
     });
 
     it('should prevent favoriting inactive projects', async () => {
@@ -104,9 +104,9 @@ describe('FavoriteService (Integration)', () => {
       const buyer = await createTestUser();
       const project = await createTestProject({ sellerId: seller.id, status: 'draft' });
 
-      await expect(
-        favoriteService.addFavorite(buyer.id, project.id)
-      ).rejects.toThrow('Cannot favorite inactive projects');
+      await expect(favoriteService.addFavorite(buyer.id, project.id)).rejects.toThrow(
+        'Cannot favorite inactive projects'
+      );
     });
 
     it('should prevent duplicate favorites', async () => {
@@ -118,9 +118,9 @@ describe('FavoriteService (Integration)', () => {
       await favoriteService.addFavorite(buyer.id, project.id);
 
       // Second favorite fails
-      await expect(
-        favoriteService.addFavorite(buyer.id, project.id)
-      ).rejects.toThrow('Project is already in favorites');
+      await expect(favoriteService.addFavorite(buyer.id, project.id)).rejects.toThrow(
+        'Project is already in favorites'
+      );
     });
   });
 

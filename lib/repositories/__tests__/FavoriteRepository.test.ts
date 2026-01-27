@@ -88,9 +88,9 @@ describe('FavoriteRepository', () => {
         new Error('Unique constraint violation')
       );
 
-      await expect(
-        favoriteRepository.create('user123', 'project456')
-      ).rejects.toThrow('[FavoriteRepository] Failed to create favorite');
+      await expect(favoriteRepository.create('user123', 'project456')).rejects.toThrow(
+        '[FavoriteRepository] Failed to create favorite'
+      );
     });
 
     it('should throw error when database operation fails', async () => {
@@ -98,9 +98,9 @@ describe('FavoriteRepository', () => {
         new Error('DB Error')
       );
 
-      await expect(
-        favoriteRepository.create('user123', 'project456')
-      ).rejects.toThrow('[FavoriteRepository] Failed to create favorite');
+      await expect(favoriteRepository.create('user123', 'project456')).rejects.toThrow(
+        '[FavoriteRepository] Failed to create favorite'
+      );
     });
   });
 
@@ -131,9 +131,9 @@ describe('FavoriteRepository', () => {
     it('should throw error when favorite not found', async () => {
       vi.mocked(mockPrismaClient.favorite.findFirst).mockResolvedValue(null);
 
-      await expect(
-        favoriteRepository.delete('user123', 'project456')
-      ).rejects.toThrow('[FavoriteRepository] Failed to delete favorite');
+      await expect(favoriteRepository.delete('user123', 'project456')).rejects.toThrow(
+        '[FavoriteRepository] Failed to delete favorite'
+      );
     });
 
     it('should throw error when database operation fails', async () => {
@@ -141,9 +141,9 @@ describe('FavoriteRepository', () => {
         new Error('DB Error')
       );
 
-      await expect(
-        favoriteRepository.delete('user123', 'project456')
-      ).rejects.toThrow('[FavoriteRepository] Failed to delete favorite');
+      await expect(favoriteRepository.delete('user123', 'project456')).rejects.toThrow(
+        '[FavoriteRepository] Failed to delete favorite'
+      );
     });
   });
 
@@ -250,9 +250,9 @@ describe('FavoriteRepository', () => {
         new Error('DB Error')
       );
 
-      await expect(
-        favoriteRepository.getUserFavorites('user123')
-      ).rejects.toThrow('[FavoriteRepository] Failed to get user favorites');
+      await expect(favoriteRepository.getUserFavorites('user123')).rejects.toThrow(
+        '[FavoriteRepository] Failed to get user favorites'
+      );
     });
   });
 
@@ -294,9 +294,9 @@ describe('FavoriteRepository', () => {
         new Error('DB Error')
       );
 
-      await expect(
-        favoriteRepository.getProjectFavoriters('project456')
-      ).rejects.toThrow('[FavoriteRepository] Failed to get project favoriters');
+      await expect(favoriteRepository.getProjectFavoriters('project456')).rejects.toThrow(
+        '[FavoriteRepository] Failed to get project favoriters'
+      );
     });
   });
 
@@ -325,9 +325,7 @@ describe('FavoriteRepository', () => {
     });
 
     it('should throw error when database operation fails', async () => {
-      vi.mocked(mockPrismaClient.favorite.count).mockRejectedValue(
-        new Error('DB Error')
-      );
+      vi.mocked(mockPrismaClient.favorite.count).mockRejectedValue(new Error('DB Error'));
 
       await expect(
         favoriteRepository.getProjectFavoriteCount('project456')
@@ -371,9 +369,7 @@ describe('FavoriteRepository', () => {
     });
 
     it('should throw error when database operation fails', async () => {
-      vi.mocked(mockPrismaClient.project.update).mockRejectedValue(
-        new Error('DB Error')
-      );
+      vi.mocked(mockPrismaClient.project.update).mockRejectedValue(new Error('DB Error'));
 
       await expect(
         favoriteRepository.updateProjectFavoriteCount('project456', true)

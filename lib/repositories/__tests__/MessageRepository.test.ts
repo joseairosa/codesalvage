@@ -269,9 +269,9 @@ describe('MessageRepository', () => {
       mockPrismaClient.message.findMany.mockRejectedValue(new Error('DB Error'));
 
       // Act & Assert
-      await expect(
-        messageRepository.getConversation('user1', 'user2')
-      ).rejects.toThrow('[MessageRepository] Failed to get conversation');
+      await expect(messageRepository.getConversation('user1', 'user2')).rejects.toThrow(
+        '[MessageRepository] Failed to get conversation'
+      );
     });
   });
 
@@ -282,8 +282,12 @@ describe('MessageRepository', () => {
 
       // Mock sent messages
       mockPrismaClient.message.findMany
-        .mockResolvedValueOnce([{ recipientId: 'user2', projectId: null, transactionId: null }]) // sent
-        .mockResolvedValueOnce([{ senderId: 'user3', projectId: null, transactionId: null }]); // received
+        .mockResolvedValueOnce([
+          { recipientId: 'user2', projectId: null, transactionId: null },
+        ]) // sent
+        .mockResolvedValueOnce([
+          { senderId: 'user3', projectId: null, transactionId: null },
+        ]); // received
 
       // Mock latest message for each conversation (with proper user IDs)
       const latestMessage1 = {
@@ -641,9 +645,7 @@ describe('MessageRepository', () => {
 
     it('should throw error when message not found', async () => {
       // Arrange
-      mockPrismaClient.message.delete.mockRejectedValue(
-        new Error('Record not found')
-      );
+      mockPrismaClient.message.delete.mockRejectedValue(new Error('Record not found'));
 
       // Act & Assert
       await expect(messageRepository.delete('nonexistent')).rejects.toThrow(

@@ -93,30 +93,19 @@ export class FavoriteService {
     await this.validateFavoriteOperation(userId, projectId);
 
     // Check if already favorited
-    const alreadyFavorited = await this.favoriteRepository.isFavorited(
-      userId,
-      projectId
-    );
+    const alreadyFavorited = await this.favoriteRepository.isFavorited(userId, projectId);
 
     if (alreadyFavorited) {
-      throw new FavoriteValidationError(
-        'Project is already in favorites',
-        'projectId'
-      );
+      throw new FavoriteValidationError('Project is already in favorites', 'projectId');
     }
 
     // Create favorite
     const favorite = await this.favoriteRepository.create(userId, projectId);
 
     // Update project favorite count (async, don't wait)
-    this.favoriteRepository
-      .updateProjectFavoriteCount(projectId, true)
-      .catch((err) => {
-        console.error(
-          '[FavoriteService] Failed to update project favorite count:',
-          err
-        );
-      });
+    this.favoriteRepository.updateProjectFavoriteCount(projectId, true).catch((err) => {
+      console.error('[FavoriteService] Failed to update project favorite count:', err);
+    });
 
     console.log('[FavoriteService] Favorite added successfully:', favorite.id);
     return favorite;
@@ -136,10 +125,7 @@ export class FavoriteService {
     console.log('[FavoriteService] Removing favorite:', { userId, projectId });
 
     // Check if favorited
-    const isFavorited = await this.favoriteRepository.isFavorited(
-      userId,
-      projectId
-    );
+    const isFavorited = await this.favoriteRepository.isFavorited(userId, projectId);
 
     if (!isFavorited) {
       console.log('[FavoriteService] Favorite not found, nothing to remove');
@@ -150,14 +136,9 @@ export class FavoriteService {
     await this.favoriteRepository.delete(userId, projectId);
 
     // Update project favorite count (async, don't wait)
-    this.favoriteRepository
-      .updateProjectFavoriteCount(projectId, false)
-      .catch((err) => {
-        console.error(
-          '[FavoriteService] Failed to update project favorite count:',
-          err
-        );
-      });
+    this.favoriteRepository.updateProjectFavoriteCount(projectId, false).catch((err) => {
+      console.error('[FavoriteService] Failed to update project favorite count:', err);
+    });
 
     console.log('[FavoriteService] Favorite removed successfully');
     return true;
@@ -177,17 +158,11 @@ export class FavoriteService {
    * const result = await favoriteService.toggleFavorite('user123', 'project456');
    * console.log(result.isFavorited); // true or false
    */
-  async toggleFavorite(
-    userId: string,
-    projectId: string
-  ): Promise<ToggleFavoriteResult> {
+  async toggleFavorite(userId: string, projectId: string): Promise<ToggleFavoriteResult> {
     console.log('[FavoriteService] Toggling favorite:', { userId, projectId });
 
     // Check current status
-    const isFavorited = await this.favoriteRepository.isFavorited(
-      userId,
-      projectId
-    );
+    const isFavorited = await this.favoriteRepository.isFavorited(userId, projectId);
 
     if (isFavorited) {
       // Remove favorite
@@ -282,10 +257,7 @@ export class FavoriteService {
 
     // Check if project is active
     if (project.status !== 'active') {
-      throw new FavoriteValidationError(
-        'Cannot favorite inactive projects',
-        'projectId'
-      );
+      throw new FavoriteValidationError('Cannot favorite inactive projects', 'projectId');
     }
 
     // Check if trying to favorite own project

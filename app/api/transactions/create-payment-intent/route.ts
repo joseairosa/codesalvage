@@ -73,10 +73,9 @@ export async function POST(request: Request) {
     });
 
     // Create transaction via TransactionService (validates business rules)
-    const transaction = await transactionService.createTransaction(
-      session.user.id,
-      { projectId }
-    );
+    const transaction = await transactionService.createTransaction(session.user.id, {
+      projectId,
+    });
 
     console.log(`[${componentName}] Transaction created:`, transaction.id);
 
