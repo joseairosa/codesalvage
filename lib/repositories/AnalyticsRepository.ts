@@ -110,10 +110,13 @@ export class AnalyticsRepository {
     };
 
     if (dateRange) {
-      where.completedAt = {
-        gte: dateRange.startDate,
-        lte: dateRange.endDate,
-      };
+      where.completedAt = {};
+      if (dateRange.startDate) {
+        where.completedAt.gte = dateRange.startDate;
+      }
+      if (dateRange.endDate) {
+        where.completedAt.lte = dateRange.endDate;
+      }
     }
 
     const transactions = await this.prisma.transaction.findMany({
@@ -251,10 +254,13 @@ export class AnalyticsRepository {
     };
 
     if (dateRange) {
-      transactionsWhere.completedAt = {
-        gte: dateRange.startDate,
-        lte: dateRange.endDate,
-      };
+      transactionsWhere.completedAt = {};
+      if (dateRange.startDate) {
+        transactionsWhere.completedAt.gte = dateRange.startDate;
+      }
+      if (dateRange.endDate) {
+        transactionsWhere.completedAt.lte = dateRange.endDate;
+      }
     }
 
     const projects = await this.prisma.project.findMany({
