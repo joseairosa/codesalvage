@@ -315,7 +315,7 @@ async function handleRefund(charge: Stripe.Charge) {
 async function handleAccountUpdated(account: Stripe.Account) {
   console.log(`[${componentName}] Account updated:`, account.id);
 
-  const userId = account.metadata?.userId;
+  const userId = account.metadata?.['userId'];
 
   if (!userId) {
     console.error(`[${componentName}] No user ID in account metadata`);
