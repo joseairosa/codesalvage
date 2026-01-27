@@ -1,0 +1,88 @@
+name: Deploy to Railway
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Allow manual triggers
+
+# Only allow one deployment at a time
+concurrency:
+  group: railway-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Railway Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Only run if all CI checks have passed
+    needs: []
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run type check
+        run: npm run type-check
+
+      - name: Generate Prisma Client
+        run: npm run db:generate
+
+      - name: Build application
+        run: npm run build
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          echo "Deploying to Railway..."
+          railway up --detach
+          echo "Deployment triggered successfully"
+
+      - name: Run database migrations
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          echo "Running database migrations..."
+          railway run npm run db:migrate:deploy
+          echo "Migrations completed"
+
+      - name: Verify deployment
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          echo "Waiting for deployment to be ready..."
+          sleep 30
+          echo "Checking deployment status..."
+          railway status
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time:** $(date)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Deployment failed! Check the logs above for details."
+          exit 1
