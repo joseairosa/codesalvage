@@ -42,7 +42,7 @@ const featuredListingService = new FeaturedListingService(
  * Remove featured status from a project (seller only)
  */
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: { projectId: string } }
 ) {
   try {

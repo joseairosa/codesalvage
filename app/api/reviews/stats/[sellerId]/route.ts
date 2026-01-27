@@ -32,7 +32,7 @@ const reviewService = new ReviewService(
  * Get seller review statistics
  */
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { sellerId: string } }
 ) {
   try {

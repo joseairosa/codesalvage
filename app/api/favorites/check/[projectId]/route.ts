@@ -36,7 +36,7 @@ const favoriteService = new FavoriteService(
  * Check if user has favorited a project
  */
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { projectId: string } }
 ) {
   try {

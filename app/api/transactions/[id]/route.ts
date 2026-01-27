@@ -42,7 +42,7 @@ const transactionService = new TransactionService(
  * Access control: Only buyer or seller can view
  */
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { id: string } }
 ) {
   try {

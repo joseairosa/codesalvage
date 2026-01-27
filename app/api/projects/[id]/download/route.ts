@@ -22,7 +22,7 @@ import { r2Service } from '@/lib/services';
  * Generate download link for purchased project
  */
 export async function POST(
-  request: Request,
+  _request: Request,
   { params }: { params: { id: string } }
 ) {
   try {

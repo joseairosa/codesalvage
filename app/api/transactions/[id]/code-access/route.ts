@@ -45,7 +45,7 @@ const transactionService = new TransactionService(
  * - Only buyer can access code
  */
 export async function POST(
-  request: Request,
+  _request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
