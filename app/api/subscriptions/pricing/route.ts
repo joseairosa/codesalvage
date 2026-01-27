@@ -28,7 +28,7 @@ const subscriptionService = new SubscriptionService(subscriptionRepository, user
  *
  * Get pricing information for all subscription plans (public endpoint)
  */
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   try {
     console.log(`[${componentName}] Fetching subscription pricing`);
 
