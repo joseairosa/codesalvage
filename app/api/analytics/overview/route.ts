@@ -54,28 +54,31 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const startDate = searchParams.get('startDate') || undefined;
-    const endDate = searchParams.get('endDate') || undefined;
-    const granularity = (searchParams.get('granularity') as
-      | 'day'
-      | 'week'
-      | 'month') || 'day';
+    const startDateParam = searchParams.get('startDate');
+    const endDateParam = searchParams.get('endDate');
+    const granularityParam = searchParams.get('granularity') as 'day' | 'week' | 'month' | null;
+
+    // Build request object with only defined values
+    const requestData: {
+      startDate?: string;
+      endDate?: string;
+      granularity?: 'day' | 'week' | 'month';
+    } = {};
+
+    if (startDateParam) requestData.startDate = startDateParam;
+    if (endDateParam) requestData.endDate = endDateParam;
+    if (granularityParam) requestData.granularity = granularityParam;
+    else requestData.granularity = 'day'; // Default
 
     console.log(`[${componentName}] Fetching analytics overview:`, {
       userId: session.user.id,
-      startDate,
-      endDate,
-      granularity,
+      ...requestData,
     });
 
     // Get analytics overview via service
     const analytics = await analyticsService.getSellerAnalyticsOverview(
       session.user.id,
-      {
-        startDate,
-        endDate,
-        granularity,
-      }
+      requestData
     );
 
     console.log(`[${componentName}] Analytics overview retrieved:`, {
