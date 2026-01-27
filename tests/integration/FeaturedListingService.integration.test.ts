@@ -657,8 +657,8 @@ describe('FeaturedListingService (Integration)', () => {
       const pricing = featuredListingService.getFeaturedPricing();
 
       expect(pricing).toHaveLength(3);
-      expect(pricing[0].durationDays).toBe(7);
-      expect(pricing[0].costCents).toBe(2999);
+      expect(pricing[0]!.durationDays).toBe(7);
+      expect(pricing[0]!.costCents).toBe(2999);
       expect(pricing[1]!.durationDays).toBe(14);
       expect(pricing[1]!.costCents).toBe(4999);
       expect(pricing[2]!.durationDays).toBe(30);

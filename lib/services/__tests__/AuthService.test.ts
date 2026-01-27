@@ -17,6 +17,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import type { MockedObject } from 'vitest';
 import { AuthService } from '../AuthService';
 import type { UserRepository } from '@/lib/repositories/UserRepository';
 import {
@@ -31,7 +32,7 @@ vi.mock('@/lib/repositories/UserRepository');
 
 describe('AuthService', () => {
   let authService: AuthService;
-  let mockUserRepository: UserRepository;
+  let mockUserRepository: MockedObject<UserRepository>;
 
   beforeEach(() => {
     // Reset mocks before each test

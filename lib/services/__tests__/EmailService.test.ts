@@ -102,7 +102,7 @@ describe('EmailService', () => {
     it('should include HTML and text versions', async () => {
       await emailService.sendBuyerPurchaseConfirmation(recipient, data);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain('Purchase Confirmed!');
       expect(call.html).toContain('React Dashboard Template');
       expect(call.html).toContain('$1,000.00');
@@ -171,7 +171,7 @@ describe('EmailService', () => {
     it('should include congratulations message in HTML', async () => {
       await emailService.sendSellerPurchaseNotification(recipient, data);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain('Congratulations');
       expect(call.html).toContain('Sale');
       expect(call.html).toContain('React Dashboard Template');
@@ -180,7 +180,7 @@ describe('EmailService', () => {
     it('should include sale details', async () => {
       await emailService.sendSellerPurchaseNotification(recipient, data);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain('$1,000.00');
       expect(call.html).toContain('John Doe');
     });
@@ -218,7 +218,7 @@ describe('EmailService', () => {
     it('should include payment amount in email', async () => {
       await emailService.sendEscrowReleaseNotification(recipient, data);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain('$820.70');
       expect(call.html).toContain('Payment Released');
     });
@@ -226,7 +226,7 @@ describe('EmailService', () => {
     it('should include release date', async () => {
       await emailService.sendEscrowReleaseNotification(recipient, data);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain('2026');
     });
   });
@@ -263,7 +263,7 @@ describe('EmailService', () => {
     it('should include message preview in email', async () => {
       await emailService.sendNewMessageNotification(recipient, data);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain('Hi, I have a question');
       expect(call.html).toContain('John Doe');
     });
@@ -271,7 +271,7 @@ describe('EmailService', () => {
     it('should include project title if provided', async () => {
       await emailService.sendNewMessageNotification(recipient, data);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain('React Dashboard Template');
     });
 
@@ -286,14 +286,14 @@ describe('EmailService', () => {
 
       await emailService.sendNewMessageNotification(recipient, dataNoProject);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain('John Doe');
     });
 
     it('should include conversation URL', async () => {
       await emailService.sendNewMessageNotification(recipient, data);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain(data.conversationUrl);
     });
   });
@@ -331,7 +331,7 @@ describe('EmailService', () => {
     it('should include star rating in email', async () => {
       await emailService.sendReviewNotification(recipient, data);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain('⭐');
       expect(call.html).toContain('5');
     });
@@ -339,7 +339,7 @@ describe('EmailService', () => {
     it('should include review comment if provided', async () => {
       await emailService.sendReviewNotification(recipient, data);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain('Great project!');
       expect(call.html).toContain('well-documented');
     });
@@ -356,7 +356,7 @@ describe('EmailService', () => {
 
       await emailService.sendReviewNotification(recipient, dataNoComment);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain('⭐');
     });
 
@@ -369,7 +369,7 @@ describe('EmailService', () => {
 
         await emailService.sendReviewNotification(recipient, testData);
 
-        const call = mockSend.mock.calls[0][0];
+        const call = mockSend.mock.calls[0]![0]!;
         expect(call.html).toContain('⭐');
         expect(call.html).toContain(String(rating));
       }
@@ -408,7 +408,7 @@ describe('EmailService', () => {
     it('should include encouragement to leave review', async () => {
       await emailService.sendReviewReminder(recipient, data);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain('review');
       expect(call.html).toContain('feedback');
     });
@@ -416,7 +416,7 @@ describe('EmailService', () => {
     it('should include review URL', async () => {
       await emailService.sendReviewReminder(recipient, data);
 
-      const call = mockSend.mock.calls[0][0];
+      const call = mockSend.mock.calls[0]![0]!;
       expect(call.html).toContain(data.reviewUrl);
     });
   });
@@ -452,7 +452,7 @@ describe('EmailService', () => {
 
         await emailService.sendBuyerPurchaseConfirmation(recipient, data);
 
-        const call = mockSend.mock.calls[0][0];
+        const call = mockSend.mock.calls[0]![0]!;
         expect(call.html).toContain(expected);
       }
     });

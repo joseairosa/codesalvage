@@ -244,14 +244,24 @@ export class SubscriptionService {
         | Stripe.PaymentIntent
         | undefined;
 
-      return {
+      const response: {
+        subscriptionId: string;
+        clientSecret?: string;
+        status: Stripe.Subscription.Status;
+        currentPeriodEnd: string;
+      } = {
         subscriptionId: stripeSubscription.id,
-        clientSecret: paymentIntent?.client_secret ?? undefined,
         status: stripeSubscription.status,
         currentPeriodEnd: new Date(
           stripeSubscription.current_period_end * 1000
         ).toISOString(),
       };
+
+      if (paymentIntent?.client_secret) {
+        response.clientSecret = paymentIntent.client_secret;
+      }
+
+      return response;
     } catch (error) {
       console.error('[SubscriptionService] createSubscription failed:', error);
       if (
