@@ -127,10 +127,15 @@ export async function POST(request: Request) {
       title: validatedData.data.title,
     });
 
+    // Filter out undefined values for exactOptionalPropertyTypes
+    const createData = Object.fromEntries(
+      Object.entries(validatedData.data).filter(([_, value]) => value !== undefined)
+    );
+
     // Create project
     const project = await projectService.createProject(
       session.user.id,
-      validatedData.data
+      createData as any
     );
 
     console.log('[Projects API] Project created successfully:', project.id);
