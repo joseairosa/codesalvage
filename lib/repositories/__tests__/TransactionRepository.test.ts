@@ -6,11 +6,8 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { PrismaClient } from '@prisma/client';
-import {
-  TransactionRepository,
-  CreateTransactionInput,
-  TransactionWithRelations,
-} from '../TransactionRepository';
+import { TransactionRepository } from '../TransactionRepository';
+import type { CreateTransactionInput, TransactionWithRelations } from '../TransactionRepository';
 
 // Mock Prisma Client
 vi.mock('@/lib/prisma', () => ({

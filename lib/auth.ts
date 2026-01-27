@@ -205,7 +205,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
    * Events - hooks for various auth events
    */
   events: {
-    async signIn({ user, account, profile, isNewUser }) {
+    async signIn({ user, account, profile: _profile, isNewUser }) {
       console.log('[Auth] Sign in event:', {
         userId: user.id,
         isNewUser,
@@ -218,7 +218,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
     },
 
-    async signOut({ session, token }) {
+    async signOut({ session: _session, token: _token }) {
       console.log('[Auth] Sign out event');
     },
 
@@ -226,7 +226,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       console.log('[Auth] User created:', user.id);
     },
 
-    async linkAccount({ user, account, profile }) {
+    async linkAccount({ user, account, profile: _profile }) {
       console.log('[Auth] Account linked:', {
         userId: user.id,
         provider: account.provider,

@@ -16,13 +16,9 @@
  * - Returns formatted analytics data
  */
 
-import { AnalyticsRepository } from '../repositories/AnalyticsRepository';
-import type {
-  SellerAnalyticsOverview,
-  ProjectPerformanceMetrics,
-  RevenueDataPoint,
-} from '../repositories/AnalyticsRepository';
-import { UserRepository } from '../repositories/UserRepository';
+import type { AnalyticsRepository } from '../repositories/AnalyticsRepository';
+import type { SellerAnalyticsOverview } from '../repositories/AnalyticsRepository';
+import type { UserRepository } from '../repositories/UserRepository';
 
 /**
  * Custom error for analytics permission issues
@@ -250,7 +246,7 @@ export class AnalyticsService {
     defaultStartDate.setDate(defaultStartDate.getDate() - 30);
 
     let start = startDate ? new Date(startDate) : defaultStartDate;
-    let end = endDate ? new Date(endDate) : now;
+    const end = endDate ? new Date(endDate) : now;
 
     // Validate dates
     if (isNaN(start.getTime())) {
@@ -296,7 +292,7 @@ export class AnalyticsService {
    */
   private formatAnalyticsOverview(
     analytics: SellerAnalyticsOverview,
-    granularity?: 'day' | 'week' | 'month'
+    _granularity?: 'day' | 'week' | 'month'
   ): AnalyticsOverviewResponse {
     return {
       userId: analytics.userId,

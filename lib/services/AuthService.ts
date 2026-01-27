@@ -18,7 +18,7 @@
  * const user = await authService.handleGitHubSignIn(profile);
  */
 
-import { UserRepository } from '@/lib/repositories/UserRepository';
+import type { UserRepository } from '@/lib/repositories/UserRepository';
 
 /**
  * GitHub OAuth Profile (from Auth.js provider)

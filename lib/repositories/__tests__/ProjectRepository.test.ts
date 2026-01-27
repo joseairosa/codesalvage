@@ -66,7 +66,7 @@ describe('ProjectRepository', () => {
 
       expect(result).toEqual(mockCreatedProject);
 
-      const { sellerId, ...projectDataWithoutSellerId } = projectData;
+      const { sellerId: _sellerId, ...projectDataWithoutSellerId } = projectData;
       expect(mockPrismaClient.project.create).toHaveBeenCalledWith({
         data: {
           ...projectDataWithoutSellerId,
