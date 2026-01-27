@@ -60,7 +60,8 @@ const featuredListingService = new FeaturedListingService(
  */
 export async function POST(request: Request) {
   const body = await request.text();
-  const signature = headers().get('stripe-signature');
+  const headersList = await headers();
+  const signature = headersList.get('stripe-signature');
 
   if (!signature) {
     console.error('[Stripe Webhook] No signature provided');
