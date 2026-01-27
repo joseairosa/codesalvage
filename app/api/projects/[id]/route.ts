@@ -93,7 +93,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     console.log('[Project API] Getting project:', id);
 
     // Get project (increment view count for active projects)
-    const project = await projectService.getProject(id, true);
+    const project = await projectService.getProject(id, { incrementView: true });
 
     if (!project) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
