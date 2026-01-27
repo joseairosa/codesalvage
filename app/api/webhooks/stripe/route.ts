@@ -168,12 +168,14 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   }
 
   // Update transaction payment status to succeeded
-  await transactionRepository.updatePaymentStatus(
-    transactionId,
-    'succeeded',
-    paymentIntent.id,
-    paymentIntent.latest_charge as string
-  );
+  await prisma.transaction.update({
+    where: { id: transactionId },
+    data: {
+      paymentStatus: 'succeeded',
+      stripePaymentIntentId: paymentIntent.id,
+      stripeChargeId: paymentIntent.latest_charge as string,
+    },
+  });
 
   // Update escrow status to held
   await transactionRepository.updateEscrowStatus(transactionId, 'held');
@@ -255,12 +257,14 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
     return;
   }
 
-  // Update transaction payment status to failed using repository
-  await transactionRepository.updatePaymentStatus(
-    transactionId,
-    'failed',
-    paymentIntent.id
-  );
+  // Update transaction payment status to failed
+  await prisma.transaction.update({
+    where: { id: transactionId },
+    data: {
+      paymentStatus: 'failed',
+      stripePaymentIntentId: paymentIntent.id,
+    },
+  });
 
   console.log(`[${componentName}] Transaction marked as failed:`, transactionId);
 
