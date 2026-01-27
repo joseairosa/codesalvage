@@ -19,25 +19,49 @@
 import Stripe from 'stripe';
 import { env } from '@/config/env';
 
-if (!env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not configured');
-}
+let _stripe: Stripe | null = null;
 
 /**
- * Stripe client instance (singleton)
+ * Get Stripe client instance (singleton, lazy initialization)
  *
  * Configured with:
  * - API version: 2024-12-18.acacia (latest stable)
  * - TypeScript: Enabled
  * - App info: ProjectFinish metadata
+ *
+ * @throws Error if STRIPE_SECRET_KEY is not configured
  */
-export const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-02-24.acacia',
-  typescript: true,
-  appInfo: {
-    name: 'ProjectFinish',
-    version: '1.0.0',
-    url: 'https://projectfinish.com',
+function getStripeClient(): Stripe {
+  if (!_stripe) {
+    if (!env.STRIPE_SECRET_KEY) {
+      throw new Error('STRIPE_SECRET_KEY is not configured');
+    }
+
+    _stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-02-24.acacia',
+      typescript: true,
+      appInfo: {
+        name: 'ProjectFinish',
+        version: '1.0.0',
+        url: 'https://projectfinish.com',
+      },
+    });
+  }
+
+  return _stripe;
+}
+
+/**
+ * Stripe client instance (lazy-initialized singleton)
+ *
+ * Use this export for all Stripe operations.
+ * Will throw error if STRIPE_SECRET_KEY is not configured.
+ */
+export const stripe = new Proxy({} as Stripe, {
+  get(_target, prop) {
+    const client = getStripeClient();
+    const value = client[prop as keyof Stripe];
+    return typeof value === 'function' ? value.bind(client) : value;
   },
 });
 
