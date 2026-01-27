@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { redis } from '@/lib/redis';
 
 /**
  * Health Check Endpoint
@@ -10,13 +9,11 @@ import { redis } from '@/lib/redis';
  *
  * Checks:
  * - Database connectivity (PostgreSQL via Prisma)
- * - Redis connectivity (optional)
  * - Application runtime status
  */
 export async function GET() {
   const checks = {
     database: false,
-    redis: false,
   };
 
   // Check database connectivity
@@ -25,16 +22,6 @@ export async function GET() {
     checks.database = true;
   } catch (error) {
     console.error('[HealthCheck] Database check failed:', error);
-  }
-
-  // Check Redis connectivity (optional, won't fail health check)
-  try {
-    if (redis) {
-      await redis.ping();
-      checks.redis = true;
-    }
-  } catch (error) {
-    console.error('[HealthCheck] Redis check failed:', error);
   }
 
   // Return 503 if database is not healthy (critical dependency)
