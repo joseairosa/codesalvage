@@ -18,9 +18,8 @@
 'use client';
 
 import * as React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, Loader2, AlertCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -146,7 +145,7 @@ export function ReviewsList({ sellerId, limit = 10 }: ReviewsListProps) {
   const formatTime = (dateString: string) => {
     try {
       return formatDistanceToNow(new Date(dateString), { addSuffix: true });
-    } catch (err) {
+    } catch {
       return dateString;
     }
   };

@@ -44,7 +44,7 @@ export default function SellerOnboardPage() {
   console.log(`[${componentName}] Page rendered`);
 
   const router = useRouter();
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: _session, status: sessionStatus } = useSession();
 
   const [status, setStatus] = React.useState<OnboardingStatus | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);

@@ -34,10 +34,10 @@ interface CheckoutFormProps {
   amount: number;
 }
 
-export function CheckoutForm({ projectId, transactionId, amount }: CheckoutFormProps) {
+export function CheckoutForm({ projectId: _projectId, transactionId, amount }: CheckoutFormProps) {
   console.log(`[${componentName}] Form rendered`);
 
-  const router = useRouter();
+  const _router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
 
