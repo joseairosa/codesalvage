@@ -255,11 +255,11 @@ describe('AnalyticsRepository', () => {
 
       expect(result).toHaveLength(3);
       // Highest revenue first
-      expect(result[0].projectId).toBe('proj3'); // 24600
+      expect(result[0]!.projectId).toBe('proj3'); // 24600
       expect(result[0]!.revenueCents).toBe(24600);
-      expect(result[0].purchaseCount).toBe(3);
-      expect(result[1].projectId).toBe('proj1'); // 16400
-      expect(result[2].projectId).toBe('proj2'); // 16400
+      expect(result[0]!.purchaseCount).toBe(3);
+      expect(result[1]!.projectId).toBe('proj1'); // 16400
+      expect(result[2]!.projectId).toBe('proj2'); // 16400
     });
 
     it('should calculate conversion rate correctly', async () => {
@@ -275,7 +275,7 @@ describe('AnalyticsRepository', () => {
 
       const result = await analyticsRepository.getTopProjects('seller123', 10);
 
-      expect(result[0].conversionRate).toBeCloseTo(0.01, 4); // 1 sale / 100 views = 1%
+      expect(result[0]!.conversionRate).toBeCloseTo(0.01, 4); // 1 sale / 100 views = 1%
     });
 
     it('should limit results to specified count', async () => {
@@ -307,7 +307,7 @@ describe('AnalyticsRepository', () => {
 
       const result = await analyticsRepository.getTopProjects('seller123', 10);
 
-      expect(result[0].conversionRate).toBe(0); // 0 views = 0 conversion
+      expect(result[0]!.conversionRate).toBe(0); // 0 views = 0 conversion
     });
   });
 
