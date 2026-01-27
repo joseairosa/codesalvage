@@ -171,7 +171,7 @@ export async function POST(request: Request) {
  *
  * Cancel subscription at end of billing period
  */
-export async function DELETE(request: Request) {
+export async function DELETE(_request: Request) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
