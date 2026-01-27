@@ -24,7 +24,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, MessageSquare, AlertCircle, Inbox } from 'lucide-react';
+import { MessageSquare, AlertCircle, Inbox } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 const componentName = 'MessagesPage';
