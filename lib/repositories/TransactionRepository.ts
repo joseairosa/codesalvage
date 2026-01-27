@@ -127,6 +127,7 @@ export class TransactionRepository {
               fullName: true,
               avatarUrl: true,
               stripeAccountId: true,
+              email: true,
             },
           },
           buyer: {
@@ -135,6 +136,7 @@ export class TransactionRepository {
               username: true,
               fullName: true,
               avatarUrl: true,
+              email: true,
             },
           },
           review: {
@@ -456,6 +458,7 @@ export class TransactionRepository {
               fullName: true,
               avatarUrl: true,
               stripeAccountId: true,
+              email: true,
             },
           },
           buyer: {
@@ -464,6 +467,7 @@ export class TransactionRepository {
               username: true,
               fullName: true,
               avatarUrl: true,
+              email: true,
             },
           },
           review: {
@@ -641,6 +645,7 @@ export class TransactionRepository {
               fullName: true,
               avatarUrl: true,
               stripeAccountId: true,
+              email: true,
             },
           },
           buyer: {
@@ -649,6 +654,7 @@ export class TransactionRepository {
               username: true,
               fullName: true,
               avatarUrl: true,
+              email: true,
             },
           },
           review: {
