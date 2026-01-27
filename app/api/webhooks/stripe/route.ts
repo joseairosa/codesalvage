@@ -152,7 +152,7 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   console.log(`[${componentName}] Payment succeeded:`, paymentIntent.id);
 
   // Check if this is a featured listing purchase
-  const isFeaturedListingPurchase = paymentIntent.metadata.featuredListingPurchase === 'true';
+  const isFeaturedListingPurchase = paymentIntent.metadata['featuredListingPurchase'] === 'true';
 
   if (isFeaturedListingPurchase) {
     await handleFeaturedListingPayment(paymentIntent);
@@ -160,7 +160,7 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   }
 
   // Otherwise, handle as regular transaction
-  const transactionId = paymentIntent.metadata.transactionId;
+  const transactionId = paymentIntent.metadata['transactionId'];
 
   if (!transactionId) {
     console.error(`[${componentName}] No transaction ID in metadata`);
@@ -248,7 +248,7 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
   console.log(`[${componentName}] Payment failed:`, paymentIntent.id);
 
-  const transactionId = paymentIntent.metadata.transactionId;
+  const transactionId = paymentIntent.metadata['transactionId'];
 
   if (!transactionId) {
     console.error(`[${componentName}] No transaction ID in metadata`);
