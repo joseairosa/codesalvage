@@ -41,7 +41,7 @@ const createSubscriptionSchema = z.object({
  *
  * Get current subscription status for authenticated user
  */
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
