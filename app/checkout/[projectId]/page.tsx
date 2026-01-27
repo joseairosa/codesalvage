@@ -61,7 +61,7 @@ export default function CheckoutPage({ params }: { params: { projectId: string }
   console.log(`[${componentName}] Page rendered for project:`, params.projectId);
 
   const router = useRouter();
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: _session, status: sessionStatus } = useSession();
 
   const [project, setProject] = React.useState<Project | null>(null);
   const [clientSecret, setClientSecret] = React.useState<string | null>(null);
