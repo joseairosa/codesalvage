@@ -58,9 +58,7 @@ interface Transaction {
   };
 }
 
-export default function CheckoutSuccessPage() {
-  console.log(`[${componentName}] Page rendered`);
-
+function CheckoutSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: _session, status: sessionStatus } = useSession();
@@ -293,5 +291,29 @@ export default function CheckoutSuccessPage() {
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * Main page component with Suspense boundary
+ * Required for useSearchParams() in Next.js 15
+ */
+export default function CheckoutSuccessPage() {
+  console.log(`[${componentName}] Page rendered`);
+
+  return (
+    <React.Suspense
+      fallback={
+        <div className="container mx-auto max-w-4xl py-10">
+          <Card>
+            <CardContent className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </CardContent>
+          </Card>
+        </div>
+      }
+    >
+      <CheckoutSuccessContent />
+    </React.Suspense>
   );
 }
