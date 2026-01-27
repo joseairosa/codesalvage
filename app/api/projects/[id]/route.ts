@@ -150,11 +150,16 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
     console.log('[Project API] Updating project:', { id, userId: session.user.id });
 
+    // Filter out undefined values for exactOptionalPropertyTypes
+    const updateData = Object.fromEntries(
+      Object.entries(validatedData.data).filter(([_, value]) => value !== undefined)
+    ) as Partial<typeof validatedData.data>;
+
     // Update project
     const project = await projectService.updateProject(
       id,
       session.user.id,
-      validatedData.data
+      updateData
     );
 
     console.log('[Project API] Project updated successfully');
