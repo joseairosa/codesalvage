@@ -10,9 +10,10 @@
  * POST /api/transactions/transaction123/code-access
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import {
   TransactionService,
   TransactionValidationError,
@@ -36,7 +37,7 @@ const transactionService = new TransactionService(
 );
 
 /**
- * POST /api/transactions/[id]/code-access
+ * POST /api/transactions/[id]/code-access (internal handler)
  *
  * Mark code as accessed by buyer
  * Access control: Only buyer can mark code as accessed
@@ -44,7 +45,7 @@ const transactionService = new TransactionService(
  * - Payment must be successful
  * - Only buyer can access code
  */
-export async function POST(_request: Request, { params }: { params: { id: string } }) {
+async function markCodeAccessed(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -111,3 +112,13 @@ export async function POST(_request: Request, { params }: { params: { id: string
     );
   }
 }
+
+/**
+ * Export rate-limited handler
+ *
+ * POST: API rate limiting (100 requests / minute per user)
+ */
+export const POST = withApiRateLimit(markCodeAccessed, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});

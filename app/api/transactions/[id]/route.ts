@@ -10,9 +10,10 @@
  * GET /api/transactions/transaction123
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import {
   TransactionService,
   TransactionValidationError,
@@ -36,12 +37,15 @@ const transactionService = new TransactionService(
 );
 
 /**
- * GET /api/transactions/[id]
+ * GET /api/transactions/[id] (internal handler)
  *
  * Get transaction details by ID
  * Access control: Only buyer or seller can view
  */
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+async function getTransactionDetails(
+  _request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -102,3 +106,13 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     );
   }
 }
+
+/**
+ * Export rate-limited handler
+ *
+ * GET: API rate limiting (100 requests / minute per user)
+ */
+export const GET = withApiRateLimit(getTransactionDetails, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});

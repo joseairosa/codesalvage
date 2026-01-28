@@ -11,9 +11,10 @@
  * POST /api/messages { recipientId, projectId, content }
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import {
   MessageService,
   MessageValidationError,
@@ -46,11 +47,11 @@ const sendMessageSchema = z.object({
 });
 
 /**
- * GET /api/messages
+ * GET /api/messages (internal handler)
  *
  * List user's conversations with message preview
  */
-export async function GET(request: Request) {
+async function getConversations(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -91,11 +92,11 @@ export async function GET(request: Request) {
 }
 
 /**
- * POST /api/messages
+ * POST /api/messages (internal handler)
  *
  * Send a new message
  */
-export async function POST(request: Request) {
+async function sendMessage(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -175,3 +176,19 @@ export async function POST(request: Request) {
     );
   }
 }
+
+/**
+ * Export rate-limited handlers
+ *
+ * GET: API rate limiting (100 requests / minute per user)
+ * POST: API rate limiting (100 requests / minute per user)
+ */
+export const GET = withApiRateLimit(getConversations, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});
+
+export const POST = withApiRateLimit(sendMessage, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});

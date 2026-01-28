@@ -10,10 +10,11 @@
  * Body: { projectId: "project123" }
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { stripe } from '@/lib/stripe';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import {
   TransactionService,
   TransactionValidationError,
@@ -37,7 +38,7 @@ const transactionService = new TransactionService(
 );
 
 /**
- * POST /api/transactions/create-payment-intent
+ * POST /api/transactions/create-payment-intent (internal handler)
  *
  * Create a Stripe Payment Intent for purchasing a project
  * Creates transaction record first, then Payment Intent
@@ -50,7 +51,7 @@ const transactionService = new TransactionService(
  * - 18% platform commission applied
  * - 7-day escrow period set
  */
-export async function POST(request: Request) {
+async function createPaymentIntent(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -182,3 +183,14 @@ export async function POST(request: Request) {
     );
   }
 }
+
+/**
+ * Export rate-limited handler
+ *
+ * POST: API rate limiting (100 requests / minute per user)
+ * Critical payment endpoint - prevent abuse
+ */
+export const POST = withApiRateLimit(createPaymentIntent, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});
