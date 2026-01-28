@@ -22,7 +22,7 @@
  * GET /api/projects?category=web_app&minCompletion=80&page=1&limit=20
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import {
@@ -37,6 +37,7 @@ import {
   ProjectValidationError,
 } from '@/lib/services';
 import { z } from 'zod';
+import { withApiRateLimit, withPublicRateLimit } from '@/lib/middleware/withRateLimit';
 
 /**
  * Initialize services
@@ -91,11 +92,11 @@ const createProjectSchema = z.object({
 });
 
 /**
- * POST /api/projects
+ * POST /api/projects (internal handler)
  *
  * Create a new project
  */
-export async function POST(request: Request) {
+async function createProject(request: NextRequest) {
   try {
     // Check authentication
     const session = await auth();
@@ -173,11 +174,11 @@ export async function POST(request: Request) {
 }
 
 /**
- * GET /api/projects
+ * GET /api/projects (internal handler)
  *
  * Search and list projects
  */
-export async function GET(request: Request) {
+async function searchProjects(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
@@ -244,3 +245,16 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+/**
+ * Export rate-limited handlers
+ *
+ * POST: API rate limiting (100 requests / minute per user)
+ * GET: Public rate limiting (1000 requests / hour per IP)
+ */
+export const POST = withApiRateLimit(createProject, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});
+
+export const GET = withPublicRateLimit(searchProjects);
