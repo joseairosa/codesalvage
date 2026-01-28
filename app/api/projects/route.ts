@@ -38,6 +38,7 @@ import {
 } from '@/lib/services';
 import { z } from 'zod';
 import { withApiRateLimit, withPublicRateLimit } from '@/lib/middleware/withRateLimit';
+import { getOrSetCache, CacheKeys, CacheTTL, invalidateCache } from '@/lib/utils/cache';
 
 /**
  * Initialize services
@@ -144,6 +145,10 @@ async function createProject(request: NextRequest) {
 
     console.log('[Projects API] Project created successfully:', project.id);
 
+    // Invalidate search cache (new project should appear in search)
+    await invalidateCache.search();
+    await invalidateCache.seller(session.user.id);
+
     return NextResponse.json(project, { status: 201 });
   } catch (error) {
     console.error('[Projects API] Error creating project:', error);
@@ -220,8 +225,16 @@ async function searchProjects(request: NextRequest) {
       Object.entries(filters).filter(([_, value]) => value !== undefined)
     );
 
-    // Search projects
-    const results = await projectService.searchProjects(cleanFilters as any, pagination);
+    // Create cache key from search parameters
+    const cacheKey = CacheKeys.searchResults(
+      filters.query || 'all',
+      JSON.stringify({ ...cleanFilters, ...pagination })
+    );
+
+    // Get cached results or fetch from database
+    const results = await getOrSetCache(cacheKey, CacheTTL.SEARCH_RESULTS, async () => {
+      return await projectService.searchProjects(cleanFilters as any, pagination);
+    });
 
     console.log('[Projects API] Search completed:', {
       count: results.projects.length,
