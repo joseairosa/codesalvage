@@ -126,13 +126,13 @@ const ENV_VARS: EnvVar[] = [
   // Postmark
   {
     name: 'POSTMARK_SERVER_TOKEN',
-    required: true,
+    required: false,
     category: 'Email',
-    description: 'Postmark Server API Token',
+    description: 'Postmark Server API Token (emails will be logged only if not set)',
   },
   {
     name: 'POSTMARK_FROM_EMAIL',
-    required: true,
+    required: false,
     category: 'Email',
     description: 'Sender email address',
     example: 'noreply@codesalvage.com',
