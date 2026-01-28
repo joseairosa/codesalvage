@@ -20,6 +20,7 @@ import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { SubscriptionRepository } from '@/lib/repositories/SubscriptionRepository';
 import { SubscriptionService } from '@/lib/services/SubscriptionService';
+import { getOrSetCache, CacheKeys, CacheTTL } from '@/lib/utils/cache';
 
 const componentName = 'FeaturedPricingAPI';
 
@@ -43,12 +44,20 @@ const featuredListingService = new FeaturedListingService(
  * GET /api/featured/pricing
  *
  * Get featured placement pricing tiers (public endpoint)
+ * Cached for 1 hour (pricing changes rarely)
  */
 export async function GET() {
   try {
     console.log(`[${componentName}] Fetching featured pricing tiers`);
 
-    const pricing = featuredListingService.getFeaturedPricing();
+    // Get cached pricing or fetch fresh data
+    const pricing = await getOrSetCache(
+      CacheKeys.featuredPricing(),
+      CacheTTL.LONG,
+      async () => {
+        return featuredListingService.getFeaturedPricing();
+      }
+    );
 
     console.log(`[${componentName}] Returned ${pricing.length} pricing tiers`);
 

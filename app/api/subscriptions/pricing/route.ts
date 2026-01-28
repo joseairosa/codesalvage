@@ -15,6 +15,7 @@ import { prisma } from '@/lib/prisma';
 import { SubscriptionService } from '@/lib/services/SubscriptionService';
 import { SubscriptionRepository } from '@/lib/repositories/SubscriptionRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
+import { getOrSetCache, CacheKeys, CacheTTL } from '@/lib/utils/cache';
 
 const componentName = 'SubscriptionPricingAPI';
 
@@ -30,12 +31,20 @@ const subscriptionService = new SubscriptionService(
  * GET /api/subscriptions/pricing
  *
  * Get pricing information for all subscription plans (public endpoint)
+ * Cached for 1 hour (pricing changes rarely)
  */
 export async function GET(_request: Request) {
   try {
     console.log(`[${componentName}] Fetching subscription pricing`);
 
-    const pricing = subscriptionService.getPricing();
+    // Get cached pricing or fetch fresh data
+    const pricing = await getOrSetCache(
+      CacheKeys.subscriptionPricing(),
+      CacheTTL.LONG,
+      async () => {
+        return subscriptionService.getPricing();
+      }
+    );
 
     console.log(`[${componentName}] Pricing fetched successfully`);
 

@@ -215,7 +215,23 @@ export const CacheKeys = {
   /**
    * Featured projects list
    */
-  featuredProjects: () => 'featured:projects',
+  featuredProjects: (page?: number, limit?: number) =>
+    page && limit ? `featured:projects:${page}:${limit}` : 'featured:projects',
+
+  /**
+   * Featured listing pricing
+   */
+  featuredPricing: () => 'featured:pricing',
+
+  /**
+   * Subscription pricing
+   */
+  subscriptionPricing: () => 'subscription:pricing',
+
+  /**
+   * Seller rating statistics
+   */
+  sellerRatingStats: (sellerId: string) => `seller:${sellerId}:rating-stats`,
 
   /**
    * Project detail
@@ -261,6 +277,11 @@ export const CacheKeys = {
    * All search cache (for invalidation)
    */
   searchAll: () => 'search:*',
+
+  /**
+   * All featured cache (for invalidation)
+   */
+  featuredAll: () => 'featured:*',
 } as const;
 
 /**
@@ -279,7 +300,7 @@ export const invalidateCache = {
    */
   project: async (projectId: string) => {
     await deleteCache(CacheKeys.projectAll(projectId));
-    await deleteCache(CacheKeys.featuredProjects()); // Featured list might include this project
+    await deleteCache(CacheKeys.featuredAll()); // Featured list might include this project
     await deleteCache(CacheKeys.searchAll()); // Search results might include this project
   },
 
@@ -289,6 +310,7 @@ export const invalidateCache = {
   seller: async (sellerId: string) => {
     await deleteCache(CacheKeys.sellerAnalytics(sellerId, '*'));
     await deleteCache(CacheKeys.sellerProjects(sellerId));
+    await deleteCache(CacheKeys.sellerRatingStats(sellerId));
   },
 
   /**
@@ -302,7 +324,15 @@ export const invalidateCache = {
    * Invalidate featured projects
    */
   featured: async () => {
-    await deleteCache(CacheKeys.featuredProjects());
+    await deleteCache(CacheKeys.featuredAll());
+  },
+
+  /**
+   * Invalidate pricing cache (featured + subscription)
+   */
+  pricing: async () => {
+    await deleteCache(CacheKeys.featuredPricing());
+    await deleteCache(CacheKeys.subscriptionPricing());
   },
 } as const;
 

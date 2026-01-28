@@ -24,6 +24,7 @@ import {
 } from '@/lib/services/AnalyticsService';
 import { AnalyticsRepository } from '@/lib/repositories/AnalyticsRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
+import { getOrSetCache, CacheKeys, CacheTTL } from '@/lib/utils/cache';
 
 const componentName = 'AnalyticsOverviewAPI';
 
@@ -36,6 +37,7 @@ const analyticsService = new AnalyticsService(analyticsRepository, userRepositor
  * GET /api/analytics/overview
  *
  * Get seller analytics overview with revenue charts and top projects
+ * Cached for 15 minutes (expensive aggregation queries, user-specific data)
  *
  * Access control: Only sellers can access analytics
  * Business rules:
@@ -76,10 +78,16 @@ export async function GET(request: Request) {
       ...requestData,
     });
 
-    // Get analytics overview via service
-    const analytics = await analyticsService.getSellerAnalyticsOverview(
-      session.user.id,
-      requestData
+    // Create cache key with all query parameters
+    const cacheRange = `${startDateParam || 'default'}-${endDateParam || 'default'}-${granularityParam || 'day'}`;
+
+    // Get cached analytics or fetch fresh data
+    const analytics = await getOrSetCache(
+      CacheKeys.sellerAnalytics(session.user.id, cacheRange),
+      CacheTTL.ANALYTICS,
+      async () => {
+        return await analyticsService.getSellerAnalyticsOverview(session.user.id, requestData);
+      }
     );
 
     console.log(`[${componentName}] Analytics overview retrieved:`, {

@@ -25,6 +25,7 @@ import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { SubscriptionRepository } from '@/lib/repositories/SubscriptionRepository';
 import { SubscriptionService } from '@/lib/services/SubscriptionService';
+import { getOrSetCache, CacheKeys, CacheTTL, invalidateCache } from '@/lib/utils/cache';
 import { z } from 'zod';
 
 const componentName = 'FeaturedListingsAPI';
@@ -54,6 +55,7 @@ const purchaseFeaturedSchema = z.object({
  * GET /api/featured
  *
  * List all active featured projects (public endpoint)
+ * Cached for 5 minutes (featured listings change infrequently)
  */
 export async function GET(request: Request) {
   try {
@@ -63,7 +65,14 @@ export async function GET(request: Request) {
 
     console.log(`[${componentName}] Fetching featured projects:`, { page, limit });
 
-    const result = await featuredListingService.getFeaturedProjects(page, limit);
+    // Get cached featured projects or fetch fresh data
+    const result = await getOrSetCache(
+      CacheKeys.featuredProjects(page, limit),
+      CacheTTL.FEATURED_PROJECTS,
+      async () => {
+        return await featuredListingService.getFeaturedProjects(page, limit);
+      }
+    );
 
     console.log(`[${componentName}] Found ${result.projects.length} featured projects`);
 
@@ -142,6 +151,9 @@ export async function POST(request: Request) {
     );
 
     console.log(`[${componentName}] Featured placement purchased:`, result.projectId);
+
+    // Invalidate featured projects cache (new placement should appear in list)
+    await invalidateCache.featured();
 
     return NextResponse.json(
       {
