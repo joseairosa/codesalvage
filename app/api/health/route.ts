@@ -54,13 +54,13 @@ export async function GET(request: Request) {
     // Check database connectivity
     try {
       await prisma.$queryRaw`SELECT 1`;
-      checks.database = true;
+      checks["database"] = true;
     } catch (error) {
       console.error('[HealthCheck] Database check failed:', error);
     }
 
     // Return 503 if database is not healthy (critical dependency)
-    if (!checks.database) {
+    if (!checks["database"]) {
       return NextResponse.json(
         {
           status: 'unhealthy',
@@ -104,14 +104,14 @@ export async function GET(request: Request) {
     await prisma.$queryRaw`SELECT 1`;
     const dbLatency = Date.now() - startDb;
 
-    checks.database = {
+    checks["database"] = {
       status: 'healthy',
       latency: dbLatency,
     };
 
     console.log(`[HealthCheck] Database: healthy (${dbLatency}ms)`);
   } catch (error) {
-    checks.database = {
+    checks["database"] = {
       status: 'unhealthy',
       error: error instanceof Error ? error.message : 'Unknown error',
     };
@@ -125,14 +125,14 @@ export async function GET(request: Request) {
     await redis.ping();
     const redisLatency = Date.now() - startRedis;
 
-    checks.redis = {
+    checks["redis"] = {
       status: 'healthy',
       latency: redisLatency,
     };
 
     console.log(`[HealthCheck] Redis: healthy (${redisLatency}ms)`);
   } catch (error) {
-    checks.redis = {
+    checks["redis"] = {
       status: 'unhealthy',
       error: error instanceof Error ? error.message : 'Unknown error',
     };
@@ -140,25 +140,25 @@ export async function GET(request: Request) {
   }
 
   // 3. Stripe Configuration Check
-  checks.stripe = {
+  checks["stripe"] = {
     status: env.STRIPE_SECRET_KEY ? 'healthy' : 'unhealthy',
     configured: !!env.STRIPE_SECRET_KEY,
   };
 
   // 4. Honeybadger Configuration Check
-  checks.honeybadger = {
+  checks["honeybadger"] = {
     status: env.HONEYBADGER_API_KEY ? 'healthy' : 'unhealthy',
     configured: !!env.HONEYBADGER_API_KEY,
   };
 
   // 5. Postmark Configuration Check
-  checks.postmark = {
+  checks["postmark"] = {
     status: env.POSTMARK_SERVER_TOKEN ? 'healthy' : 'unhealthy',
     configured: !!env.POSTMARK_SERVER_TOKEN,
   };
 
   // 6. Cloudflare R2 Configuration Check
-  checks.cloudflare = {
+  checks["cloudflare"] = {
     status:
       env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY && env.R2_BUCKET_NAME
         ? 'healthy'
@@ -171,7 +171,7 @@ export async function GET(request: Request) {
   };
 
   // 7. Auth.js Configuration Check
-  checks.auth = {
+  checks["auth"] = {
     status:
       env.AUTH_SECRET && env.AUTH_GITHUB_ID && env.AUTH_GITHUB_SECRET
         ? 'healthy'
