@@ -60,6 +60,11 @@ export const env = {
   POSTMARK_SERVER_TOKEN: getOptionalEnvVar('POSTMARK_SERVER_TOKEN'),
   POSTMARK_FROM_EMAIL: getOptionalEnvVar('POSTMARK_FROM_EMAIL'),
 
+  // Honeybadger (Error Monitoring)
+  HONEYBADGER_API_KEY: getOptionalEnvVar('HONEYBADGER_API_KEY'),
+  NEXT_PUBLIC_HONEYBADGER_API_KEY: getOptionalEnvVar('NEXT_PUBLIC_HONEYBADGER_API_KEY'),
+  HONEYBADGER_ENV: getOptionalEnvVar('HONEYBADGER_ENV'),
+
   // Cron
   CRON_SECRET: getOptionalEnvVar('CRON_SECRET'),
 } as const;
