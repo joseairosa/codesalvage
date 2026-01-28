@@ -225,7 +225,10 @@ export function getClientIP(request: NextRequest): string {
   const forwardedFor = request.headers.get('x-forwarded-for');
   if (forwardedFor) {
     // Return first IP in list (client IP)
-    return forwardedFor.split(',')[0].trim();
+    const firstIP = forwardedFor.split(',')[0];
+    if (firstIP) {
+      return firstIP.trim();
+    }
   }
 
   // Check X-Real-IP (Nginx)
