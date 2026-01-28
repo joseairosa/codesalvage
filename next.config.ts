@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const nextConfig: NextConfig = {
   /* Performance & Production */
@@ -103,4 +104,20 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry configuration options
+const sentryWebpackPluginOptions = {
+  // Suppresses source map uploading logs during build
+  silent: true,
+
+  // Automatically tree-shake Sentry SDK in production
+  widenClientFileUpload: true,
+
+  // Hides source maps from generated client bundles
+  hideSourceMaps: true,
+
+  // Disables automatic telemetry
+  disableLogger: true,
+};
+
+// Export with Sentry wrapping
+export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);
