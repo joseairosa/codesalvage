@@ -30,18 +30,18 @@ import { Download, TrendingUp, DollarSign, Eye, Heart, ShoppingCart, Loader2 } f
 const LineChart = dynamic(
   () => import('recharts').then((mod) => mod.LineChart as any),
   { ssr: false, loading: () => <div className="h-[300px] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div> }
-);
-const Line = dynamic(() => import('recharts').then((mod) => mod.Line as any), { ssr: false });
+) as any;
+const Line = dynamic(() => import('recharts').then((mod) => mod.Line as any), { ssr: false }) as any;
 const BarChart = dynamic(
   () => import('recharts').then((mod) => mod.BarChart as any),
   { ssr: false, loading: () => <div className="h-[300px] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div> }
-);
-const Bar = dynamic(() => import('recharts').then((mod) => mod.Bar as any), { ssr: false });
-const XAxis = dynamic(() => import('recharts').then((mod) => mod.XAxis as any), { ssr: false });
-const YAxis = dynamic(() => import('recharts').then((mod) => mod.YAxis as any), { ssr: false });
-const CartesianGrid = dynamic(() => import('recharts').then((mod) => mod.CartesianGrid as any), { ssr: false });
-const Tooltip = dynamic(() => import('recharts').then((mod) => mod.Tooltip as any), { ssr: false });
-const Legend = dynamic(() => import('recharts').then((mod) => mod.Legend as any), { ssr: false });
+) as any;
+const Bar = dynamic(() => import('recharts').then((mod) => mod.Bar as any), { ssr: false }) as any;
+const XAxis = dynamic(() => import('recharts').then((mod) => mod.XAxis as any), { ssr: false }) as any;
+const YAxis = dynamic(() => import('recharts').then((mod) => mod.YAxis as any), { ssr: false }) as any;
+const CartesianGrid = dynamic(() => import('recharts').then((mod) => mod.CartesianGrid as any), { ssr: false }) as any;
+const Tooltip = dynamic(() => import('recharts').then((mod) => mod.Tooltip as any), { ssr: false }) as any;
+const Legend = dynamic(() => import('recharts').then((mod) => mod.Legend as any), { ssr: false }) as any;
 const ResponsiveContainer = dynamic(
   () => import('recharts').then((mod) => mod.ResponsiveContainer as any),
   { ssr: false }
