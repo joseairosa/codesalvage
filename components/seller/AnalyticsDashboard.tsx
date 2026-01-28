@@ -295,14 +295,14 @@ export function AnalyticsDashboard() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="date"
-                  tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  tickFormatter={(date: any) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 />
                 <YAxis
-                  tickFormatter={(value) => `$${(value / 100).toFixed(0)}`}
+                  tickFormatter={(value: any) => `$${(value / 100).toFixed(0)}`}
                 />
                 <Tooltip
                   formatter={(value: number) => formatCurrency(value)}
-                  labelFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                  labelFormatter={(date: any) => new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                 />
                 <Legend />
                 <Line
