@@ -42,9 +42,13 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/start.sh ./start.sh
 
 # Install only Prisma CLI (not all dependencies) before switching user
 RUN npm install prisma --save-exact --no-save
+
+# Make start script executable
+RUN chmod +x /app/start.sh
 
 # Set correct permissions
 RUN chown -R nextjs:nodejs /app
@@ -62,5 +66,5 @@ ENV HOSTNAME="0.0.0.0"
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# Start application
-CMD ["node", "server.js"]
+# Start application (runs migrations then starts server)
+CMD ["/app/start.sh"]
