@@ -1,0 +1,11 @@
+# Load testing results
+results/
+*.json
+*.csv
+*.html
+
+# k6 environment variables
+.env.k6
+
+# Test data
+test-data/

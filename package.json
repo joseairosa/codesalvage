@@ -36,6 +36,7 @@
     "docker:dev": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
+    "validate:env": "tsx scripts/validate-env.ts",
     "verify:deployment": "bash scripts/verify-deployment.sh"
   },
   "dependencies": {
