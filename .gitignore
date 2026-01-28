@@ -47,8 +47,7 @@ yarn-error.log*
 *.tsbuildinfo
 
 # Prisma
-/prisma/migrations/*
-!/prisma/migrations/.gitkeep
+# Note: Migrations should be committed to git (part of schema history)
 
 # Docker
 docker-compose.override.yml
