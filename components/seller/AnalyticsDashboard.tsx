@@ -9,9 +9,12 @@
  * - Revenue over time chart
  * - Top performing projects
  * - CSV export functionality
+ *
+ * Performance: Uses dynamic imports for Recharts (~100KB reduction in initial bundle)
  */
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,19 +24,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
 import { Download, TrendingUp, DollarSign, Eye, Heart, ShoppingCart, Loader2 } from 'lucide-react';
+
+// Dynamic import for Recharts to reduce initial bundle size
+const LineChart = dynamic(
+  () => import('recharts').then((mod) => mod.LineChart as any),
+  { ssr: false, loading: () => <div className="h-[300px] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div> }
+);
+const Line = dynamic(() => import('recharts').then((mod) => mod.Line as any), { ssr: false });
+const BarChart = dynamic(
+  () => import('recharts').then((mod) => mod.BarChart as any),
+  { ssr: false, loading: () => <div className="h-[300px] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div> }
+);
+const Bar = dynamic(() => import('recharts').then((mod) => mod.Bar as any), { ssr: false });
+const XAxis = dynamic(() => import('recharts').then((mod) => mod.XAxis as any), { ssr: false });
+const YAxis = dynamic(() => import('recharts').then((mod) => mod.YAxis as any), { ssr: false });
+const CartesianGrid = dynamic(() => import('recharts').then((mod) => mod.CartesianGrid as any), { ssr: false });
+const Tooltip = dynamic(() => import('recharts').then((mod) => mod.Tooltip as any), { ssr: false });
+const Legend = dynamic(() => import('recharts').then((mod) => mod.Legend as any), { ssr: false });
+const ResponsiveContainer = dynamic(() => import('recharts').then((mod) => mod.ResponsiveContainer as any), { ssr: false });
 
 interface AnalyticsData {
   userId: string;

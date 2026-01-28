@@ -13,6 +13,18 @@ import { Badge } from '@/components/ui/badge';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
 import { auth } from '@/auth';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Pricing - ProjectFinish | Free and Pro Plans',
+  description:
+    'Choose between Free and Pro plans. Get unlimited project listings, advanced analytics, and Pro verification badge starting at $9.99/month.',
+  openGraph: {
+    title: 'Pricing Plans - ProjectFinish',
+    description: 'Free tier with 3 projects or Pro plan with unlimited listings for $9.99/month',
+    type: 'website',
+  },
+};
 
 export default async function PricingPage() {
   const session = await auth();
