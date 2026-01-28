@@ -10,10 +10,11 @@
  * Response: { isFavorited: true }
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { FavoriteService } from '@/lib/services/FavoriteService';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import { FavoriteRepository } from '@/lib/repositories/FavoriteRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
@@ -31,12 +32,12 @@ const favoriteService = new FavoriteService(
 );
 
 /**
- * GET /api/favorites/check/[projectId]
+ * GET /api/favorites/check/[projectId] (internal handler)
  *
  * Check if user has favorited a project
  */
-export async function GET(
-  _request: Request,
+async function checkFavoriteStatus(
+  _request: NextRequest,
   { params }: { params: { projectId: string } }
 ) {
   try {
@@ -70,3 +71,13 @@ export async function GET(
     );
   }
 }
+
+/**
+ * Export rate-limited handler
+ *
+ * GET: API rate limiting (100 requests / minute per user)
+ */
+export const GET = withApiRateLimit(checkFavoriteStatus, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});

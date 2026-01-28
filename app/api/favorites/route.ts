@@ -11,9 +11,10 @@
  * POST /api/favorites { projectId }
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import {
   FavoriteService,
   FavoriteValidationError,
@@ -41,11 +42,11 @@ const addFavoriteSchema = z.object({
 });
 
 /**
- * GET /api/favorites
+ * GET /api/favorites (internal handler)
  *
  * List user's favorite projects with pagination
  */
-export async function GET(request: Request) {
+async function listFavorites(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -92,11 +93,11 @@ export async function GET(request: Request) {
 }
 
 /**
- * POST /api/favorites
+ * POST /api/favorites (internal handler)
  *
  * Add a project to user's favorites
  */
-export async function POST(request: Request) {
+async function addFavorite(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -161,3 +162,19 @@ export async function POST(request: Request) {
     );
   }
 }
+
+/**
+ * Export rate-limited handlers
+ *
+ * GET: API rate limiting (100 requests / minute per user)
+ * POST: API rate limiting (100 requests / minute per user)
+ */
+export const GET = withApiRateLimit(listFavorites, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});
+
+export const POST = withApiRateLimit(addFavorite, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});

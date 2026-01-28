@@ -9,10 +9,11 @@
  * DELETE /api/favorites/project123
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { FavoriteService } from '@/lib/services/FavoriteService';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import { FavoriteRepository } from '@/lib/repositories/FavoriteRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
@@ -30,12 +31,12 @@ const favoriteService = new FavoriteService(
 );
 
 /**
- * DELETE /api/favorites/[projectId]
+ * DELETE /api/favorites/[projectId] (internal handler)
  *
  * Remove a project from favorites
  */
-export async function DELETE(
-  _request: Request,
+async function removeFavorite(
+  _request: NextRequest,
   { params }: { params: { projectId: string } }
 ) {
   try {
@@ -76,3 +77,13 @@ export async function DELETE(
     );
   }
 }
+
+/**
+ * Export rate-limited handler
+ *
+ * DELETE: API rate limiting (100 requests / minute per user)
+ */
+export const DELETE = withApiRateLimit(removeFavorite, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});

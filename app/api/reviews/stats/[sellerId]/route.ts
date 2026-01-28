@@ -10,11 +10,12 @@
  * Response: { averageRating, totalReviews, ratingDistribution, ... }
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ReviewService } from '@/lib/services/ReviewService';
 import { ReviewRepository } from '@/lib/repositories/ReviewRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
+import { withPublicRateLimit } from '@/lib/middleware/withRateLimit';
 
 const componentName = 'ReviewStatsAPI';
 
@@ -24,12 +25,12 @@ const userRepository = new UserRepository(prisma);
 const reviewService = new ReviewService(reviewRepository, userRepository);
 
 /**
- * GET /api/reviews/stats/[sellerId]
+ * GET /api/reviews/stats/[sellerId] (internal handler)
  *
  * Get seller review statistics
  */
-export async function GET(
-  _request: Request,
+async function getSellerStats(
+  _request: NextRequest,
   { params }: { params: { sellerId: string } }
 ) {
   try {
@@ -79,3 +80,10 @@ export async function GET(
     );
   }
 }
+
+/**
+ * Export rate-limited handler
+ *
+ * GET: Public rate limiting (1000 requests / hour per IP) - publicly accessible stats
+ */
+export const GET = withPublicRateLimit(getSellerStats);
