@@ -19,7 +19,7 @@ let cacheClient: ReturnType<typeof createClient> | null = null;
 /**
  * Get or create Redis cache client
  */
-async function getCacheClient() {
+export async function getCacheClient() {
   if (!cacheClient) {
     cacheClient = createClient({
       url: process.env['REDIS_URL'] || 'redis://localhost:6379',

@@ -83,7 +83,7 @@ async function removeFavorite(
  *
  * DELETE: API rate limiting (100 requests / minute per user)
  */
-export const DELETE = withApiRateLimit(removeFavorite, async (request) => {
+export const DELETE = withApiRateLimit(removeFavorite, async (_request) => {
   const session = await auth();
   return session?.user?.id || 'anonymous';
 });
