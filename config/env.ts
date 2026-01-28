@@ -56,9 +56,9 @@ export const env = {
   R2_BUCKET_NAME: getOptionalEnvVar('R2_BUCKET_NAME'),
   R2_PUBLIC_URL: getOptionalEnvVar('R2_PUBLIC_URL'),
 
-  // SendGrid (optional during development)
-  SENDGRID_API_KEY: getOptionalEnvVar('SENDGRID_API_KEY'),
-  SENDGRID_FROM_EMAIL: getOptionalEnvVar('SENDGRID_FROM_EMAIL'),
+  // Postmark (optional during development)
+  POSTMARK_SERVER_TOKEN: getOptionalEnvVar('POSTMARK_SERVER_TOKEN'),
+  POSTMARK_FROM_EMAIL: getOptionalEnvVar('POSTMARK_FROM_EMAIL'),
 
   // Cron
   CRON_SECRET: getOptionalEnvVar('CRON_SECRET'),

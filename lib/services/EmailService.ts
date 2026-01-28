@@ -1,7 +1,7 @@
 /**
  * Email Service
  *
- * Handles all email notifications via SendGrid.
+ * Handles all email notifications via Postmark.
  * Provides type-safe methods for sending transactional emails.
  *
  * Email Types:
@@ -16,7 +16,7 @@
  * await emailService.sendPurchaseConfirmation(transaction, buyer, seller);
  */
 
-import sgMail from '@sendgrid/mail';
+import * as postmark from 'postmark';
 import { env } from '@/config/env';
 
 const componentName = 'EmailService';
@@ -75,37 +75,38 @@ export interface FeaturedListingEmailData {
 export class EmailService {
   private fromEmail: string;
   private fromName: string;
+  private client: postmark.ServerClient | null = null;
   private isInitialized = false;
 
   constructor() {
     // Read from process.env directly to support test environment variable injection
     this.fromEmail =
-      process.env['SENDGRID_FROM_EMAIL'] ||
-      env.SENDGRID_FROM_EMAIL ||
+      process.env['POSTMARK_FROM_EMAIL'] ||
+      env.POSTMARK_FROM_EMAIL ||
       'noreply@projectfinish.com';
     this.fromName = 'ProjectFinish';
   }
 
   /**
-   * Initialize SendGrid (lazy initialization)
+   * Initialize Postmark (lazy initialization)
    * This is called on first email send to support testing
    *
    * NOTE: Reads from process.env directly (not cached env object) to support testing
    */
-  private initializeSendGrid(): void {
+  private initializePostmark(): void {
     if (this.isInitialized) {
       return;
     }
 
     // Read from process.env directly to support test environment variable injection
-    const apiKey = process.env['SENDGRID_API_KEY'] || env.SENDGRID_API_KEY;
+    const apiKey = process.env['POSTMARK_SERVER_TOKEN'] || env.POSTMARK_SERVER_TOKEN;
 
     if (apiKey) {
-      sgMail.setApiKey(apiKey);
-      console.log(`[${componentName}] SendGrid initialized`);
+      this.client = new postmark.ServerClient(apiKey);
+      console.log(`[${componentName}] Postmark initialized`);
     } else {
       console.warn(
-        `[${componentName}] SendGrid API key not configured - emails will be logged only`
+        `[${componentName}] Postmark API key not configured - emails will be logged only`
       );
     }
 
@@ -272,7 +273,7 @@ export class EmailService {
   }
 
   /**
-   * Internal method to send email via SendGrid
+   * Internal method to send email via Postmark
    */
   private async sendEmail(
     recipient: EmailRecipient,
@@ -280,13 +281,13 @@ export class EmailService {
     html: string,
     text: string
   ): Promise<void> {
-    // Initialize SendGrid on first use (lazy initialization for testing)
-    this.initializeSendGrid();
+    // Initialize Postmark on first use (lazy initialization for testing)
+    this.initializePostmark();
 
     // Check for API key (read from process.env to support testing)
-    const apiKey = process.env['SENDGRID_API_KEY'] || env.SENDGRID_API_KEY;
+    const apiKey = process.env['POSTMARK_SERVER_TOKEN'] || env.POSTMARK_SERVER_TOKEN;
 
-    if (!apiKey) {
+    if (!apiKey || !this.client) {
       console.log(`[${componentName}] Email would be sent (dev mode):`, {
         to: recipient.email,
         subject,
@@ -296,20 +297,15 @@ export class EmailService {
     }
 
     try {
-      const toData: { email: string; name?: string } = { email: recipient.email };
-      if (recipient.name) {
-        toData.name = recipient.name;
-      }
-
-      await sgMail.send({
-        to: toData,
-        from: {
-          email: this.fromEmail,
-          name: this.fromName,
-        },
-        subject,
-        html,
-        text,
+      await this.client.sendEmail({
+        From: `${this.fromName} <${this.fromEmail}>`,
+        To: recipient.name
+          ? `${recipient.name} <${recipient.email}>`
+          : recipient.email,
+        Subject: subject,
+        HtmlBody: html,
+        TextBody: text,
+        MessageStream: 'outbound',
       });
 
       console.log(`[${componentName}] Email sent successfully to:`, recipient.email);

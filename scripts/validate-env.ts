@@ -123,15 +123,15 @@ const ENV_VARS: EnvVar[] = [
     example: 'https://pub-xxx.r2.dev',
   },
 
-  // SendGrid
+  // Postmark
   {
-    name: 'SENDGRID_API_KEY',
+    name: 'POSTMARK_SERVER_TOKEN',
     required: true,
     category: 'Email',
-    description: 'SendGrid API key (SG.xxx)',
+    description: 'Postmark Server API Token',
   },
   {
-    name: 'SENDGRID_FROM_EMAIL',
+    name: 'POSTMARK_FROM_EMAIL',
     required: true,
     category: 'Email',
     description: 'Sender email address',

@@ -22,7 +22,7 @@ import { env } from '@/config/env';
  * - Redis connectivity and latency
  * - Stripe configuration
  * - Honeybadger configuration
- * - SendGrid configuration
+ * - Postmark configuration
  * - Cloudflare R2 configuration
  * - Auth.js configuration
  */
@@ -93,7 +93,7 @@ export async function GET(request: Request) {
     redis: { status: 'unhealthy' },
     stripe: { status: 'unhealthy', configured: false },
     honeybadger: { status: 'unhealthy', configured: false },
-    sendgrid: { status: 'unhealthy', configured: false },
+    postmark: { status: 'unhealthy', configured: false },
     cloudflare: { status: 'unhealthy', configured: false },
     auth: { status: 'unhealthy', configured: false },
   };
@@ -151,10 +151,10 @@ export async function GET(request: Request) {
     configured: !!env.HONEYBADGER_API_KEY,
   };
 
-  // 5. SendGrid Configuration Check
-  checks.sendgrid = {
-    status: env.SENDGRID_API_KEY ? 'healthy' : 'unhealthy',
-    configured: !!env.SENDGRID_API_KEY,
+  // 5. Postmark Configuration Check
+  checks.postmark = {
+    status: env.POSTMARK_SERVER_TOKEN ? 'healthy' : 'unhealthy',
+    configured: !!env.POSTMARK_SERVER_TOKEN,
   };
 
   // 6. Cloudflare R2 Configuration Check
