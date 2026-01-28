@@ -120,11 +120,19 @@ describe('AnalyticsRepository', () => {
 
       await analyticsRepository.getSellerRevenueSummary('seller123', dateRange);
 
-      // Verify date range was passed to queries
-      expect(mockPrismaClient.project.count).toHaveBeenCalledWith(
+      // Verify date range was passed to transaction queries (not project count)
+      // Project count intentionally does NOT filter by date - it counts ALL projects
+      expect(mockPrismaClient.project.count).toHaveBeenCalledWith({
+        where: {
+          sellerId: 'seller123',
+        },
+      });
+
+      // Date range should be applied to transactions
+      expect(mockPrismaClient.transaction.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            createdAt: {
+            completedAt: {
               gte: dateRange.startDate,
               lte: dateRange.endDate,
             },

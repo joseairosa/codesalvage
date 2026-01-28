@@ -69,6 +69,7 @@ const mockSubscriptionRepository = {
 const mockUserRepository = {
   findById: vi.fn(),
   update: vi.fn(),
+  updateStripeAccount: vi.fn(),
 } as unknown as UserRepository;
 
 // Mock data helpers

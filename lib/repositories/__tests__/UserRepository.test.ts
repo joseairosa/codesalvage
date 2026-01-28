@@ -112,7 +112,7 @@ describe('UserRepository', () => {
 
       // Act & Assert
       await expect(userRepository.createUser(userData)).rejects.toThrow(
-        '[UserRepository] Failed to create user - email or username may already exist'
+        '[UserRepository] Failed to create user - email may already exist'
       );
     });
 
@@ -125,7 +125,7 @@ describe('UserRepository', () => {
 
       // Act & Assert
       await expect(userRepository.createUser(userData)).rejects.toThrow(
-        '[UserRepository] Failed to create user - email or username may already exist'
+        '[UserRepository] Failed to create user - email may already exist'
       );
     });
   });
