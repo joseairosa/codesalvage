@@ -215,7 +215,13 @@ export class ProjectRepository {
       const project = await this.prisma.project.findUnique({
         where: { id },
         include: {
-          seller: includeSeller,
+          seller: includeSeller
+            ? {
+                include: {
+                  subscription: true,
+                },
+              }
+            : false,
         },
       });
 
@@ -418,6 +424,7 @@ export class ProjectRepository {
                 fullName: true,
                 avatarUrl: true,
                 isVerifiedSeller: true,
+                subscription: true,
               },
             },
           },

@@ -124,7 +124,13 @@ describe('ProjectRepository', () => {
       expect(result).toEqual(mockProject);
       expect(mockPrismaClient.project.findUnique).toHaveBeenCalledWith({
         where: { id: 'project123' },
-        include: { seller: true },
+        include: {
+          seller: {
+            include: {
+              subscription: true,
+            },
+          },
+        },
       });
     });
 

@@ -47,6 +47,7 @@ import {
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ProjectLimitWarning } from '@/components/seller/ProjectLimitWarning';
 
 const componentName = 'NewProjectPage';
 
@@ -61,6 +62,9 @@ export default function NewProjectPage() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
   const [uploadedScreenshots, setUploadedScreenshots] = React.useState<string[]>([]);
+  const [isCheckingLimit, setIsCheckingLimit] = React.useState(true);
+  const [projectLimitReached, setProjectLimitReached] = React.useState(false);
+  const [projectCount, setProjectCount] = React.useState(0);
 
   // ============================================
   // FORM SETUP
@@ -99,6 +103,47 @@ export default function NewProjectPage() {
 
   // Watch description length for character counter
   const description = watch('description');
+
+  // ============================================
+  // EFFECTS
+  // ============================================
+
+  /**
+   * Check project limit on page load
+   */
+  React.useEffect(() => {
+    const checkProjectLimit = async () => {
+      try {
+        console.log(`[${componentName}] Checking project limit`);
+
+        // Fetch user's projects to check count
+        const response = await fetch('/api/projects?status=active&limit=100');
+        if (!response.ok) {
+          console.error(`[${componentName}] Failed to fetch projects`);
+          setIsCheckingLimit(false);
+          return;
+        }
+
+        const data = await response.json();
+        const activeCount = data.total || 0;
+        console.log(`[${componentName}] Active project count:`, activeCount);
+
+        setProjectCount(activeCount);
+
+        // Check if limit reached (3 for free tier)
+        // Note: Backend will also check subscription status
+        if (activeCount >= 3) {
+          setProjectLimitReached(true);
+        }
+      } catch (error) {
+        console.error(`[${componentName}] Error checking project limit:`, error);
+      } finally {
+        setIsCheckingLimit(false);
+      }
+    };
+
+    checkProjectLimit();
+  }, []);
 
   // ============================================
   // EVENT HANDLERS
@@ -143,6 +188,17 @@ export default function NewProjectPage() {
 
       if (!response.ok) {
         const error = await response.json();
+
+        // Check if it's a project limit error
+        if (
+          error.field === 'plan_limit' ||
+          error.message?.includes('Free plan limited to 3 active projects')
+        ) {
+          setProjectLimitReached(true);
+          setProjectCount(3);
+          return;
+        }
+
         throw new Error(error.message || 'Failed to create project');
       }
 
@@ -178,6 +234,17 @@ export default function NewProjectPage() {
 
       if (!createResponse.ok) {
         const error = await createResponse.json();
+
+        // Check if it's a project limit error
+        if (
+          error.field === 'plan_limit' ||
+          error.message?.includes('Free plan limited to 3 active projects')
+        ) {
+          setProjectLimitReached(true);
+          setProjectCount(3);
+          return;
+        }
+
         throw new Error(error.message || 'Failed to create project');
       }
 
@@ -212,6 +279,23 @@ export default function NewProjectPage() {
   // ============================================
   // RENDER
   // ============================================
+
+  // Show loading state while checking limit
+  if (isCheckingLimit) {
+    return (
+      <div className="container mx-auto max-w-4xl py-20">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+          <p className="text-muted-foreground">Checking project limits...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show project limit warning if limit reached
+  if (projectLimitReached) {
+    return <ProjectLimitWarning projectCount={projectCount} />;
+  }
 
   return (
     <div className="container mx-auto max-w-4xl py-10">

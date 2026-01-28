@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ProBadge } from '@/components/seller/ProBadge';
 import { Star, Eye, Heart } from 'lucide-react';
 
 const componentName = 'ProjectCard';
@@ -56,6 +57,15 @@ export interface ProjectCardData {
     username: string;
     fullName?: string | null;
     avatarUrl?: string | null;
+    subscription?: {
+      status: string;
+      benefits: {
+        verificationBadge: boolean;
+        unlimitedProjects: boolean;
+        advancedAnalytics: boolean;
+        featuredListingDiscount: boolean;
+      };
+    } | null;
   };
 }
 
@@ -237,9 +247,12 @@ export function ProjectCard({
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 overflow-hidden">
-                <p className="truncate text-sm font-medium">
-                  {project.seller.fullName || project.seller.username}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <p className="truncate text-sm font-medium">
+                    {project.seller.fullName || project.seller.username}
+                  </p>
+                  <ProBadge subscription={project.seller.subscription} size="sm" />
+                </div>
                 <p className="truncate text-xs text-muted-foreground">
                   @{project.seller.username}
                 </p>

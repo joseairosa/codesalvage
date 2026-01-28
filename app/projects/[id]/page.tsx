@@ -35,6 +35,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import { ProBadge } from '@/components/seller/ProBadge';
 import {
   Star,
   Eye,
@@ -123,6 +124,15 @@ The backend is built with Node.js and Express, using PostgreSQL for data storage
     soldCount: 8,
     averageRating: 4.8,
     reviewCount: 15,
+    subscription: {
+      status: 'active',
+      benefits: {
+        verificationBadge: true,
+        unlimitedProjects: true,
+        advancedAnalytics: true,
+        featuredListingDiscount: true,
+      },
+    },
   },
 };
 
@@ -550,9 +560,12 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p className="font-semibold">
-                    {project.seller.fullName || project.seller.username}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold">
+                      {project.seller.fullName || project.seller.username}
+                    </p>
+                    <ProBadge subscription={project.seller.subscription} size="sm" />
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     @{project.seller.username}
                   </p>
