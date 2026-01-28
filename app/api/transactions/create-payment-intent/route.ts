@@ -190,7 +190,7 @@ async function createPaymentIntent(request: NextRequest) {
  * POST: API rate limiting (100 requests / minute per user)
  * Critical payment endpoint - prevent abuse
  */
-export const POST = withApiRateLimit(createPaymentIntent, async (request) => {
+export const POST = withApiRateLimit(createPaymentIntent, async (_request) => {
   const session = await auth();
   return session?.user?.id || 'anonymous';
 });

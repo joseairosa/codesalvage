@@ -265,7 +265,7 @@ async function searchProjects(request: NextRequest) {
  * POST: API rate limiting (100 requests / minute per user)
  * GET: Public rate limiting (1000 requests / hour per IP)
  */
-export const POST = withApiRateLimit(createProject, async (request) => {
+export const POST = withApiRateLimit(createProject, async (_request) => {
   const session = await auth();
   return session?.user?.id || 'anonymous';
 });

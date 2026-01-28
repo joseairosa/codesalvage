@@ -215,7 +215,7 @@ async function createReview(request: NextRequest) {
  */
 export const GET = withPublicRateLimit(listReviews);
 
-export const POST = withApiRateLimit(createReview, async (request) => {
+export const POST = withApiRateLimit(createReview, async (_request) => {
   const session = await auth();
   return session?.user?.id || 'anonymous';
 });

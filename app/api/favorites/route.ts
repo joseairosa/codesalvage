@@ -169,12 +169,12 @@ async function addFavorite(request: NextRequest) {
  * GET: API rate limiting (100 requests / minute per user)
  * POST: API rate limiting (100 requests / minute per user)
  */
-export const GET = withApiRateLimit(listFavorites, async (request) => {
+export const GET = withApiRateLimit(listFavorites, async (_request) => {
   const session = await auth();
   return session?.user?.id || 'anonymous';
 });
 
-export const POST = withApiRateLimit(addFavorite, async (request) => {
+export const POST = withApiRateLimit(addFavorite, async (_request) => {
   const session = await auth();
   return session?.user?.id || 'anonymous';
 });

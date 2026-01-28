@@ -112,7 +112,7 @@ async function getTransactionDetails(
  *
  * GET: API rate limiting (100 requests / minute per user)
  */
-export const GET = withApiRateLimit(getTransactionDetails, async (request) => {
+export const GET = withApiRateLimit(getTransactionDetails, async (_request) => {
   const session = await auth();
   return session?.user?.id || 'anonymous';
 });
