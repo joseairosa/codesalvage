@@ -42,7 +42,10 @@ const YAxis = dynamic(() => import('recharts').then((mod) => mod.YAxis as any), 
 const CartesianGrid = dynamic(() => import('recharts').then((mod) => mod.CartesianGrid as any), { ssr: false });
 const Tooltip = dynamic(() => import('recharts').then((mod) => mod.Tooltip as any), { ssr: false });
 const Legend = dynamic(() => import('recharts').then((mod) => mod.Legend as any), { ssr: false });
-const ResponsiveContainer = dynamic(() => import('recharts').then((mod) => mod.ResponsiveContainer as any), { ssr: false });
+const ResponsiveContainer = dynamic(
+  () => import('recharts').then((mod) => mod.ResponsiveContainer as any),
+  { ssr: false }
+) as any;
 
 interface AnalyticsData {
   userId: string;
