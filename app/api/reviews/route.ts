@@ -11,9 +11,10 @@
  * POST /api/reviews { transactionId, overallRating, comment, ... }
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import { withApiRateLimit, withPublicRateLimit } from '@/lib/middleware/withRateLimit';
 import {
   ReviewService,
   ReviewValidationError,
@@ -49,11 +50,11 @@ const createReviewSchema = z.object({
 });
 
 /**
- * GET /api/reviews
+ * GET /api/reviews (internal handler)
  *
  * List reviews for a seller
  */
-export async function GET(request: Request) {
+async function listReviews(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const sellerId = searchParams.get('sellerId');
@@ -116,11 +117,11 @@ export async function GET(request: Request) {
 }
 
 /**
- * POST /api/reviews
+ * POST /api/reviews (internal handler)
  *
  * Submit a new review
  */
-export async function POST(request: Request) {
+async function createReview(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -205,3 +206,16 @@ export async function POST(request: Request) {
     );
   }
 }
+
+/**
+ * Export rate-limited handlers
+ *
+ * GET: Public rate limiting (1000 requests / hour per IP) - anyone can view reviews
+ * POST: API rate limiting (100 requests / minute per user) - authenticated only
+ */
+export const GET = withPublicRateLimit(listReviews);
+
+export const POST = withApiRateLimit(createReview, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});

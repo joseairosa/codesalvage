@@ -13,10 +13,11 @@
  * { "userId": "user123", "projectId": "project456" }
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { MessageService } from '@/lib/services/MessageService';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import { MessageRepository } from '@/lib/repositories/MessageRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
@@ -45,11 +46,11 @@ const markReadSchema = z
   });
 
 /**
- * POST /api/messages/read
+ * POST /api/messages/read (internal handler)
  *
  * Mark messages as read
  */
-export async function POST(request: Request) {
+async function markMessagesAsRead(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -108,3 +109,13 @@ export async function POST(request: Request) {
     );
   }
 }
+
+/**
+ * Export rate-limited handler
+ *
+ * POST: API rate limiting (100 requests / minute per user)
+ */
+export const POST = withApiRateLimit(markMessagesAsRead, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});

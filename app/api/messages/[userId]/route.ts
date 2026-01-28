@@ -9,10 +9,11 @@
  * GET /api/messages/user123?projectId=project456
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { MessageService, MessagePermissionError } from '@/lib/services/MessageService';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import { MessageRepository } from '@/lib/repositories/MessageRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
@@ -30,11 +31,14 @@ const messageService = new MessageService(
 );
 
 /**
- * GET /api/messages/[userId]
+ * GET /api/messages/[userId] (internal handler)
  *
  * Get all messages in a conversation with a specific user
  */
-export async function GET(request: Request, { params }: { params: { userId: string } }) {
+async function getConversationThread(
+  request: NextRequest,
+  { params }: { params: { userId: string } }
+) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -90,3 +94,13 @@ export async function GET(request: Request, { params }: { params: { userId: stri
     );
   }
 }
+
+/**
+ * Export rate-limited handler
+ *
+ * GET: API rate limiting (100 requests / minute per user)
+ */
+export const GET = withApiRateLimit(getConversationThread, async (request) => {
+  const session = await auth();
+  return session?.user?.id || 'anonymous';
+});
