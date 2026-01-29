@@ -15,7 +15,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { requireAdminApi } from '@/lib/auth-helpers';
+import { requireAdminApiAuth } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
   AdminRepository,
@@ -44,14 +44,14 @@ const adminService = new AdminService(
  *
  * Get platform statistics
  */
-export async function GET() {
+export async function GET(request: Request) {
   // Verify admin authentication
-  const session = await requireAdminApi();
-  if (!session) {
+  const auth = await requireAdminApiAuth(request);
+  if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  console.log('[API] GET /api/admin/stats - Admin:', session.user.id);
+  console.log('[API] GET /api/admin/stats - Admin:', auth.user.id);
 
   try {
     const stats = await adminService.getPlatformStats();

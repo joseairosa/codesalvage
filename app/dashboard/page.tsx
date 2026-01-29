@@ -1,30 +1,22 @@
 /**
  * Dashboard Page (Protected Route)
  *
- * Requires authentication via Auth.js.
+ * Requires authentication via Firebase.
  * Redirects to sign-in if user is not authenticated.
- *
- * This is a protected route used to verify authentication middleware works.
  */
 
-import { redirect } from 'next/navigation';
-import { auth } from '@/auth';
+import { requireAuth } from '@/lib/auth-helpers';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default async function DashboardPage() {
-  const session = await auth();
-
-  // Redirect to sign-in if not authenticated
-  if (!session?.user) {
-    redirect('/auth/signin');
-  }
+  const session = await requireAuth();
 
   return (
     <div className="container mx-auto py-10">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="text-gray-600">
-          Welcome back, {session.user.name || session.user.email}
+          Welcome back, {session.user.username || session.user.email}
         </p>
       </div>
 

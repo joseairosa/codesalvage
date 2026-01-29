@@ -22,7 +22,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminApi } from '@/lib/auth-helpers';
+import { requireAdminApiAuth } from '@/lib/api-auth';
 import { getAdminService } from '@/lib/utils/admin-services';
 import { AdminValidationError } from '@/lib/services';
 import { z } from 'zod';
@@ -47,16 +47,19 @@ const resolveReportSchema = z.object({
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { reportId: string } }
+  { params }: { params: Promise<{ reportId: string }> }
 ) {
   // Verify admin session
-  const session = await requireAdminApi();
+  const auth = await requireAdminApiAuth(request);
 
-  if (!session) {
+  if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
+    // Await params
+    const { reportId } = await params;
+
     // Parse and validate request body
     const body = await request.json();
     const validatedData = resolveReportSchema.parse(body);
@@ -70,8 +73,8 @@ export async function PUT(
     // Resolve report via AdminService
     const adminService = getAdminService();
     const report = await adminService.resolveContentReport(
-      session.user.id,
-      params.reportId,
+      auth.user.id,
+      reportId,
       validatedData.resolution,
       validatedData.status,
       ipAddress

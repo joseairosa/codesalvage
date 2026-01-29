@@ -14,7 +14,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { MessageService } from '@/lib/services/MessageService';
 import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
@@ -52,8 +52,8 @@ const markReadSchema = z
  */
 async function markMessagesAsRead(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -81,7 +81,7 @@ async function markMessagesAsRead(request: NextRequest) {
     } else if (userId) {
       // Mark all messages from a specific user as read using service
       updatedCount = await messageService.markConversationAsRead(
-        session.user.id,
+        auth.user.id,
         userId,
         projectId
       );
@@ -115,7 +115,7 @@ async function markMessagesAsRead(request: NextRequest) {
  *
  * POST: API rate limiting (100 requests / minute per user)
  */
-export const POST = withApiRateLimit(markMessagesAsRead, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const POST = withApiRateLimit(markMessagesAsRead, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });

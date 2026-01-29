@@ -12,7 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { withApiRateLimit, withPublicRateLimit } from '@/lib/middleware/withRateLimit';
 import {
@@ -123,8 +123,8 @@ async function listReviews(request: NextRequest) {
  */
 async function createReview(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -169,7 +169,7 @@ async function createReview(request: NextRequest) {
     if (isAnonymous !== undefined) reviewData.isAnonymous = isAnonymous;
 
     // Use ReviewService to create review
-    const review = await reviewService.createReview(session.user.id, reviewData);
+    const review = await reviewService.createReview(auth.user.id, reviewData);
 
     console.log(`[${componentName}] Review created:`, review.id);
 
@@ -215,7 +215,7 @@ async function createReview(request: NextRequest) {
  */
 export const GET = withPublicRateLimit(listReviews);
 
-export const POST = withApiRateLimit(createReview, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const POST = withApiRateLimit(createReview, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });

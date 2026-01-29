@@ -18,7 +18,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminApi } from '@/lib/auth-helpers';
+import { requireAdminApiAuth } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
   AdminRepository,
@@ -49,12 +49,12 @@ const adminService = new AdminService(
  */
 export async function GET(request: NextRequest) {
   // Verify admin authentication
-  const session = await requireAdminApi();
-  if (!session) {
+  const auth = await requireAdminApiAuth(request);
+  if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  console.log('[API] GET /api/admin/users - Admin:', session.user.id);
+  console.log('[API] GET /api/admin/users - Admin:', auth.user.id);
 
   try {
     // Parse query parameters
@@ -68,11 +68,23 @@ export async function GET(request: NextRequest) {
     const sortBy = (searchParams.get('sortBy') || 'createdAt') as 'createdAt' | 'lastLogin' | 'email' | 'username';
     const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
+    // Filter out undefined values to satisfy exactOptionalPropertyTypes
+    const filters = Object.fromEntries(
+      Object.entries({
+        isBanned,
+        isAdmin,
+        isSeller,
+        isVerifiedSeller,
+      }).filter(([_, value]) => value !== undefined)
+    ) as {
+      isBanned?: boolean;
+      isAdmin?: boolean;
+      isSeller?: boolean;
+      isVerifiedSeller?: boolean;
+    };
+
     const users = await adminService.getUsers({
-      isBanned,
-      isAdmin,
-      isSeller,
-      isVerifiedSeller,
+      ...filters,
       limit,
       offset,
       sortBy,
@@ -80,12 +92,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Also get total count for pagination
-    const total = await userRepository.countUsers({
-      isBanned,
-      isAdmin,
-      isSeller,
-      isVerifiedSeller,
-    });
+    const total = await userRepository.countUsers(filters);
 
     return NextResponse.json(
       {

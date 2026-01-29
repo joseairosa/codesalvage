@@ -12,7 +12,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { r2Service, FileType } from '@/lib/services';
 
@@ -21,26 +21,26 @@ import { r2Service, FileType } from '@/lib/services';
  *
  * Generate download link for purchased project
  */
-export async function POST(_request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Check authentication
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const projectId = params.id;
+    const { id: projectId } = await params;
 
     console.log('[Project Download] Generating download link:', {
       projectId,
-      userId: session.user.id,
+      userId: auth.user.id,
     });
 
     // Find successful transaction for this buyer and project
     const transaction = await prisma.transaction.findFirst({
       where: {
         projectId,
-        buyerId: session.user.id,
+        buyerId: auth.user.id,
         paymentStatus: 'succeeded',
       },
       include: {
@@ -80,7 +80,7 @@ export async function POST(_request: Request, { params }: { params: { id: string
       const uploadConfig = await r2Service.getUploadUrl(
         `${projectId}-code.zip`,
         'application/zip',
-        session.user.id,
+        auth.user.id,
         FileType.ZIP,
         expiresIn
       );

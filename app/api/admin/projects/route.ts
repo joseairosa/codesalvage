@@ -4,10 +4,15 @@
  * GET /api/admin/projects
  *
  * Responsibilities:
- * - Validate admin session
+ * - Validate admin authentication (Firebase session OR API key)
  * - Parse and validate query parameters
  * - Fetch projects with filters via AdminService
  * - Return paginated project list
+ *
+ * Authentication:
+ * - Cookie: Firebase session token (browser requests)
+ * - Header: Authorization: Bearer sk-xxx (API key for programmatic access)
+ * - Header: Authorization: Bearer <firebase-token> (Firebase token for programmatic access)
  *
  * Query Parameters:
  * - status: string | string[] (optional) - Filter by project status
@@ -25,19 +30,20 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminApi } from '@/lib/auth-helpers';
+import { requireAdminApiAuth } from '@/lib/api-auth';
 import { getAdminService, getProjectRepository } from '@/lib/utils/admin-services';
 
 /**
  * GET /api/admin/projects
  *
  * Fetch all projects with optional filters and pagination.
+ * Supports dual authentication: Firebase session (cookie) OR API key (Authorization header).
  */
 export async function GET(request: NextRequest) {
-  // Verify admin session
-  const session = await requireAdminApi();
+  // Verify admin authentication (supports both cookie and Authorization header)
+  const auth = await requireAdminApiAuth(request);
 
-  if (!session) {
+  if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -65,7 +71,10 @@ export async function GET(request: NextRequest) {
     const sellerId = searchParams.get('sellerId') || undefined;
 
     // Sorting
-    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortByParam = searchParams.get('sortBy') || 'createdAt';
+    const sortBy = ['createdAt', 'updatedAt', 'priceCents', 'viewCount'].includes(sortByParam)
+      ? (sortByParam as 'createdAt' | 'updatedAt' | 'priceCents' | 'viewCount')
+      : 'createdAt';
     const sortOrder = (searchParams.get('sortOrder') || 'desc') as
       | 'asc'
       | 'desc';
@@ -79,10 +88,22 @@ export async function GET(request: NextRequest) {
 
     // Fetch projects via AdminService
     const adminService = getAdminService();
+
+    // Filter out undefined values to satisfy exactOptionalPropertyTypes
+    const filters = Object.fromEntries(
+      Object.entries({
+        status,
+        isFeatured,
+        sellerId,
+      }).filter(([_, value]) => value !== undefined)
+    ) as {
+      status?: string | string[];
+      isFeatured?: boolean;
+      sellerId?: string;
+    };
+
     const projects = await adminService.getProjects({
-      status,
-      isFeatured,
-      sellerId,
+      ...filters,
       limit,
       offset,
       sortBy,

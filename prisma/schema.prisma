@@ -39,6 +39,9 @@ model User {
   githubUsername  String? @map("github_username")
   githubAvatarUrl String? @map("github_avatar_url")
 
+  // Firebase integration
+  firebaseUid String? @unique @map("firebase_uid")
+
   // Seller specific
   payoutMethod    String? @map("payout_method") // 'stripe', 'paypal', 'bank_transfer'
   payoutEmail     String? @map("payout_email")
@@ -69,12 +72,14 @@ model User {
   sessions             Session[]
   adminAuditLogs       AdminAuditLog[]
   contentReports       ContentReport[]
+  apiKeys              ApiKey[]
 
   @@index([email])
   @@index([githubId], map: "idx_github_id")
   @@index([isSeller], map: "idx_is_seller")
   @@index([isAdmin], map: "idx_is_admin")
   @@index([isBanned], map: "idx_is_banned")
+  @@index([firebaseUid], map: "idx_firebase_uid")
   @@map("users")
 }
 
@@ -471,4 +476,36 @@ model ContentReport {
   @@index([contentType, contentId], map: "idx_content_report_content")
   @@index([status], map: "idx_content_report_status")
   @@map("content_reports")
+}
+
+// ============================================
+// API KEYS (Firebase programmatic access)
+// ============================================
+
+model ApiKey {
+  id String @id @default(cuid())
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name String // User-provided name like "Production API", "Development"
+  keyHash String @unique @map("key_hash") // SHA-256 hash of sk-xxx key (never store plaintext)
+  prefix String // First 8 chars for display (e.g., "sk-abc12")
+
+  lastUsedAt DateTime? @map("last_used_at")
+  usageCount Int @default(0) @map("usage_count")
+
+  status String @default("active") // 'active', 'revoked'
+  revokedAt DateTime? @map("revoked_at")
+  revokedReason String? @map("revoked_reason") @db.Text
+
+  expiresAt DateTime? @map("expires_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId], map: "idx_api_key_user_id")
+  @@index([keyHash], map: "idx_api_key_hash")
+  @@index([status], map: "idx_api_key_status")
+  @@map("api_keys")
 }

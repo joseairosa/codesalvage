@@ -12,7 +12,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
   SubscriptionService,
@@ -44,16 +44,16 @@ const createSubscriptionSchema = z.object({
  *
  * Get current subscription status for authenticated user
  */
-export async function GET(_request: Request) {
+export async function GET(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log(`[${componentName}] Fetching subscription status:`, session.user.id);
+    console.log(`[${componentName}] Fetching subscription status:`, auth.user.id);
 
-    const status = await subscriptionService.getSubscriptionStatus(session.user.id);
+    const status = await subscriptionService.getSubscriptionStatus(auth.user.id);
 
     console.log(`[${componentName}] Subscription status:`, {
       plan: status.plan,
@@ -86,8 +86,8 @@ export async function GET(_request: Request) {
  */
 export async function POST(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
     const { plan, paymentMethodId } = validatedData.data;
 
     console.log(`[${componentName}] Creating subscription:`, {
-      userId: session.user.id,
+      userId: auth.user.id,
       plan,
     });
 
@@ -118,7 +118,7 @@ export async function POST(request: Request) {
     }
 
     const result = await subscriptionService.createSubscription(
-      session.user.id,
+      auth.user.id,
       subscriptionRequest
     );
 
@@ -177,16 +177,16 @@ export async function POST(request: Request) {
  *
  * Cancel subscription at end of billing period
  */
-export async function DELETE(_request: Request) {
+export async function DELETE(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log(`[${componentName}] Canceling subscription:`, session.user.id);
+    console.log(`[${componentName}] Canceling subscription:`, auth.user.id);
 
-    const result = await subscriptionService.cancelSubscription(session.user.id);
+    const result = await subscriptionService.cancelSubscription(auth.user.id);
 
     console.log(`[${componentName}] Subscription canceled:`, result.subscriptionId);
 

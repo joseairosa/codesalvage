@@ -13,7 +13,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { stripeService } from '@/lib/services';
 import { calculatePaymentBreakdown, calculateEscrowReleaseDate } from '@/lib/stripe';
@@ -31,8 +31,8 @@ const createIntentSchema = z.object({
 export async function POST(request: Request) {
   try {
     // Check authentication
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
 
     console.log('[Create Intent] Creating payment intent:', {
       projectId,
-      buyerId: session.user.id,
+      buyerId: auth.user.id,
     });
 
     // Get project with seller info
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     }
 
     // Check if buyer is not the seller
-    if (project.sellerId === session.user.id) {
+    if (project.sellerId === auth.user.id) {
       return NextResponse.json(
         { error: 'You cannot purchase your own project' },
         { status: 400 }
@@ -112,7 +112,7 @@ export async function POST(request: Request) {
       data: {
         projectId: project.id,
         sellerId: project.sellerId,
-        buyerId: session.user.id,
+        buyerId: auth.user.id,
         amountCents: breakdown.total,
         commissionCents: breakdown.platformFee,
         sellerReceivesCents: breakdown.sellerReceives,
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
     const paymentIntent = await stripeService.createPaymentIntent(project.priceCents, {
       projectId: project.id,
       sellerId: project.sellerId,
-      buyerId: session.user.id,
+      buyerId: auth.user.id,
       transactionId: transaction.id,
     });
 

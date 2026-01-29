@@ -21,7 +21,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminApi } from '@/lib/auth-helpers';
+import { requireAdminApiAuth } from '@/lib/api-auth';
 import { getAdminService } from '@/lib/utils/admin-services';
 import { AdminValidationError } from '@/lib/services';
 import { z } from 'zod';
@@ -43,16 +43,19 @@ const rejectProjectSchema = z.object({
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   // Verify admin session
-  const session = await requireAdminApi();
+  const auth = await requireAdminApiAuth(request);
 
-  if (!session) {
+  if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
+    // Await params
+    const { projectId } = await params;
+
     // Parse and validate request body
     const body = await request.json();
     const validatedData = rejectProjectSchema.parse(body);
@@ -66,8 +69,8 @@ export async function PUT(
     // Reject project via AdminService
     const adminService = getAdminService();
     const rejectedProject = await adminService.rejectProject(
-      session.user.id,
-      params.projectId,
+      auth.user.id,
+      projectId,
       validatedData.reason,
       ipAddress
     );

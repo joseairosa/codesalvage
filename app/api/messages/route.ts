@@ -12,7 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import {
@@ -53,19 +53,19 @@ const sendMessageSchema = z.object({
  */
 async function getConversations(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get('projectId') || undefined;
 
-    console.log(`[${componentName}] Fetching conversations for user:`, session.user.id);
+    console.log(`[${componentName}] Fetching conversations for user:`, auth.user.id);
 
     // Use MessageService to get conversations
     const conversations = await messageService.getConversations(
-      session.user.id,
+      auth.user.id,
       projectId
     );
 
@@ -98,8 +98,8 @@ async function getConversations(request: NextRequest) {
  */
 async function sendMessage(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -119,7 +119,7 @@ async function sendMessage(request: NextRequest) {
     const { recipientId, projectId, transactionId, content } = validatedData.data;
 
     console.log(`[${componentName}] Sending message:`, {
-      senderId: session.user.id,
+      senderId: auth.user.id,
       recipientId,
       projectId,
     });
@@ -139,7 +139,7 @@ async function sendMessage(request: NextRequest) {
     if (transactionId) requestData.transactionId = transactionId;
 
     // Use MessageService to send message
-    const message = await messageService.sendMessage(session.user.id, requestData);
+    const message = await messageService.sendMessage(auth.user.id, requestData);
 
     console.log(`[${componentName}] Message sent:`, message.id);
 
@@ -183,12 +183,12 @@ async function sendMessage(request: NextRequest) {
  * GET: API rate limiting (100 requests / minute per user)
  * POST: API rate limiting (100 requests / minute per user)
  */
-export const GET = withApiRateLimit(getConversations, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const GET = withApiRateLimit(getConversations, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });
 
-export const POST = withApiRateLimit(sendMessage, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const POST = withApiRateLimit(sendMessage, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });

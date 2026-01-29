@@ -17,7 +17,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+// Auth.js signIn replaced with Firebase - redirects to /auth/signin instead
 import { Button } from '@/components/ui/button';
 import { Github } from 'lucide-react';
 
@@ -37,13 +37,10 @@ export function GitHubSignInButton({
     setIsLoading(true);
 
     try {
-      console.log('[GitHubSignInButton] Initiating GitHub sign-in');
+      console.log('[GitHubSignInButton] Redirecting to sign-in page');
 
-      // Initiate GitHub OAuth flow
-      await signIn('github', {
-        callbackUrl,
-        redirect: true, // Redirect to GitHub
-      });
+      // Redirect to Firebase sign-in page
+      window.location.href = '/auth/signin';
     } catch (error) {
       console.error('[GitHubSignInButton] Sign-in failed:', error);
       setIsLoading(false);

@@ -19,7 +19,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminApi } from '@/lib/auth-helpers';
+import { requireAdminApiAuth } from '@/lib/api-auth';
 import { getAdminService } from '@/lib/utils/admin-services';
 import { AdminValidationError } from '@/lib/services';
 
@@ -30,16 +30,19 @@ import { AdminValidationError } from '@/lib/services';
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   // Verify admin session
-  const session = await requireAdminApi();
+  const auth = await requireAdminApiAuth(request);
 
-  if (!session) {
+  if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
+    // Await params
+    const { projectId } = await params;
+
     // Get IP address for audit logging
     const ipAddress =
       request.headers.get('x-forwarded-for') ||
@@ -49,8 +52,8 @@ export async function PUT(
     // Approve project via AdminService
     const adminService = getAdminService();
     const approvedProject = await adminService.approveProject(
-      session.user.id,
-      params.projectId,
+      auth.user.id,
+      projectId,
       ipAddress
     );
 

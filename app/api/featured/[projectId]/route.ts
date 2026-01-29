@@ -8,7 +8,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
   FeaturedListingService,
@@ -45,23 +45,23 @@ const featuredListingService = new FeaturedListingService(
  * Remove featured status from a project (seller only)
  */
 export async function DELETE(
-  _request: Request,
-  { params }: { params: { projectId: string } }
+  request: Request,
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { projectId } = params;
+    const { projectId } = await params;
 
     console.log(`[${componentName}] Removing featured status:`, {
-      userId: session.user.id,
+      userId: auth.user.id,
       projectId,
     });
 
-    await featuredListingService.removeFeaturedStatus(session.user.id, projectId);
+    await featuredListingService.removeFeaturedStatus(auth.user.id, projectId);
 
     console.log(`[${componentName}] Featured status removed:`, projectId);
 

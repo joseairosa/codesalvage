@@ -10,7 +10,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
   ProjectRepository,
@@ -47,20 +47,20 @@ const projectService = new ProjectService(
  *
  * Publish a project
  */
-export async function POST(_request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Check authentication
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
-    console.log('[Publish API] Publishing project:', { id, userId: session.user.id });
+    console.log('[Publish API] Publishing project:', { id, userId: auth.user.id });
 
     // Publish project
-    const project = await projectService.publishProject(id, session.user.id);
+    const project = await projectService.publishProject(id, auth.user.id);
 
     console.log('[Publish API] Project published successfully');
 

@@ -10,7 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { MessageService, MessagePermissionError } from '@/lib/services/MessageService';
 import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
@@ -37,27 +37,27 @@ const messageService = new MessageService(
  */
 async function getConversationThread(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { userId } = params;
+    const { userId } = await params;
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get('projectId') || undefined;
 
     console.log(`[${componentName}] Fetching conversation:`, {
-      currentUser: session.user.id,
+      currentUser: auth.user.id,
       partnerId: userId,
       projectId,
     });
 
     // Use MessageService to get conversation (automatically marks as read)
     const result = await messageService.getConversation(
-      session.user.id,
+      auth.user.id,
       userId,
       projectId
     );
@@ -100,7 +100,7 @@ async function getConversationThread(
  *
  * GET: API rate limiting (100 requests / minute per user)
  */
-export const GET = withApiRateLimit(getConversationThread, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const GET = withApiRateLimit(getConversationThread, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });

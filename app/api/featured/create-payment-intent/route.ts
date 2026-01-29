@@ -12,7 +12,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { stripe } from '@/lib/stripe';
 import { z } from 'zod';
 import {
@@ -78,8 +78,8 @@ const createPaymentIntentSchema = z.object({
  */
 export async function POST(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -102,14 +102,14 @@ export async function POST(request: Request) {
     const { projectId, durationDays } = validatedData.data;
 
     console.log(`[${componentName}] Creating payment intent for featured listing:`, {
-      sellerId: session.user.id,
+      sellerId: auth.user.id,
       projectId,
       durationDays,
     });
 
     // Validate seller, project ownership, and business rules
     // This throws appropriate errors if validation fails
-    const user = await userRepository.findById(session.user.id);
+    const user = await userRepository.findById(auth.user.id);
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -126,7 +126,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    if (project.sellerId !== session.user.id) {
+    if (project.sellerId !== auth.user.id) {
       return NextResponse.json(
         { error: 'You can only feature your own projects' },
         { status: 403 }
@@ -162,7 +162,7 @@ export async function POST(request: Request) {
         // Mark this as a featured listing purchase (not a transaction)
         featuredListingPurchase: 'true',
         projectId,
-        sellerId: session.user.id,
+        sellerId: auth.user.id,
         durationDays: durationDays.toString(),
         costCents: pricingTier.costCents.toString(),
       },

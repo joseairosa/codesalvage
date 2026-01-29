@@ -15,7 +15,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
   AnalyticsService,
@@ -47,8 +47,8 @@ const analyticsService = new AnalyticsService(analyticsRepository, userRepositor
  */
 export async function GET(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -74,7 +74,7 @@ export async function GET(request: Request) {
     else requestData.granularity = 'day'; // Default
 
     console.log(`[${componentName}] Fetching analytics overview:`, {
-      userId: session.user.id,
+      userId: auth.user.id,
       ...requestData,
     });
 
@@ -83,10 +83,10 @@ export async function GET(request: Request) {
 
     // Get cached analytics or fetch fresh data
     const analytics = await getOrSetCache(
-      CacheKeys.sellerAnalytics(session.user.id, cacheRange),
+      CacheKeys.sellerAnalytics(auth.user.id, cacheRange),
       CacheTTL.ANALYTICS,
       async () => {
-        return await analyticsService.getSellerAnalyticsOverview(session.user.id, requestData);
+        return await analyticsService.getSellerAnalyticsOverview(auth.user.id, requestData);
       }
     );
 

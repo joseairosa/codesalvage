@@ -11,7 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import {
@@ -43,24 +43,24 @@ const transactionService = new TransactionService(
  * Access control: Only buyer or seller can view
  */
 async function getTransactionDetails(
-  _request: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     console.log(`[${componentName}] Fetching transaction:`, {
       transactionId: id,
-      userId: session.user.id,
+      userId: auth.user.id,
     });
 
     // Use TransactionService to get transaction with access validation
-    const transaction = await transactionService.getTransactionById(id, session.user.id);
+    const transaction = await transactionService.getTransactionById(id, auth.user.id);
 
     console.log(`[${componentName}] Transaction found:`, transaction.id);
 
@@ -112,7 +112,7 @@ async function getTransactionDetails(
  *
  * GET: API rate limiting (100 requests / minute per user)
  */
-export const GET = withApiRateLimit(getTransactionDetails, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const GET = withApiRateLimit(getTransactionDetails, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });

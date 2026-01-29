@@ -11,7 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { stripe } from '@/lib/stripe';
 import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
@@ -53,8 +53,8 @@ const transactionService = new TransactionService(
  */
 async function createPaymentIntent(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -69,12 +69,12 @@ async function createPaymentIntent(request: NextRequest) {
     }
 
     console.log(`[${componentName}] Creating payment intent:`, {
-      buyerId: session.user.id,
+      buyerId: auth.user.id,
       projectId,
     });
 
     // Create transaction via TransactionService (validates business rules)
-    const transaction = await transactionService.createTransaction(session.user.id, {
+    const transaction = await transactionService.createTransaction(auth.user.id, {
       projectId,
     });
 
@@ -190,7 +190,7 @@ async function createPaymentIntent(request: NextRequest) {
  * POST: API rate limiting (100 requests / minute per user)
  * Critical payment endpoint - prevent abuse
  */
-export const POST = withApiRateLimit(createPaymentIntent, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const POST = withApiRateLimit(createPaymentIntent, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user?.id || 'anonymous';
 });

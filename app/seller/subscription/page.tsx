@@ -11,7 +11,7 @@
  */
 
 import { redirect } from 'next/navigation';
-import { auth } from '@/auth';
+import { requireAuth } from '@/lib/auth-helpers';
 import {
   Card,
   CardContent,
@@ -50,12 +50,7 @@ async function getSubscriptionStatus(userId: string) {
 }
 
 export default async function SubscriptionManagementPage() {
-  const session = await auth();
-
-  // Redirect to sign-in if not authenticated
-  if (!session?.user) {
-    redirect('/auth/signin');
-  }
+  const session = await requireAuth();
 
   // Redirect to home if not a seller
   if (!session.user.isSeller) {

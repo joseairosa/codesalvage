@@ -21,7 +21,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminApi } from '@/lib/auth-helpers';
+import { requireAdminApiAuth } from '@/lib/api-auth';
 import { getAdminService } from '@/lib/utils/admin-services';
 import { AdminValidationError, AdminAuthorizationError } from '@/lib/services';
 import { z } from 'zod';
@@ -43,16 +43,19 @@ const banUserSchema = z.object({
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   // Verify admin session
-  const session = await requireAdminApi();
+  const auth = await requireAdminApiAuth(request);
 
-  if (!session) {
+  if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
+    // Await params
+    const { userId } = await params;
+
     // Parse and validate request body
     const body = await request.json();
     const validatedData = banUserSchema.parse(body);
@@ -66,8 +69,8 @@ export async function PUT(
     // Ban user via AdminService
     const adminService = getAdminService();
     const bannedUser = await adminService.banUser(
-      session.user.id,
-      params.userId,
+      auth.user.id,
+      userId,
       validatedData.reason,
       ipAddress
     );

@@ -22,7 +22,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminApi } from '@/lib/auth-helpers';
+import { requireAdminApiAuth } from '@/lib/api-auth';
 import { getAdminService, getAdminRepository } from '@/lib/utils/admin-services';
 
 /**
@@ -32,9 +32,9 @@ import { getAdminService, getAdminRepository } from '@/lib/utils/admin-services'
  */
 export async function GET(request: NextRequest) {
   // Verify admin session
-  const session = await requireAdminApi();
+  const auth = await requireAdminApiAuth(request);
 
-  if (!session) {
+  if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -55,9 +55,20 @@ export async function GET(request: NextRequest) {
 
     // Fetch content reports via AdminService
     const adminService = getAdminService();
+
+    // Filter out undefined values to satisfy exactOptionalPropertyTypes
+    const filters = Object.fromEntries(
+      Object.entries({
+        status,
+        contentType,
+      }).filter(([_, value]) => value !== undefined)
+    ) as {
+      status?: string;
+      contentType?: string;
+    };
+
     const reports = await adminService.getContentReports({
-      status,
-      contentType,
+      ...filters,
       limit,
       offset,
     });

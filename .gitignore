@@ -40,6 +40,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Firebase
+firebase-service-account.json
+
 # Vercel
 .vercel
 

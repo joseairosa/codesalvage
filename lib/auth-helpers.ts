@@ -1,17 +1,19 @@
 /**
- * Admin Authentication Helpers
+ * Authentication Helpers
  *
- * Server-side helpers for admin route protection.
+ * Server-side helpers for route protection using Firebase.
  *
  * Responsibilities:
  * - Provide auth helpers for Server Components
  * - Provide auth helpers for API Routes
  * - Check admin status
+ * - Maintain compatibility with Auth.js signatures
  *
  * Architecture:
- * - Uses auth() from lib/auth for session retrieval
+ * - Uses Firebase tokens stored in httpOnly cookies
  * - Redirects non-admin users appropriately
  * - Type-safe session returns
+ * - NOTE: Maintains same function signatures as Auth.js version for compatibility
  *
  * @example
  * // In a Server Component:
@@ -27,8 +29,9 @@
  * }
  */
 
-import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { verifyFirebaseToken } from './firebase-auth';
 
 /**
  * Require admin authentication (Server Components)
@@ -48,20 +51,43 @@ import { redirect } from 'next/navigation';
  * }
  */
 export async function requireAdmin() {
-  const session = await auth();
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('session')?.value;
 
-  if (!session?.user?.id) {
-    console.log('[AuthHelpers] requireAdmin: No session, redirecting to signin');
+  if (!sessionToken) {
+    console.log('[AuthHelpers] requireAdmin: No session token, redirecting to signin');
     redirect('/auth/signin');
   }
 
-  if (!session.user.isAdmin) {
-    console.log('[AuthHelpers] requireAdmin: User is not admin, redirecting to dashboard');
-    redirect('/dashboard');
-  }
+  try {
+    const auth = await verifyFirebaseToken(sessionToken);
 
-  console.log('[AuthHelpers] requireAdmin: Admin access granted for user:', session.user.id);
-  return session;
+    if (!auth.user.isAdmin) {
+      console.log(
+        '[AuthHelpers] requireAdmin: User is not admin, redirecting to dashboard'
+      );
+      redirect('/dashboard');
+    }
+
+    console.log(
+      '[AuthHelpers] requireAdmin: Admin access granted for user:',
+      auth.user.id
+    );
+
+    return {
+      user: {
+        id: auth.user.id,
+        email: auth.user.email,
+        username: auth.user.username,
+        isAdmin: auth.user.isAdmin,
+        isSeller: auth.user.isSeller,
+        isVerifiedSeller: auth.user.isVerifiedSeller,
+      },
+    };
+  } catch (error) {
+    console.log('[AuthHelpers] requireAdmin: Token verification failed, redirecting to signin');
+    redirect('/auth/signin');
+  }
 }
 
 /**
@@ -83,15 +109,114 @@ export async function requireAdmin() {
  * }
  */
 export async function requireAdminApi() {
-  const session = await auth();
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('session')?.value;
 
-  if (!session?.user?.id || !session.user.isAdmin) {
-    console.log('[AuthHelpers] requireAdminApi: Access denied');
+  if (!sessionToken) {
+    console.log('[AuthHelpers] requireAdminApi: No session token');
     return null;
   }
 
-  console.log('[AuthHelpers] requireAdminApi: Admin API access granted for user:', session.user.id);
-  return session;
+  try {
+    const auth = await verifyFirebaseToken(sessionToken);
+
+    if (!auth.user.isAdmin) {
+      console.log('[AuthHelpers] requireAdminApi: User is not admin');
+      return null;
+    }
+
+    console.log(
+      '[AuthHelpers] requireAdminApi: Admin API access granted for user:',
+      auth.user.id
+    );
+
+    return {
+      user: {
+        id: auth.user.id,
+        email: auth.user.email,
+        username: auth.user.username,
+        isAdmin: auth.user.isAdmin,
+        isSeller: auth.user.isSeller,
+        isVerifiedSeller: auth.user.isVerifiedSeller,
+      },
+    };
+  } catch (error) {
+    console.log('[AuthHelpers] requireAdminApi: Token verification failed');
+    return null;
+  }
+}
+
+/**
+ * Require authenticated user (Server Components)
+ *
+ * Use this in Server Components to protect user routes.
+ * Automatically redirects non-authenticated users to signin.
+ *
+ * @throws Redirects to /auth/signin if not authenticated
+ * @returns Session with user
+ */
+export async function requireAuth() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('session')?.value;
+
+  if (!sessionToken) {
+    console.log('[AuthHelpers] requireAuth: No session token, redirecting to signin');
+    redirect('/auth/signin');
+  }
+
+  try {
+    const auth = await verifyFirebaseToken(sessionToken);
+
+    console.log('[AuthHelpers] requireAuth: Access granted for user:', auth.user.id);
+
+    return {
+      user: {
+        id: auth.user.id,
+        email: auth.user.email,
+        username: auth.user.username,
+        isAdmin: auth.user.isAdmin,
+        isSeller: auth.user.isSeller,
+        isVerifiedSeller: auth.user.isVerifiedSeller,
+      },
+    };
+  } catch (error) {
+    console.log('[AuthHelpers] requireAuth: Token verification failed, redirecting to signin');
+    redirect('/auth/signin');
+  }
+}
+
+/**
+ * Get current session (optional auth)
+ *
+ * Non-blocking session retrieval. Returns null if not authenticated.
+ * Useful for optional auth or conditional rendering.
+ *
+ * @returns Session with user, or null if not authenticated
+ */
+export async function getSession() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('session')?.value;
+
+  if (!sessionToken) {
+    return null;
+  }
+
+  try {
+    const auth = await verifyFirebaseToken(sessionToken);
+
+    return {
+      user: {
+        id: auth.user.id,
+        email: auth.user.email,
+        username: auth.user.username,
+        isAdmin: auth.user.isAdmin,
+        isSeller: auth.user.isSeller,
+        isVerifiedSeller: auth.user.isVerifiedSeller,
+      },
+    };
+  } catch (error) {
+    return null;
+  }
 }
 
 /**
@@ -109,7 +234,7 @@ export async function requireAdminApi() {
  * }
  */
 export async function isAdmin(): Promise<boolean> {
-  const session = await auth();
+  const session = await getSession();
   const adminStatus = !!session?.user?.isAdmin;
 
   console.log('[AuthHelpers] isAdmin check:', {

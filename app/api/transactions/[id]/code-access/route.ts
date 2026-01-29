@@ -11,7 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import {
@@ -45,22 +45,22 @@ const transactionService = new TransactionService(
  * - Payment must be successful
  * - Only buyer can access code
  */
-async function markCodeAccessed(_request: NextRequest, { params }: { params: { id: string } }) {
+async function markCodeAccessed(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     console.log(`[${componentName}] Marking code as accessed:`, {
       transactionId: id,
-      userId: session.user.id,
+      userId: auth.user.id,
     });
 
     // Use TransactionService to mark code as accessed
-    await transactionService.markCodeAccessed(id, session.user.id);
+    await transactionService.markCodeAccessed(id, auth.user.id);
 
     console.log(`[${componentName}] Code access marked successfully`);
 
@@ -118,7 +118,7 @@ async function markCodeAccessed(_request: NextRequest, { params }: { params: { i
  *
  * POST: API rate limiting (100 requests / minute per user)
  */
-export const POST = withApiRateLimit(markCodeAccessed, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const POST = withApiRateLimit(markCodeAccessed, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });

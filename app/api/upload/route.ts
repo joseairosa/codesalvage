@@ -26,7 +26,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { r2Service, FileType } from '@/lib/services';
 import { z } from 'zod';
 
@@ -47,8 +47,8 @@ const uploadRequestSchema = z.object({
 export async function POST(request: Request) {
   try {
     // Check authentication
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     const { filename, mimeType, fileType } = validatedData.data;
 
     console.log('[Upload API] Generating upload URL:', {
-      userId: session.user.id,
+      userId: auth.user.id,
       filename,
       fileType,
     });
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
     const uploadResponse = await r2Service.getUploadUrl(
       filename,
       mimeType,
-      session.user.id,
+      auth.user.id,
       fileType
     );
 

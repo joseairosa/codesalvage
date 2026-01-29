@@ -27,7 +27,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminApi } from '@/lib/auth-helpers';
+import { requireAdminApiAuth } from '@/lib/api-auth';
 import { getAdminService, getTransactionRepository } from '@/lib/utils/admin-services';
 
 /**
@@ -37,9 +37,9 @@ import { getAdminService, getTransactionRepository } from '@/lib/utils/admin-ser
  */
 export async function GET(request: NextRequest) {
   // Verify admin session
-  const session = await requireAdminApi();
+  const auth = await requireAdminApiAuth(request);
 
-  if (!session) {
+  if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -55,7 +55,10 @@ export async function GET(request: NextRequest) {
     const projectId = searchParams.get('projectId') || undefined;
 
     // Sorting
-    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortByParam = searchParams.get('sortBy') || 'createdAt';
+    const sortBy = ['createdAt', 'amountCents', 'escrowReleaseDate'].includes(sortByParam)
+      ? (sortByParam as 'createdAt' | 'amountCents' | 'escrowReleaseDate')
+      : 'createdAt';
     const sortOrder = (searchParams.get('sortOrder') || 'desc') as
       | 'asc'
       | 'desc';
@@ -69,12 +72,26 @@ export async function GET(request: NextRequest) {
 
     // Fetch transactions via AdminService
     const adminService = getAdminService();
+
+    // Filter out undefined values to satisfy exactOptionalPropertyTypes
+    const filters = Object.fromEntries(
+      Object.entries({
+        paymentStatus,
+        escrowStatus,
+        sellerId,
+        buyerId,
+        projectId,
+      }).filter(([_, value]) => value !== undefined)
+    ) as {
+      paymentStatus?: string;
+      escrowStatus?: string;
+      sellerId?: string;
+      buyerId?: string;
+      projectId?: string;
+    };
+
     const transactions = await adminService.getTransactions({
-      paymentStatus,
-      escrowStatus,
-      sellerId,
-      buyerId,
-      projectId,
+      ...filters,
       limit,
       offset,
       sortBy,
@@ -83,13 +100,7 @@ export async function GET(request: NextRequest) {
 
     // Get total count for pagination metadata
     const transactionRepository = getTransactionRepository();
-    const total = await transactionRepository.countAllTransactions({
-      paymentStatus,
-      escrowStatus,
-      sellerId,
-      buyerId,
-      projectId,
-    });
+    const total = await transactionRepository.countAllTransactions(filters);
 
     return NextResponse.json(
       {

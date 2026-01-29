@@ -12,7 +12,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { stripeService } from '@/lib/services';
 
@@ -21,19 +21,19 @@ import { stripeService } from '@/lib/services';
  *
  * Get Connect account status for current user
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
     // Check authentication
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('[Stripe Status] Checking status for user:', session.user.id);
+    console.log('[Stripe Status] Checking status for user:', auth.user.id);
 
     // Get user from database
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: auth.user.id },
       select: {
         id: true,
         stripeAccountId: true,

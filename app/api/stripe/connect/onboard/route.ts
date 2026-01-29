@@ -12,7 +12,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { stripeService } from '@/lib/services';
 import { env } from '@/config/env';
@@ -22,19 +22,19 @@ import { env } from '@/config/env';
  *
  * Create or retrieve Stripe Connect account and generate onboarding link
  */
-export async function POST() {
+export async function POST(request: Request) {
   try {
     // Check authentication
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('[Stripe Onboard] Creating onboarding link for user:', session.user.id);
+    console.log('[Stripe Onboard] Creating onboarding link for user:', auth.user.id);
 
     // Get user from database
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: auth.user.id },
       select: {
         id: true,
         email: true,
