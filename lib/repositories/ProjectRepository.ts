@@ -653,4 +653,249 @@ export class ProjectRepository {
       );
     }
   }
+
+  /**
+   * Approve a project (ADMIN ONLY)
+   *
+   * Sets project status to active and records approval metadata.
+   *
+   * @param projectId - Project ID to approve
+   * @param approvedBy - Admin user ID performing approval
+   * @returns Updated project
+   * @throws Error if project not found or update fails
+   *
+   * @example
+   * const approvedProject = await projectRepo.approveProject('proj123', 'admin456');
+   */
+  async approveProject(projectId: string, approvedBy: string): Promise<Project> {
+    console.log('[ProjectRepository] approveProject called:', { projectId, approvedBy });
+
+    try {
+      const project = await this.prisma.project.update({
+        where: { id: projectId },
+        data: {
+          status: 'active',
+          approvedBy,
+          approvedAt: new Date(),
+        },
+      });
+
+      console.log('[ProjectRepository] Project approved successfully:', projectId);
+      return project;
+    } catch (error) {
+      console.error('[ProjectRepository] approveProject failed:', error);
+      throw new Error(
+        `Failed to approve project: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Reject a project (ADMIN ONLY)
+   *
+   * Sets project status to draft/rejected.
+   *
+   * @param projectId - Project ID to reject
+   * @param reason - Reason for rejection
+   * @returns Updated project
+   * @throws Error if project not found or update fails
+   *
+   * @example
+   * const rejectedProject = await projectRepo.rejectProject('proj123', 'Violates content policy');
+   */
+  async rejectProject(projectId: string, reason?: string): Promise<Project> {
+    console.log('[ProjectRepository] rejectProject called:', { projectId, reason });
+
+    try {
+      const project = await this.prisma.project.update({
+        where: { id: projectId },
+        data: {
+          status: 'draft',
+          approvedBy: null,
+          approvedAt: null,
+          // Note: rejectionReason field doesn't exist in schema
+          // If needed, add to schema or use a different approach
+        },
+      });
+
+      console.log('[ProjectRepository] Project rejected successfully:', projectId);
+      return project;
+    } catch (error) {
+      console.error('[ProjectRepository] rejectProject failed:', error);
+      throw new Error(
+        `Failed to reject project: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Toggle featured status for a project (ADMIN ONLY)
+   *
+   * Featured projects get priority placement in marketplace.
+   * Sets isFeatured flag and records admin who featured it.
+   *
+   * @param projectId - Project ID to feature/unfeature
+   * @param featured - Whether project should be featured
+   * @param featuredBy - Admin user ID performing action
+   * @param featuredDays - Number of days to feature (default 30)
+   * @returns Updated project
+   * @throws Error if project not found or update fails
+   *
+   * @example
+   * const featuredProject = await projectRepo.toggleFeatured('proj123', true, 'admin456', 30);
+   */
+  async toggleFeatured(
+    projectId: string,
+    featured: boolean,
+    featuredBy: string,
+    featuredDays: number = 30
+  ): Promise<Project> {
+    console.log('[ProjectRepository] toggleFeatured called:', {
+      projectId,
+      featured,
+      featuredBy,
+      featuredDays,
+    });
+
+    try {
+      // Calculate expiry date if featuring
+      const featuredUntil = featured
+        ? new Date(Date.now() + featuredDays * 24 * 60 * 60 * 1000)
+        : null;
+
+      const project = await this.prisma.project.update({
+        where: { id: projectId },
+        data: {
+          isFeatured: featured,
+          featuredBy: featured ? featuredBy : null,
+          featuredAt: featured ? new Date() : null,
+          featuredUntil,
+        },
+      });
+
+      console.log('[ProjectRepository] Project featured status updated:', projectId, featured);
+      return project;
+    } catch (error) {
+      console.error('[ProjectRepository] toggleFeatured failed:', error);
+      throw new Error(
+        `Failed to toggle featured status: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Get all projects with admin-level access (ADMIN ONLY)
+   *
+   * Returns all projects regardless of status, with pagination and filtering.
+   *
+   * @param options - Pagination and filtering options
+   * @returns Array of projects
+   * @throws Error if query fails
+   *
+   * @example
+   * const allProjects = await projectRepo.getAllProjects({ status: 'draft', limit: 100 });
+   */
+  async getAllProjects(
+    options?: {
+      status?: string | string[];
+      isFeatured?: boolean;
+      sellerId?: string;
+      limit?: number;
+      offset?: number;
+      sortBy?: 'createdAt' | 'updatedAt' | 'priceCents' | 'viewCount';
+      sortOrder?: 'asc' | 'desc';
+    }
+  ): Promise<Project[]> {
+    const {
+      status,
+      isFeatured,
+      sellerId,
+      limit = 50,
+      offset = 0,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = options || {};
+
+    console.log('[ProjectRepository] getAllProjects called:', {
+      filters: { status, isFeatured, sellerId },
+      limit,
+      offset,
+    });
+
+    // Build where clause
+    const where: Prisma.ProjectWhereInput = {};
+
+    if (status) {
+      if (Array.isArray(status)) {
+        where.status = { in: status };
+      } else {
+        where.status = status;
+      }
+    }
+
+    if (isFeatured !== undefined) {
+      where.isFeatured = isFeatured;
+    }
+
+    if (sellerId) {
+      where.sellerId = sellerId;
+    }
+
+    try {
+      const projects = await this.prisma.project.findMany({
+        where,
+        take: limit,
+        skip: offset,
+        orderBy: { [sortBy]: sortOrder },
+        include: {
+          seller: {
+            select: {
+              id: true,
+              username: true,
+              fullName: true,
+              email: true,
+              isVerifiedSeller: true,
+              isBanned: true,
+            },
+          },
+        },
+      });
+
+      console.log('[ProjectRepository] Found projects (admin):', projects.length);
+      return projects;
+    } catch (error) {
+      console.error('[ProjectRepository] getAllProjects failed:', error);
+      throw new Error(
+        `Failed to get all projects: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Count all projects (ADMIN ONLY)
+   *
+   * @param status - Optional status filter
+   * @returns Count of projects
+   * @throws Error if query fails
+   *
+   * @example
+   * const draftCount = await projectRepo.countAllProjects('draft');
+   */
+  async countAllProjects(status?: string): Promise<number> {
+    console.log('[ProjectRepository] countAllProjects called:', { status });
+
+    try {
+      const count = await this.prisma.project.count({
+        where: status ? { status } : undefined,
+      });
+
+      console.log('[ProjectRepository] Project count (admin):', count);
+      return count;
+    } catch (error) {
+      console.error('[ProjectRepository] countAllProjects failed:', error);
+      throw new Error(
+        `Failed to count projects: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
 }

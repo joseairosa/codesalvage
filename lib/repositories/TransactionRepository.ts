@@ -678,4 +678,232 @@ export class TransactionRepository {
       );
     }
   }
+
+  /**
+   * Get all transactions with admin-level access (ADMIN ONLY)
+   *
+   * Returns all transactions with full details, pagination, and filtering.
+   * Includes buyer, seller, and project information.
+   *
+   * @param options - Filtering and pagination options
+   * @returns Array of transactions with relations
+   * @throws Error if query fails
+   *
+   * @example
+   * const allTransactions = await transactionRepo.getAllTransactions({
+   *   paymentStatus: 'succeeded',
+   *   limit: 100
+   * });
+   */
+  async getAllTransactions(
+    options?: {
+      paymentStatus?: string;
+      escrowStatus?: string;
+      sellerId?: string;
+      buyerId?: string;
+      projectId?: string;
+      limit?: number;
+      offset?: number;
+      sortBy?: 'createdAt' | 'amountCents' | 'escrowReleaseDate';
+      sortOrder?: 'asc' | 'desc';
+    }
+  ): Promise<TransactionWithRelations[]> {
+    const {
+      paymentStatus,
+      escrowStatus,
+      sellerId,
+      buyerId,
+      projectId,
+      limit = 50,
+      offset = 0,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = options || {};
+
+    console.log('[TransactionRepository] getAllTransactions called:', {
+      filters: { paymentStatus, escrowStatus, sellerId, buyerId, projectId },
+      limit,
+      offset,
+    });
+
+    // Build where clause
+    const where: any = {};
+
+    if (paymentStatus) {
+      where.paymentStatus = paymentStatus;
+    }
+
+    if (escrowStatus) {
+      where.escrowStatus = escrowStatus;
+    }
+
+    if (sellerId) {
+      where.sellerId = sellerId;
+    }
+
+    if (buyerId) {
+      where.buyerId = buyerId;
+    }
+
+    if (projectId) {
+      where.projectId = projectId;
+    }
+
+    try {
+      const transactions = await this.prisma.transaction.findMany({
+        where,
+        take: limit,
+        skip: offset,
+        orderBy: { [sortBy]: sortOrder },
+        include: {
+          project: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              thumbnailImageUrl: true,
+              priceCents: true,
+              status: true,
+            },
+          },
+          seller: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              fullName: true,
+              isVerifiedSeller: true,
+              stripeAccountId: true,
+            },
+          },
+          buyer: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              fullName: true,
+            },
+          },
+          review: {
+            select: {
+              id: true,
+              overallRating: true,
+              comment: true,
+              createdAt: true,
+            },
+          },
+        },
+      });
+
+      console.log('[TransactionRepository] Found transactions (admin):', transactions.length);
+      return transactions as TransactionWithRelations[];
+    } catch (error) {
+      console.error('[TransactionRepository] getAllTransactions failed:', error);
+      throw new Error(
+        '[TransactionRepository] Failed to get all transactions'
+      );
+    }
+  }
+
+  /**
+   * Count all transactions (ADMIN ONLY)
+   *
+   * @param options - Filtering options
+   * @returns Count of transactions matching filters
+   * @throws Error if query fails
+   *
+   * @example
+   * const succeededCount = await transactionRepo.countAllTransactions({
+   *   paymentStatus: 'succeeded'
+   * });
+   */
+  async countAllTransactions(
+    options?: {
+      paymentStatus?: string;
+      escrowStatus?: string;
+      sellerId?: string;
+      buyerId?: string;
+      projectId?: string;
+    }
+  ): Promise<number> {
+    const { paymentStatus, escrowStatus, sellerId, buyerId, projectId } = options || {};
+
+    console.log('[TransactionRepository] countAllTransactions called:', {
+      paymentStatus,
+      escrowStatus,
+      sellerId,
+      buyerId,
+      projectId,
+    });
+
+    // Build where clause
+    const where: any = {};
+
+    if (paymentStatus) {
+      where.paymentStatus = paymentStatus;
+    }
+
+    if (escrowStatus) {
+      where.escrowStatus = escrowStatus;
+    }
+
+    if (sellerId) {
+      where.sellerId = sellerId;
+    }
+
+    if (buyerId) {
+      where.buyerId = buyerId;
+    }
+
+    if (projectId) {
+      where.projectId = projectId;
+    }
+
+    try {
+      const count = await this.prisma.transaction.count({ where });
+
+      console.log('[TransactionRepository] Transaction count (admin):', count);
+      return count;
+    } catch (error) {
+      console.error('[TransactionRepository] countAllTransactions failed:', error);
+      throw new Error(
+        '[TransactionRepository] Failed to count transactions'
+      );
+    }
+  }
+
+  /**
+   * Manually release escrow for a transaction (ADMIN ONLY)
+   *
+   * Used for manual intervention in dispute resolution.
+   * Sets escrow status to 'released' immediately.
+   *
+   * @param transactionId - Transaction ID to release escrow for
+   * @returns Updated transaction
+   * @throws Error if transaction not found or update fails
+   *
+   * @example
+   * const releasedTx = await transactionRepo.releaseEscrowManually('tx123');
+   */
+  async releaseEscrowManually(transactionId: string): Promise<Transaction> {
+    console.log('[TransactionRepository] releaseEscrowManually called:', transactionId);
+
+    try {
+      const transaction = await this.prisma.transaction.update({
+        where: { id: transactionId },
+        data: {
+          escrowStatus: 'released',
+          escrowReleaseDate: new Date(),
+        },
+      });
+
+      console.log('[TransactionRepository] Escrow released manually:', transactionId);
+      return transaction;
+    } catch (error) {
+      console.error('[TransactionRepository] releaseEscrowManually failed:', error);
+      throw new Error(
+        '[TransactionRepository] Failed to release escrow manually'
+      );
+    }
+  }
 }

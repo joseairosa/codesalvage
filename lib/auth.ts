@@ -36,6 +36,7 @@ declare module 'next-auth' {
       username: string | null;
       isSeller: boolean;
       isVerifiedSeller: boolean;
+      isAdmin: boolean;
     } & DefaultSession['user'];
   }
 
@@ -43,6 +44,7 @@ declare module 'next-auth' {
     username: string | null;
     isSeller: boolean;
     isVerifiedSeller: boolean;
+    isAdmin: boolean;
   }
 }
 
@@ -85,6 +87,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           username: profile.login,
           isSeller: false, // Default to non-seller, user can enable later
           isVerifiedSeller: false,
+          isAdmin: false, // Default to non-admin
         };
       },
     }),
@@ -118,6 +121,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token['username'] = user.username;
         token['isSeller'] = user.isSeller;
         token['isVerifiedSeller'] = user.isVerifiedSeller;
+        token['isAdmin'] = user.isAdmin;
       }
 
       return token;
@@ -136,6 +140,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.username = user.username;
         session.user.isSeller = user.isSeller;
         session.user.isVerifiedSeller = user.isVerifiedSeller;
+        session.user.isAdmin = user.isAdmin;
 
         // Update last login timestamp (non-blocking)
         authService.updateLastLogin(user.id).catch((err) => {

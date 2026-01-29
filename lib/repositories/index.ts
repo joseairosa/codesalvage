@@ -70,3 +70,14 @@ export type {
   UpdateSubscriptionInput,
   SubscriptionWithUser,
 } from './SubscriptionRepository';
+
+export { AdminRepository } from './AdminRepository';
+export type {
+  PlatformStats,
+  CreateAuditLogInput,
+  CreateContentReportInput,
+  UpdateContentReportInput,
+  AuditLogWithAdmin,
+  ContentReportWithReporter,
+  AdminPaginationOptions,
+} from './AdminRepository';

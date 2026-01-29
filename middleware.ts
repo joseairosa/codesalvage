@@ -17,6 +17,7 @@
  * - /seller/* - Sellers only
  * - /buyer/* - Buyers only (all users by default)
  * - /projects/new - Sellers only (create project)
+ * - /admin/* - Admins only
  */
 
 import { NextResponse } from 'next/server';
@@ -39,6 +40,7 @@ export async function middleware(request: NextRequest) {
   const isDashboardRoute = pathname.startsWith('/dashboard');
   const isSellerRoute = pathname.startsWith('/seller');
   const isBuyerRoute = pathname.startsWith('/buyer');
+  const isAdminRoute = pathname.startsWith('/admin');
   const isCreateProjectRoute = pathname === '/projects/new';
 
   // Allow auth routes (sign-in, sign-out, etc.)
@@ -48,7 +50,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check authentication for protected routes
-  if (isDashboardRoute || isSellerRoute || isBuyerRoute || isCreateProjectRoute) {
+  if (isDashboardRoute || isSellerRoute || isBuyerRoute || isAdminRoute || isCreateProjectRoute) {
     if (!session?.user) {
       console.log('[Middleware] Unauthenticated user, redirecting to sign-in');
 
@@ -57,6 +59,15 @@ export async function middleware(request: NextRequest) {
       signInUrl.searchParams.set('callbackUrl', pathname);
 
       return NextResponse.redirect(signInUrl);
+    }
+
+    // Check admin-only routes
+    if (isAdminRoute && !session.user.isAdmin) {
+      console.log('[Middleware] Non-admin accessing admin route, redirecting to dashboard');
+
+      // Redirect non-admins to dashboard
+      const dashboardUrl = new URL('/dashboard', request.url);
+      return NextResponse.redirect(dashboardUrl);
     }
 
     // Check seller-only routes
