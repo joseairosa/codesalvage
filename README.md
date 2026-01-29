@@ -1,8 +1,8 @@
-# ProjectFinish
+# CodeSalvage
 
 > Marketplace for Incomplete Software Projects
 
-![CI Status](https://github.com/YOUR_USERNAME/projectfinish/workflows/CI/badge.svg)
+![CI Status](https://github.com/YOUR_USERNAME/codesalvage/workflows/CI/badge.svg)
 ![Deployment](https://img.shields.io/badge/deploy-railway-blueviolet)
 ![License](https://img.shields.io/badge/license-proprietary-red)
 
@@ -82,7 +82,7 @@ npm run dev
 ## 📁 Project Structure
 
 ```
-projectfinish/
+codesalvage/
 ├── app/                    # Next.js 15 App Router pages
 ├── components/             # React components
 │   └── ui/                # Shadcn/ui components
@@ -192,8 +192,8 @@ docker-compose up -d
 ### Production Build
 
 ```bash
-docker build -t projectfinish .
-docker run -p 3000:3000 projectfinish
+docker build -t codesalvage .
+docker run -p 3000:3000 codesalvage
 ```
 
 ## 📚 Tech Stack

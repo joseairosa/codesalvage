@@ -7,7 +7,7 @@
 
 ## 1. Introduction
 
-Welcome to ProjectFinish ("we," "us," "our," or "the Platform"). We are committed to protecting your privacy and handling your personal information responsibly.
+Welcome to CodeSalvage ("we," "us," "our," or "the Platform"). We are committed to protecting your privacy and handling your personal information responsibly.
 
 This Privacy Policy explains:
 - What information we collect
@@ -16,9 +16,9 @@ This Privacy Policy explains:
 - Your privacy rights
 - How we protect your information
 
-By using ProjectFinish, you agree to the collection and use of information in accordance with this Privacy Policy.
+By using CodeSalvage, you agree to the collection and use of information in accordance with this Privacy Policy.
 
-**Platform Description**: ProjectFinish is an online marketplace connecting sellers of unfinished code projects with buyers seeking starter code for development projects.
+**Platform Description**: CodeSalvage is an online marketplace connecting sellers of unfinished code projects with buyers seeking starter code for development projects.
 
 ---
 
@@ -254,7 +254,7 @@ We may disclose your information if required by law or in response to:
 
 ### 4.5 Business Transfers
 
-If ProjectFinish is acquired, merged, or sold, your information may be transferred to the new owner. You will be notified of any such change via email.
+If CodeSalvage is acquired, merged, or sold, your information may be transferred to the new owner. You will be notified of any such change via email.
 
 ### 4.6 With Your Consent
 
@@ -339,7 +339,7 @@ We currently do not respond to "Do Not Track" browser signals.
 
 ### 7.1 Data Transfer
 
-ProjectFinish is based in the United States. By using the Platform, you consent to the transfer of your information to the United States, which may have different data protection laws than your country.
+CodeSalvage is based in the United States. By using the Platform, you consent to the transfer of your information to the United States, which may have different data protection laws than your country.
 
 ### 7.2 GDPR Rights (EU Users)
 
@@ -361,7 +361,7 @@ If you are located in the European Union, you have additional rights under GDPR:
 
 **Right to Lodge a Complaint**: File a complaint with your local data protection authority
 
-**How to exercise GDPR rights**: Email privacy@projectfinish.com
+**How to exercise GDPR rights**: Email privacy@codesalvage.com
 
 **Response time**: We will respond within 30 days of your request.
 
@@ -381,14 +381,14 @@ We process your personal data based on:
 
 ## 8. Children's Privacy
 
-ProjectFinish is **not intended for users under 18 years of age**. We do not knowingly collect personal information from children.
+CodeSalvage is **not intended for users under 18 years of age**. We do not knowingly collect personal information from children.
 
 If we discover that a user is under 18, we will:
 1. Delete their account immediately
 2. Delete all associated personal information
 3. Notify the user (via email if available)
 
-If you believe a user is under 18, please report it to support@projectfinish.com.
+If you believe a user is under 18, please report it to support@codesalvage.com.
 
 ---
 
@@ -530,7 +530,7 @@ If you are a California resident, you have the right to:
 
 ### 12.3 How to Exercise CCPA Rights
 
-**Email**: privacy@projectfinish.com
+**Email**: privacy@codesalvage.com
 **Subject**: "CCPA Request - [Your Name]"
 **Include**:
 - Full name
@@ -568,12 +568,12 @@ Continued use of the Platform after changes constitutes acceptance of the update
 
 If you have questions about this Privacy Policy or wish to exercise your privacy rights:
 
-**Email**: privacy@projectfinish.com
+**Email**: privacy@codesalvage.com
 **Subject**: "Privacy Inquiry - [Your Name]"
 
 **Response time**: We aim to respond within 5 business days.
 
-For general support inquiries, contact: support@projectfinish.com
+For general support inquiries, contact: support@codesalvage.com
 
 ---
 
@@ -581,7 +581,7 @@ For general support inquiries, contact: support@projectfinish.com
 
 For GDPR-related inquiries, contact our Data Protection Officer:
 
-**Email**: dpo@projectfinish.com
+**Email**: dpo@codesalvage.com
 
 ---
 
@@ -691,7 +691,7 @@ All employees and contractors sign confidentiality agreements and receive privac
 
 **Sensitive Personal Information**: Categories requiring extra protection (SSN, health data, financial data)
 
-**Controller**: Entity that determines purposes and means of processing personal data (ProjectFinish)
+**Controller**: Entity that determines purposes and means of processing personal data (CodeSalvage)
 
 **Processor**: Entity that processes personal data on behalf of the controller (Stripe, SendGrid, etc.)
 
@@ -716,4 +716,4 @@ BY USING THE PLATFORM, YOU ACKNOWLEDGE THAT:
 **Last Updated**: January 28, 2026
 **Effective Date**: January 28, 2026
 
-© 2026 ProjectFinish. All rights reserved.
+© 2026 CodeSalvage. All rights reserved.

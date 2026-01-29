@@ -27,7 +27,7 @@ let _stripe: Stripe | null = null;
  * Configured with:
  * - API version: 2024-12-18.acacia (latest stable)
  * - TypeScript: Enabled
- * - App info: ProjectFinish metadata
+ * - App info: CodeSalvage metadata
  *
  * @throws Error if STRIPE_SECRET_KEY is not configured
  */
@@ -41,9 +41,9 @@ function getStripeClient(): Stripe {
       apiVersion: '2025-02-24.acacia',
       typescript: true,
       appInfo: {
-        name: 'ProjectFinish',
+        name: 'CodeSalvage',
         version: '1.0.0',
-        url: 'https://projectfinish.com',
+        url: 'https://codesalvage.com',
       },
     });
   }

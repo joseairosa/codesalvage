@@ -7,7 +7,7 @@
 
 ## Overview
 
-Honeybadger provides error monitoring and uptime tracking for ProjectFinish. It captures unhandled exceptions, promise rejections, and custom error reports from both client-side (browser) and server-side (Node.js) code.
+Honeybadger provides error monitoring and uptime tracking for CodeSalvage. It captures unhandled exceptions, promise rejections, and custom error reports from both client-side (browser) and server-side (Node.js) code.
 
 **Why Honeybadger?**
 - Simple, developer-friendly error tracking
@@ -78,7 +78,7 @@ Global error boundary for unhandled errors.
 
 1. Go to [honeybadger.io](https://www.honeybadger.io)
 2. Sign up for a free account
-3. Create a new project: **"ProjectFinish"**
+3. Create a new project: **"CodeSalvage"**
 4. Copy your API key
 
 ### Step 2: Configure Environment Variables

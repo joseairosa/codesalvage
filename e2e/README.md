@@ -1,6 +1,6 @@
 # E2E Tests with Playwright
 
-End-to-end tests for ProjectFinish marketplace using Playwright.
+End-to-end tests for CodeSalvage marketplace using Playwright.
 
 ## Setup
 

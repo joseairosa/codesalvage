@@ -59,13 +59,13 @@ export default async function SignInPage({
             <CardHeader className="space-y-2 text-center">
               {/* Logo/Branding */}
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg">
-                <span className="text-3xl font-bold text-white">PF</span>
+                <span className="text-3xl font-bold text-white">CS</span>
               </div>
 
               <CardTitle className="text-3xl font-bold tracking-tight">
                 Welcome to{' '}
                 <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  ProjectFinish
+                  CodeSalvage
                 </span>
               </CardTitle>
 
@@ -165,6 +165,6 @@ function SignInCardSkeleton() {
  * Metadata for SEO
  */
 export const metadata = {
-  title: 'Sign In | ProjectFinish',
-  description: 'Sign in to ProjectFinish to buy and sell incomplete software projects',
+  title: 'Sign In | CodeSalvage',
+  description: 'Sign in to CodeSalvage to buy and sell incomplete software projects',
 };

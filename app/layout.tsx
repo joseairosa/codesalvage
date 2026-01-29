@@ -14,7 +14,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'ProjectFinish - Marketplace for Incomplete Software Projects',
+  title: 'CodeSalvage - Marketplace for Incomplete Software Projects',
   description:
     'Buy and sell incomplete software projects. Turn your 80% complete side project into revenue.',
   keywords: [
@@ -24,19 +24,19 @@ export const metadata: Metadata = {
     'code marketplace',
     'developer marketplace',
   ],
-  authors: [{ name: 'ProjectFinish' }],
+  authors: [{ name: 'CodeSalvage' }],
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: env.NEXT_PUBLIC_APP_URL,
-    title: 'ProjectFinish - Marketplace for Incomplete Software Projects',
+    title: 'CodeSalvage - Marketplace for Incomplete Software Projects',
     description:
       'Buy and sell incomplete software projects. Turn your 80% complete side project into revenue.',
-    siteName: 'ProjectFinish',
+    siteName: 'CodeSalvage',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ProjectFinish - Marketplace for Incomplete Software Projects',
+    title: 'CodeSalvage - Marketplace for Incomplete Software Projects',
     description:
       'Buy and sell incomplete software projects. Turn your 80% complete side project into revenue.',
   },

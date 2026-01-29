@@ -1,6 +1,6 @@
-# Seller User Guide - ProjectFinish
+# Seller User Guide - CodeSalvage
 
-**Welcome to ProjectFinish!** This guide will help you successfully list, manage, and sell your unfinished code projects.
+**Welcome to CodeSalvage!** This guide will help you successfully list, manage, and sell your unfinished code projects.
 
 ---
 
@@ -25,7 +25,7 @@
 
 1. **Sign in with GitHub**
    - Click "Sign In" in the top navigation
-   - Authorize ProjectFinish to access your GitHub profile
+   - Authorize CodeSalvage to access your GitHub profile
    - Your username and avatar will be imported automatically
 
 2. **Complete Your Profile**
@@ -348,7 +348,7 @@ Select time period for detailed analytics:
 
 ### What Are Featured Listings?
 
-Featured listings receive **premium placement** on ProjectFinish:
+Featured listings receive **premium placement** on CodeSalvage:
 - ⭐ Featured badge on project card
 - Priority placement in search results
 - Increased visibility in category pages
@@ -784,7 +784,7 @@ Upgrade to Pro for advanced seller features:
 - Wait for escrow release (automatic after 7 days)
 - Complete Stripe verification if pending
 - Request manual payout if below auto-threshold
-- Contact support if overdue (support@projectfinish.com)
+- Contact support if overdue (support@codesalvage.com)
 
 ---
 
@@ -807,7 +807,7 @@ Upgrade to Pro for advanced seller features:
 
 ### Support Channels
 
-**Email Support**: support@projectfinish.com
+**Email Support**: support@codesalvage.com
 - Response time: 24-48 hours (Pro: 12-24 hours)
 - Include: Account email, project URL (if applicable), screenshots
 
@@ -837,7 +837,7 @@ Upgrade to Pro for advanced seller features:
 
 ## Conclusion
 
-ProjectFinish helps you monetize unfinished projects and turn abandoned code into revenue. Follow this guide to maximize your success:
+CodeSalvage helps you monetize unfinished projects and turn abandoned code into revenue. Follow this guide to maximize your success:
 
 1. ✅ Write detailed, honest descriptions
 2. ✅ Use high-quality screenshots and demos
@@ -851,6 +851,6 @@ ProjectFinish helps you monetize unfinished projects and turn abandoned code int
 
 ---
 
-**Questions?** Email us at support@projectfinish.com or visit our FAQ at `/faq`.
+**Questions?** Email us at support@codesalvage.com or visit our FAQ at `/faq`.
 
 **Last Updated**: January 28, 2026

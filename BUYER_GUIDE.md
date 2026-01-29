@@ -1,6 +1,6 @@
-# Buyer User Guide - ProjectFinish
+# Buyer User Guide - CodeSalvage
 
-**Welcome to ProjectFinish!** This guide will help you find, evaluate, purchase, and successfully use unfinished code projects to accelerate your development.
+**Welcome to CodeSalvage!** This guide will help you find, evaluate, purchase, and successfully use unfinished code projects to accelerate your development.
 
 ---
 
@@ -25,7 +25,7 @@
 
 1. **Sign in with GitHub**
    - Click "Sign In" in the top navigation
-   - Authorize ProjectFinish to access your GitHub profile
+   - Authorize CodeSalvage to access your GitHub profile
    - Your account is created automatically
 
 2. **Complete Your Profile** (Optional)
@@ -286,7 +286,7 @@ Each project has a detailed page with:
 3. **Enter Payment Information**
    - Powered by Stripe (secure)
    - Accepts: Credit/debit cards, Apple Pay, Google Pay
-   - Information is never stored on ProjectFinish servers
+   - Information is never stored on CodeSalvage servers
 
 4. **Complete Purchase**
    - Click "Complete Purchase"
@@ -796,7 +796,7 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 
 ---
 
-## Making the Most of ProjectFinish
+## Making the Most of CodeSalvage
 
 ### For Hobbyists & Learners
 
@@ -846,7 +846,7 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 
 ### Support Channels
 
-**Email Support**: support@projectfinish.com
+**Email Support**: support@codesalvage.com
 - Response time: 24-48 hours
 - Include: Account email, transaction ID (if applicable), screenshots
 
@@ -878,7 +878,7 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 
 ## Conclusion
 
-ProjectFinish helps you **build faster** by starting with solid foundations instead of from scratch. Follow this guide to make smart purchases:
+CodeSalvage helps you **build faster** by starting with solid foundations instead of from scratch. Follow this guide to make smart purchases:
 
 1. ✅ Research thoroughly before buying
 2. ✅ Understand completion % and known issues
@@ -892,6 +892,6 @@ ProjectFinish helps you **build faster** by starting with solid foundations inst
 
 ---
 
-**Questions?** Email us at support@projectfinish.com or visit our FAQ at `/faq`.
+**Questions?** Email us at support@codesalvage.com or visit our FAQ at `/faq`.
 
 **Last Updated**: January 28, 2026

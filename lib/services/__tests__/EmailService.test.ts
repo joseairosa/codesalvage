@@ -17,7 +17,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Set environment BEFORE importing EmailService
 process.env['POSTMARK_SERVER_TOKEN'] = 'test-api-key';
-process.env['POSTMARK_FROM_EMAIL'] = 'test@projectfinish.com';
+process.env['POSTMARK_FROM_EMAIL'] = 'test@codesalvage.com';
 
 // Mock Postmark BEFORE importing EmailService (hoisted)
 vi.mock('postmark', () => ({
@@ -95,7 +95,7 @@ describe('EmailService', () => {
       expect(mockSendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
           To: 'John Doe <buyer@example.com>',
-          From: 'ProjectFinish <test@projectfinish.com>',
+          From: 'CodeSalvage <test@codesalvage.com>',
           Subject: 'Purchase Confirmation - React Dashboard Template',
           MessageStream: 'outbound',
         })

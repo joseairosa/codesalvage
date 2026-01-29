@@ -32,7 +32,7 @@ export const env = {
   // Database
   DATABASE_URL: getEnvVar(
     'DATABASE_URL',
-    'postgresql://projectfinish:password@localhost:5444/projectfinish'
+    'postgresql://codesalvage:password@localhost:5444/codesalvage'
   ),
 
   // Redis

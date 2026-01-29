@@ -1,6 +1,6 @@
 # 🚀 Deployment Checklist - Railway Staging
 
-This checklist guides you through deploying ProjectFinish to Railway staging environment.
+This checklist guides you through deploying CodeSalvage to Railway staging environment.
 
 ---
 
@@ -48,7 +48,7 @@ cd /Users/joseairosa/Development/recycleai
 # Initialize Railway project
 railway init
 
-# Project name: projectfinish-staging
+# Project name: codesalvage-staging
 # Select: Create a new project
 ```
 
@@ -74,7 +74,7 @@ Wait for provisioning (~1-2 minutes).
 railway link
 ```
 
-Select the `projectfinish-staging` project you just created.
+Select the `codesalvage-staging` project you just created.
 
 ---
 
@@ -93,7 +93,7 @@ Copy the output (e.g., `xyz123abc456...`)
 1. Go to https://github.com/settings/developers
 2. Click **New OAuth App**
 3. Fill in:
-   - **Application name:** ProjectFinish Staging
+   - **Application name:** CodeSalvage Staging
    - **Homepage URL:** (Railway will provide this after first deployment)
    - **Authorization callback URL:** `https://your-app.railway.app/api/auth/callback/github`
 4. Click **Register application**
@@ -154,7 +154,7 @@ This will:
 Building...
 Deploying...
 Deployment successful!
-Your app is live at: https://projectfinish-staging-production-xxxx.up.railway.app
+Your app is live at: https://codesalvage-staging-production-xxxx.up.railway.app
 ```
 
 ### Step 2: Update NEXTAUTH_URL
@@ -163,8 +163,8 @@ After first deployment, you'll get a Railway domain. Update environment variable
 
 ```bash
 # Replace with your actual Railway domain
-railway variables set NEXTAUTH_URL="https://projectfinish-staging-production-xxxx.up.railway.app"
-railway variables set NEXT_PUBLIC_APP_URL="https://projectfinish-staging-production-xxxx.up.railway.app"
+railway variables set NEXTAUTH_URL="https://codesalvage-staging-production-xxxx.up.railway.app"
+railway variables set NEXT_PUBLIC_APP_URL="https://codesalvage-staging-production-xxxx.up.railway.app"
 ```
 
 ### Step 3: Update GitHub OAuth Callback URL
@@ -309,7 +309,7 @@ railway logs --lines 100
 
 ### Step 2: Configure DNS
 
-For custom domain (e.g., `staging.projectfinish.com`):
+For custom domain (e.g., `staging.codesalvage.com`):
 
 1. Add CNAME record in your DNS provider:
    - Name: `staging`
@@ -321,8 +321,8 @@ For custom domain (e.g., `staging.projectfinish.com`):
 ### Step 3: Update Environment Variables
 
 ```bash
-railway variables set NEXTAUTH_URL="https://staging.projectfinish.com"
-railway variables set NEXT_PUBLIC_APP_URL="https://staging.projectfinish.com"
+railway variables set NEXTAUTH_URL="https://staging.codesalvage.com"
+railway variables set NEXT_PUBLIC_APP_URL="https://staging.codesalvage.com"
 ```
 
 ### Step 4: Update GitHub OAuth

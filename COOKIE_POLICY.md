@@ -7,7 +7,7 @@
 
 ## 1. Introduction
 
-This Cookie Policy explains how ProjectFinish ("we," "us," "our") uses cookies and similar tracking technologies on our website and platform (collectively, "the Platform").
+This Cookie Policy explains how CodeSalvage ("we," "us," "our") uses cookies and similar tracking technologies on our website and platform (collectively, "the Platform").
 
 By using the Platform, you consent to the use of cookies in accordance with this policy. If you do not agree, please adjust your browser settings or stop using the Platform.
 
@@ -192,7 +192,7 @@ We use cookies to:
 
 ## 6. Cookie Details
 
-### 6.1 First-Party Cookies (Set by ProjectFinish)
+### 6.1 First-Party Cookies (Set by CodeSalvage)
 
 | Cookie Name | Purpose | Duration | Type |
 |-------------|---------|----------|------|
@@ -379,9 +379,9 @@ We use session storage for temporary data:
 
 ## 12. Cookies and Children
 
-ProjectFinish is **not intended for users under 18 years of age**. We do not knowingly use cookies to collect information from children.
+CodeSalvage is **not intended for users under 18 years of age**. We do not knowingly use cookies to collect information from children.
 
-If you believe a child under 18 has used the Platform, please contact us at privacy@projectfinish.com.
+If you believe a child under 18 has used the Platform, please contact us at privacy@codesalvage.com.
 
 ---
 
@@ -447,7 +447,7 @@ Under CCPA, you have the right to:
 
 If you have questions about this Cookie Policy:
 
-**Email**: privacy@projectfinish.com
+**Email**: privacy@codesalvage.com
 **Subject**: "Cookie Policy Inquiry"
 
 **Response time**: We aim to respond within 5 business days.
@@ -482,4 +482,4 @@ If you have questions about this Cookie Policy:
 **Last Updated**: January 28, 2026
 **Effective Date**: January 28, 2026
 
-© 2026 ProjectFinish. All rights reserved.
+© 2026 CodeSalvage. All rights reserved.

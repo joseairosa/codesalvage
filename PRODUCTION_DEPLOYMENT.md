@@ -1,5 +1,5 @@
 # Production Deployment Checklist
-**Project**: ProjectFinish (codesalvage.com)
+**Project**: CodeSalvage (codesalvage.com)
 **Status**: 🚀 READY FOR DEPLOYMENT
 
 ---
@@ -94,7 +94,7 @@ STRIPE_WEBHOOK_SECRET="whsec_your_production_webhook_secret"
 R2_ENDPOINT="https://your_account.r2.cloudflarestorage.com"
 R2_ACCESS_KEY_ID="your_r2_access_key"
 R2_SECRET_ACCESS_KEY="your_r2_secret_key"
-R2_BUCKET_NAME="projectfinish-production"
+R2_BUCKET_NAME="codesalvage-production"
 R2_PUBLIC_URL="https://pub-xxxxx.r2.dev"
 
 # ============================================
@@ -113,7 +113,7 @@ CRON_SECRET="your_cron_secret_for_production"
 ### How to Set Variables in Railway:
 
 1. Go to Railway Dashboard
-2. Select your project (ProjectFinish)
+2. Select your project (CodeSalvage)
 3. Click "Variables" tab
 4. Click "New Variable"
 5. Add each variable above
@@ -142,7 +142,7 @@ CRON_SECRET="your_cron_secret_for_production"
 1. Go to "Connect" → "Settings" in Stripe Dashboard
 2. Verify business information is complete
 3. Enable "Express" account type
-4. Set brand name: "CodeSalvage" or "ProjectFinish"
+4. Set brand name: "CodeSalvage" or "CodeSalvage"
 5. Set brand color and logo (optional)
 
 #### 3.3 Setup Production Webhooks

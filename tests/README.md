@@ -1,6 +1,6 @@
 # Testing Guide
 
-Comprehensive testing setup for ProjectFinish marketplace with unit tests, integration tests, and E2E tests.
+Comprehensive testing setup for CodeSalvage marketplace with unit tests, integration tests, and E2E tests.
 
 ## Quick Start
 
@@ -96,7 +96,7 @@ describe('UserRepository (Integration)', () => {
 
 ### Architecture
 
-- **Separate database**: `projectfinish_test` (port 5445)
+- **Separate database**: `codesalvage_test` (port 5445)
 - **Separate Redis**: `redis://localhost:6391`
 - **Ephemeral storage**: Uses tmpfs (in-memory) for speed
 - **Isolated**: Never touches development database
@@ -115,7 +115,7 @@ npm run test:db:reset
 
 # Manual setup
 docker-compose -f docker-compose.test.yml up -d
-DATABASE_URL="postgresql://projectfinish_test:password_test@localhost:5445/projectfinish_test" \
+DATABASE_URL="postgresql://codesalvage_test:password_test@localhost:5445/codesalvage_test" \
   npx prisma migrate deploy
 ```
 
@@ -123,10 +123,10 @@ DATABASE_URL="postgresql://projectfinish_test:password_test@localhost:5445/proje
 
 - **Host**: localhost
 - **Port**: 5445 (dev is 5444)
-- **Database**: projectfinish_test
-- **User**: projectfinish_test
+- **Database**: codesalvage_test
+- **User**: codesalvage_test
 - **Password**: password_test
-- **URL**: `postgresql://projectfinish_test:password_test@localhost:5445/projectfinish_test`
+- **URL**: `postgresql://codesalvage_test:password_test@localhost:5445/codesalvage_test`
 
 ## Test Helpers
 

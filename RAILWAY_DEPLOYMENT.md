@@ -1,6 +1,6 @@
 # Railway Deployment Guide
 
-Complete guide for deploying ProjectFinish to Railway.
+Complete guide for deploying CodeSalvage to Railway.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ Complete guide for deploying ProjectFinish to Railway.
 railway init
 
 # Follow prompts:
-# - Project name: projectfinish-staging (or projectfinish-production)
+# - Project name: codesalvage-staging (or codesalvage-production)
 # - Choose: "Deploy from GitHub repo"
 # - Select your repository
 ```
@@ -83,7 +83,7 @@ railway variables set NODE_ENV="production"
 railway variables set R2_ENDPOINT="https://xxx.r2.cloudflarestorage.com"
 railway variables set R2_ACCESS_KEY_ID="your-r2-access-key"
 railway variables set R2_SECRET_ACCESS_KEY="your-r2-secret-key"
-railway variables set R2_BUCKET_NAME="projectfinish"
+railway variables set R2_BUCKET_NAME="codesalvage"
 railway variables set R2_PUBLIC_URL="https://pub-xxx.r2.dev"
 
 # Stripe (when ready)
@@ -93,7 +93,7 @@ railway variables set STRIPE_WEBHOOK_SECRET="whsec_..."
 
 # SendGrid (when ready)
 railway variables set SENDGRID_API_KEY="SG.xxx"
-railway variables set SENDGRID_FROM_EMAIL="noreply@projectfinish.com"
+railway variables set SENDGRID_FROM_EMAIL="noreply@codesalvage.com"
 
 # Database URLs are automatically set by Railway plugins
 # DATABASE_URL - Set by PostgreSQL plugin
@@ -211,11 +211,11 @@ railway run npm run db:seed
 
 ```bash
 # Add custom domain
-railway domain add projectfinish.com
+railway domain add codesalvage.com
 
 # Railway will provide DNS records to configure:
 # - A record: points to Railway IP
-# - CNAME record: www.projectfinish.com → your-app.railway.app
+# - CNAME record: www.codesalvage.com → your-app.railway.app
 
 # SSL certificate is automatically provisioned
 ```
@@ -224,7 +224,7 @@ railway domain add projectfinish.com
 
 1. Go to Railway project → Settings → Domains
 2. Click "Add Domain"
-3. Enter your domain (e.g., projectfinish.com)
+3. Enter your domain (e.g., codesalvage.com)
 4. Configure DNS records with your domain registrar
 5. Wait for DNS propagation (5-60 minutes)
 6. Railway auto-provisions SSL certificate

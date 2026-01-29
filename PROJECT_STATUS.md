@@ -1,4 +1,4 @@
-# 📊 ProjectFinish - Implementation Status
+# 📊 CodeSalvage - Implementation Status
 
 **Last Updated:** January 24, 2026
 **Status:** 🚀 **READY FOR DEPLOYMENT** (31/32 tasks complete - 96.9%)
@@ -7,7 +7,7 @@
 
 ## 🎯 Executive Summary
 
-ProjectFinish is a marketplace for incomplete software projects (50-95% complete). The platform is now **production-ready** with all core features implemented, tested, and documented.
+CodeSalvage is a marketplace for incomplete software projects (50-95% complete). The platform is now **production-ready** with all core features implemented, tested, and documented.
 
 **Next Step:** Deploy to Railway staging environment using the [Deployment Checklist](DEPLOYMENT_CHECKLIST.md).
 
@@ -145,7 +145,7 @@ CI/CD:     GitHub Actions + Railway
 ### Project Structure
 
 ```
-projectfinish/
+codesalvage/
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml              # CI pipeline

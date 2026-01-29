@@ -83,8 +83,8 @@ export class EmailService {
     this.fromEmail =
       process.env['POSTMARK_FROM_EMAIL'] ||
       env.POSTMARK_FROM_EMAIL ||
-      'noreply@projectfinish.com';
-    this.fromName = 'ProjectFinish';
+      'noreply@codesalvage.com';
+    this.fromName = 'CodeSalvage';
   }
 
   /**
@@ -383,7 +383,7 @@ export class EmailService {
   </p>
 
   <p style="font-size: 12px; color: #999;">
-    ProjectFinish - Marketplace for Incomplete Software Projects<br>
+    CodeSalvage - Marketplace for Incomplete Software Projects<br>
     <a href="${appUrl}">Visit our website</a>
   </p>
 </body>
@@ -424,7 +424,7 @@ After 7 days, the payment will be automatically released to the seller.
 
 Questions? Contact the seller or reach out to our support team.
 
-ProjectFinish - Marketplace for Incomplete Software Projects
+CodeSalvage - Marketplace for Incomplete Software Projects
 ${appUrl}
     `.trim();
   }
@@ -480,7 +480,7 @@ ${appUrl}
   </p>
 
   <p style="font-size: 12px; color: #999;">
-    ProjectFinish - Marketplace for Incomplete Software Projects<br>
+    CodeSalvage - Marketplace for Incomplete Software Projects<br>
     <a href="${appUrl}">Visit our website</a>
   </p>
 </body>
@@ -516,7 +516,7 @@ View your dashboard: ${appUrl}/seller/dashboard
 
 Keep up the great work!
 
-ProjectFinish - Marketplace for Incomplete Software Projects
+CodeSalvage - Marketplace for Incomplete Software Projects
 ${appUrl}
     `.trim();
   }
@@ -559,7 +559,7 @@ ${appUrl}
   <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
 
   <p style="font-size: 12px; color: #999;">
-    ProjectFinish - Marketplace for Incomplete Software Projects<br>
+    CodeSalvage - Marketplace for Incomplete Software Projects<br>
     <a href="${appUrl}">Visit our website</a>
   </p>
 </body>
@@ -586,7 +586,7 @@ The funds have been transferred to your Stripe account and should appear in your
 
 View your dashboard: ${appUrl}/seller/dashboard
 
-ProjectFinish - Marketplace for Incomplete Software Projects
+CodeSalvage - Marketplace for Incomplete Software Projects
 ${appUrl}
     `.trim();
   }
@@ -730,7 +730,7 @@ Reviews help build your reputation and attract more buyers. Keep up the excellen
   </a>
 
   <p style="font-size: 14px; color: #666; margin-top: 20px;">
-    Thank you for being part of the ProjectFinish community!
+    Thank you for being part of the CodeSalvage community!
   </p>
 </body>
 </html>
@@ -749,7 +749,7 @@ Your feedback helps other buyers make informed decisions and helps sellers impro
 
 Leave a review: ${data.reviewUrl}
 
-Thank you for being part of the ProjectFinish community!
+Thank you for being part of the CodeSalvage community!
     `.trim();
   }
 
@@ -773,7 +773,7 @@ Thank you for being part of the ProjectFinish community!
 
   <p>Hi ${data.sellerName},</p>
 
-  <p>Great news! Your project is now featured on ProjectFinish.</p>
+  <p>Great news! Your project is now featured on CodeSalvage.</p>
 
   <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
     <h2 style="margin-top: 0;">Featured Listing Details</h2>
@@ -812,7 +812,7 @@ Thank you for being part of the ProjectFinish community!
   </p>
 
   <p style="font-size: 12px; color: #999;">
-    ProjectFinish - Marketplace for Incomplete Software Projects<br>
+    CodeSalvage - Marketplace for Incomplete Software Projects<br>
     <a href="${appUrl}">Visit our website</a>
   </p>
 </body>
@@ -828,7 +828,7 @@ Featured Listing Confirmed!
 
 Hi ${data.sellerName},
 
-Great news! Your project is now featured on ProjectFinish.
+Great news! Your project is now featured on CodeSalvage.
 
 FEATURED LISTING DETAILS
 Project: ${data.projectTitle}
@@ -855,7 +855,7 @@ To get the most out of your featured listing:
 Want to feature another project? Visit your seller dashboard:
 ${appUrl}/seller/dashboard
 
-ProjectFinish - Marketplace for Incomplete Software Projects
+CodeSalvage - Marketplace for Incomplete Software Projects
 ${appUrl}
     `.trim();
   }
@@ -908,7 +908,7 @@ ${appUrl}
   <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
 
   <p style="font-size: 12px; color: #999;">
-    ProjectFinish - Marketplace for Incomplete Software Projects<br>
+    CodeSalvage - Marketplace for Incomplete Software Projects<br>
     <a href="${appUrl}">Visit our website</a>
   </p>
 </body>
@@ -943,7 +943,7 @@ After your featured period ends:
 
 You can renew your featured listing anytime from your seller dashboard.
 
-ProjectFinish - Marketplace for Incomplete Software Projects
+CodeSalvage - Marketplace for Incomplete Software Projects
 ${appUrl}
     `.trim();
   }
@@ -998,7 +998,7 @@ ${appUrl}
   </p>
 
   <p style="font-size: 12px; color: #999;">
-    ProjectFinish - Marketplace for Incomplete Software Projects<br>
+    CodeSalvage - Marketplace for Incomplete Software Projects<br>
     <a href="${appUrl}">Visit our website</a>
   </p>
 </body>
@@ -1035,7 +1035,7 @@ Feature this project again: ${data.projectUrl}
 Questions? Visit your seller dashboard or contact support:
 ${appUrl}/seller/dashboard
 
-ProjectFinish - Marketplace for Incomplete Software Projects
+CodeSalvage - Marketplace for Incomplete Software Projects
 ${appUrl}
     `.trim();
   }

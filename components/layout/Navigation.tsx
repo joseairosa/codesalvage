@@ -35,13 +35,13 @@ export async function Navigation() {
         <Link
           href="/"
           className="flex items-center gap-2 transition-transform hover:scale-105"
-          aria-label="ProjectFinish home"
+          aria-label="CodeSalvage home"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-md">
-            <span className="text-xl font-bold text-white">PF</span>
+            <span className="text-xl font-bold text-white">CS</span>
           </div>
           <span className="hidden text-xl font-bold text-gray-900 sm:inline">
-            Project<span className="text-blue-600">Finish</span>
+            Code<span className="text-blue-600">Salvage</span>
           </span>
         </Link>
 

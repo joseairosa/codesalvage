@@ -1,7 +1,7 @@
 /**
  * Homepage
  *
- * Landing page for ProjectFinish marketplace.
+ * Landing page for CodeSalvage marketplace.
  * Shows hero section, featured projects, and how it works.
  */
 

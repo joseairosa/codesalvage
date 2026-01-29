@@ -462,7 +462,7 @@ All emails include:
 ```bash
 # Set environment variable
 export SENDGRID_API_KEY="SG.xxx"
-export SENDGRID_FROM_EMAIL="noreply@projectfinish.com"
+export SENDGRID_FROM_EMAIL="noreply@codesalvage.com"
 
 # Trigger webhook with test payment
 stripe trigger payment_intent.succeeded

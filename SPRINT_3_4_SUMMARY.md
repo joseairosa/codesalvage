@@ -10,7 +10,7 @@
 
 ## 🎯 Sprint Goals Achieved
 
-Sprint 3-4 focused on building the **complete project listing and search functionality** for the ProjectFinish marketplace. All objectives were met with comprehensive testing and documentation.
+Sprint 3-4 focused on building the **complete project listing and search functionality** for the CodeSalvage marketplace. All objectives were met with comprehensive testing and documentation.
 
 ### ✅ Backend Implementation
 

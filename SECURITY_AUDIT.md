@@ -1,5 +1,5 @@
 # Security Audit Report - OWASP Top 10 (2021)
-**Project**: ProjectFinish
+**Project**: CodeSalvage
 **Audit Date**: January 28, 2026
 **Status**: ✅ PRE-LAUNCH AUDIT COMPLETE
 **Overall Rating**: **SECURE** (Minor recommendations only)

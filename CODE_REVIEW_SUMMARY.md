@@ -8,7 +8,7 @@
 
 ## Overview
 
-Comprehensive code review of ProjectFinish after completing Sprint 1-2 (Foundation & Authentication).
+Comprehensive code review of CodeSalvage after completing Sprint 1-2 (Foundation & Authentication).
 
 **Scope:**
 

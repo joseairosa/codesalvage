@@ -62,7 +62,7 @@ Each method:
 ```typescript
 // Environment Variables Required
 SENDGRID_API_KEY=SG.xxx
-SENDGRID_FROM_EMAIL=noreply@projectfinish.com
+SENDGRID_FROM_EMAIL=noreply@codesalvage.com
 
 // Initialization (lib/services/EmailService.ts)
 import sgMail from '@sendgrid/mail';
@@ -340,7 +340,7 @@ sgMail.send({
     <!-- Footer -->
     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;" />
     <p style="font-size: 12px; color: #999;">
-      ProjectFinish - Marketplace for Incomplete Software Projects
+      CodeSalvage - Marketplace for Incomplete Software Projects
     </p>
   </body>
 </html>
@@ -363,7 +363,7 @@ CTA: {{url}}
 
 Additional information...
 
-ProjectFinish - Marketplace for Incomplete Software Projects
+CodeSalvage - Marketplace for Incomplete Software Projects
 {{appUrl}}
 ```
 
@@ -426,7 +426,7 @@ await emailService.sendNewMessageNotification(
 
 1. Navigate to Settings → API Keys
 2. Click "Create API Key"
-3. Name: "ProjectFinish Production"
+3. Name: "CodeSalvage Production"
 4. Permissions: "Full Access" (or "Mail Send" only)
 5. Copy API key (save securely)
 
@@ -437,7 +437,7 @@ await emailService.sendNewMessageNotification(
    - Add DNS records to your domain
    - Verify domain ownership
 3. Single Sender Verification (quick for testing):
-   - Add sender email (`noreply@projectfinish.com`)
+   - Add sender email (`noreply@codesalvage.com`)
    - Verify email address
 
 ### 4. Update Environment Variables
@@ -445,7 +445,7 @@ await emailService.sendNewMessageNotification(
 ```bash
 # Add to Railway or local .env
 SENDGRID_API_KEY=SG.xxx
-SENDGRID_FROM_EMAIL=noreply@projectfinish.com
+SENDGRID_FROM_EMAIL=noreply@codesalvage.com
 ```
 
 ### 5. Test Email Sending

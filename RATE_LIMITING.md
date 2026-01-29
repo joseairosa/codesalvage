@@ -563,6 +563,6 @@ Before deploying to production:
 
 ---
 
-**Questions?** Check troubleshooting section or email support@projectfinish.com
+**Questions?** Check troubleshooting section or email support@codesalvage.com
 
 **Last Updated**: January 28, 2026

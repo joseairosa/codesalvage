@@ -75,7 +75,7 @@ See [PRODUCTION_DEPLOYMENT.md Section 2](PRODUCTION_DEPLOYMENT.md#2-railway-envi
 # Update DNS records (at your registrar):
 # Type: CNAME
 # Name: @
-# Value: [Railway provides this, e.g., projectfinish-production.up.railway.app]
+# Value: [Railway provides this, e.g., codesalvage-production.up.railway.app]
 # TTL: Auto or 3600
 
 # Wait for DNS propagation (5-60 minutes)

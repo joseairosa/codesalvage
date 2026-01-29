@@ -1,6 +1,6 @@
 # GitHub Actions CI/CD Setup
 
-This document explains the GitHub Actions workflows configured for ProjectFinish and how to set them up.
+This document explains the GitHub Actions workflows configured for CodeSalvage and how to set them up.
 
 ## Table of Contents
 
@@ -14,7 +14,7 @@ This document explains the GitHub Actions workflows configured for ProjectFinish
 
 ## Overview
 
-ProjectFinish uses GitHub Actions for:
+CodeSalvage uses GitHub Actions for:
 
 - **Continuous Integration (CI):** Automated testing, linting, and type checking on every push and PR
 - **Continuous Deployment (CD):** Automated deployment to Railway staging environment on main branch merges
@@ -233,7 +233,7 @@ GitHub Actions needs these secrets to deploy to Railway:
 The CI workflow sets these environment variables for testing:
 
 ```yaml
-DATABASE_URL: 'postgresql://postgres:password@localhost:5432/projectfinish_test'
+DATABASE_URL: 'postgresql://postgres:password@localhost:5432/codesalvage_test'
 REDIS_URL: 'redis://localhost:6379'
 AUTH_SECRET: 'test-secret-min-32-characters-long-for-ci'
 AUTH_GITHUB_ID: 'test-github-id'
@@ -434,7 +434,7 @@ Click **Details** next to any check to see logs.
 Add CI status badge to README.md:
 
 ```markdown
-![CI Status](https://github.com/YOUR_USERNAME/projectfinish/workflows/CI/badge.svg)
+![CI Status](https://github.com/YOUR_USERNAME/codesalvage/workflows/CI/badge.svg)
 ```
 
 Replace `YOUR_USERNAME` with your GitHub username.

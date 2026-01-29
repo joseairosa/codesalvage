@@ -7,9 +7,9 @@
 
 ## 1. Agreement to Terms
 
-By accessing or using ProjectFinish ("the Platform," "we," "us," or "our"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these Terms, you may not access or use the Platform.
+By accessing or using CodeSalvage ("the Platform," "we," "us," or "our"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these Terms, you may not access or use the Platform.
 
-**Platform Description**: ProjectFinish is an online marketplace connecting sellers of unfinished code projects with buyers seeking starter code for development projects.
+**Platform Description**: CodeSalvage is an online marketplace connecting sellers of unfinished code projects with buyers seeking starter code for development projects.
 
 ---
 
@@ -20,7 +20,7 @@ By accessing or using ProjectFinish ("the Platform," "we," "us," or "our"), you 
 - **"Project"**: Unfinished source code, documentation, and related assets listed by a Seller.
 - **"Transaction"**: The purchase and delivery of a Project from Seller to Buyer.
 - **"Escrow Period"**: A 7-day period after purchase during which payment is held before release to Seller.
-- **"Platform Fee"**: The commission charged by ProjectFinish on each Transaction (18% of sale price).
+- **"Platform Fee"**: The commission charged by CodeSalvage on each Transaction (18% of sale price).
 
 ---
 
@@ -349,14 +349,14 @@ To cancel:
 
 ### 13.1 User Content
 
-You retain ownership of content you upload (code, descriptions, images). By uploading content, you grant ProjectFinish a non-exclusive, worldwide, royalty-free license to:
+You retain ownership of content you upload (code, descriptions, images). By uploading content, you grant CodeSalvage a non-exclusive, worldwide, royalty-free license to:
 - Display, reproduce, and distribute your content on the Platform
 - Create derivative works for Platform functionality (thumbnails, previews)
 - Use for marketing and promotional purposes
 
 ### 13.2 Platform Content
 
-All Platform code, design, trademarks, and content (excluding user-generated content) are owned by ProjectFinish or licensors. You may not copy, modify, or distribute Platform content without permission.
+All Platform code, design, trademarks, and content (excluding user-generated content) are owned by CodeSalvage or licensors. You may not copy, modify, or distribute Platform content without permission.
 
 ---
 
@@ -420,7 +420,7 @@ TO THE MAXIMUM EXTENT PERMITTED BY LAW, PROJECTFINISH SHALL NOT BE LIABLE FOR:
 
 OUR TOTAL LIABILITY TO YOU SHALL NOT EXCEED THE GREATER OF:
 - $100 USD, OR
-- The amount of fees you paid to ProjectFinish in the 12 months preceding the claim
+- The amount of fees you paid to CodeSalvage in the 12 months preceding the claim
 
 ### 16.3 Exceptions
 
@@ -433,7 +433,7 @@ This limitation does not apply to:
 
 ## 17. Indemnification
 
-You agree to indemnify, defend, and hold harmless ProjectFinish, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including attorneys' fees) arising from:
+You agree to indemnify, defend, and hold harmless CodeSalvage, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including attorneys' fees) arising from:
 - Your violation of these Terms
 - Your violation of any third-party rights (IP, privacy, etc.)
 - Your use of the Platform
@@ -476,7 +476,7 @@ These Terms are governed by the laws of the State of California, United States, 
 
 ### 19.2 Informal Resolution
 
-Before filing a claim, you agree to contact us at support@projectfinish.com to attempt informal resolution.
+Before filing a claim, you agree to contact us at support@codesalvage.com to attempt informal resolution.
 
 ### 19.3 Arbitration Agreement
 
@@ -518,7 +518,7 @@ Continued use of the Platform after changes constitutes acceptance of modified T
 
 ### 21.1 Entire Agreement
 
-These Terms constitute the entire agreement between you and ProjectFinish regarding use of the Platform.
+These Terms constitute the entire agreement between you and CodeSalvage regarding use of the Platform.
 
 ### 21.2 Severability
 
@@ -540,11 +540,11 @@ We are not liable for failure to perform due to causes beyond our reasonable con
 
 ## 22. Contact Information
 
-**ProjectFinish**
-Email: support@projectfinish.com
-Legal: legal@projectfinish.com
+**CodeSalvage**
+Email: support@codesalvage.com
+Legal: legal@codesalvage.com
 
-For questions about these Terms, contact us at legal@projectfinish.com.
+For questions about these Terms, contact us at legal@codesalvage.com.
 
 ---
 
@@ -561,4 +561,4 @@ BY USING THE PLATFORM, YOU ACKNOWLEDGE THAT:
 **Last Updated**: January 28, 2026
 **Effective Date**: January 28, 2026
 
-© 2026 ProjectFinish. All rights reserved.
+© 2026 CodeSalvage. All rights reserved.

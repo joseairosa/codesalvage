@@ -1,16 +1,16 @@
 # Frequently Asked Questions (FAQ)
 
-**Quick answers to common questions about ProjectFinish.**
+**Quick answers to common questions about CodeSalvage.**
 
 ---
 
 ## Table of Contents
 
 **General**
-- [What is ProjectFinish?](#what-is-projectfinish)
-- [Who is ProjectFinish for?](#who-is-projectfinish-for)
-- [How does ProjectFinish work?](#how-does-projectfinish-work)
-- [Is ProjectFinish legitimate?](#is-projectfinish-legitimate)
+- [What is CodeSalvage?](#what-is-codesalvage)
+- [Who is CodeSalvage for?](#who-is-codesalvage-for)
+- [How does CodeSalvage work?](#how-does-codesalvage-work)
+- [Is CodeSalvage legitimate?](#is-codesalvage-legitimate)
 
 **For Buyers**
 - [What am I actually buying?](#what-am-i-actually-buying)
@@ -51,9 +51,9 @@
 
 ## General
 
-### What is ProjectFinish?
+### What is CodeSalvage?
 
-**ProjectFinish is a marketplace for unfinished code projects.**
+**CodeSalvage is a marketplace for unfinished code projects.**
 
 Sellers list partially completed projects they don't have time to finish. Buyers purchase these projects as a head start on their own development, saving time and money compared to building from scratch.
 
@@ -66,7 +66,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 
 ---
 
-### Who is ProjectFinish for?
+### Who is CodeSalvage for?
 
 **For Sellers**:
 - Developers with unfinished side projects
@@ -83,7 +83,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 
 ---
 
-### How does ProjectFinish work?
+### How does CodeSalvage work?
 
 **5-Step Process**:
 
@@ -101,9 +101,9 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 
 ---
 
-### Is ProjectFinish legitimate?
+### Is CodeSalvage legitimate?
 
-**Yes, ProjectFinish is a legitimate platform.**
+**Yes, CodeSalvage is a legitimate platform.**
 
 **Security Measures**:
 - ✅ Payments processed by Stripe (industry standard)
@@ -519,7 +519,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **Powered by Stripe**:
 - Industry-leading payment processor
 - Secure, PCI-compliant
-- Your payment info never stored on ProjectFinish servers
+- Your payment info never stored on CodeSalvage servers
 
 **Sellers Receive Payouts Via**:
 - Bank transfer (ACH for US, SEPA for EU, etc.)
@@ -627,7 +627,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 
 **All tech stacks are supported.**
 
-ProjectFinish is tech-agnostic. You can list projects built with any programming language, framework, or tools.
+CodeSalvage is tech-agnostic. You can list projects built with any programming language, framework, or tools.
 
 **Popular Stacks** (most listed):
 - **Frontend**: React, Vue, Next.js, Angular, Svelte
@@ -692,7 +692,7 @@ ProjectFinish is tech-agnostic. You can list projects built with any programming
 - **Post-Purchase**: Most sellers help with setup questions (not required, but common)
 - **Best Practice**: Be specific with error messages and context
 
-**From ProjectFinish**:
+**From CodeSalvage**:
 - ❌ Platform support does NOT provide code help
 - ✅ Platform support helps with account, payment, disputes
 
@@ -799,7 +799,7 @@ ProjectFinish is tech-agnostic. You can list projects built with any programming
 
 **Security Measures**:
 - ✅ End-to-end encryption (HTTPS)
-- ✅ Your card info NEVER touches ProjectFinish servers
+- ✅ Your card info NEVER touches CodeSalvage servers
 - ✅ Stripe handles all payment data
 - ✅ Two-factor authentication available
 - ✅ Fraud detection and monitoring
@@ -893,7 +893,7 @@ ProjectFinish is tech-agnostic. You can list projects built with any programming
 
 ### Contact Support
 
-**Email**: support@projectfinish.com
+**Email**: support@codesalvage.com
 - Response time: 24-48 hours
 - Include: Your account email, transaction ID (if applicable), detailed question
 
@@ -914,4 +914,4 @@ ProjectFinish is tech-agnostic. You can list projects built with any programming
 
 **Last Updated**: January 28, 2026
 
-**Didn't find your answer?** Email us at support@projectfinish.com and we'll help!
+**Didn't find your answer?** Email us at support@codesalvage.com and we'll help!

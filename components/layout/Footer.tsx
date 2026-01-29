@@ -78,23 +78,23 @@ export function Footer() {
   const socialLinks = [
     {
       icon: Github,
-      href: 'https://github.com/projectfinish',
+      href: 'https://github.com/codesalvage',
       label: 'GitHub',
       external: true,
     },
     {
       icon: Twitter,
-      href: 'https://twitter.com/projectfinish',
+      href: 'https://twitter.com/codesalvage',
       label: 'Twitter',
       external: true,
     },
     {
       icon: Linkedin,
-      href: 'https://linkedin.com/company/projectfinish',
+      href: 'https://linkedin.com/company/codesalvage',
       label: 'LinkedIn',
       external: true,
     },
-    { icon: Mail, href: 'mailto:hello@projectfinish.com', label: 'Email' },
+    { icon: Mail, href: 'mailto:hello@codesalvage.com', label: 'Email' },
   ];
 
   return (
@@ -107,13 +107,13 @@ export function Footer() {
             <Link
               href="/"
               className="flex items-center gap-2"
-              aria-label="ProjectFinish home"
+              aria-label="CodeSalvage home"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-md">
-                <span className="text-xl font-bold text-white">PF</span>
+                <span className="text-xl font-bold text-white">CS</span>
               </div>
               <span className="text-xl font-bold text-gray-900">
-                Project<span className="text-blue-600">Finish</span>
+                Code<span className="text-blue-600">Salvage</span>
               </span>
             </Link>
 
@@ -171,7 +171,7 @@ export function Footer() {
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             {/* Copyright */}
             <p className="text-sm text-gray-500">
-              © {currentYear} ProjectFinish. All rights reserved.
+              © {currentYear} CodeSalvage. All rights reserved.
             </p>
 
             {/* Legal links */}

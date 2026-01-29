@@ -21,7 +21,7 @@ test.describe('Playwright Setup Verification', () => {
     await navigateTo(page, '/');
 
     // Verify page title
-    await expect(page).toHaveTitle(/ProjectFinish/i);
+    await expect(page).toHaveTitle(/CodeSalvage/i);
 
     // Verify navigation is visible
     const nav = page.locator('nav');

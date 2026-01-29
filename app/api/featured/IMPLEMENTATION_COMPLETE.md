@@ -154,7 +154,7 @@ Prisma (Database ORM)
 STRIPE_SECRET_KEY="sk_live_..."
 STRIPE_WEBHOOK_SECRET="whsec_..."
 SENDGRID_API_KEY="SG...."
-SENDGRID_FROM_EMAIL="noreply@projectfinish.com"
+SENDGRID_FROM_EMAIL="noreply@codesalvage.com"
 CRON_SECRET="your-cron-secret"
 NEXT_PUBLIC_APP_URL="https://yourapp.com"
 ```

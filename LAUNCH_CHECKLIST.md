@@ -1,4 +1,4 @@
-# Production Launch Checklist - ProjectFinish
+# Production Launch Checklist - CodeSalvage
 
 **Comprehensive pre-launch verification for production deployment.**
 
@@ -302,7 +302,7 @@
 
 **Railway Cron Configuration**:
 ```
-0 */6 * * * curl -H "Authorization: Bearer ${CRON_SECRET}" https://projectfinish.com/api/cron/release-escrow
+0 */6 * * * curl -H "Authorization: Bearer ${CRON_SECRET}" https://codesalvage.com/api/cron/release-escrow
 ```
 
 ---
@@ -614,7 +614,7 @@ Before launching, the following people/roles must sign off:
 ## Emergency Contacts
 
 **Critical Issues**:
-- **José Airosa** (CTO): jose@projectfinish.com
+- **José Airosa** (CTO): jose@codesalvage.com
 - **Sentry Dashboard**: https://sentry.io/organizations/[your-org]/issues/
 - **Railway Dashboard**: https://railway.app/project/[your-project]
 - **Stripe Dashboard**: https://dashboard.stripe.com/
@@ -623,7 +623,7 @@ Before launching, the following people/roles must sign off:
 If critical issues arise, rollback to previous deployment:
 ```bash
 # Railway CLI
-railway rollback --project projectfinish
+railway rollback --project codesalvage
 ```
 
 ---
@@ -676,7 +676,7 @@ railway rollback --project projectfinish
 **Last Updated**: January 28, 2026
 **Next Review**: Before launch (final verification)
 
-**Questions?** Email support@projectfinish.com
+**Questions?** Email support@codesalvage.com
 
 ---
 
@@ -712,11 +712,11 @@ railway logs
 
 ### Critical URLs (Production)
 
-- **App**: https://projectfinish.com (after domain setup)
+- **App**: https://codesalvage.com (after domain setup)
 - **Sentry**: https://sentry.io
 - **Stripe**: https://dashboard.stripe.com
 - **Railway**: https://railway.app
-- **GitHub**: https://github.com/[your-org]/projectfinish
+- **GitHub**: https://github.com/[your-org]/codesalvage
 
 ---
 

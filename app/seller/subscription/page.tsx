@@ -71,7 +71,7 @@ export default async function SubscriptionManagementPage() {
       <div className="mb-8">
         <h1 className="mb-2 text-3xl font-bold">Subscription Management</h1>
         <p className="text-gray-600">
-          Manage your ProjectFinish subscription and billing
+          Manage your CodeSalvage subscription and billing
         </p>
       </div>
 
