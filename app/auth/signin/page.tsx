@@ -23,7 +23,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   signInWithEmailAndPassword,
@@ -49,6 +49,14 @@ import { AlertCircle } from 'lucide-react';
  * Sign In Page Component
  */
 export default function SignInPage() {
+  return (
+    <Suspense>
+      <SignInContent />
+    </Suspense>
+  );
+}
+
+function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';

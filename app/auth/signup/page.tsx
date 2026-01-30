@@ -23,7 +23,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   createUserWithEmailAndPassword,
@@ -48,6 +48,14 @@ import { AlertCircle } from 'lucide-react';
  * Sign Up Page Component
  */
 export default function SignUpPage() {
+  return (
+    <Suspense>
+      <SignUpContent />
+    </Suspense>
+  );
+}
+
+function SignUpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';

@@ -16,7 +16,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -36,6 +36,14 @@ import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
  * Magic Link Verification Page Component
  */
 export default function VerifyPage() {
+  return (
+    <Suspense>
+      <VerifyContent />
+    </Suspense>
+  );
+}
+
+function VerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const emailFromUrl = searchParams.get('email') ?? '';
