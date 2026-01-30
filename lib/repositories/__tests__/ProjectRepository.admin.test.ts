@@ -221,7 +221,7 @@ describe('ProjectRepository - Admin Methods', () => {
       (mockPrisma.project.update as any).mockResolvedValue(mockFeaturedProject);
 
       // Act
-      const result = await projectRepo.toggleFeatured(
+      await projectRepo.toggleFeatured(
         projectId,
         featured,
         featuredBy,
@@ -332,7 +332,7 @@ describe('ProjectRepository - Admin Methods', () => {
       (mockPrisma.project.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await projectRepo.getAllProjects({ status: 'draft' });
+      await projectRepo.getAllProjects({ status: 'draft' });
 
       // Assert
       expect(mockPrisma.project.findMany).toHaveBeenCalledWith(
@@ -347,7 +347,7 @@ describe('ProjectRepository - Admin Methods', () => {
       (mockPrisma.project.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await projectRepo.getAllProjects({
+      await projectRepo.getAllProjects({
         status: ['draft', 'active', 'sold'],
       });
 
@@ -364,7 +364,7 @@ describe('ProjectRepository - Admin Methods', () => {
       (mockPrisma.project.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await projectRepo.getAllProjects({ isFeatured: true });
+      await projectRepo.getAllProjects({ isFeatured: true });
 
       // Assert
       expect(mockPrisma.project.findMany).toHaveBeenCalledWith(
@@ -379,7 +379,7 @@ describe('ProjectRepository - Admin Methods', () => {
       (mockPrisma.project.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await projectRepo.getAllProjects({ sellerId: 'seller123' });
+      await projectRepo.getAllProjects({ sellerId: 'seller123' });
 
       // Assert
       expect(mockPrisma.project.findMany).toHaveBeenCalledWith(
@@ -394,7 +394,7 @@ describe('ProjectRepository - Admin Methods', () => {
       (mockPrisma.project.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await projectRepo.getAllProjects({
+      await projectRepo.getAllProjects({
         status: 'active',
         isFeatured: true,
         sellerId: 'seller123',
@@ -417,7 +417,7 @@ describe('ProjectRepository - Admin Methods', () => {
       (mockPrisma.project.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await projectRepo.getAllProjects({
+      await projectRepo.getAllProjects({
         limit: 20,
         offset: 40,
       });
@@ -436,7 +436,7 @@ describe('ProjectRepository - Admin Methods', () => {
       (mockPrisma.project.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await projectRepo.getAllProjects({
+      await projectRepo.getAllProjects({
         sortBy: 'viewCount',
         sortOrder: 'asc',
       });
@@ -472,9 +472,7 @@ describe('ProjectRepository - Admin Methods', () => {
 
       // Assert
       expect(result).toBe(250);
-      expect(mockPrisma.project.count).toHaveBeenCalledWith({
-        where: undefined,
-      });
+      expect(mockPrisma.project.count).toHaveBeenCalledWith();
     });
 
     it('should count projects filtered by status', async () => {

@@ -772,6 +772,7 @@ export class TransactionRepository {
               username: true,
               email: true,
               fullName: true,
+              avatarUrl: true,
               isVerifiedSeller: true,
               stripeAccountId: true,
             },
@@ -782,6 +783,7 @@ export class TransactionRepository {
               username: true,
               email: true,
               fullName: true,
+              avatarUrl: true,
             },
           },
           review: {

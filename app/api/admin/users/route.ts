@@ -17,7 +17,7 @@
  * GET /api/admin/users?isBanned=true&limit=20
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { requireAdminApiAuth } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {

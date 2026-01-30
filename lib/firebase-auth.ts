@@ -66,12 +66,13 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
     if (!user && decodedToken.email) {
       console.log('[Firebase Auth] Auto-creating user for:', decodedToken.email);
 
+      const email = decodedToken.email!;
       user = await prisma.user.create({
         data: {
           firebaseUid,
-          email: decodedToken.email,
-          username: decodedToken.email.split('@')[0], // Default username from email
-          emailVerified: decodedToken.email_verified ?? false,
+          email,
+          username: email.split('@')[0] ?? email,
+          emailVerified: decodedToken.email_verified ? new Date() : null,
         },
         select: {
           id: true,

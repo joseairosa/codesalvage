@@ -268,11 +268,11 @@ describe('AdminRepository', () => {
 
     it('should return audit logs with custom pagination', async () => {
       // Arrange
-      const mockLogs = [];
+      const mockLogs: any[] = [];
       (mockPrisma.adminAuditLog.findMany as any).mockResolvedValue(mockLogs);
 
       // Act
-      const result = await adminRepo.getAuditLogs({
+      await adminRepo.getAuditLogs({
         limit: 20,
         offset: 40,
         sortBy: 'action',
@@ -503,11 +503,11 @@ describe('AdminRepository', () => {
 
     it('should filter reports by status', async () => {
       // Arrange
-      const mockReports = [];
+      const mockReports: any[] = [];
       (mockPrisma.contentReport.findMany as any).mockResolvedValue(mockReports);
 
       // Act
-      const result = await adminRepo.getContentReports({}, 'pending');
+      await adminRepo.getContentReports({}, 'pending');
 
       // Assert
       expect(mockPrisma.contentReport.findMany).toHaveBeenCalledWith(
@@ -519,11 +519,11 @@ describe('AdminRepository', () => {
 
     it('should filter reports by content type', async () => {
       // Arrange
-      const mockReports = [];
+      const mockReports: any[] = [];
       (mockPrisma.contentReport.findMany as any).mockResolvedValue(mockReports);
 
       // Act
-      const result = await adminRepo.getContentReports({}, undefined, 'project');
+      await adminRepo.getContentReports({}, undefined, 'project');
 
       // Assert
       expect(mockPrisma.contentReport.findMany).toHaveBeenCalledWith(
@@ -535,11 +535,11 @@ describe('AdminRepository', () => {
 
     it('should filter reports by both status and content type', async () => {
       // Arrange
-      const mockReports = [];
+      const mockReports: any[] = [];
       (mockPrisma.contentReport.findMany as any).mockResolvedValue(mockReports);
 
       // Act
-      const result = await adminRepo.getContentReports({}, 'resolved', 'user');
+      await adminRepo.getContentReports({}, 'resolved', 'user');
 
       // Assert
       expect(mockPrisma.contentReport.findMany).toHaveBeenCalledWith(
@@ -655,9 +655,7 @@ describe('AdminRepository', () => {
 
       // Assert
       expect(result).toBe(42);
-      expect(mockPrisma.contentReport.count).toHaveBeenCalledWith({
-        where: undefined,
-      });
+      expect(mockPrisma.contentReport.count).toHaveBeenCalledWith();
     });
 
     it('should count content reports filtered by status', async () => {
@@ -708,9 +706,7 @@ describe('AdminRepository', () => {
 
       // Assert
       expect(result).toBe(150);
-      expect(mockPrisma.adminAuditLog.count).toHaveBeenCalledWith({
-        where: undefined,
-      });
+      expect(mockPrisma.adminAuditLog.count).toHaveBeenCalledWith();
     });
 
     it('should count audit logs filtered by admin ID', async () => {

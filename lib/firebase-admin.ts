@@ -24,9 +24,9 @@ export function getFirebaseAdmin(): admin.app.App {
     return firebaseAdmin;
   }
 
-  const serviceAccountBase64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
-  const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
-  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const serviceAccountBase64 = process.env['FIREBASE_SERVICE_ACCOUNT_BASE64'];
+  const serviceAccountPath = process.env['FIREBASE_SERVICE_ACCOUNT_PATH'];
+  const projectId = process.env['FIREBASE_PROJECT_ID'];
 
   if (!projectId) {
     throw new Error('[Firebase Admin] FIREBASE_PROJECT_ID is required');

@@ -233,9 +233,9 @@ export class AdminRepository {
           action: data.action,
           targetType: data.targetType,
           targetId: data.targetId,
-          reason: data.reason,
-          metadata: data.metadata,
-          ipAddress: data.ipAddress,
+          ...(data.reason !== undefined ? { reason: data.reason } : {}),
+          ...(data.metadata !== undefined ? { metadata: data.metadata as any } : {}),
+          ...(data.ipAddress !== undefined ? { ipAddress: data.ipAddress } : {}),
         },
       });
 
@@ -535,7 +535,7 @@ export class AdminRepository {
           status: data.status,
           reviewedBy: data.reviewedBy,
           reviewedAt: new Date(),
-          resolution: data.resolution,
+          ...(data.resolution !== undefined ? { resolution: data.resolution } : {}),
         },
       });
 
@@ -563,9 +563,9 @@ export class AdminRepository {
     console.log('[AdminRepository] countContentReports called:', { status });
 
     try {
-      const count = await this.prisma.contentReport.count({
-        where: status ? { status } : undefined,
-      });
+      const count = status
+        ? await this.prisma.contentReport.count({ where: { status } })
+        : await this.prisma.contentReport.count();
 
       console.log('[AdminRepository] Content report count:', count);
       return count;
@@ -591,9 +591,9 @@ export class AdminRepository {
     console.log('[AdminRepository] countAuditLogs called:', { adminId });
 
     try {
-      const count = await this.prisma.adminAuditLog.count({
-        where: adminId ? { adminId } : undefined,
-      });
+      const count = adminId
+        ? await this.prisma.adminAuditLog.count({ where: { adminId } })
+        : await this.prisma.adminAuditLog.count();
 
       console.log('[AdminRepository] Audit log count:', count);
       return count;

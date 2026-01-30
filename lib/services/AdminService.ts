@@ -160,7 +160,7 @@ export class AdminService {
           email: user.email,
           isSeller: user.isSeller,
         },
-        ipAddress,
+        ...(ipAddress ? { ipAddress } : {}),
       });
 
       // Send email notification
@@ -238,7 +238,7 @@ export class AdminService {
           previousBanReason: user.bannedReason,
           bannedBy: user.bannedBy,
         },
-        ipAddress,
+        ...(ipAddress ? { ipAddress } : {}),
       });
 
       // Send email notification
@@ -316,7 +316,7 @@ export class AdminService {
           sellerId: project.sellerId,
           previousStatus: project.status,
         },
-        ipAddress,
+        ...(ipAddress ? { ipAddress } : {}),
       });
 
       console.log('[AdminService] Project approved successfully:', projectId);
@@ -385,7 +385,7 @@ export class AdminService {
           sellerId: project.sellerId,
           previousStatus: project.status,
         },
-        ipAddress,
+        ...(ipAddress ? { ipAddress } : {}),
       });
 
       console.log('[AdminService] Project rejected successfully:', projectId);
@@ -463,10 +463,10 @@ export class AdminService {
         metadata: {
           title: project.title,
           sellerId: project.sellerId,
-          featuredDays: featured ? featuredDays : undefined,
+          ...(featured && featuredDays ? { featuredDays } : {}),
           previouslyFeatured: project.isFeatured,
         },
-        ipAddress,
+        ...(ipAddress ? { ipAddress } : {}),
       });
 
       console.log(
@@ -620,7 +620,7 @@ export class AdminService {
           contentType: updatedReport.contentType,
           contentId: updatedReport.contentId,
         },
-        ipAddress,
+        ...(ipAddress ? { ipAddress } : {}),
       });
 
       console.log('[AdminService] Content report resolved successfully:', reportId);
@@ -687,7 +687,7 @@ export class AdminService {
           buyerId: transaction.buyerId,
           projectId: transaction.projectId,
         },
-        ipAddress,
+        ...(ipAddress ? { ipAddress } : {}),
       });
 
       console.log('[AdminService] Escrow released manually:', transactionId);

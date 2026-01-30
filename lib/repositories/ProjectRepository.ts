@@ -885,9 +885,9 @@ export class ProjectRepository {
     console.log('[ProjectRepository] countAllProjects called:', { status });
 
     try {
-      const count = await this.prisma.project.count({
-        where: status ? { status } : undefined,
-      });
+      const count = status
+        ? await this.prisma.project.count({ where: { status } })
+        : await this.prisma.project.count();
 
       console.log('[ProjectRepository] Project count (admin):', count);
       return count;

@@ -88,6 +88,7 @@ describe('TransactionRepository - Admin Methods', () => {
               username: true,
               email: true,
               fullName: true,
+              avatarUrl: true,
               isVerifiedSeller: true,
               stripeAccountId: true,
             },
@@ -98,6 +99,7 @@ describe('TransactionRepository - Admin Methods', () => {
               username: true,
               email: true,
               fullName: true,
+              avatarUrl: true,
             },
           },
           review: {
@@ -117,7 +119,7 @@ describe('TransactionRepository - Admin Methods', () => {
       (mockPrisma.transaction.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await transactionRepo.getAllTransactions({
+      await transactionRepo.getAllTransactions({
         paymentStatus: 'succeeded',
       });
 
@@ -134,7 +136,7 @@ describe('TransactionRepository - Admin Methods', () => {
       (mockPrisma.transaction.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await transactionRepo.getAllTransactions({
+      await transactionRepo.getAllTransactions({
         escrowStatus: 'held',
       });
 
@@ -151,7 +153,7 @@ describe('TransactionRepository - Admin Methods', () => {
       (mockPrisma.transaction.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await transactionRepo.getAllTransactions({
+      await transactionRepo.getAllTransactions({
         sellerId: 'seller123',
       });
 
@@ -168,7 +170,7 @@ describe('TransactionRepository - Admin Methods', () => {
       (mockPrisma.transaction.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await transactionRepo.getAllTransactions({
+      await transactionRepo.getAllTransactions({
         buyerId: 'buyer123',
       });
 
@@ -185,7 +187,7 @@ describe('TransactionRepository - Admin Methods', () => {
       (mockPrisma.transaction.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await transactionRepo.getAllTransactions({
+      await transactionRepo.getAllTransactions({
         projectId: 'proj123',
       });
 
@@ -202,7 +204,7 @@ describe('TransactionRepository - Admin Methods', () => {
       (mockPrisma.transaction.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await transactionRepo.getAllTransactions({
+      await transactionRepo.getAllTransactions({
         paymentStatus: 'succeeded',
         escrowStatus: 'held',
         sellerId: 'seller123',
@@ -225,7 +227,7 @@ describe('TransactionRepository - Admin Methods', () => {
       (mockPrisma.transaction.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await transactionRepo.getAllTransactions({
+      await transactionRepo.getAllTransactions({
         limit: 20,
         offset: 40,
       });
@@ -244,7 +246,7 @@ describe('TransactionRepository - Admin Methods', () => {
       (mockPrisma.transaction.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await transactionRepo.getAllTransactions({
+      await transactionRepo.getAllTransactions({
         sortBy: 'amountCents',
         sortOrder: 'asc',
       });
@@ -262,7 +264,7 @@ describe('TransactionRepository - Admin Methods', () => {
       (mockPrisma.transaction.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await transactionRepo.getAllTransactions({
+      await transactionRepo.getAllTransactions({
         sortBy: 'escrowReleaseDate',
         sortOrder: 'desc',
       });

@@ -9,7 +9,7 @@
  * DELETE /api/favorites/project123
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { FavoriteService } from '@/lib/services/FavoriteService';

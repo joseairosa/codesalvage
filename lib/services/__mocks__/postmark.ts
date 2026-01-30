@@ -11,7 +11,7 @@ export const sendEmail = vi.fn();
 export class ServerClient {
   sendEmail = sendEmail;
 
-  constructor(apiKey: string) {
+  constructor(_apiKey: string) {
     // Mock constructor
   }
 }

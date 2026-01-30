@@ -266,7 +266,7 @@ describe('UserRepository - Admin Methods', () => {
       (mockPrisma.user.findMany as any).mockResolvedValue(mockBannedUsers);
 
       // Act
-      const result = await userRepo.getAllUsers({ isBanned: true });
+      await userRepo.getAllUsers({ isBanned: true });
 
       // Assert
       expect(mockPrisma.user.findMany).toHaveBeenCalledWith({
@@ -286,7 +286,7 @@ describe('UserRepository - Admin Methods', () => {
       (mockPrisma.user.findMany as any).mockResolvedValue(mockAdmins);
 
       // Act
-      const result = await userRepo.getAllUsers({ isAdmin: true });
+      await userRepo.getAllUsers({ isAdmin: true });
 
       // Assert
       expect(mockPrisma.user.findMany).toHaveBeenCalledWith({
@@ -306,7 +306,7 @@ describe('UserRepository - Admin Methods', () => {
       (mockPrisma.user.findMany as any).mockResolvedValue(mockSellers);
 
       // Act
-      const result = await userRepo.getAllUsers({ isSeller: true });
+      await userRepo.getAllUsers({ isSeller: true });
 
       // Assert
       expect(mockPrisma.user.findMany).toHaveBeenCalledWith({
@@ -330,7 +330,7 @@ describe('UserRepository - Admin Methods', () => {
       (mockPrisma.user.findMany as any).mockResolvedValue(mockVerifiedSellers);
 
       // Act
-      const result = await userRepo.getAllUsers({ isVerifiedSeller: true });
+      await userRepo.getAllUsers({ isVerifiedSeller: true });
 
       // Assert
       expect(mockPrisma.user.findMany).toHaveBeenCalledWith({
@@ -346,7 +346,7 @@ describe('UserRepository - Admin Methods', () => {
       (mockPrisma.user.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await userRepo.getAllUsers({
+      await userRepo.getAllUsers({
         isBanned: false,
         isSeller: true,
         isVerifiedSeller: true,
@@ -370,7 +370,7 @@ describe('UserRepository - Admin Methods', () => {
       (mockPrisma.user.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await userRepo.getAllUsers({
+      await userRepo.getAllUsers({
         limit: 20,
         offset: 40,
       });
@@ -389,7 +389,7 @@ describe('UserRepository - Admin Methods', () => {
       (mockPrisma.user.findMany as any).mockResolvedValue([]);
 
       // Act
-      const result = await userRepo.getAllUsers({
+      await userRepo.getAllUsers({
         sortBy: 'email',
         sortOrder: 'asc',
       });

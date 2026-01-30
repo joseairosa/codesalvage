@@ -20,14 +20,6 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import {
@@ -39,10 +31,8 @@ import {
 } from '@/components/ui/select';
 import {
   AlertTriangle,
-  User,
   Shield,
   Clock,
-  FileText,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';

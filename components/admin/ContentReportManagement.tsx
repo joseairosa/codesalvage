@@ -44,8 +44,6 @@ import {
   Flag,
   CheckCircle,
   XCircle,
-  Clock,
-  MessageSquare,
 } from 'lucide-react';
 
 /**

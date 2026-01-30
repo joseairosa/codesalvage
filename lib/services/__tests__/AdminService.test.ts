@@ -406,7 +406,7 @@ describe('AdminService', () => {
       (mockAdminRepo.createAuditLog as any).mockResolvedValue({});
 
       // Act
-      const result = await adminService.rejectProject(adminId, projectId, reason, ipAddress);
+      await adminService.rejectProject(adminId, projectId, reason, ipAddress);
 
       // Assert
       expect(mockProjectRepo.rejectProject).toHaveBeenCalledWith(projectId, reason);
@@ -468,7 +468,7 @@ describe('AdminService', () => {
       (mockAdminRepo.createAuditLog as any).mockResolvedValue({});
 
       // Act
-      const result = await adminService.toggleProjectFeatured(
+      await adminService.toggleProjectFeatured(
         adminId,
         projectId,
         true,
@@ -540,7 +540,7 @@ describe('AdminService', () => {
       (mockAdminRepo.createAuditLog as any).mockResolvedValue({});
 
       // Act
-      const result = await adminService.releaseEscrowManually(
+      await adminService.releaseEscrowManually(
         adminId,
         transactionId,
         reason,

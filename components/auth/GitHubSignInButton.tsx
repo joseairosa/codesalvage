@@ -29,7 +29,7 @@ interface GitHubSignInButtonProps {
  * GitHub Sign In Button
  */
 export function GitHubSignInButton({
-  callbackUrl = '/dashboard',
+  callbackUrl: _callbackUrl = '/dashboard',
 }: GitHubSignInButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 

@@ -22,7 +22,7 @@
  * GET /api/projects?category=web_app&minCompletion=80&page=1&limit=20
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {

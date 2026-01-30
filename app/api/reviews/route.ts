@@ -11,7 +11,7 @@
  * POST /api/reviews { transactionId, overallRating, comment, ... }
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { withApiRateLimit, withPublicRateLimit } from '@/lib/middleware/withRateLimit';

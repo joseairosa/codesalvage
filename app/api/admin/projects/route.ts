@@ -29,7 +29,7 @@
  * - 500: Server error
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { requireAdminApiAuth } from '@/lib/api-auth';
 import { getAdminService, getProjectRepository } from '@/lib/utils/admin-services';
 
