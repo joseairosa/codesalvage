@@ -72,6 +72,18 @@ export interface FeaturedListingEmailData {
   projectUrl: string;
 }
 
+export interface UserBannedEmailData {
+  username: string;
+  reason: string;
+  bannedAt: string;
+  supportEmail: string;
+}
+
+export interface UserUnbannedEmailData {
+  username: string;
+  unbannedAt: string;
+}
+
 export class EmailService {
   private fromEmail: string;
   private fromName: string;
@@ -299,9 +311,7 @@ export class EmailService {
     try {
       await this.client.sendEmail({
         From: `${this.fromName} <${this.fromEmail}>`,
-        To: recipient.name
-          ? `${recipient.name} <${recipient.email}>`
-          : recipient.email,
+        To: recipient.name ? `${recipient.name} <${recipient.email}>` : recipient.email,
         Subject: subject,
         HtmlBody: html,
         TextBody: text,
@@ -1034,6 +1044,207 @@ Feature this project again: ${data.projectUrl}
 
 Questions? Visit your seller dashboard or contact support:
 ${appUrl}/seller/dashboard
+
+CodeSalvage - Marketplace for Incomplete Software Projects
+${appUrl}
+    `.trim();
+  }
+
+  /**
+   * Send user banned notification
+   */
+  async sendUserBannedNotification(
+    recipient: EmailRecipient,
+    data: UserBannedEmailData
+  ): Promise<void> {
+    const subject = 'Your CodeSalvage account has been suspended';
+    const html = this.getUserBannedHTML(data);
+    const text = this.getUserBannedText(data);
+
+    await this.sendEmail(recipient, subject, html, text);
+
+    console.log(`[${componentName}] User banned notification sent:`, recipient.email);
+  }
+
+  /**
+   * Send user unbanned notification
+   */
+  async sendUserUnbannedNotification(
+    recipient: EmailRecipient,
+    data: UserUnbannedEmailData
+  ): Promise<void> {
+    const subject = 'Your CodeSalvage account has been reactivated';
+    const html = this.getUserUnbannedHTML(data);
+    const text = this.getUserUnbannedText(data);
+
+    await this.sendEmail(recipient, subject, html, text);
+
+    console.log(`[${componentName}] User unbanned notification sent:`, recipient.email);
+  }
+
+  /**
+   * Email Templates - User Banned
+   */
+  private getUserBannedHTML(data: UserBannedEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #ef4444; border-bottom: 2px solid #ef4444; padding-bottom: 10px;">
+    Account Suspended
+  </h1>
+
+  <p>Hi ${data.username},</p>
+
+  <p>Your CodeSalvage account has been suspended due to a violation of our Terms of Service.</p>
+
+  <div style="background: #fee2e2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444;">
+    <h2 style="margin-top: 0; color: #991b1b;">Suspension Reason</h2>
+    <p style="margin: 0;">${data.reason}</p>
+  </div>
+
+  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h2 style="margin-top: 0;">What This Means</h2>
+    <ul style="margin: 10px 0;">
+      <li>You cannot access your dashboard</li>
+      <li>Your projects are no longer visible on the marketplace</li>
+      <li>You cannot purchase or sell projects</li>
+      <li>Your messaging capabilities are disabled</li>
+    </ul>
+  </div>
+
+  <h2>Think This Was a Mistake?</h2>
+  <p>If you believe this suspension was made in error, please contact our support team:</p>
+  <p><a href="mailto:${data.supportEmail}" style="color: #10b981;">${data.supportEmail}</a></p>
+
+  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+  <p style="font-size: 12px; color: #6b7280;">
+    Suspended: ${new Date(data.bannedAt).toLocaleString()}<br>
+    CodeSalvage - Marketplace for Incomplete Software Projects<br>
+    <a href="${appUrl}" style="color: #10b981;">${appUrl}</a>
+  </p>
+</body>
+</html>
+    `.trim();
+  }
+
+  private getUserBannedText(data: UserBannedEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+ACCOUNT SUSPENDED
+
+Hi ${data.username},
+
+Your CodeSalvage account has been suspended due to a violation of our Terms of Service.
+
+SUSPENSION REASON
+${data.reason}
+
+WHAT THIS MEANS
+- You cannot access your dashboard
+- Your projects are no longer visible on the marketplace
+- You cannot purchase or sell projects
+- Your messaging capabilities are disabled
+
+THINK THIS WAS A MISTAKE?
+If you believe this suspension was made in error, please contact our support team:
+${data.supportEmail}
+
+Suspended: ${new Date(data.bannedAt).toLocaleString()}
+
+CodeSalvage - Marketplace for Incomplete Software Projects
+${appUrl}
+    `.trim();
+  }
+
+  /**
+   * Email Templates - User Unbanned
+   */
+  private getUserUnbannedHTML(data: UserUnbannedEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #10b981; border-bottom: 2px solid #10b981; padding-bottom: 10px;">
+    Account Reactivated! 🎉
+  </h1>
+
+  <p>Hi ${data.username},</p>
+
+  <p>Good news! Your CodeSalvage account has been reactivated and you now have full access to the platform.</p>
+
+  <div style="background: #d1fae5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+    <h2 style="margin-top: 0; color: #065f46;">Your Access Has Been Restored</h2>
+    <p style="margin: 0;">You can now:</p>
+    <ul style="margin: 10px 0;">
+      <li>Access your dashboard</li>
+      <li>Browse and purchase projects</li>
+      <li>List your own projects (if seller)</li>
+      <li>Send and receive messages</li>
+      <li>Participate fully in the marketplace</li>
+    </ul>
+  </div>
+
+  <h2>Welcome Back!</h2>
+  <p>We're glad to have you back. Please review our <a href="${appUrl}/terms" style="color: #10b981;">Terms of Service</a> to ensure future compliance.</p>
+
+  <div style="text-align: center; margin: 30px 0;">
+    <a href="${appUrl}/dashboard" style="background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block;">
+      Go to Dashboard
+    </a>
+  </div>
+
+  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+  <p style="font-size: 12px; color: #6b7280;">
+    Reactivated: ${new Date(data.unbannedAt).toLocaleString()}<br>
+    CodeSalvage - Marketplace for Incomplete Software Projects<br>
+    <a href="${appUrl}" style="color: #10b981;">${appUrl}</a>
+  </p>
+</body>
+</html>
+    `.trim();
+  }
+
+  private getUserUnbannedText(data: UserUnbannedEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+ACCOUNT REACTIVATED! 🎉
+
+Hi ${data.username},
+
+Good news! Your CodeSalvage account has been reactivated and you now have full access to the platform.
+
+YOUR ACCESS HAS BEEN RESTORED
+You can now:
+- Access your dashboard
+- Browse and purchase projects
+- List your own projects (if seller)
+- Send and receive messages
+- Participate fully in the marketplace
+
+WELCOME BACK!
+We're glad to have you back. Please review our Terms of Service to ensure future compliance:
+${appUrl}/terms
+
+Go to your dashboard: ${appUrl}/dashboard
+
+Reactivated: ${new Date(data.unbannedAt).toLocaleString()}
 
 CodeSalvage - Marketplace for Incomplete Software Projects
 ${appUrl}

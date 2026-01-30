@@ -27,6 +27,8 @@
  */
 
 // Dynamic import to handle client/server differences
+// require() is necessary here for synchronous conditional loading based on runtime environment
+/* eslint-disable @typescript-eslint/no-require-imports */
 const getHoneybadger = () => {
   if (typeof window !== 'undefined') {
     // Client-side
@@ -36,6 +38,7 @@ const getHoneybadger = () => {
     return require('../../honeybadger.server.config').default;
   }
 };
+/* eslint-enable @typescript-eslint/no-require-imports */
 
 /**
  * Capture and report an exception to Honeybadger
@@ -61,7 +64,10 @@ export function captureException(
     const Honeybadger = getHoneybadger();
 
     if (!Honeybadger.apiKey) {
-      console.warn('[Honeybadger] API key not configured, error not reported:', error.message);
+      console.warn(
+        '[Honeybadger] API key not configured, error not reported:',
+        error.message
+      );
       return;
     }
 
@@ -114,7 +120,10 @@ export function captureMessage(
     const Honeybadger = getHoneybadger();
 
     if (!Honeybadger.apiKey) {
-      console.warn('[Honeybadger] API key not configured, message not reported:', message);
+      console.warn(
+        '[Honeybadger] API key not configured, message not reported:',
+        message
+      );
       return;
     }
 

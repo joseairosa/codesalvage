@@ -1,4 +1,5 @@
 # Production Deployment Checklist
+
 **Project**: CodeSalvage (codesalvage.com)
 **Status**: 🚀 READY FOR DEPLOYMENT
 
@@ -7,6 +8,7 @@
 ## Pre-Deployment Summary
 
 **Completed** ✅:
+
 - [x] 507 tests passing
 - [x] Redis rate limiting implemented
 - [x] Redis caching on expensive queries
@@ -16,6 +18,7 @@
 - [x] Honeybadger error monitoring configured (code-level)
 
 **Remaining** ⏹️:
+
 - [ ] Railway production environment configuration
 - [ ] Honeybadger production API key setup
 - [ ] Custom domain (codesalvage.com) configuration
@@ -31,6 +34,7 @@
 **Current Status**: You're on the setup page ✅
 
 **Actions**:
+
 1. Copy your Honeybadger API key from the dashboard
 2. Note it down securely (you'll need it for Railway environment variables)
 
@@ -133,8 +137,8 @@ CRON_SECRET="your_cron_secret_for_production"
 2. Toggle from "Test mode" to "Live mode" (top right)
 3. Navigate to "Developers" → "API keys"
 4. Copy:
-   - **Secret key** (sk_live_...)
-   - **Publishable key** (pk_live_...)
+   - **Secret key** (sk*live*...)
+   - **Publishable key** (pk*live*...)
 5. Add to Railway environment variables
 
 #### 3.2 Configure Stripe Connect (for seller payouts)
@@ -150,6 +154,7 @@ CRON_SECRET="your_cron_secret_for_production"
 **Webhook URL**: `https://codesalvage.com/api/webhooks/stripe`
 
 **Events to Subscribe**:
+
 ```
 payment_intent.succeeded
 payment_intent.payment_failed
@@ -159,12 +164,13 @@ charge.refunded
 ```
 
 **How to Create Webhook**:
+
 1. Go to "Developers" → "Webhooks" in Stripe Dashboard
 2. Click "Add endpoint"
 3. Enter URL: `https://codesalvage.com/api/webhooks/stripe`
 4. Select events listed above
 5. Click "Add endpoint"
-6. Copy "Signing secret" (whsec_...)
+6. Copy "Signing secret" (whsec\_...)
 7. Add `STRIPE_WEBHOOK_SECRET` to Railway environment variables
 
 #### 3.4 Test Stripe Integration (After Deployment)
@@ -196,6 +202,7 @@ stripe trigger payment_intent.succeeded
 **Add these DNS records at your domain registrar**:
 
 **Option A: Using CNAME (Recommended)**
+
 ```
 Type: CNAME
 Name: @ (or leave blank for root domain)
@@ -204,6 +211,7 @@ TTL: 3600
 ```
 
 **Option B: Using A Record (if CNAME not supported for root)**
+
 ```
 Type: A
 Name: @ (or leave blank)
@@ -212,6 +220,7 @@ TTL: 3600
 ```
 
 **For www subdomain**:
+
 ```
 Type: CNAME
 Name: www
@@ -224,6 +233,7 @@ TTL: 3600
 Railway automatically provisions SSL certificates via Let's Encrypt once DNS propagates.
 
 **Verification**:
+
 - Wait 10-60 minutes for DNS propagation
 - Railway will show "SSL Active" in domain settings
 - Visit `https://codesalvage.com` to verify
@@ -258,10 +268,7 @@ Railway automatically provisions SSL certificates via Let's Encrypt once DNS pro
 ```json
 [
   {
-    "AllowedOrigins": [
-      "https://codesalvage.com",
-      "https://www.codesalvage.com"
-    ],
+    "AllowedOrigins": ["https://codesalvage.com", "https://www.codesalvage.com"],
     "AllowedMethods": ["GET", "PUT", "POST", "DELETE"],
     "AllowedHeaders": ["*"],
     "ExposeHeaders": ["ETag"],
@@ -286,6 +293,7 @@ Railway automatically provisions SSL certificates via Let's Encrypt once DNS pro
 6. Set default "From" email: `noreply@codesalvage.com`
 
 **Verify Environment Variable**:
+
 ```bash
 SENDGRID_FROM_EMAIL="noreply@codesalvage.com"
 ```
@@ -303,6 +311,7 @@ SENDGRID_FROM_EMAIL="noreply@codesalvage.com"
 **Cron Expression**: `0 */6 * * *`
 
 **Command**:
+
 ```bash
 curl -H "Authorization: Bearer ${CRON_SECRET}" https://codesalvage.com/api/cron/release-escrow
 ```
@@ -312,6 +321,7 @@ curl -H "Authorization: Bearer ${CRON_SECRET}" https://codesalvage.com/api/cron/
 **Cron Expression**: `0 2 * * *`
 
 **Command**:
+
 ```bash
 curl -H "Authorization: Bearer ${CRON_SECRET}" https://codesalvage.com/api/cron/cleanup-featured
 ```
@@ -321,11 +331,13 @@ curl -H "Authorization: Bearer ${CRON_SECRET}" https://codesalvage.com/api/cron/
 **Cron Expression**: `0 10 * * *`
 
 **Command**:
+
 ```bash
 curl -H "Authorization: Bearer ${CRON_SECRET}" https://codesalvage.com/api/cron/featured-expiration-warning
 ```
 
 **How to Add Cron Jobs in Railway**:
+
 1. Railway Dashboard → Your Project
 2. Click "Add Service" → "Cron Job"
 3. Enter cron expression and command
@@ -353,6 +365,7 @@ git push origin main
 ```
 
 Railway will automatically:
+
 1. Detect the push
 2. Run `npm run build` (includes Prisma generate)
 3. Deploy the standalone Next.js app
@@ -404,42 +417,50 @@ railway run npx prisma migrate deploy
 ### Step 11: Smoke Testing Checklist
 
 #### 11.1 Basic Availability ✅
+
 - [ ] Visit `https://codesalvage.com`
 - [ ] Verify homepage loads without errors
 - [ ] Check browser console for JavaScript errors
 - [ ] Verify SSL certificate is valid (green padlock)
 
 #### 11.2 Authentication ✅
+
 - [ ] Click "Sign In" button
 - [ ] Sign in with GitHub OAuth
 - [ ] Verify redirected back to homepage after login
 - [ ] Check user menu displays correctly
 
 #### 11.3 API Endpoints ✅
+
 - [ ] Visit `/api/health` (should return 200 OK)
 - [ ] Visit `/api/projects` (should return projects list)
 - [ ] Check Honeybadger dashboard for any errors
 
 #### 11.4 Database Connectivity ✅
+
 - [ ] Create a test project (as seller)
 - [ ] Verify project appears in database
 - [ ] Delete test project
 
 #### 11.5 Redis Connectivity ✅
+
 - [ ] Check rate limiting works (try 10 rapid requests)
 - [ ] Verify cached responses (check response headers if implemented)
 
 #### 11.6 Stripe Integration ✅
+
 - [ ] Make a test purchase (use test card: 4242 4242 4242 4242)
 - [ ] Verify webhook received (check Stripe Dashboard → Webhooks)
 - [ ] Check transaction appears in database
 
 #### 11.7 SendGrid Emails ✅
+
 - [ ] Complete a test purchase
 - [ ] Verify buyer receives confirmation email
 - [ ] Verify seller receives notification email
 
 #### 11.8 File Uploads (Cloudflare R2) ✅
+
 - [ ] Upload a project screenshot
 - [ ] Verify image displays correctly
 - [ ] Check R2 bucket for uploaded file
@@ -453,6 +474,7 @@ railway run npx prisma migrate deploy
 #### 12.1 Honeybadger Alerts
 
 **Email Notifications**:
+
 1. Honeybadger Dashboard → Project Settings → Notifications
 2. Add your email address
 3. Configure alert rules:
@@ -461,6 +483,7 @@ railway run npx prisma migrate deploy
    - Critical errors (tagged `severity: critical`): Immediate
 
 **Slack Integration** (Optional):
+
 1. Honeybadger → Integrations → Slack
 2. Connect your Slack workspace
 3. Choose channel: `#engineering` or `#alerts`
@@ -469,6 +492,7 @@ railway run npx prisma migrate deploy
 #### 12.2 Railway Monitoring
 
 **Railway Dashboard**:
+
 1. Go to "Metrics" tab
 2. Monitor:
    - CPU usage
@@ -477,6 +501,7 @@ railway run npx prisma migrate deploy
    - Response time
 
 **Set up alerts** (if available):
+
 - CPU > 80%: Alert
 - Memory > 80%: Alert
 - Error rate > 5%: Alert
@@ -484,11 +509,13 @@ railway run npx prisma migrate deploy
 #### 12.3 Uptime Monitoring (Optional)
 
 **Recommended Tools**:
+
 - **UptimeRobot** (Free): https://uptimerobot.com/
 - **Pingdom** (Paid): https://www.pingdom.com/
 - **StatusCake** (Free tier): https://www.statuscake.com/
 
 **Setup**:
+
 1. Create account
 2. Add monitor: `https://codesalvage.com/api/health`
 3. Check interval: 5 minutes
@@ -501,6 +528,7 @@ railway run npx prisma migrate deploy
 ### Step 13: Production Security Verification
 
 #### 13.1 HTTPS Enforcement ✅
+
 ```bash
 # Test HTTP redirects to HTTPS
 curl -I http://codesalvage.com
@@ -508,12 +536,14 @@ curl -I http://codesalvage.com
 ```
 
 #### 13.2 Security Headers ✅
+
 ```bash
 # Check security headers
 curl -I https://codesalvage.com | grep -E "(X-Frame-Options|X-Content-Type-Options|Strict-Transport-Security)"
 ```
 
 **Expected Headers**:
+
 ```
 X-Frame-Options: DENY
 X-Content-Type-Options: nosniff
@@ -521,6 +551,7 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains
 ```
 
 #### 13.3 Rate Limiting ✅
+
 ```bash
 # Test rate limiting
 for i in {1..10}; do curl -I https://codesalvage.com/api/projects; done
@@ -528,6 +559,7 @@ for i in {1..10}; do curl -I https://codesalvage.com/api/projects; done
 ```
 
 #### 13.4 Environment Variables ✅
+
 - [ ] Verify no secrets in public code (GitHub)
 - [ ] Verify `.env` files are in `.gitignore`
 - [ ] Verify Railway environment variables are set correctly
@@ -539,18 +571,21 @@ for i in {1..10}; do curl -I https://codesalvage.com/api/projects; done
 ### Step 14: Run Lighthouse Audit
 
 **Chrome DevTools**:
+
 1. Open Chrome DevTools (F12)
 2. Navigate to "Lighthouse" tab
 3. Select all categories
 4. Click "Analyze page load"
 
 **Expected Scores**:
+
 - Performance: > 90 (desktop), > 80 (mobile)
 - Accessibility: > 95
 - Best Practices: > 95
 - SEO: > 90
 
 **Fix Common Issues**:
+
 - Low performance: Check image optimization, JavaScript bundle size
 - Low accessibility: Check alt text, ARIA labels, color contrast
 - Low SEO: Check meta tags, sitemap, robots.txt
@@ -576,11 +611,13 @@ for i in {1..10}; do curl -I https://codesalvage.com/api/projects; done
 **If Something Goes Wrong**:
 
 **Option 1: Revert to Previous Deployment (Railway)**
+
 1. Railway Dashboard → Deployments
 2. Find previous successful deployment
 3. Click "..." → "Redeploy"
 
 **Option 2: Rollback Git Commit**
+
 ```bash
 # Find last working commit
 git log
@@ -593,6 +630,7 @@ git push origin main
 ```
 
 **Option 3: Rollback Environment Variables**
+
 1. Railway Dashboard → Variables
 2. Click on variable
 3. View history
@@ -605,6 +643,7 @@ git push origin main
 ### Final Pre-Launch Checklist
 
 **24 Hours Before Launch**:
+
 - [ ] All environment variables configured in Railway
 - [ ] Honeybadger API key set and tested
 - [ ] Custom domain (codesalvage.com) DNS configured
@@ -622,6 +661,7 @@ git push origin main
 - [ ] Lighthouse audit > 80 all categories
 
 **Launch Day**:
+
 - [ ] Deploy to production (git push)
 - [ ] Verify homepage loads
 - [ ] Test authentication flow
@@ -631,6 +671,7 @@ git push origin main
 - [ ] Announce launch (ProductHunt, social media)
 
 **First Week**:
+
 - [ ] Monitor Honeybadger daily
 - [ ] Check Railway resource usage
 - [ ] Review user feedback
@@ -644,17 +685,21 @@ git push origin main
 ### Contact Information
 
 **Critical Issues** (Production Down):
+
 1. Check Railway status: https://status.railway.app/
 2. Check Honeybadger dashboard for errors
 3. Check Railway logs: Dashboard → Logs
 
 **Stripe Issues**:
+
 - Stripe Support: https://support.stripe.com/
 
 **Honeybadger Issues**:
+
 - Honeybadger Support: support@honeybadger.io
 
 **Domain/DNS Issues**:
+
 - Your domain registrar support
 
 ---
@@ -664,6 +709,7 @@ git push origin main
 ### Week 1-2 Optimizations
 
 **Monitor and Optimize**:
+
 1. Review Honeybadger error frequency
 2. Optimize slow API endpoints (> 1s response time)
 3. Review Redis cache hit rates
@@ -689,10 +735,10 @@ git push origin main
 
 3. **Stripe Live Mode** (30 min):
    - Toggle to live mode in Stripe Dashboard
-   - Copy live API keys (sk_live_, pk_live_)
+   - Copy live API keys (sk*live*, pk*live*)
    - Add to Railway environment variables
    - Create webhook endpoint
-   - Copy webhook secret (whsec_)
+   - Copy webhook secret (whsec\_)
    - Add to Railway environment variables
 
 4. **Custom Domain** (30 min + DNS propagation time):
@@ -705,6 +751,7 @@ git push origin main
    - Update callback URL in GitHub OAuth app settings
 
 6. **Deploy** (10 min):
+
    ```bash
    git push origin main
    ```

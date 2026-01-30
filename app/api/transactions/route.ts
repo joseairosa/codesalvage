@@ -10,8 +10,8 @@
  * GET /api/transactions?view=seller&page=1&limit=20
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { type NextRequest, NextResponse } from 'next/server';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import {
@@ -47,8 +47,8 @@ const transactionService = new TransactionService(
  */
 async function listTransactions(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -58,7 +58,7 @@ async function listTransactions(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20', 10);
 
     console.log(`[${componentName}] Fetching transactions:`, {
-      userId: session.user.id,
+      userId: auth.user.id,
       view,
       page,
       limit,
@@ -67,11 +67,11 @@ async function listTransactions(request: NextRequest) {
     // Get transactions based on view
     const result =
       view === 'seller'
-        ? await transactionService.getSellerTransactions(session.user.id, {
+        ? await transactionService.getSellerTransactions(auth.user.id, {
             page,
             limit,
           })
-        : await transactionService.getBuyerTransactions(session.user.id, {
+        : await transactionService.getBuyerTransactions(auth.user.id, {
             page,
             limit,
           });
@@ -137,7 +137,7 @@ async function listTransactions(request: NextRequest) {
  *
  * GET: API rate limiting (100 requests / minute per user)
  */
-export const GET = withApiRateLimit(listTransactions, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const GET = withApiRateLimit(listTransactions, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });

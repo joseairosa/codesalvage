@@ -18,6 +18,7 @@ By using the Platform, you consent to the use of cookies in accordance with this
 Cookies are small text files stored on your device (computer, smartphone, tablet) when you visit websites. They help websites remember your preferences, improve functionality, and provide analytics.
 
 **Types of storage**:
+
 - **Cookies**: Small text files stored by your browser
 - **Local Storage**: Key-value pairs stored in your browser
 - **Session Storage**: Temporary storage cleared when you close the browser
@@ -27,6 +28,7 @@ Cookies are small text files stored on your device (computer, smartphone, tablet
 ## 3. Why We Use Cookies
 
 We use cookies to:
+
 - Keep you logged in
 - Remember your preferences
 - Protect against security threats
@@ -43,6 +45,7 @@ We use cookies to:
 **Purpose**: These cookies are strictly necessary for the Platform to function. You cannot opt out of essential cookies.
 
 **Examples**:
+
 - **Session cookies**: Keep you logged in
 - **Security tokens**: Protect against CSRF attacks
 - **Authentication cookies**: Verify your identity
@@ -51,6 +54,7 @@ We use cookies to:
 **Duration**: Session cookies (deleted when you close browser) or up to 30 days
 
 **Data collected**:
+
 - Session ID
 - User ID (encrypted)
 - CSRF token
@@ -65,6 +69,7 @@ We use cookies to:
 **Purpose**: Remember your preferences and improve your experience.
 
 **Examples**:
+
 - **Language preference**: Remember your selected language
 - **Theme preference**: Remember dark/light mode choice
 - **Notification settings**: Remember which notifications you want
@@ -73,6 +78,7 @@ We use cookies to:
 **Duration**: Up to 1 year
 
 **Data collected**:
+
 - Language code (e.g., "en", "es")
 - Theme preference ("light" or "dark")
 - Notification preferences
@@ -87,12 +93,14 @@ We use cookies to:
 **Purpose**: Help us understand how visitors use the Platform so we can improve it.
 
 **Examples**:
+
 - **Google Analytics**: Track page views, session duration, bounce rate
 - **Cloudflare Analytics**: Monitor performance and detect issues
 
 **Duration**: Up to 2 years
 
 **Data collected**:
+
 - Pages visited
 - Time spent on pages
 - Click patterns
@@ -103,6 +111,7 @@ We use cookies to:
 - Approximate location (city/country level)
 
 **How to opt out**:
+
 - Settings → Privacy → Analytics Cookies → Disable
 - Google Analytics opt-out: https://tools.google.com/dlpage/gaoptout
 
@@ -113,12 +122,14 @@ We use cookies to:
 **Purpose**: Monitor Platform performance and identify errors.
 
 **Examples**:
+
 - **Honeybadger**: Error monitoring and crash reporting
 - **Redis Cache**: Store temporary data for faster page loads
 
 **Duration**: Up to 1 year
 
 **Data collected**:
+
 - Page load times
 - API response times
 - Error messages
@@ -138,6 +149,7 @@ We use cookies to:
 **Provider**: Google LLC
 
 **Data collected**:
+
 - Page views
 - Session duration
 - Bounce rate
@@ -159,6 +171,7 @@ We use cookies to:
 **Provider**: Stripe, Inc.
 
 **Data collected**:
+
 - Payment verification status
 - Fraud detection data
 - Device fingerprint
@@ -178,6 +191,7 @@ We use cookies to:
 **Provider**: Cloudflare, Inc.
 
 **Data collected**:
+
 - IP address
 - Browser type
 - Request metadata
@@ -194,30 +208,30 @@ We use cookies to:
 
 ### 6.1 First-Party Cookies (Set by CodeSalvage)
 
-| Cookie Name | Purpose | Duration | Type |
-|-------------|---------|----------|------|
-| `next-auth.session-token` | Authentication | 30 days | Essential |
-| `next-auth.csrf-token` | CSRF protection | Session | Essential |
-| `next-auth.callback-url` | Login redirect | Session | Essential |
-| `theme` | Dark/light mode preference | 1 year | Functional |
-| `language` | Language preference | 1 year | Functional |
-| `cookie-consent` | Remember cookie preferences | 1 year | Essential |
-| `search-history` | Recent searches | 7 days | Functional |
+| Cookie Name               | Purpose                     | Duration | Type       |
+| ------------------------- | --------------------------- | -------- | ---------- |
+| `next-auth.session-token` | Authentication              | 30 days  | Essential  |
+| `next-auth.csrf-token`    | CSRF protection             | Session  | Essential  |
+| `next-auth.callback-url`  | Login redirect              | Session  | Essential  |
+| `theme`                   | Dark/light mode preference  | 1 year   | Functional |
+| `language`                | Language preference         | 1 year   | Functional |
+| `cookie-consent`          | Remember cookie preferences | 1 year   | Essential  |
+| `search-history`          | Recent searches             | 7 days   | Functional |
 
 ---
 
 ### 6.2 Third-Party Cookies
 
-| Cookie Name | Provider | Purpose | Duration |
-|-------------|----------|---------|----------|
-| `_ga` | Google Analytics | Analytics tracking | 2 years |
-| `_ga_*` | Google Analytics | Analytics session | 2 years |
-| `_gid` | Google Analytics | Analytics identifier | 24 hours |
-| `_gat` | Google Analytics | Throttle requests | 1 minute |
-| `__stripe_mid` | Stripe | Fraud prevention | 1 year |
-| `__stripe_sid` | Stripe | Payment session | 30 minutes |
-| `__cflb` | Cloudflare | Load balancing | Session |
-| `__cf_bm` | Cloudflare | Bot management | 30 minutes |
+| Cookie Name    | Provider         | Purpose              | Duration   |
+| -------------- | ---------------- | -------------------- | ---------- |
+| `_ga`          | Google Analytics | Analytics tracking   | 2 years    |
+| `_ga_*`        | Google Analytics | Analytics session    | 2 years    |
+| `_gid`         | Google Analytics | Analytics identifier | 24 hours   |
+| `_gat`         | Google Analytics | Throttle requests    | 1 minute   |
+| `__stripe_mid` | Stripe           | Fraud prevention     | 1 year     |
+| `__stripe_sid` | Stripe           | Payment session      | 30 minutes |
+| `__cflb`       | Cloudflare       | Load balancing       | Session    |
+| `__cf_bm`      | Cloudflare       | Bot management       | 30 minutes |
 
 ---
 
@@ -226,6 +240,7 @@ We use cookies to:
 In addition to cookies, we use browser local storage to store:
 
 **Data stored**:
+
 - Draft project listings (auto-save)
 - Shopping cart (for future features)
 - User preferences
@@ -242,6 +257,7 @@ In addition to cookies, we use browser local storage to store:
 We use session storage for temporary data:
 
 **Data stored**:
+
 - Form validation errors
 - Temporary UI state
 - Redirect URLs
@@ -257,6 +273,7 @@ We use session storage for temporary data:
 **Access**: Settings → Privacy → Cookie Preferences
 
 **Options**:
+
 - Essential Cookies: **Always On** (required)
 - Functional Cookies: On/Off
 - Analytics Cookies: On/Off
@@ -269,6 +286,7 @@ We use session storage for temporary data:
 ### 9.2 Browser Settings
 
 **Most browsers allow you to**:
+
 - Block all cookies
 - Block third-party cookies only
 - Delete cookies after each session
@@ -277,20 +295,24 @@ We use session storage for temporary data:
 **How to manage cookies in popular browsers**:
 
 **Google Chrome**:
+
 1. Settings → Privacy and security → Cookies and other site data
 2. Choose your cookie settings
 3. Manage individual cookies: Site Settings → View permissions and data stored
 
 **Mozilla Firefox**:
+
 1. Settings → Privacy & Security → Cookies and Site Data
 2. Choose your cookie settings
 3. Manage Data → View and remove individual cookies
 
 **Safari (Mac)**:
+
 1. Preferences → Privacy → Manage Website Data
 2. View and remove individual cookies
 
 **Microsoft Edge**:
+
 1. Settings → Cookies and site permissions → Cookies and site data
 2. Choose your cookie settings
 3. See all cookies and site data → View and remove individual cookies
@@ -300,9 +322,11 @@ We use session storage for temporary data:
 ### 9.3 Mobile Browsers
 
 **Safari (iOS)**:
+
 1. Settings → Safari → Block All Cookies
 
 **Chrome (Android)**:
+
 1. Chrome → Settings → Site Settings → Cookies
 2. Choose your cookie settings
 
@@ -311,6 +335,7 @@ We use session storage for temporary data:
 ### 9.4 Opt-Out Links
 
 **Google Analytics**:
+
 - Browser extension: https://tools.google.com/dlpage/gaoptout
 - Works across all websites using Google Analytics
 
@@ -321,6 +346,7 @@ We use session storage for temporary data:
 ### 10.1 Essential Cookies Disabled
 
 **Impact**:
+
 - ❌ Cannot log in
 - ❌ Cannot make purchases
 - ❌ CSRF protection disabled (security risk)
@@ -333,6 +359,7 @@ We use session storage for temporary data:
 ### 10.2 Functional Cookies Disabled
 
 **Impact**:
+
 - ⚠️ Preferences not remembered
 - ⚠️ Must select language/theme each visit
 - ⚠️ Search history not saved
@@ -345,6 +372,7 @@ We use session storage for temporary data:
 ### 10.3 Analytics Cookies Disabled
 
 **Impact**:
+
 - ✅ No impact on functionality
 - ⚠️ We cannot improve Platform based on your usage
 - ✅ Increased privacy
@@ -356,6 +384,7 @@ We use session storage for temporary data:
 ### 10.4 Performance Cookies Disabled
 
 **Impact**:
+
 - ⚠️ Errors may not be reported
 - ⚠️ Platform may be slower (no caching)
 - ✅ Can still use Platform
@@ -371,6 +400,7 @@ We use session storage for temporary data:
 **Our response**: We currently **do not respond** to DNT signals. This is because there is no industry standard for how to interpret DNT.
 
 **How to enable DNT**:
+
 - Chrome: Settings → Privacy and security → Send a "Do Not Track" request
 - Firefox: Settings → Privacy & Security → Send websites a "Do Not Track" signal
 - Safari: Preferences → Privacy → Website tracking
@@ -402,6 +432,7 @@ We may update this Cookie Policy from time to time. Changes will be posted on th
 When you first visit the Platform, you will see a cookie consent banner.
 
 **Options**:
+
 - **Accept All Cookies**: Enable all cookie types
 - **Essential Only**: Enable only essential cookies
 - **Customize**: Choose which cookie types to enable
@@ -425,11 +456,13 @@ You can change your cookie preferences at any time:
 ### 15.1 European Union (GDPR)
 
 Under GDPR, you have the right to:
+
 - Know what cookies we use
 - Opt out of non-essential cookies
 - Withdraw consent at any time
 
 **Legal basis for cookies**:
+
 - Essential cookies: Legitimate interest (Platform functionality)
 - Optional cookies: Consent (you opt in)
 
@@ -438,6 +471,7 @@ Under GDPR, you have the right to:
 ### 15.2 California (CCPA)
 
 Under CCPA, you have the right to:
+
 - Know what information is collected via cookies
 - Opt out of sale of personal information (we do not sell your information)
 
@@ -457,10 +491,12 @@ If you have questions about this Cookie Policy:
 ## 17. Additional Resources
 
 **Learn more about cookies**:
+
 - All About Cookies: https://www.allaboutcookies.org
 - Cookie information: https://www.cookiepolicygenerator.com/cookie-policy-generator/
 
 **Browser cookie guides**:
+
 - Chrome: https://support.google.com/chrome/answer/95647
 - Firefox: https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer
 - Safari: https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac

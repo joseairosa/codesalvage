@@ -62,6 +62,12 @@ export function createMockUser(overrides?: Partial<User>): User {
     stripeAccountId: null,
     taxId: null,
     isVerifiedSeller: false,
+    isAdmin: false,
+    isBanned: false,
+    bannedAt: null,
+    bannedReason: null,
+    bannedBy: null,
+    firebaseUid: null,
     sellerVerificationDate: null,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -110,6 +116,7 @@ export function createMockSession(user?: Partial<User>): Session {
       username: mockUser.username,
       isSeller: mockUser.isSeller,
       isVerifiedSeller: mockUser.isVerifiedSeller,
+      isAdmin: mockUser.isAdmin,
     },
     expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
   };

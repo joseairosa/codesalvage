@@ -7,12 +7,14 @@
 ## Table of Contents
 
 **General**
+
 - [What is CodeSalvage?](#what-is-codesalvage)
 - [Who is CodeSalvage for?](#who-is-codesalvage-for)
 - [How does CodeSalvage work?](#how-does-codesalvage-work)
 - [Is CodeSalvage legitimate?](#is-codesalvage-legitimate)
 
 **For Buyers**
+
 - [What am I actually buying?](#what-am-i-actually-buying)
 - [How do I know if a project is good quality?](#how-do-i-know-if-a-project-is-good-quality)
 - [Can I get a refund?](#can-i-get-a-refund)
@@ -22,6 +24,7 @@
 - [Can I resell a project I purchase?](#can-i-resell-a-project-i-purchase)
 
 **For Sellers**
+
 - [How much does it cost to sell?](#how-much-does-it-cost-to-sell)
 - [When do I get paid?](#when-do-i-get-paid)
 - [How many projects can I list?](#how-many-projects-can-i-list)
@@ -30,18 +33,21 @@
 - [What if a buyer disputes?](#what-if-a-buyer-disputes)
 
 **Pricing & Payments**
+
 - [What payment methods are accepted?](#what-payment-methods-are-accepted)
 - [Are there any hidden fees?](#are-there-any-hidden-fees)
 - [What is the Pro subscription?](#what-is-the-pro-subscription)
 - [Can I cancel Pro subscription?](#can-i-cancel-pro-subscription)
 
 **Technical**
+
 - [What tech stacks are supported?](#what-tech-stacks-are-supported)
 - [How is code delivered?](#how-is-code-delivered)
 - [Can I get help setting up a project?](#can-i-get-help-setting-up-a-project)
 - [What if I find bugs in a purchased project?](#what-if-i-find-bugs-in-a-purchased-project)
 
 **Legal & Security**
+
 - [Who owns the code after purchase?](#who-owns-the-code-after-purchase)
 - [Is my payment information secure?](#is-my-payment-information-secure)
 - [What happens to my data?](#what-happens-to-my-data)
@@ -58,6 +64,7 @@
 Sellers list partially completed projects they don't have time to finish. Buyers purchase these projects as a head start on their own development, saving time and money compared to building from scratch.
 
 **Key Features**:
+
 - Search projects by tech stack, completion %, and price
 - 7-day buyer protection (escrow period)
 - Secure payments via Stripe
@@ -69,12 +76,14 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 ### Who is CodeSalvage for?
 
 **For Sellers**:
+
 - Developers with unfinished side projects
 - Freelancers with abandoned client work (with client permission)
 - Agencies with unused starter templates
 - Anyone with code that could be valuable to others
 
 **For Buyers**:
+
 - Developers wanting a head start on projects
 - Freelancers needing starter code for client work
 - Entrepreneurs launching MVPs quickly
@@ -94,6 +103,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 5. **Review**: 7-day escrow period to test code and report issues
 
 **For Sellers**:
+
 1. **List**: Create project listing with details, screenshots, pricing
 2. **Sell**: Buyers discover and purchase your project
 3. **Escrow**: Payment held for 7 days (buyer protection)
@@ -106,6 +116,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **Yes, CodeSalvage is a legitimate platform.**
 
 **Security Measures**:
+
 - ✅ Payments processed by Stripe (industry standard)
 - ✅ 7-day escrow protection for buyers
 - ✅ Seller verification for Pro accounts
@@ -113,6 +124,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 - ✅ Platform moderation and fraud detection
 
 **Not a Scam Indicator**:
+
 - Clear pricing (no hidden fees)
 - Transparent buyer protection policy
 - Public seller ratings and reviews
@@ -126,11 +138,13 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 ### What am I actually buying?
 
 **You're buying:**
+
 - ✅ Source code for an unfinished project
 - ✅ A head start on development
 - ✅ Time savings vs. building from scratch
 
 **You're NOT buying:**
+
 - ❌ A finished, production-ready product
 - ❌ Ongoing support or maintenance
 - ❌ Guaranteed bug-free code
@@ -145,6 +159,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **Quality Indicators**:
 
 **✅ Good Signs**:
+
 - Seller has Pro verified badge
 - High seller rating (4+ stars)
 - Multiple positive reviews
@@ -155,6 +170,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 - Seller responds to messages quickly
 
 **❌ Red Flags**:
+
 - No screenshots or only placeholder images
 - Vague description with no technical details
 - Seller has no reviews or low rating
@@ -171,6 +187,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **Yes, under certain conditions.**
 
 **7-Day Escrow Period** (Buyer Protection):
+
 - You have **7 days** to review the code after purchase
 - If project doesn't match description, open a dispute
 - Valid reasons for refund:
@@ -180,6 +197,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
   - ✅ Completion % significantly inflated
 
 **Invalid Reasons**:
+
 - ❌ You changed your mind
 - ❌ Code has bugs (unfinished code is expected to have bugs)
 - ❌ You can't figure out how to set it up (ask seller for help)
@@ -188,6 +206,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **After 7 Days**: Escrow released, refunds not possible (except fraud cases).
 
 **Refund Process**:
+
 1. Open dispute with evidence (screenshots, details)
 2. Platform reviews (2-3 business days)
 3. Decision: Full refund, partial refund, or no refund
@@ -200,6 +219,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **Escrow = Payment held for 7 days.**
 
 **How It Works**:
+
 1. You purchase a project
 2. Payment is held by platform (not sent to seller yet)
 3. You receive code immediately
@@ -207,12 +227,14 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 5. After 7 days (if no issues), seller receives payment
 
 **Benefits**:
+
 - ✅ Buyer protection against fraud or misrepresentation
 - ✅ Time to verify code matches description
 - ✅ Ability to dispute if significant issues found
 - ✅ Incentivizes sellers to be honest and accurate
 
 **What to Do in 7 Days**:
+
 - Download and extract code
 - Install dependencies and run project
 - Test major features
@@ -226,26 +248,31 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **Sometimes.**
 
 **GitHub Preview** (if seller provides):
+
 - Some sellers link public GitHub repos
 - You can preview code quality, structure, commits
 - Most valuable for evaluating before purchase
 
 **Live Demo** (if seller provides):
+
 - Test actual functionality
 - See project in action
 - Better than screenshots for understanding features
 
 **Screenshots & Videos**:
+
 - All projects have screenshots
 - Many have demo videos
 - Shows UI and features but not underlying code
 
 **If No Preview**:
+
 - Message seller asking for GitHub access or demo
 - Check seller rating and reviews
 - Understand there's more risk (use escrow period wisely)
 
 **After Purchase**:
+
 - You receive full code immediately (ZIP download or GitHub access)
 - 7-day escrow period to review
 
@@ -256,28 +283,33 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **Within 7-Day Escrow Period**:
 
 **First**: Message seller with specific error messages
+
 - Many setup issues have quick fixes
 - Seller may provide workarounds
 - Could be environment mismatch (Node.js version, etc.)
 
 **If Seller Can't Help**: Open a dispute
+
 - Document issues with screenshots
 - Provide error messages
 - Explain what doesn't work vs. description
 - Platform reviews and decides on refund
 
 **After 7 Days**:
+
 - Escrow released, refunds not available
 - Seller may still help if you message politely
 - Leave honest review to warn other buyers
 
 **Common Setup Issues** (not refund-worthy):
+
 - Missing environment variables (.env file)
 - Wrong Node.js/Python version
 - Dependencies not installed
 - Database not configured
 
 **Actual Misrepresentation** (refund-worthy):
+
 - Core features don't exist
 - Code is fundamentally broken
 - Project is 30% complete when advertised as 80%
@@ -317,25 +349,30 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 ### How much does it cost to sell?
 
 **No Upfront Fees**:
+
 - ✅ Free to create account
 - ✅ Free to list up to 3 projects (Free tier)
 - ✅ No monthly fees (unless Pro subscription)
 
 **Commission on Sales**:
+
 - **18% platform commission** on each sale
 - Example: $500 project → You receive $410 after $90 commission
 
 **Stripe Processing Fees**:
+
 - **2.9% + $0.30** per transaction (standard for online payments)
 - Deducted from sale price
 
 **Full Example**:
+
 - **Sale Price**: $500
 - **Stripe Fee**: $14.80 (2.9% + $0.30)
 - **Platform Commission**: $90 (18%)
 - **You Receive**: $395.20
 
 **Pro Subscription** (Optional):
+
 - $9.99/month for unlimited listings and benefits
 - See [What is the Pro subscription?](#what-is-the-pro-subscription)
 
@@ -344,21 +381,25 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 ### When do I get paid?
 
 **7-Day Escrow Period**:
+
 - Payment is held for 7 days after sale
 - Buyer protection period
 - If no disputes, funds released automatically
 
 **Payout Schedule**:
+
 - **Automatic**: Weekly (every Monday if balance > $50)
 - **Manual**: Request payout anytime (minimum $50 balance)
 - First payout may take 7-10 business days (Stripe verification)
 
 **Setup Required**:
+
 - Connect Stripe account (one-time setup)
 - Provide tax information (W-9 for US, W-8BEN international)
 - Link bank account for payouts
 
 **Total Wait Time**:
+
 - 7 days (escrow) + up to 7 days (payout schedule) = ~2 weeks from sale to bank account
 
 ---
@@ -366,21 +407,25 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 ### How many projects can I list?
 
 **Free Tier**:
+
 - Maximum **3 active projects** at once
 - Unlimited drafts (unpublished)
 - Unlimited sold projects (archived)
 
 **Pro Tier** ($9.99/month):
+
 - **Unlimited active projects**
 - No restrictions on published listings
 
 **What Counts as "Active"**:
+
 - ✅ Published and visible in search
 - ❌ Drafts (not yet published)
 - ❌ Sold projects (automatically archived)
 - ❌ Delisted projects (hidden but not deleted)
 
 **Reaching the Limit**:
+
 - You'll see warning when approaching 3 projects
 - Must delist or delete a project before publishing a new one
 - OR upgrade to Pro for unlimited
@@ -390,6 +435,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 ### What completion percentage should I use?
 
 **Be Honest**:
+
 - Accurate completion % builds trust
 - Inflated % leads to disputes and bad reviews
 - Buyers appreciate transparency
@@ -412,6 +458,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
   - Example: Fully functional, good documentation, just needs hosting setup
 
 **Consider**:
+
 - What's built vs. what was originally planned
 - Code quality (well-structured code = higher %)
 - Documentation (good docs increase effective completion)
@@ -420,9 +467,11 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **Example Descriptions**:
 
 **60% Complete**:
+
 > "Core functionality complete: user authentication, dashboard, basic CRUD operations. Remaining: advanced reporting, email notifications, payment integration (estimated 20-25 hours)."
 
 **85% Complete**:
+
 > "Fully functional with all planned features. Needs: minor bug fixes, test coverage improvement, deployment documentation (estimated 5-10 hours)."
 
 ---
@@ -432,22 +481,26 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **Yes, absolutely.**
 
 **Digital Goods**:
+
 - Code can be sold unlimited times
 - Each buyer receives full code
 - No exclusivity unless you specify
 
 **Exclusivity Options**:
+
 - Default: Non-exclusive (can sell to multiple buyers)
 - Optional: Offer exclusive rights for higher price
 - Specify in listing description if exclusive
 
 **Ethical Considerations**:
+
 - ✅ Always ethical to sell multiple copies (standard practice)
 - ✅ Buyers understand code isn't exclusive unless stated
 - ❌ Don't promise exclusivity if you plan to sell to others
 - ✅ Consider removing listing after first sale if you want exclusivity
 
 **Pricing Strategy**:
+
 - Non-exclusive: Standard pricing ($100-$1,000+)
 - Exclusive rights: 3-5x higher price (compensates for lost future sales)
 
@@ -479,18 +532,21 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **Common Dispute Reasons**:
 
 **Valid** (may result in refund):
+
 - Description significantly mismatched
 - Completion % vastly inflated
 - Major features missing vs. description
 - Critical files missing (code doesn't run)
 
 **Invalid** (unlikely to refund):
+
 - Buyer can't set up project (their responsibility)
 - Minor bugs in unfinished code (expected)
 - Buyer changed their mind (all sales final)
 - Features were disclosed in "known issues"
 
 **Protecting Yourself**:
+
 - ✅ Write accurate, detailed descriptions
 - ✅ List known issues upfront
 - ✅ Specify completion % honestly
@@ -499,6 +555,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 - ✅ Provide setup instructions with code
 
 **Dispute Resolution Tips**:
+
 - Stay professional (don't be defensive)
 - Provide evidence (screenshots of listing, messages)
 - Offer reasonable compromises (partial refund, extended support)
@@ -511,21 +568,25 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 ### What payment methods are accepted?
 
 **Buyers Can Pay With**:
+
 - ✅ Credit/Debit Cards (Visa, Mastercard, Amex, Discover)
 - ✅ Apple Pay
 - ✅ Google Pay
 - ✅ Bank transfers (via Stripe, select regions)
 
 **Powered by Stripe**:
+
 - Industry-leading payment processor
 - Secure, PCI-compliant
 - Your payment info never stored on CodeSalvage servers
 
 **Sellers Receive Payouts Via**:
+
 - Bank transfer (ACH for US, SEPA for EU, etc.)
 - Debit card (Stripe instant payouts, optional)
 
 **Not Accepted**:
+
 - ❌ PayPal (not integrated)
 - ❌ Cryptocurrency
 - ❌ Wire transfers
@@ -538,17 +599,20 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **No, pricing is transparent.**
 
 **For Buyers**:
+
 - Price shown = price you pay
 - No checkout fees, processing fees, or hidden costs
 - All fees included in project price
 
 **For Sellers**:
+
 - **18% platform commission** (clearly stated)
 - **2.9% + $0.30 Stripe fee** (industry standard)
 - **$9.99/month Pro subscription** (optional)
 - No surprise fees or charges
 
 **Example for $500 Project**:
+
 - **Buyer Pays**: $500 (exactly as listed)
 - **Seller Receives**: $395.20 (after $90 commission + $14.80 Stripe fee)
 
@@ -584,12 +648,14 @@ Sellers list partially completed projects they don't have time to finish. Buyers
    - Dedicated seller success manager (coming soon)
 
 **Who Should Subscribe**:
+
 - ✅ Serious sellers with 4+ projects
 - ✅ Sellers wanting verified badge for trust
 - ✅ Sellers using featured listings frequently (discount pays for itself)
 - ❌ Casual sellers with 1-2 projects (free tier is fine)
 
 **ROI Calculation**:
+
 - $9.99/month = $120/year
 - If you sell just 1 extra project due to Pro badge, it pays for itself
 - If you use 2+ featured listings/year, discount saves you $50+
@@ -601,6 +667,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 **Yes, cancel anytime.**
 
 **Cancellation Policy**:
+
 - No contracts or commitments
 - Cancel from your dashboard
 - Pro benefits remain active until end of billing period
@@ -608,6 +675,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 - No cancellation fees
 
 **What Happens After Cancellation**:
+
 - Pro badge removed from profile/listings
 - Project limit reverts to 3 active projects
 - Existing projects remain published (until you hit limit)
@@ -615,6 +683,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 - Analytics revert to basic view
 
 **Re-Subscribing**:
+
 - Can re-subscribe anytime
 - Pro benefits restore immediately
 - Same price ($9.99/month)
@@ -630,6 +699,7 @@ Sellers list partially completed projects they don't have time to finish. Buyers
 CodeSalvage is tech-agnostic. You can list projects built with any programming language, framework, or tools.
 
 **Popular Stacks** (most listed):
+
 - **Frontend**: React, Vue, Next.js, Angular, Svelte
 - **Backend**: Node.js, Python (Django/Flask), PHP (Laravel), Ruby on Rails, Go
 - **Databases**: PostgreSQL, MySQL, MongoDB, SQLite, Firebase
@@ -637,14 +707,17 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 - **Other**: Chrome Extensions, Desktop Apps (Electron), DevOps Tools, Scripts
 
 **Emerging Stacks**:
+
 - Rust, Deno, Bun, Fresh, SolidJS, Qwik, etc.
 
 **Search & Filters**:
+
 - Filter projects by tech stack tags
 - Search by framework or language
 - Find projects matching your expertise
 
 **As a Seller**:
+
 - Tag your project with all relevant technologies
 - Include frameworks, databases, languages
 - Helps buyers discover your project
@@ -656,6 +729,7 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 **Two Methods**:
 
 **1. ZIP File Download** (most common):
+
 - Immediate download after purchase
 - Contains all source code files
 - Typically 10-100MB
@@ -663,6 +737,7 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 - No Git history included
 
 **2. GitHub Repository Access** (if seller offers):
+
 - Seller grants you collaborator/read access
 - You receive GitHub invite email
 - Clone repo with `git clone`
@@ -670,6 +745,7 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 - Seller may revoke access after 30 days (download first)
 
 **What's Included**:
+
 - ✅ All source code files
 - ✅ Dependencies list (package.json, requirements.txt, etc.)
 - ✅ Configuration files (.env.example, etc.)
@@ -678,6 +754,7 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 - ❌ Database data (schema included, but no sample data usually)
 
 **After Download**:
+
 - Extract/clone to your development environment
 - Install dependencies
 - Configure environment variables
@@ -688,25 +765,30 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 ### Can I get help setting up a project?
 
 **From Seller**:
+
 - **Pre-Purchase**: Message seller with questions (recommended)
 - **Post-Purchase**: Most sellers help with setup questions (not required, but common)
 - **Best Practice**: Be specific with error messages and context
 
 **From CodeSalvage**:
+
 - ❌ Platform support does NOT provide code help
 - ✅ Platform support helps with account, payment, disputes
 
 **From Community** (coming soon):
+
 - Discord server for buyers and sellers
 - Ask setup questions
 - Share solutions and tips
 
 **Third-Party Help**:
+
 - Hire freelancer to set up or finish project (Upwork, Fiverr)
 - Post on Stack Overflow with specific error messages
 - Search project's tech stack documentation
 
 **Documentation**:
+
 - Seller may include README with setup instructions
 - Check for INSTALL.md, SETUP.md, or docs/ folder
 - Look for .env.example showing required variables
@@ -716,6 +798,7 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 ### What if I find bugs in a purchased project?
 
 **Understanding Expectations**:
+
 - You bought **unfinished** code
 - Bugs are expected (disclosed in description)
 - Completion % indicates how much work remains
@@ -723,28 +806,33 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 **Within 7-Day Escrow Period**:
 
 **Minor Bugs** (expected):
+
 - UI glitches, validation issues, edge cases
 - These are normal in unfinished code
 - NOT grounds for refund
 - Finishing these bugs is part of "completing" the project
 
 **Major Bugs** (may warrant dispute):
+
 - Core features completely broken
 - Critical functionality doesn't work at all
 - Bugs prevent basic use of the project
 - If this wasn't disclosed, you can dispute
 
 **Message Seller**:
+
 - Report bugs politely
 - Seller may have workarounds or fixes
 - Shows good faith before disputing
 
 **After 7 Days**:
+
 - Seller may still help if you message (but not required)
 - You're responsible for fixing bugs (that's the remaining work)
 - Leave honest review mentioning bug severity
 
 **Best Practice**:
+
 - Expect bugs in unfinished code
 - Budget time to fix issues
 - Consider hiring developer if beyond your skill level
@@ -758,6 +846,7 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 **Depends on license type** specified by seller.
 
 **Full Code Transfer** (most common):
+
 - ✅ You own all rights
 - ✅ Can use commercially
 - ✅ Can modify freely
@@ -765,6 +854,7 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 - ✅ Seller retains no rights
 
 **Limited License**:
+
 - ✅ You can use commercially
 - ✅ You can modify
 - ❌ You cannot resell original code
@@ -772,16 +862,19 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 - Seller retains original rights
 
 **Custom License**:
+
 - Read seller's specific terms
 - Varies by project
 - Clarify with seller before purchasing
 
 **Check License Type**:
+
 - Displayed on project detail page
 - Specified in purchase agreement
 - Contact seller if unclear
 
 **Default Assumption**:
+
 - Most projects are "Full Code Transfer"
 - You own code after purchase
 - Seller cannot resell same code as "exclusive"
@@ -793,11 +886,13 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 **Yes, payments are highly secure.**
 
 **Powered by Stripe**:
+
 - Industry-leading payment processor
 - Used by Amazon, Google, Shopify, etc.
 - PCI DSS Level 1 certified (highest security standard)
 
 **Security Measures**:
+
 - ✅ End-to-end encryption (HTTPS)
 - ✅ Your card info NEVER touches CodeSalvage servers
 - ✅ Stripe handles all payment data
@@ -805,12 +900,14 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 - ✅ Fraud detection and monitoring
 
 **What We Store**:
+
 - ❌ NO credit card numbers
 - ❌ NO CVV codes
 - ❌ NO raw payment information
 - ✅ Only transaction IDs and statuses
 
 **Best Practices**:
+
 - Use strong password for your account
 - Enable two-factor authentication (GitHub account)
 - Monitor your bank statements
@@ -821,6 +918,7 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 ### What happens to my data?
 
 **Data We Collect**:
+
 - Account info (email, username from GitHub)
 - Project listings (descriptions, images, code)
 - Transaction history (purchases, sales)
@@ -828,6 +926,7 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 - Usage analytics (page views, searches)
 
 **How We Use Your Data**:
+
 - Provide platform services (buying, selling, messaging)
 - Process payments (via Stripe)
 - Send transaction notifications
@@ -835,17 +934,20 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 - Prevent fraud and abuse
 
 **Data We DON'T Sell**:
+
 - ✅ We NEVER sell your personal information
 - ✅ We NEVER share email lists with third parties
 - ✅ We NEVER sell usage data to advertisers
 
 **Data Privacy**:
+
 - Compliance with GDPR (EU), CCPA (California)
 - You can request data export
 - You can request account deletion
 - Deleted accounts remove personal info (transaction records retained for compliance)
 
 **Third-Party Services**:
+
 - **Stripe**: Payment processing (required for sales)
 - **GitHub**: Authentication (OAuth)
 - **Cloudflare R2**: File storage (code zips, images)
@@ -860,6 +962,7 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 **Yes, in most cases.**
 
 **Full Code Transfer** (majority of projects):
+
 - ✅ YES, use commercially
 - ✅ Launch products
 - ✅ Use for client work
@@ -867,22 +970,26 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 - ✅ Monetize directly
 
 **Limited License** (some projects):
+
 - ✅ YES, use commercially
 - ✅ Build products on top
 - ❌ CANNOT resell original code as-is
 - Check seller's specific terms
 
 **Custom License**:
+
 - Read seller's terms carefully
 - May have restrictions
 - Clarify with seller before purchasing
 
 **Check Before Buying**:
+
 - License type is shown on project page
 - If unclear, message seller
 - Default assumption: Commercial use allowed
 
 **Ethical Considerations**:
+
 - ✅ Give credit to original seller (optional but appreciated)
 - ✅ Customize and improve code (make it your own)
 - ❌ Don't resell code as-is claiming you built it (unethical, possibly violates license)
@@ -894,6 +1001,7 @@ CodeSalvage is tech-agnostic. You can list projects built with any programming l
 ### Contact Support
 
 **Email**: support@codesalvage.com
+
 - Response time: 24-48 hours
 - Include: Your account email, transaction ID (if applicable), detailed question
 

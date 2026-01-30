@@ -14,7 +14,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
   ProjectRepository,
@@ -89,9 +89,12 @@ const updateProjectSchema = z.object({
  *
  * Get project by ID
  */
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     console.log('[Project API] Getting project:', id);
 
@@ -127,15 +130,18 @@ export async function GET(_request: Request, { params }: { params: { id: string 
  *
  * Update project
  */
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     // Check authentication
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Parse and validate request body
     const body = await request.json();
@@ -151,7 +157,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       );
     }
 
-    console.log('[Project API] Updating project:', { id, userId: session.user.id });
+    console.log('[Project API] Updating project:', { id, userId: auth.user.id });
 
     // Filter out undefined values for exactOptionalPropertyTypes
     const updateData = Object.fromEntries(
@@ -161,7 +167,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     // Update project
     const project = await projectService.updateProject(
       id,
-      session.user.id,
+      auth.user.id,
       updateData as any
     );
 
@@ -209,20 +215,23 @@ export async function PUT(request: Request, { params }: { params: { id: string }
  *
  * Delete project
  */
-export async function DELETE(_request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     // Check authentication
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
-    console.log('[Project API] Deleting project:', { id, userId: session.user.id });
+    console.log('[Project API] Deleting project:', { id, userId: auth.user.id });
 
     // Delete project
-    await projectService.deleteProject(id, session.user.id);
+    await projectService.deleteProject(id, auth.user.id);
 
     console.log('[Project API] Project deleted successfully');
 

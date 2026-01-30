@@ -22,8 +22,8 @@
  * GET /api/projects?category=web_app&minCompletion=80&page=1&limit=20
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { type NextRequest, NextResponse } from 'next/server';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
   ProjectRepository,
@@ -99,14 +99,14 @@ const createProjectSchema = z.object({
  */
 async function createProject(request: NextRequest) {
   try {
-    // Check authentication
-    const session = await auth();
-    if (!session?.user?.id) {
+    // Check authentication (supports both cookie and Authorization header)
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Check if user is a seller
-    if (!session.user.isSeller) {
+    if (!auth.user.isSeller) {
       return NextResponse.json(
         { error: 'Only sellers can create projects' },
         { status: 403 }
@@ -128,7 +128,7 @@ async function createProject(request: NextRequest) {
     }
 
     console.log('[Projects API] Creating project:', {
-      userId: session.user.id,
+      userId: auth.user.id,
       title: validatedData.data.title,
     });
 
@@ -138,16 +138,13 @@ async function createProject(request: NextRequest) {
     );
 
     // Create project
-    const project = await projectService.createProject(
-      session.user.id,
-      createData as any
-    );
+    const project = await projectService.createProject(auth.user.id, createData as any);
 
     console.log('[Projects API] Project created successfully:', project.id);
 
     // Invalidate search cache (new project should appear in search)
     await invalidateCache.search();
-    await invalidateCache.seller(session.user.id);
+    await invalidateCache.seller(auth.user.id);
 
     return NextResponse.json(project, { status: 201 });
   } catch (error) {
@@ -265,9 +262,9 @@ async function searchProjects(request: NextRequest) {
  * POST: API rate limiting (100 requests / minute per user)
  * GET: Public rate limiting (1000 requests / hour per IP)
  */
-export const POST = withApiRateLimit(createProject, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const POST = withApiRateLimit(createProject, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });
 
 export const GET = withPublicRateLimit(searchProjects);

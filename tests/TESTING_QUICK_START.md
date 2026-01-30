@@ -22,6 +22,7 @@ The testing process has 4 phases:
 ## Phase 1: Pre-Deployment Tests ✅
 
 ### Run All Unit & Integration Tests
+
 ```bash
 # From project root
 npm test
@@ -31,6 +32,7 @@ npm test
 ```
 
 ### Check Test Coverage
+
 ```bash
 npm test -- --coverage
 
@@ -42,6 +44,7 @@ npm test -- --coverage
 ```
 
 ### Run Linting
+
 ```bash
 npm run lint
 
@@ -50,6 +53,7 @@ npm run lint
 ```
 
 ### TypeScript Type Checking
+
 ```bash
 npx tsc --noEmit
 
@@ -57,6 +61,7 @@ npx tsc --noEmit
 ```
 
 ### Build Verification
+
 ```bash
 npm run build
 
@@ -89,6 +94,7 @@ Follow the [PRODUCTION_DEPLOYMENT.md](../PRODUCTION_DEPLOYMENT.md) checklist:
 **Run this immediately after deployment (within 15 minutes)**
 
 ### Quick Smoke Test (10 minutes)
+
 Essential checks to verify production is functional:
 
 1. **Homepage loads** - https://codesalvage.com
@@ -105,9 +111,11 @@ Essential checks to verify production is functional:
 **If any of these fail, STOP and investigate before continuing.**
 
 ### Full Smoke Test (30-45 minutes)
+
 Complete checklist in [SMOKE_TESTING_CHECKLIST.md](./SMOKE_TESTING_CHECKLIST.md)
 
 **Sections**:
+
 1. Authentication Flow
 2. Homepage & Navigation
 3. Project Browsing & Search
@@ -132,6 +140,7 @@ Complete checklist in [SMOKE_TESTING_CHECKLIST.md](./SMOKE_TESTING_CHECKLIST.md)
 ### 4.1 Load Testing (1-2 hours)
 
 **Prerequisites**:
+
 ```bash
 # Install k6
 brew install k6  # macOS
@@ -140,6 +149,7 @@ choco install k6  # Windows
 ```
 
 **Run Load Tests**:
+
 ```bash
 cd tests/load-testing
 
@@ -177,12 +187,14 @@ k6 run spike-test.js
 ```
 
 **Monitor During Load Tests**:
+
 - **Honeybadger**: Watch for error spikes
 - **Railway Metrics**: CPU, memory, database connections
 - **Redis Metrics**: Cache hit rate, memory usage
 - **Stripe Dashboard**: Payment success rate
 
 **If load tests fail**:
+
 1. Check Railway resource limits
 2. Check database connection pool
 3. Check Redis memory
@@ -194,32 +206,30 @@ k6 run spike-test.js
 Follow [CROSS_BROWSER_MOBILE_TESTING.md](./CROSS_BROWSER_MOBILE_TESTING.md)
 
 **Priority 1 Browsers** (30 minutes):
+
 1. Chrome Desktop (latest)
 2. Safari Desktop (latest)
 3. Mobile Safari (iPhone)
 4. Mobile Chrome (Android)
 
 **Test each browser**:
+
 - [ ] Homepage renders correctly
 - [ ] Navigation works
 - [ ] Forms functional
 - [ ] Payment flow works
 - [ ] No console errors
 
-**Priority 2 Browsers** (20 minutes):
-5. Firefox Desktop
-6. Edge Desktop
-7. Samsung Internet
+**Priority 2 Browsers** (20 minutes): 5. Firefox Desktop 6. Edge Desktop 7. Samsung Internet
 
-**Priority 3** (10 minutes):
-8. iPad testing (portrait & landscape)
-9. Accessibility (keyboard navigation, screen reader basics)
+**Priority 3** (10 minutes): 8. iPad testing (portrait & landscape) 9. Accessibility (keyboard navigation, screen reader basics)
 
 **Use BrowserStack or LambdaTest** for browsers/devices you don't have access to.
 
 ### 4.3 Mobile Responsive Testing (30 minutes)
 
 **Screen Sizes to Test**:
+
 - iPhone SE (375px)
 - iPhone 14 (390px)
 - iPhone 14 Pro Max (430px)
@@ -227,6 +237,7 @@ Follow [CROSS_BROWSER_MOBILE_TESTING.md](./CROSS_BROWSER_MOBILE_TESTING.md)
 - iPad Pro (1024px)
 
 **Using Chrome DevTools Device Mode**:
+
 1. Open Chrome DevTools (F12)
 2. Click "Toggle Device Toolbar" (Cmd+Shift+M)
 3. Select device from dropdown
@@ -241,23 +252,27 @@ Follow [CROSS_BROWSER_MOBILE_TESTING.md](./CROSS_BROWSER_MOBILE_TESTING.md)
 ### 4.4 Performance Validation (15 minutes)
 
 **Run Lighthouse Audit**:
+
 1. Open Chrome DevTools (F12)
 2. Go to "Lighthouse" tab
 3. Select all categories
 4. Click "Generate report"
 
 **Expected Scores**:
+
 - Performance: ≥ 85
 - Accessibility: ≥ 90
 - Best Practices: ≥ 90
 - SEO: ≥ 90
 
 **Test Multiple Pages**:
+
 - Homepage: https://codesalvage.com
 - Project List: https://codesalvage.com/projects
 - Project Detail: https://codesalvage.com/projects/[id]
 
 **If scores are low**:
+
 - Check "Opportunities" section for recommendations
 - Optimize images (WebP, AVIF)
 - Reduce JavaScript bundle size
@@ -268,6 +283,7 @@ Follow [CROSS_BROWSER_MOBILE_TESTING.md](./CROSS_BROWSER_MOBILE_TESTING.md)
 ## Testing Checklist Summary
 
 ### Before Deployment
+
 - [x] 507 tests passing
 - [x] Test coverage > 85%
 - [x] No lint errors
@@ -275,17 +291,20 @@ Follow [CROSS_BROWSER_MOBILE_TESTING.md](./CROSS_BROWSER_MOBILE_TESTING.md)
 - [x] Build successful
 
 ### After Deployment (Immediate)
+
 - [ ] Quick smoke test (10 min)
 - [ ] Full smoke test (45 min)
 - [ ] Check monitoring dashboards
 
 ### Extended Testing (Within 24 hours)
+
 - [ ] Load testing (1-2 hours)
 - [ ] Cross-browser testing (1 hour)
 - [ ] Mobile testing (30 min)
 - [ ] Performance audit (15 min)
 
 ### Post-Launch Monitoring (First Week)
+
 - [ ] Monitor Honeybadger daily
 - [ ] Check Railway metrics daily
 - [ ] Review Stripe transactions daily
@@ -297,6 +316,7 @@ Follow [CROSS_BROWSER_MOBILE_TESTING.md](./CROSS_BROWSER_MOBILE_TESTING.md)
 ## Issue Response Protocol
 
 ### Critical Issues (Site Down, Payments Failing)
+
 1. **Immediate**: Roll back deployment
 2. **Investigate**: Check Honeybadger, Railway logs
 3. **Fix**: Apply hotfix
@@ -304,6 +324,7 @@ Follow [CROSS_BROWSER_MOBILE_TESTING.md](./CROSS_BROWSER_MOBILE_TESTING.md)
 5. **Re-test**: Run smoke tests again
 
 ### High Priority Issues (Major Feature Broken)
+
 1. **Document**: Create GitHub issue
 2. **Prioritize**: Add to sprint backlog
 3. **Fix**: Within 24 hours
@@ -311,6 +332,7 @@ Follow [CROSS_BROWSER_MOBILE_TESTING.md](./CROSS_BROWSER_MOBILE_TESTING.md)
 5. **Verify**: Re-test affected feature
 
 ### Medium/Low Priority Issues
+
 1. **Document**: Create GitHub issue
 2. **Prioritize**: Add to next sprint
 3. **Fix**: Normal development cycle
@@ -321,6 +343,7 @@ Follow [CROSS_BROWSER_MOBILE_TESTING.md](./CROSS_BROWSER_MOBILE_TESTING.md)
 ## Monitoring Dashboards
 
 ### Production Monitoring (Check Daily)
+
 - **Honeybadger**: https://app.honeybadger.io/
   - Errors, warnings, alerts
   - Response times
@@ -356,6 +379,7 @@ Follow [CROSS_BROWSER_MOBILE_TESTING.md](./CROSS_BROWSER_MOBILE_TESTING.md)
 ## Success Criteria
 
 **Ready for Launch when**:
+
 - ✅ All 507 tests passing
 - ✅ Smoke tests pass (all critical features work)
 - ✅ Load tests pass (performance under load acceptable)

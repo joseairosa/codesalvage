@@ -5,6 +5,7 @@ This directory contains load testing scripts using [k6](https://k6.io/) to valid
 ## Prerequisites
 
 Install k6:
+
 ```bash
 # macOS
 brew install k6
@@ -22,6 +23,7 @@ sudo apt-get install k6
 ## Test Scenarios
 
 ### 1. Homepage Load Test
+
 Tests homepage performance under load.
 
 **Target**: 100 concurrent users for 5 minutes
@@ -32,6 +34,7 @@ k6 run homepage-load-test.js
 ```
 
 ### 2. Search API Load Test
+
 Tests search functionality under heavy load.
 
 **Target**: 50 concurrent users for 3 minutes
@@ -42,6 +45,7 @@ k6 run search-api-load-test.js
 ```
 
 ### 3. Payment Flow Load Test
+
 Tests payment intent creation under moderate load.
 
 **Target**: 20 concurrent authenticated users for 2 minutes
@@ -52,6 +56,7 @@ k6 run payment-flow-load-test.js
 ```
 
 ### 4. Spike Test
+
 Tests system behavior during traffic spikes.
 
 **Target**: 0 → 200 users → 0 over 10 minutes
@@ -64,6 +69,7 @@ k6 run spike-test.js
 ## Environment Variables
 
 Create a `.env.k6` file:
+
 ```bash
 # Production URL
 BASE_URL=https://codesalvage.com
@@ -77,30 +83,33 @@ TEST_AUTH_TOKEN=your-auth-token-here
 
 ## Performance Targets
 
-| Metric | Target | Critical |
-|--------|--------|----------|
-| Homepage (P95) | < 2.0s | < 3.0s |
-| Search API (P95) | < 500ms | < 1.0s |
-| Project Detail (P95) | < 1.5s | < 2.5s |
-| Payment Intent (P95) | < 3.0s | < 5.0s |
-| API Error Rate | < 0.1% | < 1.0% |
-| Database Queries | < 100ms | < 200ms |
+| Metric               | Target  | Critical |
+| -------------------- | ------- | -------- |
+| Homepage (P95)       | < 2.0s  | < 3.0s   |
+| Search API (P95)     | < 500ms | < 1.0s   |
+| Project Detail (P95) | < 1.5s  | < 2.5s   |
+| Payment Intent (P95) | < 3.0s  | < 5.0s   |
+| API Error Rate       | < 0.1%  | < 1.0%   |
+| Database Queries     | < 100ms | < 200ms  |
 
 ## Running Load Tests
 
 ### Development
+
 ```bash
 # Run against local environment
 BASE_URL=http://localhost:3011 k6 run homepage-load-test.js
 ```
 
 ### Staging
+
 ```bash
 # Run against staging environment
 BASE_URL=https://staging-codesalvage.railway.app k6 run homepage-load-test.js
 ```
 
 ### Production (CAREFUL)
+
 ```bash
 # Run with reduced load for production smoke test
 BASE_URL=https://codesalvage.com k6 run --vus 10 --duration 1m homepage-load-test.js
@@ -109,6 +118,7 @@ BASE_URL=https://codesalvage.com k6 run --vus 10 --duration 1m homepage-load-tes
 ## Interpreting Results
 
 ### Good Results ✅
+
 ```
 ✓ http_req_duration.............avg=450ms  p95=800ms
 ✓ http_req_failed...............0.00%
@@ -116,6 +126,7 @@ BASE_URL=https://codesalvage.com k6 run --vus 10 --duration 1m homepage-load-tes
 ```
 
 ### Warning Results ⚠️
+
 ```
 ✓ http_req_duration.............avg=1.2s   p95=2.8s
 ✗ http_req_failed...............0.15%
@@ -123,6 +134,7 @@ BASE_URL=https://codesalvage.com k6 run --vus 10 --duration 1m homepage-load-tes
 ```
 
 ### Critical Issues ❌
+
 ```
 ✗ http_req_duration.............avg=5.2s   p95=15s
 ✗ http_req_failed...............5.4%
@@ -139,15 +151,19 @@ BASE_URL=https://codesalvage.com k6 run --vus 10 --duration 1m homepage-load-tes
 ## Common Issues
 
 ### Rate Limiting Triggered
+
 If you see 429 errors, reduce VUs or increase duration:
+
 ```bash
 k6 run --vus 20 --duration 5m homepage-load-test.js
 ```
 
 ### Database Connection Pool Exhausted
+
 Check Railway Postgres metrics and adjust `connection_limit` in Prisma.
 
 ### Redis Memory Full
+
 Monitor Redis memory usage and adjust TTLs if needed.
 
 ## Load Testing Best Practices
@@ -161,6 +177,7 @@ Monitor Redis memory usage and adjust TTLs if needed.
 ## CI/CD Integration
 
 Add to GitHub Actions:
+
 ```yaml
 - name: Run Load Tests
   run: |
@@ -170,6 +187,7 @@ Add to GitHub Actions:
 ## Results Storage
 
 Results are stored in:
+
 - `results/` directory (gitignored)
 - Export to InfluxDB/Grafana for long-term tracking (optional)
 

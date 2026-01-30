@@ -16,7 +16,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signOut } from 'next-auth/react';
+import { useSignOut } from '@/lib/hooks/useSession';
 import Link from 'next/link';
 import {
   Sheet,
@@ -56,11 +56,12 @@ interface MobileMenuProps {
  */
 export function MobileMenu({ user }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const signOut = useSignOut();
 
   const handleSignOut = async () => {
     console.log('[MobileMenu] Signing out user:', user.id);
     setIsOpen(false);
-    await signOut({ callbackUrl: '/' });
+    await signOut();
   };
 
   // Get user initials for avatar fallback

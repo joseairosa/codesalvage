@@ -11,8 +11,8 @@
  * POST /api/favorites { projectId }
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { type NextRequest, NextResponse } from 'next/server';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import {
@@ -48,8 +48,8 @@ const addFavoriteSchema = z.object({
  */
 async function listFavorites(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -57,10 +57,10 @@ async function listFavorites(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '20', 10);
 
-    console.log(`[${componentName}] Fetching favorites for user:`, session.user.id);
+    console.log(`[${componentName}] Fetching favorites for user:`, auth.user.id);
 
     // Use FavoriteService to get favorites
-    const result = await favoriteService.getUserFavorites(session.user.id, {
+    const result = await favoriteService.getUserFavorites(auth.user.id, {
       page,
       limit,
     });
@@ -99,8 +99,8 @@ async function listFavorites(request: NextRequest) {
  */
 async function addFavorite(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -120,12 +120,12 @@ async function addFavorite(request: NextRequest) {
     const { projectId } = validatedData.data;
 
     console.log(`[${componentName}] Adding favorite:`, {
-      userId: session.user.id,
+      userId: auth.user.id,
       projectId,
     });
 
     // Use FavoriteService to add favorite
-    const favorite = await favoriteService.addFavorite(session.user.id, projectId);
+    const favorite = await favoriteService.addFavorite(auth.user.id, projectId);
 
     console.log(`[${componentName}] Favorite added:`, favorite.id);
 
@@ -169,12 +169,12 @@ async function addFavorite(request: NextRequest) {
  * GET: API rate limiting (100 requests / minute per user)
  * POST: API rate limiting (100 requests / minute per user)
  */
-export const GET = withApiRateLimit(listFavorites, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const GET = withApiRateLimit(listFavorites, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });
 
-export const POST = withApiRateLimit(addFavorite, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const POST = withApiRateLimit(addFavorite, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });

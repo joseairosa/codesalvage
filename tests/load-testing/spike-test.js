@@ -21,16 +21,16 @@ const serverErrors = new Counter('server_errors');
 // Test configuration
 export const options = {
   stages: [
-    { duration: '30s', target: 10 },    // Normal load
-    { duration: '30s', target: 200 },   // Spike to 200 users
-    { duration: '1m', target: 200 },    // Hold spike
-    { duration: '30s', target: 10 },    // Drop back to normal
-    { duration: '30s', target: 0 },     // Recovery
+    { duration: '30s', target: 10 }, // Normal load
+    { duration: '30s', target: 200 }, // Spike to 200 users
+    { duration: '1m', target: 200 }, // Hold spike
+    { duration: '30s', target: 10 }, // Drop back to normal
+    { duration: '30s', target: 0 }, // Recovery
   ],
   thresholds: {
-    'http_req_duration': ['p(95)<5000'],  // 95% should be below 5s (relaxed for spike)
-    'http_req_failed': ['rate<0.05'],     // Less than 5% errors (relaxed for spike)
-    'errors': ['rate<0.05'],              // Less than 5% errors
+    http_req_duration: ['p(95)<5000'], // 95% should be below 5s (relaxed for spike)
+    http_req_failed: ['rate<0.05'], // Less than 5% errors (relaxed for spike)
+    errors: ['rate<0.05'], // Less than 5% errors
   },
 };
 

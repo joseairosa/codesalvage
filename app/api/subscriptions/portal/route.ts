@@ -11,7 +11,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
   SubscriptionService,
@@ -44,8 +44,8 @@ const createPortalSessionSchema = z.object({
  */
 export async function POST(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -68,12 +68,12 @@ export async function POST(request: Request) {
       `${env.NEXT_PUBLIC_APP_URL || 'http://localhost:3011'}/settings/subscription`;
 
     console.log(`[${componentName}] Creating portal session:`, {
-      userId: session.user.id,
+      userId: auth.user.id,
       returnUrl,
     });
 
     const portalUrl = await subscriptionService.createPortalSession(
-      session.user.id,
+      auth.user.id,
       returnUrl
     );
 

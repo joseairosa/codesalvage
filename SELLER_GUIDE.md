@@ -64,11 +64,13 @@ Click "New Project" button in your seller dashboard or navigation menu.
 #### Basic Information
 
 **Title** (required)
+
 - Clear, descriptive name for your project
 - Example: "E-commerce Dashboard with Analytics"
 - Avoid generic titles like "My Project" or "Code for Sale"
 
 **Description** (required)
+
 - Explain what the project does
 - Highlight key features and functionality
 - Mention what's completed vs. what's remaining
@@ -76,6 +78,7 @@ Click "New Project" button in your seller dashboard or navigation menu.
 - Recommended length: 200-500 words
 
 **Category** (required)
+
 - Choose the most relevant category:
   - Web Application
   - Mobile App
@@ -89,6 +92,7 @@ Click "New Project" button in your seller dashboard or navigation menu.
 #### Completion Status
 
 **Completion Percentage** (required)
+
 - Honest assessment: 0% to 100%
 - Use the slider to set your project's completion level
 - Example values:
@@ -98,11 +102,13 @@ Click "New Project" button in your seller dashboard or navigation menu.
   - 95%: Nearly complete, minor bugs or finishing touches
 
 **Estimated Completion Hours** (optional)
+
 - How many hours would it take to finish the remaining work?
 - Helps buyers understand the effort required
 - Be realistic - buyers appreciate transparency
 
 **Known Issues** (optional but recommended)
+
 - List any bugs, missing features, or technical debt
 - Example: "Authentication works but needs password reset flow"
 - Transparency builds trust and reduces disputes
@@ -110,21 +116,25 @@ Click "New Project" button in your seller dashboard or navigation menu.
 #### Technical Details
 
 **Tech Stack** (required)
+
 - Select all technologies used in your project
 - Predefined options include: React, Vue, Node.js, Python, PostgreSQL, etc.
 - Add custom tags if your stack isn't listed
 - Minimum 1 tag, no maximum
 
 **Primary Language** (required)
+
 - The main programming language
 - Used for search filtering
 
 **Frameworks** (optional)
+
 - Key frameworks used (Next.js, Express, Django, etc.)
 
 #### Pricing
 
 **Price** (required)
+
 - Set price in USD (minimum $10)
 - Consider these factors:
   - Completion percentage
@@ -152,17 +162,20 @@ Click "New Project" button in your seller dashboard or navigation menu.
 #### Media Assets
 
 **Thumbnail Image** (required)
+
 - Main image shown in search results and project cards
 - Recommended size: 1200x630px
 - Should showcase your project's UI or architecture
 - Formats: JPG, PNG, WebP
 
 **Screenshots** (recommended)
+
 - Upload 3-8 screenshots showing key features
 - Max 10MB per image
 - Show actual UI, not placeholder screens
 
 **Demo Video** (optional but highly recommended)
+
 - YouTube or Vimeo embed URL
 - 2-5 minute walkthrough of features
 - Shows project in action better than screenshots
@@ -171,29 +184,34 @@ Click "New Project" button in your seller dashboard or navigation menu.
 #### Code & Demo Links
 
 **GitHub Repository** (optional but recommended)
+
 - Link to a public repo (or make repo public temporarily)
 - Buyers can preview code quality before purchase
 - Increases trust and reduces questions
 - You can make private after sale
 
 **Live Demo URL** (optional)
+
 - Link to a deployed demo of the project
 - Use free hosting: Vercel, Netlify, Railway
 - Significantly increases buyer confidence
 
 **Documentation URL** (optional)
+
 - Link to README, wiki, or docs site
 - Helps buyers understand setup and architecture
 
 ### Step 3: Save as Draft or Publish
 
 **Save as Draft**
+
 - Saves your progress without publishing
 - Not visible to buyers
 - You can edit and publish later
 - Drafts don't count toward your 3-project limit (free tier)
 
 **Publish**
+
 - Makes your project visible in search
 - Buyers can view, favorite, and purchase immediately
 - Counts toward your active project limit
@@ -242,6 +260,7 @@ If you want to remove a project from public view:
 ### Understanding Project Limits
 
 **Free Tier**
+
 - Maximum **3 active projects** at a time
 - Unlimited drafts (not published)
 - When you reach 3 active projects, you must:
@@ -249,6 +268,7 @@ If you want to remove a project from public view:
   - OR upgrade to Pro for unlimited listings
 
 **Pro Tier** ($9.99/month)
+
 - **Unlimited active projects**
 - No restrictions on drafts or published listings
 - See [Pro Subscription Benefits](#pro-subscription-benefits)
@@ -262,19 +282,23 @@ Access analytics at `/seller/dashboard` (Analytics Dashboard section).
 ### Overview Metrics (Summary Cards)
 
 **Total Revenue**
+
 - Lifetime earnings from all sold projects
 - Displayed in USD
 - Shows total sales count
 
 **Projects Listed**
+
 - Number of active listings
 - Includes both published and draft projects
 
 **Total Views**
+
 - Aggregate views across all your projects
 - Buyers viewing your project detail pages
 
 **Conversion Rate**
+
 - (Total Sales / Total Views) × 100
 - Indicates how well your listings convert browsers to buyers
 - Industry average: 2-5%
@@ -282,6 +306,7 @@ Access analytics at `/seller/dashboard` (Analytics Dashboard section).
 ### Date Range Selector
 
 Select time period for detailed analytics:
+
 - Last 7 days
 - Last 30 days (default)
 - Last 90 days
@@ -290,6 +315,7 @@ Select time period for detailed analytics:
 ### Revenue Over Time Chart
 
 **Line Chart**: Shows revenue trends over selected period
+
 - X-axis: Date
 - Y-axis: Revenue in USD
 - Hover over data points for exact values
@@ -299,6 +325,7 @@ Select time period for detailed analytics:
   - 90+ days: Weekly data points
 
 **Use Cases**:
+
 - Identify sales spikes (correlate with featured listings or marketing)
 - Understand seasonal trends
 - Plan when to list new projects
@@ -306,6 +333,7 @@ Select time period for detailed analytics:
 ### Top Performing Projects
 
 **Table View**: Your best projects ranked by revenue
+
 - Shows top 5 projects by default
 - Metrics per project:
   - **Views**: Total project detail page views
@@ -314,6 +342,7 @@ Select time period for detailed analytics:
   - **Revenue**: Total earnings from this project
 
 **Use Cases**:
+
 - Identify what types of projects sell best
 - Understand which tech stacks are in demand
 - Guide future project selection
@@ -321,12 +350,14 @@ Select time period for detailed analytics:
 ### Engagement Overview Chart
 
 **Bar Chart**: Compare views, favorites, and sales across top 5 projects
+
 - Blue bars: Views
 - Pink bars: Favorites
 - Green bars: Sales
 - Side-by-side comparison for each project
 
 **Use Cases**:
+
 - Identify projects with high views but low sales (pricing issue?)
 - See which projects generate interest (favorites) but don't convert
 - Optimize pricing and descriptions based on engagement patterns
@@ -334,6 +365,7 @@ Select time period for detailed analytics:
 ### Exporting Analytics
 
 **CSV Export**:
+
 1. Click "Export CSV" button
 2. Downloads a spreadsheet with:
    - Project titles
@@ -349,6 +381,7 @@ Select time period for detailed analytics:
 ### What Are Featured Listings?
 
 Featured listings receive **premium placement** on CodeSalvage:
+
 - ⭐ Featured badge on project card
 - Priority placement in search results
 - Increased visibility in category pages
@@ -356,11 +389,11 @@ Featured listings receive **premium placement** on CodeSalvage:
 
 ### Pricing & Duration
 
-| Duration  | Standard Price | Pro Discount (20% off) |
-|-----------|----------------|------------------------|
-| 1 Week    | $49            | $39                    |
-| 2 Weeks   | $79            | $63                    |
-| 1 Month   | $129           | $103                   |
+| Duration | Standard Price | Pro Discount (20% off) |
+| -------- | -------------- | ---------------------- |
+| 1 Week   | $49            | $39                    |
+| 2 Weeks  | $79            | $63                    |
+| 1 Month  | $129           | $103                   |
 
 **Note**: Pro subscribers receive 20% discount on all featured listings.
 
@@ -377,16 +410,19 @@ Featured listings receive **premium placement** on CodeSalvage:
 ### Featured Listing Benefits
 
 **Increased Visibility**:
+
 - 3-5x more views on average
 - Higher click-through rate in search results
 - Featured badge attracts attention
 
 **Better Conversion**:
+
 - Social proof (featured = quality)
 - Buyers associate featured with top projects
 - Typically 20-30% higher conversion rate
 
 **When to Use Featured Listings**:
+
 - ✅ Newly launched project (drive initial traffic)
 - ✅ High-quality project that deserves more attention
 - ✅ Before holidays or peak buying seasons
@@ -411,22 +447,26 @@ Featured listings receive **premium placement** on CodeSalvage:
 Upgrade to Pro for advanced seller features:
 
 #### 1. **Unlimited Project Listings**
+
 - Free tier: 3 active projects
 - Pro tier: **No limit**
 - List as many projects as you want simultaneously
 
 #### 2. **Verified Pro Badge** ✅
+
 - Shield badge displayed on your profile
 - Shown next to your name on project listings
 - Builds buyer trust
 - Only available to active Pro subscribers
 
 #### 3. **Featured Listing Discounts**
+
 - 20% off all featured placements
 - Example: 1-month featured for $103 instead of $129
 - Significant savings if you use featured often
 
 #### 4. **Advanced Analytics**
+
 - All standard analytics PLUS:
   - Traffic sources (where buyers found you)
   - Conversion funnel breakdown
@@ -434,6 +474,7 @@ Upgrade to Pro for advanced seller features:
   - Comparative benchmarks (how you rank vs. other sellers)
 
 #### 5. **Priority Support**
+
 - Faster response times for support tickets
 - Dedicated seller success manager (coming soon)
 
@@ -479,14 +520,17 @@ Upgrade to Pro for advanced seller features:
 ### Fee Structure
 
 **Platform Commission**: 18% of sale price
+
 - Example: $500 project → You receive $410 (after $90 commission)
 - Covers payment processing, hosting, support
 
 **Stripe Fees**: 2.9% + $0.30 per transaction
+
 - Deducted from gross sale price
 - Standard for online payments
 
 **Example Calculation**:
+
 - Sale Price: $500
 - Stripe Fee: $14.80 (2.9% + $0.30)
 - Platform Commission: $90 (18%)
@@ -506,6 +550,7 @@ Upgrade to Pro for advanced seller features:
 5. Once verified, you can receive payouts
 
 **Payout Schedule**:
+
 - Automatic: Weekly (every Monday if balance > $50)
 - Manual: Request payout anytime (minimum $50)
 - First payout may take 7-10 days (Stripe verification)
@@ -517,11 +562,13 @@ Upgrade to Pro for advanced seller features:
 ### How Reviews Work
 
 **Buyers Can Review After Purchase**:
+
 - Only verified buyers who completed a transaction can review
 - Review window: 30 days after purchase
 - One review per transaction
 
 **Review Components**:
+
 - Overall rating (1-5 stars, required)
 - Written comment (optional)
 - Detailed ratings (optional):
@@ -533,16 +580,19 @@ Upgrade to Pro for advanced seller features:
 ### Your Seller Rating
 
 **Displayed On**:
+
 - Your seller profile page
 - Next to your name on project listings (if 4+ stars)
 - Search results (sort by seller rating)
 
 **Calculation**:
+
 - Average of all overall ratings
 - Minimum 3 reviews before public display
 - Recent reviews weighted slightly higher (last 6 months)
 
 **Impact on Sales**:
+
 - 4.5+ stars: Significantly increases conversion
 - 3.5-4.4 stars: Average performance
 - Below 3.5 stars: Major trust issues, consider improving
@@ -550,12 +600,14 @@ Upgrade to Pro for advanced seller features:
 ### Responding to Reviews
 
 **You Can Respond** to any review:
+
 1. Navigate to review on your profile
 2. Click "Respond"
 3. Write professional, helpful response
 4. Published publicly below buyer's review
 
 **Best Practices**:
+
 - Thank buyers for positive reviews
 - Address concerns in negative reviews professionally
 - Offer to help resolve issues (shows future buyers you care)
@@ -564,9 +616,11 @@ Upgrade to Pro for advanced seller features:
 **Example Responses**:
 
 **Positive Review**:
+
 > "Thank you! I'm glad the project met your needs. Feel free to reach out if you have any questions as you continue development."
 
 **Negative Review** (e.g., "Code was messy"):
+
 > "I appreciate your feedback. I acknowledge the code could have been better organized. I've since improved my coding standards and future projects reflect this. I'm happy to answer any questions about the architecture if it helps."
 
 ---
@@ -576,6 +630,7 @@ Upgrade to Pro for advanced seller features:
 ### 1. Write Detailed Descriptions
 
 **Do**:
+
 - Explain what the project does in plain English
 - List all major features completed
 - Specify what's remaining to be built
@@ -583,6 +638,7 @@ Upgrade to Pro for advanced seller features:
 - Mention any unique architecture or interesting implementations
 
 **Don't**:
+
 - Use vague descriptions like "Good project" or "Code for sale"
 - Oversell or exaggerate completion status
 - Leave out known issues
@@ -591,12 +647,14 @@ Upgrade to Pro for advanced seller features:
 ### 2. Use High-Quality Images
 
 **Screenshots**:
+
 - Capture actual UI, not placeholder screens
 - Show different pages/features
 - Use consistent lighting/theme
 - Crop out sensitive data (API keys, personal info)
 
 **Thumbnail**:
+
 - Eye-catching but representative
 - Include project name/logo if available
 - Test how it looks at small sizes (search results)
@@ -604,17 +662,20 @@ Upgrade to Pro for advanced seller features:
 ### 3. Be Transparent About Completion
 
 **Honesty Builds Trust**:
+
 - Accurate completion % reduces disputes
 - List known issues upfront
 - Buyers appreciate transparency
 - Better to under-promise and over-deliver
 
 **Example**:
+
 > "Project is 70% complete. Authentication, dashboard, and user management are fully functional. Payment integration is started but not complete (estimated 15-20 hours). Needs testing and deployment setup."
 
 ### 4. Provide a Demo
 
 **Live Demo > Video > Screenshots**:
+
 - Deploy to free hosting (Vercel, Netlify, Railway)
 - Or record a 3-5 minute demo video
 - Show actual functionality, not just static screens
@@ -623,11 +684,13 @@ Upgrade to Pro for advanced seller features:
 ### 5. Price Competitively
 
 **Research Similar Projects**:
+
 - Search for projects with similar tech stack
 - Compare completion percentages
 - Adjust pricing based on quality and features
 
 **Pricing Strategy**:
+
 - Start slightly lower to build reviews
 - Increase price as you gain reputation
 - Offer "first buyer discount" in description
@@ -636,12 +699,14 @@ Upgrade to Pro for advanced seller features:
 ### 6. Respond to Messages Quickly
 
 **Buyer Questions**:
+
 - Respond within 24 hours (faster is better)
 - Be helpful and professional
 - Answer technical questions honestly
 - If you don't know, say so
 
 **Impact on Sales**:
+
 - Fast responses build trust
 - Buyers often message multiple sellers; first to respond often wins
 - Responsiveness affects your rating
@@ -649,6 +714,7 @@ Upgrade to Pro for advanced seller features:
 ### 7. Keep Projects Updated
 
 **Update When**:
+
 - You make improvements (bug fixes, new features)
 - You update screenshots or demo
 - You adjust pricing based on completion
@@ -657,12 +723,14 @@ Upgrade to Pro for advanced seller features:
 ### 8. Leverage Featured Listings Strategically
 
 **When to Feature**:
+
 - Launch week (drive initial traffic)
 - After major updates (let buyers know)
 - Before holidays (increased buyer activity)
 - When conversion rate is high (maximize ROI)
 
 **Don't Feature**:
+
 - Immediately without testing regular listing first
 - Projects with poor descriptions or images
 - Projects with low completion or quality
@@ -676,6 +744,7 @@ Upgrade to Pro for advanced seller features:
 **Cause**: Free tier is limited to 3 active projects.
 
 **Solutions**:
+
 1. Delist or delete an existing project
 2. Upgrade to Pro for unlimited listings
 
@@ -686,10 +755,12 @@ Upgrade to Pro for advanced seller features:
 ### Issue: Can't edit published project
 
 **Check**:
+
 - Is the project sold? Sold projects are read-only.
 - Are you logged in as the project owner?
 
 **Solution**:
+
 - If sold, you cannot edit (contact support if critical fix needed)
 - Ensure you're logged in with the correct account
 
@@ -698,11 +769,13 @@ Upgrade to Pro for advanced seller features:
 ### Issue: Images not uploading
 
 **Common Causes**:
+
 - File too large (max 10MB per image)
 - Unsupported format (use JPG, PNG, or WebP)
 - Network issue during upload
 
 **Solutions**:
+
 1. Compress images using TinyPNG or Squoosh
 2. Convert to supported format
 3. Check internet connection and retry
@@ -713,12 +786,14 @@ Upgrade to Pro for advanced seller features:
 ### Issue: Low views on my project
 
 **Possible Reasons**:
+
 - New listing (needs time to gain traction)
 - Poor SEO (vague title or missing tech stack tags)
 - Competitive category
 - Low completion percentage
 
 **Solutions**:
+
 - Use specific, searchable title (include main tech stack)
 - Add all relevant tech stack tags
 - Improve thumbnail and screenshots
@@ -730,12 +805,14 @@ Upgrade to Pro for advanced seller features:
 ### Issue: High views but no sales
 
 **Possible Reasons**:
+
 - Price too high for completion level
 - Unclear description or missing details
 - Poor code quality (visible in GitHub preview)
 - Missing demo or screenshots
 
 **Solutions**:
+
 - Review pricing vs. similar projects
 - Add more detail to description
 - Add live demo or video walkthrough
@@ -747,17 +824,20 @@ Upgrade to Pro for advanced seller features:
 ### Issue: Dispute from buyer
 
 **Buyer Claims**:
+
 - Project doesn't match description
 - Code doesn't run
 - Missing features
 
 **How Disputes Work**:
+
 1. Buyer opens dispute within 7-day escrow period
 2. Platform reviews both sides (description, code, messages)
 3. Decision made within 2-3 business days
 4. Outcome: Full refund, partial refund, or no refund
 
 **Protect Yourself**:
+
 - Accurate descriptions and completion %
 - List known issues upfront
 - Respond to pre-sale questions thoroughly
@@ -765,6 +845,7 @@ Upgrade to Pro for advanced seller features:
 - Offer to help with setup (builds goodwill)
 
 **If Dispute Opened**:
+
 - Respond professionally within 24 hours
 - Provide evidence (screenshots, messages, code files)
 - Offer reasonable solution (partial refund, extended support)
@@ -775,12 +856,14 @@ Upgrade to Pro for advanced seller features:
 ### Issue: Payout not received
 
 **Check**:
+
 1. Has 7-day escrow period passed?
 2. Is your Stripe account fully verified?
 3. Do you have minimum $50 balance (for automatic payouts)?
 4. Check email for Stripe notifications
 
 **Solutions**:
+
 - Wait for escrow release (automatic after 7 days)
 - Complete Stripe verification if pending
 - Request manual payout if below auto-threshold
@@ -791,11 +874,13 @@ Upgrade to Pro for advanced seller features:
 ### Issue: Can't connect Stripe account
 
 **Common Issues**:
+
 - Already connected to another platform
 - Verification documents needed
 - Country not supported by Stripe Connect
 
 **Solutions**:
+
 - Use a different Stripe account
 - Complete identity verification via Stripe
 - Check Stripe's supported countries list
@@ -808,15 +893,18 @@ Upgrade to Pro for advanced seller features:
 ### Support Channels
 
 **Email Support**: support@codesalvage.com
+
 - Response time: 24-48 hours (Pro: 12-24 hours)
 - Include: Account email, project URL (if applicable), screenshots
 
 **Documentation**:
+
 - Seller Guide (this document)
 - Buyer Guide: `/buyer-guide`
 - FAQ: `/faq`
 
 **Community** (coming soon):
+
 - Discord server for sellers
 - Share tips, ask questions, network
 

@@ -35,6 +35,8 @@ export type {
   MessageEmailData,
   ReviewEmailData,
   FeaturedListingEmailData,
+  UserBannedEmailData,
+  UserUnbannedEmailData,
 } from './EmailService';
 
 export {
@@ -101,3 +103,9 @@ export type {
   CreateSubscriptionResponse,
   SubscriptionStatusResponse,
 } from './SubscriptionService';
+
+export {
+  AdminService,
+  AdminValidationError,
+  AdminAuthorizationError,
+} from './AdminService';

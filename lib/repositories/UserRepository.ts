@@ -395,4 +395,227 @@ export class UserRepository {
       throw new Error('[UserRepository] Failed to get verified sellers');
     }
   }
+
+  /**
+   * Ban a user (ADMIN ONLY)
+   *
+   * Sets isBanned flag, records ban timestamp, reason, and admin who banned.
+   *
+   * @param userId - User ID to ban
+   * @param bannedBy - Admin user ID performing the ban
+   * @param reason - Reason for ban
+   * @returns Updated user record
+   * @throws Error if user not found or update fails
+   *
+   * @example
+   * const bannedUser = await userRepo.banUser('user123', 'admin456', 'Spam violation');
+   */
+  async banUser(userId: string, bannedBy: string, reason: string): Promise<User> {
+    console.log('[UserRepository] banUser called:', { userId, bannedBy, reason });
+
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          isBanned: true,
+          bannedAt: new Date(),
+          bannedBy,
+          bannedReason: reason,
+        },
+      });
+
+      console.log('[UserRepository] User banned successfully:', userId);
+      return user;
+    } catch (error) {
+      console.error('[UserRepository] banUser failed:', error);
+      throw new Error('[UserRepository] Failed to ban user - user may not exist');
+    }
+  }
+
+  /**
+   * Unban a user (ADMIN ONLY)
+   *
+   * Clears isBanned flag and ban-related fields.
+   *
+   * @param userId - User ID to unban
+   * @returns Updated user record
+   * @throws Error if user not found or update fails
+   *
+   * @example
+   * const unbannedUser = await userRepo.unbanUser('user123');
+   */
+  async unbanUser(userId: string): Promise<User> {
+    console.log('[UserRepository] unbanUser called:', userId);
+
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          isBanned: false,
+          bannedAt: null,
+          bannedBy: null,
+          bannedReason: null,
+        },
+      });
+
+      console.log('[UserRepository] User unbanned successfully:', userId);
+      return user;
+    } catch (error) {
+      console.error('[UserRepository] unbanUser failed:', error);
+      throw new Error('[UserRepository] Failed to unban user - user may not exist');
+    }
+  }
+
+  /**
+   * Set admin status for a user (SUPER ADMIN ONLY)
+   *
+   * Grants or revokes admin privileges.
+   *
+   * @param userId - User ID to update
+   * @param isAdmin - Whether user should be admin
+   * @returns Updated user record
+   * @throws Error if user not found or update fails
+   *
+   * @example
+   * const admin = await userRepo.setAdminStatus('user123', true);
+   */
+  async setAdminStatus(userId: string, isAdmin: boolean): Promise<User> {
+    console.log('[UserRepository] setAdminStatus called:', { userId, isAdmin });
+
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: { isAdmin },
+      });
+
+      console.log('[UserRepository] Admin status updated:', userId, isAdmin);
+      return user;
+    } catch (error) {
+      console.error('[UserRepository] setAdminStatus failed:', error);
+      throw new Error(
+        '[UserRepository] Failed to update admin status - user may not exist'
+      );
+    }
+  }
+
+  /**
+   * Get all users with pagination and filtering (ADMIN ONLY)
+   *
+   * Returns paginated list of users with optional filters.
+   *
+   * @param options - Filtering and pagination options
+   * @returns Array of users
+   * @throws Error if query fails
+   *
+   * @example
+   * const bannedUsers = await userRepo.getAllUsers({ isBanned: true, limit: 50 });
+   */
+  async getAllUsers(options?: {
+    isBanned?: boolean;
+    isAdmin?: boolean;
+    isSeller?: boolean;
+    isVerifiedSeller?: boolean;
+    limit?: number;
+    offset?: number;
+    sortBy?: 'createdAt' | 'lastLogin' | 'email' | 'username';
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<User[]> {
+    const {
+      isBanned,
+      isAdmin,
+      isSeller,
+      isVerifiedSeller,
+      limit = 50,
+      offset = 0,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = options || {};
+
+    console.log('[UserRepository] getAllUsers called:', {
+      filters: { isBanned, isAdmin, isSeller, isVerifiedSeller },
+      limit,
+      offset,
+    });
+
+    // Build where clause
+    const where: any = {};
+    if (isBanned !== undefined) {
+      where.isBanned = isBanned;
+    }
+    if (isAdmin !== undefined) {
+      where.isAdmin = isAdmin;
+    }
+    if (isSeller !== undefined) {
+      where.isSeller = isSeller;
+    }
+    if (isVerifiedSeller !== undefined) {
+      where.isVerifiedSeller = isVerifiedSeller;
+    }
+
+    try {
+      const users = await this.prisma.user.findMany({
+        where,
+        take: limit,
+        skip: offset,
+        orderBy: { [sortBy]: sortOrder },
+      });
+
+      console.log('[UserRepository] Found users:', users.length);
+      return users;
+    } catch (error) {
+      console.error('[UserRepository] getAllUsers failed:', error);
+      throw new Error('[UserRepository] Failed to get users');
+    }
+  }
+
+  /**
+   * Count users with optional filters (ADMIN ONLY)
+   *
+   * @param options - Filtering options
+   * @returns Count of users matching filters
+   * @throws Error if query fails
+   *
+   * @example
+   * const totalBanned = await userRepo.countUsers({ isBanned: true });
+   */
+  async countUsers(options?: {
+    isBanned?: boolean;
+    isAdmin?: boolean;
+    isSeller?: boolean;
+    isVerifiedSeller?: boolean;
+  }): Promise<number> {
+    const { isBanned, isAdmin, isSeller, isVerifiedSeller } = options || {};
+
+    console.log('[UserRepository] countUsers called:', {
+      isBanned,
+      isAdmin,
+      isSeller,
+      isVerifiedSeller,
+    });
+
+    // Build where clause
+    const where: any = {};
+    if (isBanned !== undefined) {
+      where.isBanned = isBanned;
+    }
+    if (isAdmin !== undefined) {
+      where.isAdmin = isAdmin;
+    }
+    if (isSeller !== undefined) {
+      where.isSeller = isSeller;
+    }
+    if (isVerifiedSeller !== undefined) {
+      where.isVerifiedSeller = isVerifiedSeller;
+    }
+
+    try {
+      const count = await this.prisma.user.count({ where });
+
+      console.log('[UserRepository] User count:', count);
+      return count;
+    } catch (error) {
+      console.error('[UserRepository] countUsers failed:', error);
+      throw new Error('[UserRepository] Failed to count users');
+    }
+  }
 }

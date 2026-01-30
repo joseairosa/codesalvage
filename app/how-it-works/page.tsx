@@ -12,10 +12,16 @@
  * - CTA sections
  */
 
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Search,
   ShoppingCart,
@@ -52,7 +58,7 @@ export default function HowItWorksPage() {
       title: '1. Browse Projects',
       description: 'Explore our marketplace of incomplete software projects',
       details:
-        'Search by technology, completion percentage, price, or category. Each project shows what\'s done, what\'s left, and known issues.',
+        "Search by technology, completion percentage, price, or category. Each project shows what's done, what's left, and known issues.",
     },
     {
       icon: ShoppingCart,
@@ -83,7 +89,7 @@ export default function HowItWorksPage() {
       title: '1. List Your Project',
       description: 'Upload your incomplete project with details',
       details:
-        'Provide title, description, tech stack, completion percentage, known issues, and screenshots. Be transparent about what works and what doesn\'t.',
+        "Provide title, description, tech stack, completion percentage, known issues, and screenshots. Be transparent about what works and what doesn't.",
     },
     {
       icon: DollarSign,
@@ -113,7 +119,7 @@ export default function HowItWorksPage() {
       icon: Shield,
       title: '7-Day Escrow Protection',
       description:
-        'All payments held in escrow for 7 days. Buyers can request refunds if project doesn\'t match description.',
+        "All payments held in escrow for 7 days. Buyers can request refunds if project doesn't match description.",
     },
     {
       icon: Star,
@@ -145,8 +151,9 @@ export default function HowItWorksPage() {
               How CodeSalvage Works
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
-              A marketplace connecting developers with incomplete software projects. Buyers get a
-              head start on development. Sellers monetize their unfinished work.
+              A marketplace connecting developers with incomplete software projects.
+              Buyers get a head start on development. Sellers monetize their unfinished
+              work.
             </p>
           </div>
         </div>
@@ -157,7 +164,9 @@ export default function HowItWorksPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-5xl">
             <div className="mb-12 text-center">
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900">For Buyers</h2>
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+                For Buyers
+              </h2>
               <p className="mt-4 text-lg text-gray-600">
                 Skip months of development by starting with existing code
               </p>
@@ -173,7 +182,9 @@ export default function HowItWorksPage() {
                         <Icon className="h-6 w-6 text-blue-600" />
                       </div>
                       <CardTitle className="text-xl">{step.title}</CardTitle>
-                      <CardDescription className="text-base">{step.description}</CardDescription>
+                      <CardDescription className="text-base">
+                        {step.description}
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-gray-600">{step.details}</p>
@@ -184,7 +195,11 @@ export default function HowItWorksPage() {
             </div>
 
             <div className="mt-12 text-center">
-              <Button asChild size="lg" className="shadow-md transition-transform hover:scale-105">
+              <Button
+                asChild
+                size="lg"
+                className="shadow-md transition-transform hover:scale-105"
+              >
                 <Link href="/projects">
                   Browse Projects <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -199,7 +214,9 @@ export default function HowItWorksPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-5xl">
             <div className="mb-12 text-center">
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900">For Sellers</h2>
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+                For Sellers
+              </h2>
               <p className="mt-4 text-lg text-gray-600">
                 Turn your incomplete projects into income
               </p>
@@ -215,7 +232,9 @@ export default function HowItWorksPage() {
                         <Icon className="h-6 w-6 text-purple-600" />
                       </div>
                       <CardTitle className="text-xl">{step.title}</CardTitle>
-                      <CardDescription className="text-base">{step.description}</CardDescription>
+                      <CardDescription className="text-base">
+                        {step.description}
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-gray-600">{step.details}</p>
@@ -262,7 +281,9 @@ export default function HowItWorksPage() {
                     <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                       <Icon className="h-8 w-8 text-green-600" />
                     </div>
-                    <h3 className="mb-2 text-lg font-semibold text-gray-900">{feature.title}</h3>
+                    <h3 className="mb-2 text-lg font-semibold text-gray-900">
+                      {feature.title}
+                    </h3>
                     <p className="text-sm text-gray-600">{feature.description}</p>
                   </div>
                 );
@@ -287,7 +308,9 @@ export default function HowItWorksPage() {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600" />
                   <div>
-                    <p className="font-medium text-gray-900">For Buyers: Pay Listed Price</p>
+                    <p className="font-medium text-gray-900">
+                      For Buyers: Pay Listed Price
+                    </p>
                     <p className="text-sm text-gray-600">
                       No additional fees. What you see is what you pay.
                     </p>
@@ -301,8 +324,8 @@ export default function HowItWorksPage() {
                       For Sellers: 18% Platform Commission
                     </p>
                     <p className="text-sm text-gray-600">
-                      We take 18% of sale price. You keep 82%. Covers payment processing, escrow,
-                      hosting, and support.
+                      We take 18% of sale price. You keep 82%. Covers payment processing,
+                      escrow, hosting, and support.
                     </p>
                   </div>
                 </div>
@@ -312,7 +335,8 @@ export default function HowItWorksPage() {
                   <div>
                     <p className="font-medium text-gray-900">7-Day Escrow Period</p>
                     <p className="text-sm text-gray-600">
-                      Payments held for 7 days to protect buyers. Automatic release if no disputes.
+                      Payments held for 7 days to protect buyers. Automatic release if no
+                      disputes.
                     </p>
                   </div>
                 </div>

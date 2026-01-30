@@ -10,8 +10,8 @@
  * Response: { isFavorited: true }
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { type NextRequest, NextResponse } from 'next/server';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { FavoriteService } from '@/lib/services/FavoriteService';
 import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
@@ -37,24 +37,24 @@ const favoriteService = new FavoriteService(
  * Check if user has favorited a project
  */
 async function checkFavoriteStatus(
-  _request: NextRequest,
-  { params }: { params: { projectId: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { projectId } = params;
+    const { projectId } = await params;
 
     console.log(`[${componentName}] Checking favorite status:`, {
-      userId: session.user.id,
+      userId: auth.user.id,
       projectId,
     });
 
     // Use FavoriteService to check status
-    const isFavorited = await favoriteService.isFavorited(session.user.id, projectId);
+    const isFavorited = await favoriteService.isFavorited(auth.user.id, projectId);
 
     console.log(`[${componentName}] Favorite status:`, isFavorited);
 
@@ -77,7 +77,7 @@ async function checkFavoriteStatus(
  *
  * GET: API rate limiting (100 requests / minute per user)
  */
-export const GET = withApiRateLimit(checkFavoriteStatus, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const GET = withApiRateLimit(checkFavoriteStatus, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });

@@ -26,11 +26,21 @@ model User {
   // Role flags
   isSeller Boolean @default(false) @map("is_seller")
   isBuyer  Boolean @default(true) @map("is_buyer")
+  isAdmin  Boolean @default(false) @map("is_admin")
+
+  // Ban system
+  isBanned     Boolean   @default(false) @map("is_banned")
+  bannedAt     DateTime? @map("banned_at")
+  bannedReason String?   @map("banned_reason") @db.Text
+  bannedBy     String?   @map("banned_by") // Admin user ID who banned
 
   // GitHub OAuth
   githubId        String? @unique @map("github_id")
   githubUsername  String? @map("github_username")
   githubAvatarUrl String? @map("github_avatar_url")
+
+  // Firebase integration
+  firebaseUid String? @unique @map("firebase_uid")
 
   // Seller specific
   payoutMethod    String? @map("payout_method") // 'stripe', 'paypal', 'bank_transfer'
@@ -60,10 +70,16 @@ model User {
   subscription         Subscription?
   accounts             Account[]
   sessions             Session[]
+  adminAuditLogs       AdminAuditLog[]
+  contentReports       ContentReport[]
+  apiKeys              ApiKey[]
 
   @@index([email])
   @@index([githubId], map: "idx_github_id")
   @@index([isSeller], map: "idx_is_seller")
+  @@index([isAdmin], map: "idx_is_admin")
+  @@index([isBanned], map: "idx_is_banned")
+  @@index([firebaseUid], map: "idx_firebase_uid")
   @@map("users")
 }
 
@@ -161,8 +177,14 @@ model Project {
   messageCount  Int @default(0) @map("message_count")
 
   // Moderation
-  isApproved      Boolean @default(true) @map("is_approved")
-  rejectionReason String? @map("rejection_reason") @db.Text
+  isApproved      Boolean   @default(true) @map("is_approved")
+  rejectionReason String?   @map("rejection_reason") @db.Text
+  approvedBy      String?   @map("approved_by") // Admin user ID who approved
+  approvedAt      DateTime? @map("approved_at")
+
+  // Featured management
+  featuredBy String?   @map("featured_by") // Admin user ID who featured
+  featuredAt DateTime? @map("featured_at")
 
   // Metadata
   createdAt DateTime @default(now()) @map("created_at")
@@ -179,6 +201,7 @@ model Project {
   @@index([completionPercentage], map: "idx_completion")
   @@index([primaryLanguage], map: "idx_primary_language")
   @@index([priceCents], map: "idx_price")
+  @@index([approvedBy], map: "idx_approved_by")
   @@map("projects")
 }
 
@@ -391,4 +414,98 @@ model Subscription {
   @@index([stripeSubscriptionId], map: "idx_subscription_stripe_id")
   @@index([status], map: "idx_subscription_status")
   @@map("subscriptions")
+}
+
+// ============================================
+// ADMIN SYSTEM
+// ============================================
+
+model AdminAuditLog {
+  id String @id @default(cuid())
+
+  // Who performed the action
+  adminId String @map("admin_id")
+  admin   User   @relation(fields: [adminId], references: [id])
+
+  // What action was performed
+  action String // 'user.ban', 'user.unban', 'project.approve', 'project.reject', 'project.feature', etc.
+
+  // What was affected
+  targetType String @map("target_type") // 'user', 'project', 'transaction', 'report'
+  targetId   String @map("target_id")
+
+  // Additional context
+  reason   String? @db.Text
+  metadata Json?
+
+  // IP address of admin
+  ipAddress String? @map("ip_address")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([adminId], map: "idx_admin_audit_admin_id")
+  @@index([targetType, targetId], map: "idx_admin_audit_target")
+  @@index([createdAt], map: "idx_admin_audit_created_at")
+  @@map("admin_audit_logs")
+}
+
+model ContentReport {
+  id String @id @default(cuid())
+
+  // Who reported
+  reporterId String @map("reporter_id")
+  reporter   User   @relation(fields: [reporterId], references: [id])
+
+  // What was reported
+  contentType String @map("content_type") // 'project', 'user', 'review', 'message'
+  contentId   String @map("content_id")
+
+  // Report details
+  reason      String @map("reason") // 'spam', 'inappropriate', 'scam', 'copyright', 'other'
+  description String @db.Text
+
+  // Moderation status
+  status     String    @default("pending") // 'pending', 'reviewed', 'resolved', 'dismissed'
+  reviewedBy String?   @map("reviewed_by") // Admin user ID
+  reviewedAt DateTime? @map("reviewed_at")
+  resolution String?   @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([reporterId], map: "idx_content_report_reporter_id")
+  @@index([contentType, contentId], map: "idx_content_report_content")
+  @@index([status], map: "idx_content_report_status")
+  @@map("content_reports")
+}
+
+// ============================================
+// API KEYS (Firebase programmatic access)
+// ============================================
+
+model ApiKey {
+  id String @id @default(cuid())
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name String // User-provided name like "Production API", "Development"
+  keyHash String @unique @map("key_hash") // SHA-256 hash of sk-xxx key (never store plaintext)
+  prefix String // First 8 chars for display (e.g., "sk-abc12")
+
+  lastUsedAt DateTime? @map("last_used_at")
+  usageCount Int @default(0) @map("usage_count")
+
+  status String @default("active") // 'active', 'revoked'
+  revokedAt DateTime? @map("revoked_at")
+  revokedReason String? @map("revoked_reason") @db.Text
+
+  expiresAt DateTime? @map("expires_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId], map: "idx_api_key_user_id")
+  @@index([keyHash], map: "idx_api_key_hash")
+  @@index([status], map: "idx_api_key_status")
+  @@map("api_keys")
 }

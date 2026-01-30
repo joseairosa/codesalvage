@@ -10,7 +10,7 @@
  * Response: { averageRating, totalReviews, ratingDistribution, ... }
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ReviewService } from '@/lib/services/ReviewService';
 import { ReviewRepository } from '@/lib/repositories/ReviewRepository';

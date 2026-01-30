@@ -19,15 +19,15 @@ const cacheHitRate = new Rate('cache_hits');
 // Test configuration
 export const options = {
   stages: [
-    { duration: '30s', target: 10 },  // Ramp up to 10 users
-    { duration: '1m', target: 50 },   // Ramp up to 50 users
-    { duration: '2m', target: 50 },   // Stay at 50 users
-    { duration: '30s', target: 0 },   // Ramp down to 0 users
+    { duration: '30s', target: 10 }, // Ramp up to 10 users
+    { duration: '1m', target: 50 }, // Ramp up to 50 users
+    { duration: '2m', target: 50 }, // Stay at 50 users
+    { duration: '30s', target: 0 }, // Ramp down to 0 users
   ],
   thresholds: {
-    'http_req_duration': ['p(95)<500'],  // 95% of requests should be below 500ms
-    'http_req_failed': ['rate<0.01'],    // Less than 1% errors
-    'errors': ['rate<0.01'],             // Less than 1% errors
+    http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
+    http_req_failed: ['rate<0.01'], // Less than 1% errors
+    errors: ['rate<0.01'], // Less than 1% errors
   },
 };
 

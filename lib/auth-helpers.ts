@@ -1,274 +1,250 @@
 /**
- * Auth Helper Utilities
+ * Authentication Helpers
+ *
+ * Server-side helpers for route protection using Firebase.
  *
  * Responsibilities:
- * - Provide reusable auth check functions for Server Components
- * - Provide reusable auth check functions for API routes
- * - Handle unauthorized access with proper errors
- * - Type-safe session access
+ * - Provide auth helpers for Server Components
+ * - Provide auth helpers for API Routes
+ * - Check admin status
+ * - Maintain compatibility with Auth.js signatures
  *
  * Architecture:
- * - Utility functions (not a class)
- * - Works with Auth.js v5 auth() helper
- * - Can be used in both Server Components and API routes
+ * - Uses Firebase tokens stored in httpOnly cookies
+ * - Redirects non-admin users appropriately
+ * - Type-safe session returns
+ * - NOTE: Maintains same function signatures as Auth.js version for compatibility
  *
  * @example
- * import { requireAuth, requireSeller } from '@/lib/auth-helpers';
- * const session = await requireAuth(); // Throws if not authenticated
- * const sellerSession = await requireSeller(); // Throws if not seller
+ * // In a Server Component:
+ * import { requireAdmin } from '@/lib/auth-helpers';
+ * const session = await requireAdmin();
+ *
+ * @example
+ * // In an API Route:
+ * import { requireAdminApi } from '@/lib/auth-helpers';
+ * const session = await requireAdminApi();
+ * if (!session) {
+ *   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+ * }
  */
 
-import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import type { Session } from 'next-auth';
+import { cookies } from 'next/headers';
+import { verifyFirebaseToken } from './firebase-auth';
 
 /**
- * Custom error for unauthorized access
- */
-export class UnauthorizedError extends Error {
-  constructor(message: string = 'Unauthorized') {
-    super(message);
-    this.name = 'UnauthorizedError';
-  }
-}
-
-/**
- * Custom error for forbidden access (authenticated but not authorized)
- */
-export class ForbiddenError extends Error {
-  constructor(message: string = 'Forbidden') {
-    super(message);
-    this.name = 'ForbiddenError';
-  }
-}
-
-/**
- * Get current session (returns null if not authenticated)
+ * Require admin authentication (Server Components)
  *
- * Use this when you want to conditionally show content based on auth state.
+ * Use this in Server Components to protect admin routes.
+ * Automatically redirects non-authenticated users to signin,
+ * and non-admin users to dashboard.
  *
- * @returns Session or null
+ * @throws Redirects to /auth/signin if not authenticated
+ * @throws Redirects to /dashboard if not admin
+ * @returns Session with admin user
  *
  * @example
- * const session = await getSession();
- * if (session) {
- *   // Show authenticated content
- * } else {
- *   // Show public content
+ * export default async function AdminPage() {
+ *   const session = await requireAdmin();
+ *   return <div>Welcome Admin: {session.user.username}</div>;
  * }
  */
-export async function getSession(): Promise<Session | null> {
-  return await auth();
-}
+export async function requireAdmin() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('session')?.value;
 
-/**
- * Require authentication (throws/redirects if not authenticated)
- *
- * Use this in Server Components when you need authentication.
- * Automatically redirects to sign-in page.
- *
- * @param callbackUrl - Optional URL to redirect to after sign-in
- * @returns Session (guaranteed to exist)
- * @throws Redirects to sign-in if not authenticated
- *
- * @example
- * const session = await requireAuth();
- * // session is guaranteed to exist here
- */
-export async function requireAuth(callbackUrl?: string): Promise<Session> {
-  const session = await auth();
-
-  if (!session?.user) {
-    console.log('[AuthHelpers] requireAuth: User not authenticated, redirecting');
-
-    // Redirect to sign-in with callback URL
-    const signInUrl = callbackUrl
-      ? `/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`
-      : '/auth/signin';
-
-    redirect(signInUrl);
+  if (!sessionToken) {
+    console.log('[AuthHelpers] requireAdmin: No session token, redirecting to signin');
+    redirect('/auth/signin');
   }
 
-  return session;
+  try {
+    const auth = await verifyFirebaseToken(sessionToken);
+
+    if (!auth.user.isAdmin) {
+      console.log(
+        '[AuthHelpers] requireAdmin: User is not admin, redirecting to dashboard'
+      );
+      redirect('/dashboard');
+    }
+
+    console.log(
+      '[AuthHelpers] requireAdmin: Admin access granted for user:',
+      auth.user.id
+    );
+
+    return {
+      user: {
+        id: auth.user.id,
+        email: auth.user.email,
+        username: auth.user.username,
+        isAdmin: auth.user.isAdmin,
+        isSeller: auth.user.isSeller,
+        isVerifiedSeller: auth.user.isVerifiedSeller,
+      },
+    };
+  } catch {
+    console.log(
+      '[AuthHelpers] requireAdmin: Token verification failed, redirecting to signin'
+    );
+    redirect('/auth/signin');
+  }
 }
 
 /**
- * Require authentication for API routes (throws error if not authenticated)
+ * Require admin authentication (API Routes)
  *
- * Use this in API routes where you can't redirect.
- * Throws UnauthorizedError that should be caught and returned as 401.
+ * Use this in API Routes to protect admin endpoints.
+ * Returns null if user is not authenticated or not admin,
+ * allowing you to return appropriate error responses.
  *
- * @returns Session (guaranteed to exist)
- * @throws UnauthorizedError if not authenticated
+ * @returns Session with admin user, or null if not authorized
  *
  * @example
- * // In API route
- * try {
- *   const session = await requireAuthApi();
- *   // Process request
- * } catch (error) {
- *   if (error instanceof UnauthorizedError) {
- *     return new Response('Unauthorized', { status: 401 });
+ * export async function GET() {
+ *   const session = await requireAdminApi();
+ *   if (!session) {
+ *     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
  *   }
- *   throw error;
+ *   // Admin-only logic here
  * }
  */
-export async function requireAuthApi(): Promise<Session> {
-  const session = await auth();
+export async function requireAdminApi() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('session')?.value;
 
-  if (!session?.user) {
-    console.log('[AuthHelpers] requireAuthApi: User not authenticated');
-    throw new UnauthorizedError('Authentication required');
+  if (!sessionToken) {
+    console.log('[AuthHelpers] requireAdminApi: No session token');
+    return null;
   }
 
-  return session;
+  try {
+    const auth = await verifyFirebaseToken(sessionToken);
+
+    if (!auth.user.isAdmin) {
+      console.log('[AuthHelpers] requireAdminApi: User is not admin');
+      return null;
+    }
+
+    console.log(
+      '[AuthHelpers] requireAdminApi: Admin API access granted for user:',
+      auth.user.id
+    );
+
+    return {
+      user: {
+        id: auth.user.id,
+        email: auth.user.email,
+        username: auth.user.username,
+        isAdmin: auth.user.isAdmin,
+        isSeller: auth.user.isSeller,
+        isVerifiedSeller: auth.user.isVerifiedSeller,
+      },
+    };
+  } catch {
+    console.log('[AuthHelpers] requireAdminApi: Token verification failed');
+    return null;
+  }
 }
 
 /**
- * Require seller role (throws/redirects if not seller)
+ * Require authenticated user (Server Components)
  *
- * Use this in Server Components for seller-only pages.
- * Redirects to dashboard if user is not a seller.
+ * Use this in Server Components to protect user routes.
+ * Automatically redirects non-authenticated users to signin.
  *
- * @returns Session (guaranteed to exist and user is seller)
- * @throws Redirects to dashboard if not seller
- *
- * @example
- * const session = await requireSeller();
- * // session.user.isSeller is guaranteed to be true
+ * @throws Redirects to /auth/signin if not authenticated
+ * @returns Session with user
  */
-export async function requireSeller(): Promise<Session> {
-  const session = await requireAuth();
+export async function requireAuth() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('session')?.value;
 
-  if (!session.user.isSeller) {
-    console.log('[AuthHelpers] requireSeller: User is not a seller, redirecting');
-    redirect('/dashboard');
+  if (!sessionToken) {
+    console.log('[AuthHelpers] requireAuth: No session token, redirecting to signin');
+    redirect('/auth/signin');
   }
 
-  return session;
+  try {
+    const auth = await verifyFirebaseToken(sessionToken);
+
+    console.log('[AuthHelpers] requireAuth: Access granted for user:', auth.user.id);
+
+    return {
+      user: {
+        id: auth.user.id,
+        email: auth.user.email,
+        username: auth.user.username,
+        isAdmin: auth.user.isAdmin,
+        isSeller: auth.user.isSeller,
+        isVerifiedSeller: auth.user.isVerifiedSeller,
+      },
+    };
+  } catch {
+    console.log(
+      '[AuthHelpers] requireAuth: Token verification failed, redirecting to signin'
+    );
+    redirect('/auth/signin');
+  }
 }
 
 /**
- * Require seller role for API routes (throws error if not seller)
+ * Get current session (optional auth)
  *
- * Use this in API routes for seller-only endpoints.
- * Throws ForbiddenError if user is authenticated but not a seller.
+ * Non-blocking session retrieval. Returns null if not authenticated.
+ * Useful for optional auth or conditional rendering.
  *
- * @returns Session (guaranteed to exist and user is seller)
- * @throws UnauthorizedError if not authenticated
- * @throws ForbiddenError if not seller
- *
- * @example
- * // In API route
- * try {
- *   const session = await requireSellerApi();
- *   // Process seller-only request
- * } catch (error) {
- *   if (error instanceof UnauthorizedError) {
- *     return new Response('Unauthorized', { status: 401 });
- *   }
- *   if (error instanceof ForbiddenError) {
- *     return new Response('Forbidden - Seller access required', { status: 403 });
- *   }
- *   throw error;
- * }
+ * @returns Session with user, or null if not authenticated
  */
-export async function requireSellerApi(): Promise<Session> {
-  const session = await requireAuthApi();
+export async function getSession() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('session')?.value;
 
-  if (!session.user.isSeller) {
-    console.log('[AuthHelpers] requireSellerApi: User is not a seller');
-    throw new ForbiddenError('Seller access required');
+  if (!sessionToken) {
+    return null;
   }
 
-  return session;
-}
+  try {
+    const auth = await verifyFirebaseToken(sessionToken);
 
-/**
- * Require verified seller role (throws/redirects if not verified)
- *
- * Use this for features that require seller verification.
- *
- * @returns Session (guaranteed to exist and user is verified seller)
- * @throws Redirects to seller verification page if not verified
- *
- * @example
- * const session = await requireVerifiedSeller();
- * // session.user.isVerifiedSeller is guaranteed to be true
- */
-export async function requireVerifiedSeller(): Promise<Session> {
-  const session = await requireSeller();
-
-  if (!session.user.isVerifiedSeller) {
-    console.log('[AuthHelpers] requireVerifiedSeller: Seller not verified, redirecting');
-    redirect('/seller/verify');
+    return {
+      user: {
+        id: auth.user.id,
+        email: auth.user.email,
+        username: auth.user.username,
+        isAdmin: auth.user.isAdmin,
+        isSeller: auth.user.isSeller,
+        isVerifiedSeller: auth.user.isVerifiedSeller,
+      },
+    };
+  } catch {
+    return null;
   }
-
-  return session;
 }
 
 /**
- * Check if user is authenticated (boolean check)
+ * Check if current user is admin
  *
- * Use this when you need a simple boolean check without redirects.
+ * Non-blocking check that returns a boolean.
+ * Useful for conditional rendering or logic.
  *
- * @returns true if authenticated
+ * @returns Boolean indicating admin status
  *
  * @example
- * const isAuthenticated = await isAuth();
- * if (isAuthenticated) {
- *   // Show authenticated features
+ * const userIsAdmin = await isAdmin();
+ * if (userIsAdmin) {
+ *   // Show admin features
  * }
  */
-export async function isAuth(): Promise<boolean> {
-  const session = await auth();
-  return !!session?.user;
-}
+export async function isAdmin(): Promise<boolean> {
+  const session = await getSession();
+  const adminStatus = !!session?.user?.isAdmin;
 
-/**
- * Check if user is a seller (boolean check)
- *
- * @returns true if user is a seller
- *
- * @example
- * const canCreateProject = await isSeller();
- * if (canCreateProject) {
- *   // Show "Create Project" button
- * }
- */
-export async function isSeller(): Promise<boolean> {
-  const session = await auth();
-  return !!session?.user?.isSeller;
-}
+  console.log('[AuthHelpers] isAdmin check:', {
+    userId: session?.user?.id,
+    isAdmin: adminStatus,
+  });
 
-/**
- * Check if user is a verified seller (boolean check)
- *
- * @returns true if user is a verified seller
- *
- * @example
- * const isVerified = await isVerifiedSeller();
- * if (isVerified) {
- *   // Show verified badge
- * }
- */
-export async function isVerifiedSeller(): Promise<boolean> {
-  const session = await auth();
-  return !!session?.user?.isVerifiedSeller;
-}
-
-/**
- * Get user ID from session (convenience helper)
- *
- * @returns User ID or null if not authenticated
- *
- * @example
- * const userId = await getUserId();
- * if (userId) {
- *   // Fetch user-specific data
- * }
- */
-export async function getUserId(): Promise<string | null> {
-  const session = await auth();
-  return session?.user?.id ?? null;
+  return adminStatus;
 }

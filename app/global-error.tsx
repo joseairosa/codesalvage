@@ -65,20 +65,26 @@ export default function GlobalError({
             </div>
 
             {/* Error Message */}
-            <h1 className="mb-4 text-center text-2xl font-bold text-red-600">Something went wrong!</h1>
+            <h1 className="mb-4 text-center text-2xl font-bold text-red-600">
+              Something went wrong!
+            </h1>
 
             <p className="mb-6 text-center text-gray-600">
-              We apologize for the inconvenience. An unexpected error has occurred and our team has been
-              notified.
+              We apologize for the inconvenience. An unexpected error has occurred and our
+              team has been notified.
             </p>
 
             {/* Error Details (Development Only) */}
             {process.env['NODE_ENV'] === 'development' && (
               <div className="mb-6 rounded-md bg-gray-100 p-4">
-                <p className="mb-2 font-mono text-sm font-semibold text-gray-700">Error Details:</p>
+                <p className="mb-2 font-mono text-sm font-semibold text-gray-700">
+                  Error Details:
+                </p>
                 <p className="mb-2 font-mono text-xs text-gray-600">{error.message}</p>
                 {error.digest && (
-                  <p className="font-mono text-xs text-gray-500">Digest: {error.digest}</p>
+                  <p className="font-mono text-xs text-gray-500">
+                    Digest: {error.digest}
+                  </p>
                 )}
               </div>
             )}
@@ -102,7 +108,10 @@ export default function GlobalError({
             {/* Support Link */}
             <p className="mt-6 text-center text-sm text-gray-500">
               If this problem persists, please{' '}
-              <a href="mailto:support@codesalvage.com" className="text-blue-600 hover:underline">
+              <a
+                href="mailto:support@codesalvage.com"
+                className="text-blue-600 hover:underline"
+              >
                 contact support
               </a>
               .

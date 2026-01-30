@@ -16,7 +16,7 @@
 
 'use client';
 
-import { signOut } from 'next-auth/react';
+import { useSignOut } from '@/lib/hooks/useSession';
 import Link from 'next/link';
 import {
   DropdownMenu,
@@ -53,9 +53,11 @@ interface UserMenuProps {
  * UserMenu Component
  */
 export function UserMenu({ user }: UserMenuProps) {
+  const signOut = useSignOut();
+
   const handleSignOut = async () => {
     console.log('[UserMenu] Signing out user:', user.id);
-    await signOut({ callbackUrl: '/' });
+    await signOut();
   };
 
   // Get user initials for avatar fallback

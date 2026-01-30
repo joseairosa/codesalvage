@@ -1,79 +1,78 @@
 /**
- * Next.js Middleware - Route Protection
+ * Next.js Middleware - Route Protection (Firebase)
  *
  * Responsibilities:
  * - Protect authenticated routes (dashboard, seller pages, buyer pages)
  * - Redirect unauthenticated users to sign-in page
- * - Handle seller-only routes
+ * - Lightweight Firebase token validation
  * - Preserve original URL for post-auth redirect
  *
  * Architecture:
  * - Runs on Edge Runtime (fast, globally distributed)
- * - Uses Auth.js session checking
- * - Matches routes via config.matcher
+ * - Uses Firebase tokens stored in httpOnly cookies
+ * - Lightweight token check (full verification in routes with requireAuth/requireAdmin)
+ * - Follows ataglance pattern for consistency
  *
  * Protected Routes:
  * - /dashboard/* - All authenticated users
- * - /seller/* - Sellers only
+ * - /seller/* - Sellers only (full check in route)
  * - /buyer/* - Buyers only (all users by default)
- * - /projects/new - Sellers only (create project)
+ * - /admin/* - Admins only (full check in route)
+ *
+ * Public Routes (auth handled in API routes):
+ * - /projects/* - Browse, search, view project details
+ * - /auth/* - Authentication pages
  */
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { auth } from '@/lib/auth';
 
 /**
  * Middleware function - runs on every request matching config.matcher
+ *
+ * NOTE: firebase-admin cannot run in Edge Runtime (uses node:process, node:stream).
+ * Middleware only checks for session cookie presence as a lightweight gate.
+ * Full Firebase token verification happens in route handlers via requireAuth/requireAdmin.
  */
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   console.log('[Middleware] Checking route:', pathname);
 
-  // Get session (Auth.js automatically handles this)
-  const session = await auth();
-
-  // Route protection rules
-  const isAuthRoute = pathname.startsWith('/auth/');
-  const isDashboardRoute = pathname.startsWith('/dashboard');
-  const isSellerRoute = pathname.startsWith('/seller');
-  const isBuyerRoute = pathname.startsWith('/buyer');
-  const isCreateProjectRoute = pathname === '/projects/new';
-
-  // Allow auth routes (sign-in, sign-out, etc.)
-  if (isAuthRoute) {
-    console.log('[Middleware] Auth route, allowing access');
+  // Public routes (no auth required)
+  if (
+    pathname.startsWith('/auth') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api/webhooks') ||
+    pathname === '/' ||
+    pathname.startsWith('/api/auth/session') // Allow session API route
+  ) {
+    console.log('[Middleware] Public route, allowing access');
     return NextResponse.next();
   }
 
-  // Check authentication for protected routes
-  if (isDashboardRoute || isSellerRoute || isBuyerRoute || isCreateProjectRoute) {
-    if (!session?.user) {
-      console.log('[Middleware] Unauthenticated user, redirecting to sign-in');
+  // Get session cookie
+  const sessionToken = request.cookies.get('session')?.value;
 
-      // Redirect to sign-in with callback URL
-      const signInUrl = new URL('/auth/signin', request.url);
-      signInUrl.searchParams.set('callbackUrl', pathname);
+  // Protected routes require session token
+  const isProtectedRoute =
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/seller') ||
+    pathname.startsWith('/buyer') ||
+    pathname.startsWith('/admin');
 
-      return NextResponse.redirect(signInUrl);
-    }
+  if (isProtectedRoute && !sessionToken) {
+    console.log('[Middleware] No session token, redirecting to sign-in');
 
-    // Check seller-only routes
-    if ((isSellerRoute || isCreateProjectRoute) && !session.user.isSeller) {
-      console.log(
-        '[Middleware] Non-seller accessing seller route, redirecting to dashboard'
-      );
+    // Redirect to sign-in with callback URL
+    const signInUrl = new URL('/auth/signin', request.url);
+    signInUrl.searchParams.set('callbackUrl', pathname);
 
-      // Redirect non-sellers to dashboard
-      const dashboardUrl = new URL('/dashboard', request.url);
-      return NextResponse.redirect(dashboardUrl);
-    }
-
-    console.log('[Middleware] Authenticated user, allowing access');
+    return NextResponse.redirect(signInUrl);
   }
 
   // Allow request to proceed
+  // Full token verification happens in route handlers (requireAuth, requireAdmin)
   return NextResponse.next();
 }
 
@@ -84,15 +83,5 @@ export async function middleware(request: NextRequest) {
  * Uses matcher to include only protected routes for performance.
  */
 export const config = {
-  matcher: [
-    /*
-     * Match all routes except:
-     * - _next/static (static files)
-     * - _next/image (image optimization)
-     * - favicon.ico (favicon)
-     * - public files (images, etc.)
-     * - API routes (handle auth separately)
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/dashboard/:path*', '/seller/:path*', '/buyer/:path*', '/admin/:path*'],
 };

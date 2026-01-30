@@ -11,7 +11,7 @@
  */
 
 import { createClient } from 'redis';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 // Redis client singleton
 let redisClient: ReturnType<typeof createClient> | null = null;
@@ -336,7 +336,10 @@ export function addRateLimitHeaders(
  * @example
  * await clearRateLimit('auth', '192.168.1.1');
  */
-export async function clearRateLimit(namespace: string, identifier: string): Promise<void> {
+export async function clearRateLimit(
+  namespace: string,
+  identifier: string
+): Promise<void> {
   try {
     const redis = await getRedisClient();
     const key = `ratelimit:${namespace}:${identifier}`;

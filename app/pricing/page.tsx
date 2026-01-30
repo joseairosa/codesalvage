@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
-import { auth } from '@/auth';
+import { getSession } from '@/lib/auth-helpers';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -21,13 +21,14 @@ export const metadata: Metadata = {
     'Choose between Free and Pro plans. Get unlimited project listings, advanced analytics, and Pro verification badge starting at $9.99/month.',
   openGraph: {
     title: 'Pricing Plans - CodeSalvage',
-    description: 'Free tier with 3 projects or Pro plan with unlimited listings for $9.99/month',
+    description:
+      'Free tier with 3 projects or Pro plan with unlimited listings for $9.99/month',
     type: 'website',
   },
 };
 
 export default async function PricingPage() {
-  const session = await auth();
+  const session = await getSession();
   const isAuthenticated = !!session?.user;
   const isSeller = session?.user?.isSeller;
 

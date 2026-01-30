@@ -14,7 +14,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
   FeaturedListingRepository,
@@ -71,8 +71,8 @@ const purchaseSchema = z.object({
  */
 export async function POST(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -92,19 +92,16 @@ export async function POST(request: Request) {
     const { projectId, durationDays } = validatedData.data;
 
     console.log(`[${componentName}] Processing purchase:`, {
-      userId: session.user.id,
+      userId: auth.user.id,
       projectId,
       durationDays,
     });
 
     // Purchase featured placement
-    const result = await featuredListingService.purchaseFeaturedPlacement(
-      session.user.id,
-      {
-        projectId,
-        durationDays,
-      }
-    );
+    const result = await featuredListingService.purchaseFeaturedPlacement(auth.user.id, {
+      projectId,
+      durationDays,
+    });
 
     console.log(`[${componentName}] Featured placement purchased successfully`);
 

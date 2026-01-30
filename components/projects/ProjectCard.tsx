@@ -251,7 +251,10 @@ export function ProjectCard({
                   <p className="truncate text-sm font-medium">
                     {project.seller.fullName || project.seller.username}
                   </p>
-                  <ProBadge subscription={project.seller.subscription ?? null} size="sm" />
+                  <ProBadge
+                    subscription={project.seller.subscription ?? null}
+                    size="sm"
+                  />
                 </div>
                 <p className="truncate text-xs text-muted-foreground">
                   @{project.seller.username}

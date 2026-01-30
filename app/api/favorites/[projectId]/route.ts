@@ -9,8 +9,8 @@
  * DELETE /api/favorites/project123
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { type NextRequest, NextResponse } from 'next/server';
+import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { FavoriteService } from '@/lib/services/FavoriteService';
 import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
@@ -36,24 +36,24 @@ const favoriteService = new FavoriteService(
  * Remove a project from favorites
  */
 async function removeFavorite(
-  _request: NextRequest,
-  { params }: { params: { projectId: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    const auth = await authenticateApiRequest(request);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { projectId } = params;
+    const { projectId } = await params;
 
     console.log(`[${componentName}] Removing favorite:`, {
-      userId: session.user.id,
+      userId: auth.user.id,
       projectId,
     });
 
     // Use FavoriteService to remove favorite
-    const removed = await favoriteService.removeFavorite(session.user.id, projectId);
+    const removed = await favoriteService.removeFavorite(auth.user.id, projectId);
 
     if (!removed) {
       return NextResponse.json({ error: 'Favorite not found' }, { status: 404 });
@@ -83,7 +83,7 @@ async function removeFavorite(
  *
  * DELETE: API rate limiting (100 requests / minute per user)
  */
-export const DELETE = withApiRateLimit(removeFavorite, async (_request) => {
-  const session = await auth();
-  return session?.user?.id || 'anonymous';
+export const DELETE = withApiRateLimit(removeFavorite, async (request) => {
+  const auth = await authenticateApiRequest(request);
+  return auth?.user.id || 'anonymous';
 });

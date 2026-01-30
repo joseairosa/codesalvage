@@ -5,14 +5,14 @@
  * Wraps the app with necessary context providers.
  *
  * Responsibilities:
- * - Provide NextAuth session context
+ * - Provide Firebase authentication context
  * - Future: Add other global providers (React Query, etc.)
  */
 
 'use client';
 
 import * as React from 'react';
-import { SessionProvider } from 'next-auth/react';
+import { AuthProvider } from '@/lib/hooks/useSession';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -24,5 +24,5 @@ interface ProvidersProps {
  * Wraps the application with all necessary providers.
  */
 export function Providers({ children }: ProvidersProps) {
-  return <SessionProvider>{children}</SessionProvider>;
+  return <AuthProvider>{children}</AuthProvider>;
 }
