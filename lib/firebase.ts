@@ -25,21 +25,28 @@ const firebaseConfig = {
   appId: process.env['NEXT_PUBLIC_FIREBASE_APP_ID']!,
 };
 
-// Validate configuration
-if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-  throw new Error(
-    '[Firebase Client] Missing required Firebase configuration. Check NEXT_PUBLIC_FIREBASE_* environment variables.'
+// Check if Firebase is configured (may not be during build/CI)
+const isFirebaseConfigured = !!(firebaseConfig.apiKey && firebaseConfig.projectId);
+
+if (!isFirebaseConfigured) {
+  console.warn(
+    '[Firebase Client] Missing Firebase configuration. Auth features will be unavailable.'
   );
 }
 
-// Initialize Firebase (singleton pattern)
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// Initialize Firebase (singleton pattern) - only if configured
+const app = isFirebaseConfigured
+  ? getApps().length === 0
+    ? initializeApp(firebaseConfig)
+    : getApps()[0]
+  : null;
 
-// Get Auth instance
-export const auth = getAuth(app);
+// Get Auth instance - only if app is initialized
+export const auth = app ? getAuth(app) : (null as unknown as ReturnType<typeof getAuth>);
 
 // Connect to emulator in development (optional)
 if (
+  app &&
   process.env.NODE_ENV === 'development' &&
   process.env['NEXT_PUBLIC_FIREBASE_EMULATOR'] === 'true'
 ) {
@@ -47,6 +54,8 @@ if (
   connectAuthEmulator(auth, 'http://localhost:9099');
 }
 
-console.log('[Firebase Client] Initialized for project:', firebaseConfig.projectId);
+if (isFirebaseConfigured) {
+  console.log('[Firebase Client] Initialized for project:', firebaseConfig.projectId);
+}
 
 export default app;
