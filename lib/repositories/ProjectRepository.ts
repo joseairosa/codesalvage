@@ -773,7 +773,11 @@ export class ProjectRepository {
         },
       });
 
-      console.log('[ProjectRepository] Project featured status updated:', projectId, featured);
+      console.log(
+        '[ProjectRepository] Project featured status updated:',
+        projectId,
+        featured
+      );
       return project;
     } catch (error) {
       console.error('[ProjectRepository] toggleFeatured failed:', error);
@@ -795,17 +799,15 @@ export class ProjectRepository {
    * @example
    * const allProjects = await projectRepo.getAllProjects({ status: 'draft', limit: 100 });
    */
-  async getAllProjects(
-    options?: {
-      status?: string | string[];
-      isFeatured?: boolean;
-      sellerId?: string;
-      limit?: number;
-      offset?: number;
-      sortBy?: 'createdAt' | 'updatedAt' | 'priceCents' | 'viewCount';
-      sortOrder?: 'asc' | 'desc';
-    }
-  ): Promise<Project[]> {
+  async getAllProjects(options?: {
+    status?: string | string[];
+    isFeatured?: boolean;
+    sellerId?: string;
+    limit?: number;
+    offset?: number;
+    sortBy?: 'createdAt' | 'updatedAt' | 'priceCents' | 'viewCount';
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<Project[]> {
     const {
       status,
       isFeatured,

@@ -695,19 +695,17 @@ export class TransactionRepository {
    *   limit: 100
    * });
    */
-  async getAllTransactions(
-    options?: {
-      paymentStatus?: string;
-      escrowStatus?: string;
-      sellerId?: string;
-      buyerId?: string;
-      projectId?: string;
-      limit?: number;
-      offset?: number;
-      sortBy?: 'createdAt' | 'amountCents' | 'escrowReleaseDate';
-      sortOrder?: 'asc' | 'desc';
-    }
-  ): Promise<TransactionWithRelations[]> {
+  async getAllTransactions(options?: {
+    paymentStatus?: string;
+    escrowStatus?: string;
+    sellerId?: string;
+    buyerId?: string;
+    projectId?: string;
+    limit?: number;
+    offset?: number;
+    sortBy?: 'createdAt' | 'amountCents' | 'escrowReleaseDate';
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<TransactionWithRelations[]> {
     const {
       paymentStatus,
       escrowStatus,
@@ -797,13 +795,14 @@ export class TransactionRepository {
         },
       });
 
-      console.log('[TransactionRepository] Found transactions (admin):', transactions.length);
+      console.log(
+        '[TransactionRepository] Found transactions (admin):',
+        transactions.length
+      );
       return transactions as TransactionWithRelations[];
     } catch (error) {
       console.error('[TransactionRepository] getAllTransactions failed:', error);
-      throw new Error(
-        '[TransactionRepository] Failed to get all transactions'
-      );
+      throw new Error('[TransactionRepository] Failed to get all transactions');
     }
   }
 
@@ -819,15 +818,13 @@ export class TransactionRepository {
    *   paymentStatus: 'succeeded'
    * });
    */
-  async countAllTransactions(
-    options?: {
-      paymentStatus?: string;
-      escrowStatus?: string;
-      sellerId?: string;
-      buyerId?: string;
-      projectId?: string;
-    }
-  ): Promise<number> {
+  async countAllTransactions(options?: {
+    paymentStatus?: string;
+    escrowStatus?: string;
+    sellerId?: string;
+    buyerId?: string;
+    projectId?: string;
+  }): Promise<number> {
     const { paymentStatus, escrowStatus, sellerId, buyerId, projectId } = options || {};
 
     console.log('[TransactionRepository] countAllTransactions called:', {
@@ -868,9 +865,7 @@ export class TransactionRepository {
       return count;
     } catch (error) {
       console.error('[TransactionRepository] countAllTransactions failed:', error);
-      throw new Error(
-        '[TransactionRepository] Failed to count transactions'
-      );
+      throw new Error('[TransactionRepository] Failed to count transactions');
     }
   }
 
@@ -903,9 +898,7 @@ export class TransactionRepository {
       return transaction;
     } catch (error) {
       console.error('[TransactionRepository] releaseEscrowManually failed:', error);
-      throw new Error(
-        '[TransactionRepository] Failed to release escrow manually'
-      );
+      throw new Error('[TransactionRepository] Failed to release escrow manually');
     }
   }
 }

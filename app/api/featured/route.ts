@@ -145,10 +145,10 @@ export async function POST(request: Request) {
       durationDays,
     });
 
-    const result = await featuredListingService.purchaseFeaturedPlacement(
-      auth.user.id,
-      { projectId, durationDays }
-    );
+    const result = await featuredListingService.purchaseFeaturedPlacement(auth.user.id, {
+      projectId,
+      durationDays,
+    });
 
     console.log(`[${componentName}] Featured placement purchased:`, result.projectId);
 

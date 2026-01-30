@@ -14,7 +14,11 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { AdminService, AdminValidationError, AdminAuthorizationError } from '../AdminService';
+import {
+  AdminService,
+  AdminValidationError,
+  AdminAuthorizationError,
+} from '../AdminService';
 import type { AdminRepository } from '@/lib/repositories/AdminRepository';
 import type { UserRepository } from '@/lib/repositories/UserRepository';
 import type { ProjectRepository } from '@/lib/repositories/ProjectRepository';
@@ -269,12 +273,12 @@ describe('AdminService', () => {
       (mockUserRepo.findById as any).mockResolvedValue(null);
 
       // Act & Assert
-      await expect(
-        adminService.unbanUser(adminId, userId, ipAddress)
-      ).rejects.toThrow(AdminValidationError);
-      await expect(
-        adminService.unbanUser(adminId, userId, ipAddress)
-      ).rejects.toThrow('User not found');
+      await expect(adminService.unbanUser(adminId, userId, ipAddress)).rejects.toThrow(
+        AdminValidationError
+      );
+      await expect(adminService.unbanUser(adminId, userId, ipAddress)).rejects.toThrow(
+        'User not found'
+      );
     });
 
     it('should throw error if user not currently banned', async () => {
@@ -285,12 +289,12 @@ describe('AdminService', () => {
       });
 
       // Act & Assert
-      await expect(
-        adminService.unbanUser(adminId, userId, ipAddress)
-      ).rejects.toThrow(AdminValidationError);
-      await expect(
-        adminService.unbanUser(adminId, userId, ipAddress)
-      ).rejects.toThrow('User is not currently banned');
+      await expect(adminService.unbanUser(adminId, userId, ipAddress)).rejects.toThrow(
+        AdminValidationError
+      );
+      await expect(adminService.unbanUser(adminId, userId, ipAddress)).rejects.toThrow(
+        'User is not currently banned'
+      );
     });
 
     it('should succeed even if email notification fails', async () => {
@@ -402,7 +406,10 @@ describe('AdminService', () => {
     it('should reject project with audit log', async () => {
       // Arrange
       (mockProjectRepo.findById as any).mockResolvedValue(mockProject);
-      (mockProjectRepo.rejectProject as any).mockResolvedValue({ ...mockProject, status: 'draft' });
+      (mockProjectRepo.rejectProject as any).mockResolvedValue({
+        ...mockProject,
+        status: 'draft',
+      });
       (mockAdminRepo.createAuditLog as any).mockResolvedValue({});
 
       // Act
@@ -468,13 +475,7 @@ describe('AdminService', () => {
       (mockAdminRepo.createAuditLog as any).mockResolvedValue({});
 
       // Act
-      await adminService.toggleProjectFeatured(
-        adminId,
-        projectId,
-        true,
-        30,
-        ipAddress
-      );
+      await adminService.toggleProjectFeatured(adminId, projectId, true, 30, ipAddress);
 
       // Assert
       expect(mockProjectRepo.toggleFeatured).toHaveBeenCalledWith(
@@ -540,15 +541,12 @@ describe('AdminService', () => {
       (mockAdminRepo.createAuditLog as any).mockResolvedValue({});
 
       // Act
-      await adminService.releaseEscrowManually(
-        adminId,
-        transactionId,
-        reason,
-        ipAddress
-      );
+      await adminService.releaseEscrowManually(adminId, transactionId, reason, ipAddress);
 
       // Assert
-      expect(mockTransactionRepo.releaseEscrowManually).toHaveBeenCalledWith(transactionId);
+      expect(mockTransactionRepo.releaseEscrowManually).toHaveBeenCalledWith(
+        transactionId
+      );
       expect(mockAdminRepo.createAuditLog).toHaveBeenCalledWith({
         adminId,
         action: 'transaction.escrow_release',

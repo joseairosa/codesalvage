@@ -27,17 +27,22 @@ By accessing or using CodeSalvage ("the Platform," "we," "us," or "our"), you ag
 ## 3. Eligibility
 
 ### 3.1 Age Requirement
+
 You must be at least 18 years old to use the Platform. By using the Platform, you represent and warrant that you are at least 18 years of age.
 
 ### 3.2 Account Registration
+
 You must register for an account using GitHub OAuth. You agree to:
+
 - Provide accurate and complete information
 - Maintain the security of your account credentials
 - Notify us immediately of any unauthorized account use
 - Be responsible for all activities under your account
 
 ### 3.3 Prohibited Users
+
 You may not use the Platform if:
+
 - You are prohibited by law from using the Platform
 - Your account has been previously terminated for violation of these Terms
 - You are located in a country embargoed by the United States
@@ -49,11 +54,13 @@ You may not use the Platform if:
 ### 4.1 Sellers
 
 **Eligibility**:
+
 - Must have a valid GitHub account
 - Must complete Stripe Connect onboarding for payment processing
 - Must provide tax information (W-9 for US residents, W-8BEN for international)
 
 **Responsibilities**:
+
 - Provide accurate descriptions of Projects, including completion percentage and known issues
 - Deliver source code and documentation as described
 - Respond to Buyer inquiries within reasonable timeframes
@@ -61,6 +68,7 @@ You may not use the Platform if:
 - Ensure you have the right to sell the code (no stolen or plagiarized code)
 
 **Prohibited Conduct**:
+
 - Listing Projects containing malicious code (viruses, malware, backdoors)
 - Listing Projects you do not own or have rights to sell
 - Significantly misrepresenting completion percentage or functionality
@@ -70,12 +78,14 @@ You may not use the Platform if:
 ### 4.2 Buyers
 
 **Responsibilities**:
+
 - Review Project descriptions, screenshots, and known issues before purchasing
 - Understand that Projects are **unfinished** and may require additional work
 - Complete review of code within 7-day Escrow Period
 - Provide honest and fair reviews of purchased Projects
 
 **Prohibited Conduct**:
+
 - Disputing Transactions based on issues that were disclosed in Project description
 - Requesting refunds after Escrow Period expires (except in cases of fraud)
 - Redistributing purchased code in violation of license terms
@@ -88,6 +98,7 @@ You may not use the Platform if:
 ### 5.1 Content Standards
 
 All Projects must:
+
 - Contain legitimate, functional source code
 - Include accurate descriptions and completion percentages
 - Disclose all known issues and limitations
@@ -97,6 +108,7 @@ All Projects must:
 ### 5.2 Prohibited Content
 
 Projects must not contain:
+
 - Stolen or plagiarized code
 - Code that violates third-party licenses or copyrights
 - Malware, viruses, trojans, or other malicious code
@@ -120,16 +132,19 @@ Sellers set their own prices in USD. All prices are displayed in USD and charged
 ### 6.2 Platform Fees
 
 **Seller Fees**:
+
 - 18% Platform commission on each sale
 - Stripe processing fees: 2.9% + $0.30 per transaction
 
 **Example**: For a $500 Project sale:
+
 - Buyer pays: $500
 - Stripe fee: $14.80
 - Platform commission: $90
 - Seller receives: $395.20
 
 **Buyer Fees**:
+
 - No additional fees beyond listed price
 - Price shown is the price paid
 
@@ -142,6 +157,7 @@ Payments are processed via Stripe. By making a purchase, you agree to Stripe's T
 **Purpose**: Protect Buyers by holding payment for 7 days after purchase.
 
 **Process**:
+
 1. Buyer completes purchase, payment is held in escrow
 2. Buyer receives code immediately
 3. Buyer has 7 days to review code and report issues
@@ -149,6 +165,7 @@ Payments are processed via Stripe. By making a purchase, you agree to Stripe's T
 5. If dispute, Platform reviews and decides on refund
 
 **Seller Payouts**:
+
 - Automatic payouts: Weekly (every Monday) for balances > $50
 - Manual payouts: Available anytime for balances > $50
 - First payout may take 7-10 business days (Stripe verification)
@@ -160,6 +177,7 @@ Payments are processed via Stripe. By making a purchase, you agree to Stripe's T
 ### 7.1 Refund Eligibility
 
 Refunds may be granted during the 7-day Escrow Period if:
+
 - Project does not match description (e.g., advertised features missing)
 - Completion percentage significantly inflated (claimed 80%, actually 40%)
 - Major features are non-functional and not disclosed
@@ -168,6 +186,7 @@ Refunds may be granted during the 7-day Escrow Period if:
 ### 7.2 Non-Refundable
 
 Refunds will **NOT** be granted for:
+
 - Buyer inability to run or understand the code (setup assistance is Buyer's responsibility)
 - Minor bugs in unfinished code (expected in incomplete Projects)
 - Issues disclosed in "Known Issues" section of Project description
@@ -185,6 +204,7 @@ Refunds will **NOT** be granted for:
 ### 7.4 Dispute Evidence
 
 Buyers should provide:
+
 - Screenshots of issues
 - Specific description discrepancies
 - Error messages or logs
@@ -197,6 +217,7 @@ Buyers should provide:
 ### 8.1 Delivery Method
 
 Code is delivered via:
+
 - **ZIP File Download**: Available immediately after purchase
 - **GitHub Repository Access**: If Seller provides repository access
 
@@ -207,28 +228,33 @@ Code is delivered via:
 Projects are sold under one of three license types:
 
 **1. Full Code Transfer** (Most Common):
+
 - Buyer owns all rights to the code
 - Buyer may use commercially, modify, resell, redistribute
 - Seller retains no rights after sale
 
 **2. Limited License**:
+
 - Buyer may use commercially and modify
 - Buyer may NOT resell code as-is
 - Buyer MAY sell products built on top of code
 - Seller retains original rights
 
 **3. Custom License**:
+
 - Terms defined by Seller in Project description
 - Buyer should clarify before purchase
 
 ### 8.3 Intellectual Property
 
 **Seller Warranties**: By listing a Project, Seller warrants that:
+
 - They own all rights to the code or have permission to sell
 - The code does not infringe on third-party IP rights
 - The code does not contain proprietary third-party code without proper licensing
 
 **Buyer Rights**: Upon purchase under "Full Code Transfer" license:
+
 - Buyer receives all rights to modify, use commercially, and redistribute
 - Buyer is not required to attribute Seller (though appreciated)
 
@@ -243,6 +269,7 @@ Only verified Buyers who completed a Transaction may leave reviews.
 ### 9.2 Review Guidelines
 
 Reviews must:
+
 - Be honest and based on actual experience
 - Focus on code quality, completeness, and description accuracy
 - Not contain offensive language, personal attacks, or discriminatory content
@@ -251,6 +278,7 @@ Reviews must:
 ### 9.3 Prohibited Review Conduct
 
 Users may not:
+
 - Leave fake or misleading reviews
 - Review Projects they did not purchase
 - Extort Sellers by threatening negative reviews
@@ -259,6 +287,7 @@ Users may not:
 ### 9.4 Review Moderation
 
 We reserve the right to remove reviews that:
+
 - Violate these Terms or review guidelines
 - Contain offensive, defamatory, or illegal content
 - Are determined to be fake or fraudulent
@@ -270,23 +299,27 @@ We reserve the right to remove reviews that:
 Users may not:
 
 ### 10.1 Fraud and Abuse
+
 - Engage in fraudulent transactions or chargebacks
 - Create multiple accounts to circumvent restrictions
 - Manipulate ratings or reviews
 - Engage in price manipulation or anti-competitive behavior
 
 ### 10.2 Security and Technical
+
 - Attempt to hack, disrupt, or compromise Platform security
 - Use automated tools (bots, scrapers) without permission
 - Reverse engineer or decompile Platform code
 - Overwhelm Platform with excessive requests (API abuse)
 
 ### 10.3 Circumvention
+
 - Contact other users outside Platform to avoid fees
 - Share or sell account credentials
 - Attempt to bypass payment processing or escrow
 
 ### 10.4 Illegal Activities
+
 - Use Platform for money laundering, fraud, or illegal purposes
 - Sell or distribute illegal content
 - Violate export control or sanctions laws
@@ -300,6 +333,7 @@ Users may not:
 **Price**: $9.99/month (billed monthly)
 
 **Benefits**:
+
 - Unlimited project listings
 - Verified Pro badge
 - 20% discount on featured listings
@@ -316,6 +350,7 @@ Users may not:
 ### 11.3 Cancellation
 
 To cancel:
+
 - Navigate to account settings
 - Click "Cancel Subscription"
 - Benefits remain active until end of current billing period
@@ -350,6 +385,7 @@ To cancel:
 ### 13.1 User Content
 
 You retain ownership of content you upload (code, descriptions, images). By uploading content, you grant CodeSalvage a non-exclusive, worldwide, royalty-free license to:
+
 - Display, reproduce, and distribute your content on the Platform
 - Create derivative works for Platform functionality (thumbnails, previews)
 - Use for marketing and promotional purposes
@@ -369,6 +405,7 @@ We collect and process personal data as described in our [Privacy Policy](PRIVAC
 ### 14.2 Third-Party Services
 
 We use third-party services:
+
 - **Stripe**: Payment processing
 - **GitHub**: Authentication
 - **Cloudflare R2**: File storage
@@ -384,6 +421,7 @@ Each service has its own privacy policy and terms.
 ### 15.1 Platform "As-Is"
 
 THE PLATFORM IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
+
 - Warranties of merchantability or fitness for a particular purpose
 - Warranties that the Platform will be uninterrupted or error-free
 - Warranties that defects will be corrected
@@ -391,6 +429,7 @@ THE PLATFORM IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KI
 ### 15.2 No Warranty on User Content
 
 WE DO NOT WARRANT OR ENDORSE:
+
 - The accuracy, quality, or legality of Projects listed by Sellers
 - The ability of Sellers to complete sales or deliver code
 - The ability of Buyers to pay for purchases
@@ -399,6 +438,7 @@ WE DO NOT WARRANT OR ENDORSE:
 ### 15.3 Use at Your Own Risk
 
 You acknowledge that:
+
 - Projects are unfinished and may contain bugs
 - You are responsible for reviewing code before use in production
 - We are not liable for damages caused by use of purchased code
@@ -411,6 +451,7 @@ You acknowledge that:
 ### 16.1 Limitation
 
 TO THE MAXIMUM EXTENT PERMITTED BY LAW, PROJECTFINISH SHALL NOT BE LIABLE FOR:
+
 - Indirect, incidental, special, consequential, or punitive damages
 - Loss of profits, revenue, data, or use
 - Damages arising from use or inability to use the Platform
@@ -419,12 +460,14 @@ TO THE MAXIMUM EXTENT PERMITTED BY LAW, PROJECTFINISH SHALL NOT BE LIABLE FOR:
 ### 16.2 Maximum Liability
 
 OUR TOTAL LIABILITY TO YOU SHALL NOT EXCEED THE GREATER OF:
+
 - $100 USD, OR
 - The amount of fees you paid to CodeSalvage in the 12 months preceding the claim
 
 ### 16.3 Exceptions
 
 This limitation does not apply to:
+
 - Liability for death or personal injury caused by our negligence
 - Liability for fraud or fraudulent misrepresentation
 - Liability that cannot be limited by law
@@ -434,6 +477,7 @@ This limitation does not apply to:
 ## 17. Indemnification
 
 You agree to indemnify, defend, and hold harmless CodeSalvage, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including attorneys' fees) arising from:
+
 - Your violation of these Terms
 - Your violation of any third-party rights (IP, privacy, etc.)
 - Your use of the Platform
@@ -447,6 +491,7 @@ You agree to indemnify, defend, and hold harmless CodeSalvage, its officers, dir
 ### 18.1 Termination by You
 
 You may terminate your account at any time by contacting support. Upon termination:
+
 - Your listings will be removed
 - Pending Transactions will be completed
 - You will receive any outstanding payouts
@@ -454,6 +499,7 @@ You may terminate your account at any time by contacting support. Upon terminati
 ### 18.2 Termination by Us
 
 We may suspend or terminate your account if:
+
 - You violate these Terms
 - We suspect fraudulent or illegal activity
 - Required by law
@@ -462,6 +508,7 @@ We may suspend or terminate your account if:
 ### 18.3 Effect of Termination
 
 Upon termination:
+
 - Access to your account will be revoked
 - Pending Transactions will be handled case-by-case
 - We may retain data as required by law or for legitimate business purposes
@@ -481,6 +528,7 @@ Before filing a claim, you agree to contact us at support@codesalvage.com to att
 ### 19.3 Arbitration Agreement
 
 Any dispute arising from these Terms or use of the Platform shall be resolved through binding arbitration, except:
+
 - Small claims court disputes (under $10,000)
 - IP infringement claims
 
@@ -499,12 +547,14 @@ YOU AGREE TO BRING CLAIMS ONLY ON AN INDIVIDUAL BASIS. YOU WAIVE THE RIGHT TO PA
 ### 20.1 Right to Modify
 
 We reserve the right to modify these Terms at any time. Changes will be effective:
+
 - Immediately for new users
 - 30 days after notice for existing users
 
 ### 20.2 Notice of Changes
 
 We will notify you of material changes via:
+
 - Email to your registered address
 - Notice on the Platform
 
@@ -551,6 +601,7 @@ For questions about these Terms, contact us at legal@codesalvage.com.
 ## 23. Acknowledgment
 
 BY USING THE PLATFORM, YOU ACKNOWLEDGE THAT:
+
 - You have read and understood these Terms
 - You agree to be bound by these Terms
 - You are at least 18 years old

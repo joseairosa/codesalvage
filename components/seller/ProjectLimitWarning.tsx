@@ -15,7 +15,13 @@
  */
 
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
@@ -34,15 +40,16 @@ export function ProjectLimitWarning({ projectCount }: ProjectLimitWarningProps) 
             <div>
               <CardTitle className="text-2xl">Project Limit Reached</CardTitle>
               <CardDescription className="mt-1.5 text-base text-foreground/80">
-                You've reached the maximum of {projectCount} active projects on the Free plan
+                You've reached the maximum of {projectCount} active projects on the Free
+                plan
               </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-muted-foreground">
-            To create more projects and grow your business, upgrade to Pro and unlock unlimited
-            project listings plus additional premium features.
+            To create more projects and grow your business, upgrade to Pro and unlock
+            unlimited project listings plus additional premium features.
           </p>
 
           <div className="space-y-3">
@@ -62,19 +69,22 @@ export function ProjectLimitWarning({ projectCount }: ProjectLimitWarningProps) 
               <li className="flex items-start gap-2 text-sm">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
                 <span>
-                  <strong>Advanced Analytics</strong> - Detailed insights into your sales performance
+                  <strong>Advanced Analytics</strong> - Detailed insights into your sales
+                  performance
                 </span>
               </li>
               <li className="flex items-start gap-2 text-sm">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
                 <span>
-                  <strong>Featured Listing Discounts</strong> - 20% off featured placements
+                  <strong>Featured Listing Discounts</strong> - 20% off featured
+                  placements
                 </span>
               </li>
               <li className="flex items-start gap-2 text-sm">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
                 <span>
-                  <strong>Verified Pro Badge</strong> - Build trust with the Pro seller badge
+                  <strong>Verified Pro Badge</strong> - Build trust with the Pro seller
+                  badge
                 </span>
               </li>
             </ul>

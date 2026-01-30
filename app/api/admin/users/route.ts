@@ -59,13 +59,37 @@ export async function GET(request: NextRequest) {
   try {
     // Parse query parameters
     const searchParams = request.nextUrl.searchParams;
-    const isBanned = searchParams.get('isBanned') === 'true' ? true : searchParams.get('isBanned') === 'false' ? false : undefined;
-    const isAdmin = searchParams.get('isAdmin') === 'true' ? true : searchParams.get('isAdmin') === 'false' ? false : undefined;
-    const isSeller = searchParams.get('isSeller') === 'true' ? true : searchParams.get('isSeller') === 'false' ? false : undefined;
-    const isVerifiedSeller = searchParams.get('isVerifiedSeller') === 'true' ? true : searchParams.get('isVerifiedSeller') === 'false' ? false : undefined;
+    const isBanned =
+      searchParams.get('isBanned') === 'true'
+        ? true
+        : searchParams.get('isBanned') === 'false'
+          ? false
+          : undefined;
+    const isAdmin =
+      searchParams.get('isAdmin') === 'true'
+        ? true
+        : searchParams.get('isAdmin') === 'false'
+          ? false
+          : undefined;
+    const isSeller =
+      searchParams.get('isSeller') === 'true'
+        ? true
+        : searchParams.get('isSeller') === 'false'
+          ? false
+          : undefined;
+    const isVerifiedSeller =
+      searchParams.get('isVerifiedSeller') === 'true'
+        ? true
+        : searchParams.get('isVerifiedSeller') === 'false'
+          ? false
+          : undefined;
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
-    const sortBy = (searchParams.get('sortBy') || 'createdAt') as 'createdAt' | 'lastLogin' | 'email' | 'username';
+    const sortBy = (searchParams.get('sortBy') || 'createdAt') as
+      | 'createdAt'
+      | 'lastLogin'
+      | 'email'
+      | 'username';
     const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
     // Filter out undefined values to satisfy exactOptionalPropertyTypes
@@ -108,9 +132,6 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     console.error('[API] GET /api/admin/users - Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch users' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
   }
 }

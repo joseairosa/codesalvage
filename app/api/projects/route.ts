@@ -138,10 +138,7 @@ async function createProject(request: NextRequest) {
     );
 
     // Create project
-    const project = await projectService.createProject(
-      auth.user.id,
-      createData as any
-    );
+    const project = await projectService.createProject(auth.user.id, createData as any);
 
     console.log('[Projects API] Project created successfully:', project.id);
 

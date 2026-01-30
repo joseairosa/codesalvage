@@ -11,8 +11,18 @@
 
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { onAuthStateChanged, signOut as firebaseSignOut, type User as FirebaseUser } from 'firebase/auth';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from 'react';
+import {
+  onAuthStateChanged,
+  signOut as firebaseSignOut,
+  type User as FirebaseUser,
+} from 'firebase/auth';
 import { auth as firebaseAuth } from '@/lib/firebase';
 
 /**
@@ -75,56 +85,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     console.log('[AuthProvider] Setting up auth state listener');
 
-    const unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser: FirebaseUser | null) => {
-      console.log('[AuthProvider] Auth state changed:', firebaseUser ? firebaseUser.uid : 'null');
+    const unsubscribe = onAuthStateChanged(
+      firebaseAuth,
+      async (firebaseUser: FirebaseUser | null) => {
+        console.log(
+          '[AuthProvider] Auth state changed:',
+          firebaseUser ? firebaseUser.uid : 'null'
+        );
 
-      if (firebaseUser) {
-        // Store ID token in httpOnly cookie
-        try {
-          const idToken = await firebaseUser.getIdToken();
+        if (firebaseUser) {
+          // Store ID token in httpOnly cookie
+          try {
+            const idToken = await firebaseUser.getIdToken();
 
-          await fetch('/api/auth/session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ idToken }),
-          });
-
-          // Fetch database user data
-          const userData = await fetchUserData();
-
-          if (userData) {
-            setSession({
-              user: {
-                ...userData,
-                name: firebaseUser.displayName || userData.email,
-              },
+            await fetch('/api/auth/session', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ idToken }),
             });
-            setStatus('authenticated');
-            console.log('[AuthProvider] Authenticated:', userData.id);
-          } else {
-            // User exists in Firebase but not in database yet
-            // This can happen on first sign-in before auto-create completes
+
+            // Fetch database user data
+            const userData = await fetchUserData();
+
+            if (userData) {
+              setSession({
+                user: {
+                  ...userData,
+                  name: firebaseUser.displayName || userData.email,
+                },
+              });
+              setStatus('authenticated');
+              console.log('[AuthProvider] Authenticated:', userData.id);
+            } else {
+              // User exists in Firebase but not in database yet
+              // This can happen on first sign-in before auto-create completes
+              setSession(null);
+              setStatus('unauthenticated');
+              console.log('[AuthProvider] Firebase user exists but no database user');
+            }
+          } catch (error) {
+            console.error('[AuthProvider] Session sync error:', error);
             setSession(null);
             setStatus('unauthenticated');
-            console.log('[AuthProvider] Firebase user exists but no database user');
           }
-        } catch (error) {
-          console.error('[AuthProvider] Session sync error:', error);
+        } else {
+          // Clear session
+          try {
+            await fetch('/api/auth/session', { method: 'DELETE' });
+          } catch {
+            // Ignore cleanup errors
+          }
           setSession(null);
           setStatus('unauthenticated');
+          console.log('[AuthProvider] Unauthenticated');
         }
-      } else {
-        // Clear session
-        try {
-          await fetch('/api/auth/session', { method: 'DELETE' });
-        } catch {
-          // Ignore cleanup errors
-        }
-        setSession(null);
-        setStatus('unauthenticated');
-        console.log('[AuthProvider] Unauthenticated');
       }
-    });
+    );
 
     return () => {
       console.log('[AuthProvider] Cleaning up auth state listener');

@@ -30,6 +30,7 @@ This document lists Auth.js files and code that should be removed after the Fire
 ### Auth.js Components (if any exist)
 
 Search for and delete:
+
 ```bash
 # Find components using Auth.js
 grep -r "useSession" components/
@@ -38,6 +39,7 @@ grep -r "signIn.*from.*next-auth" components/
 ```
 
 Common Auth.js client components to remove:
+
 - Any `<SessionProvider>` wrapper
 - Any `useSession()` hooks
 - Any `signIn()` / `signOut()` from `next-auth/react`
@@ -58,6 +60,7 @@ DROP TABLE IF EXISTS "accounts";
 ```
 
 Tables to remove from `prisma/schema.prisma`:
+
 - `Account` model
 - `Session` model
 - `VerificationToken` model
@@ -75,6 +78,7 @@ GITHUB_SECRET="..."    # If not migrated to Firebase GitHub OAuth
 ```
 
 Keep Firebase environment variables:
+
 ```bash
 # Firebase (KEEP)
 FIREBASE_PROJECT_ID="..."
@@ -117,6 +121,7 @@ grep -r "await auth()" app/api/ | grep -v node_modules
 ```
 
 **Common routes that may need updates:**
+
 - `/api/messages/*`
 - `/api/favorites/*`
 - `/api/transactions/*`
@@ -132,6 +137,7 @@ See [`FIREBASE_API_MIGRATION_GUIDE.md`](FIREBASE_API_MIGRATION_GUIDE.md) for upd
 Before deleting Auth.js code, verify:
 
 ### Phase 1: Frontend Testing (Week 2)
+
 - [ ] Users can sign in with Email/Password
 - [ ] Users can sign in with Email Magic Link
 - [ ] Users can sign in with Google OAuth
@@ -143,6 +149,7 @@ Before deleting Auth.js code, verify:
 - [ ] Callback URLs work after sign-in
 
 ### Phase 2: Backend Testing (Week 3)
+
 - [ ] All API routes support cookie-based auth
 - [ ] All API routes support API key auth
 - [ ] API keys can be created
@@ -153,6 +160,7 @@ Before deleting Auth.js code, verify:
 - [ ] Banned users are blocked
 
 ### Phase 3: User Migration (Week 3-4)
+
 - [ ] Auto-create Firebase users on first sign-in
 - [ ] All existing users have `firebaseUid` populated
 - [ ] User roles preserved (isAdmin, isSeller, isVerifiedSeller)
@@ -162,6 +170,7 @@ Before deleting Auth.js code, verify:
 - [ ] No user reports of auth issues
 
 ### Phase 4: Production Validation (Week 4)
+
 - [ ] Monitor Firebase Auth logs for errors
 - [ ] Monitor API error rates (should not increase)
 - [ ] Check authentication latency (<100ms)
@@ -171,6 +180,7 @@ Before deleting Auth.js code, verify:
 - [ ] Verify ban system still works
 
 ### Phase 5: Cleanup (After All Checks Pass)
+
 - [ ] All items in Phase 1-4 complete
 - [ ] Zero Auth.js related errors in production logs for 1 week
 - [ ] 100% of active users have `firebaseUid` populated
@@ -220,6 +230,7 @@ This is why we keep Auth.js code until migration is 100% validated!
 ## Questions?
 
 If you're unsure about deleting something:
+
 1. Search for references: `grep -r "filename" .`
 2. Check if it's imported anywhere
 3. When in doubt, keep it a bit longer

@@ -85,9 +85,7 @@ export async function authenticateApiRequest(
  *
  * @returns AuthResult if authenticated as admin, null otherwise
  */
-export async function requireAdminApiAuth(
-  request: Request
-): Promise<AuthResult | null> {
+export async function requireAdminApiAuth(request: Request): Promise<AuthResult | null> {
   const auth = await authenticateApiRequest(request);
 
   if (!auth) {

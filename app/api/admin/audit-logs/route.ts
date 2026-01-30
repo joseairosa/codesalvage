@@ -51,10 +51,7 @@ export async function GET(request: NextRequest) {
     const action = searchParams.get('action') || undefined;
 
     // Pagination
-    const limit = Math.min(
-      parseInt(searchParams.get('limit') || '50', 10),
-      100
-    );
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
     // Fetch audit logs via AdminService
@@ -100,9 +97,6 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('[Admin API] Fetch audit logs error:', error);
 
-    return NextResponse.json(
-      { error: 'Failed to fetch audit logs' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch audit logs' }, { status: 500 });
   }
 }

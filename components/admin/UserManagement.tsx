@@ -302,9 +302,7 @@ export function UserManagement() {
                           <div>
                             <div className="font-medium">{user.username}</div>
                             {user.fullName && (
-                              <div className="text-xs text-gray-500">
-                                {user.fullName}
-                              </div>
+                              <div className="text-xs text-gray-500">{user.fullName}</div>
                             )}
                           </div>
                         </TableCell>
@@ -322,9 +320,7 @@ export function UserManagement() {
                                 Admin
                               </Badge>
                             )}
-                            {user.isSeller && (
-                              <Badge variant="secondary">Seller</Badge>
-                            )}
+                            {user.isSeller && <Badge variant="secondary">Seller</Badge>}
                             {user.isVerifiedSeller && (
                               <Badge variant="outline" className="gap-1">
                                 <UserCheck className="h-3 w-3" />
@@ -413,8 +409,8 @@ export function UserManagement() {
           <DialogHeader>
             <DialogTitle>Ban User</DialogTitle>
             <DialogDescription>
-              You are about to ban {selectedUser?.username}. This action will prevent
-              them from accessing the platform.
+              You are about to ban {selectedUser?.username}. This action will prevent them
+              from accessing the platform.
             </DialogDescription>
           </DialogHeader>
 
@@ -429,9 +425,7 @@ export function UserManagement() {
                 rows={4}
                 className="mt-2"
               />
-              {banError && (
-                <p className="mt-2 text-sm text-red-600">{banError}</p>
-              )}
+              {banError && <p className="mt-2 text-sm text-red-600">{banError}</p>}
             </div>
           </div>
 

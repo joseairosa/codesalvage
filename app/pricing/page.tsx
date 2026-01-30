@@ -21,7 +21,8 @@ export const metadata: Metadata = {
     'Choose between Free and Pro plans. Get unlimited project listings, advanced analytics, and Pro verification badge starting at $9.99/month.',
   openGraph: {
     title: 'Pricing Plans - CodeSalvage',
-    description: 'Free tier with 3 projects or Pro plan with unlimited listings for $9.99/month',
+    description:
+      'Free tier with 3 projects or Pro plan with unlimited listings for $9.99/month',
     type: 'website',
   },
 };

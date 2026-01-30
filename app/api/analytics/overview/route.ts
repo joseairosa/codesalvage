@@ -86,7 +86,10 @@ export async function GET(request: Request) {
       CacheKeys.sellerAnalytics(auth.user.id, cacheRange),
       CacheTTL.ANALYTICS,
       async () => {
-        return await analyticsService.getSellerAnalyticsOverview(auth.user.id, requestData);
+        return await analyticsService.getSellerAnalyticsOverview(
+          auth.user.id,
+          requestData
+        );
       }
     );
 

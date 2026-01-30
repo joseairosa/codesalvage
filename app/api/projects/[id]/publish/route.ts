@@ -47,7 +47,10 @@ const projectService = new ProjectService(
  *
  * Publish a project
  */
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     // Check authentication
     const auth = await authenticateApiRequest(request);

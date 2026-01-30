@@ -51,11 +51,7 @@ export async function PUT(
 
     // Unban user via AdminService
     const adminService = getAdminService();
-    const unbannedUser = await adminService.unbanUser(
-      auth.user.id,
-      userId,
-      ipAddress
-    );
+    const unbannedUser = await adminService.unbanUser(auth.user.id, userId, ipAddress);
 
     return NextResponse.json(
       {
@@ -80,9 +76,6 @@ export async function PUT(
     }
 
     // Handle generic errors
-    return NextResponse.json(
-      { error: 'Failed to unban user' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to unban user' }, { status: 500 });
   }
 }

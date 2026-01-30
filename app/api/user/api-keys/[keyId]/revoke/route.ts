@@ -76,10 +76,7 @@ export async function POST(
     // Check if already revoked
     if (apiKey.status === 'revoked') {
       console.log('[API Keys] REVOKE: Key already revoked:', keyId);
-      return NextResponse.json(
-        { error: 'API key is already revoked' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'API key is already revoked' }, { status: 400 });
     }
 
     // Revoke the key - filter out undefined to satisfy exactOptionalPropertyTypes
@@ -117,9 +114,6 @@ export async function POST(
     });
   } catch (error) {
     console.error('[API Keys] REVOKE error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

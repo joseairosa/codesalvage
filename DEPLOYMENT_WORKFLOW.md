@@ -9,6 +9,7 @@ This is a quick reference guide. For detailed instructions, see [PRODUCTION_DEPL
 ## Pre-Deployment Checklist (30 minutes)
 
 ### 1. Validate Environment Variables
+
 ```bash
 npm run validate:env
 ```
@@ -18,6 +19,7 @@ npm run validate:env
 **If failures**: Set missing environment variables in Railway
 
 ### 2. Run All Tests
+
 ```bash
 npm test
 
@@ -25,6 +27,7 @@ npm test
 ```
 
 ### 3. Run Linting & Type Checking
+
 ```bash
 npm run lint
 npx tsc --noEmit
@@ -33,6 +36,7 @@ npx tsc --noEmit
 ```
 
 ### 4. Build Verification
+
 ```bash
 npm run build
 
@@ -40,6 +44,7 @@ npm run build
 ```
 
 ### 5. Review Changes
+
 ```bash
 git status
 git log -5
@@ -52,13 +57,16 @@ git log -5
 ## Deployment Steps (1-2 hours)
 
 ### 1. Configure Honeybadger
+
 - [ ] Copy API key from dashboard: https://app.honeybadger.io/
 - [ ] Set in Railway: `HONEYBADGER_API_KEY` and `NEXT_PUBLIC_HONEYBADGER_API_KEY`
 
 ### 2. Configure Railway Environment Variables
+
 See [PRODUCTION_DEPLOYMENT.md Section 2](PRODUCTION_DEPLOYMENT.md#2-railway-environment-variables) for complete list (30+ variables)
 
 **Critical variables**:
+
 - `DATABASE_URL` - Already set by Railway Postgres
 - `REDIS_URL` - Already set by Railway Redis
 - `AUTH_SECRET` - Generate: `openssl rand -base64 32`
@@ -67,6 +75,7 @@ See [PRODUCTION_DEPLOYMENT.md Section 2](PRODUCTION_DEPLOYMENT.md#2-railway-envi
 - `CRON_SECRET` - Generate random secret
 
 ### 3. Configure Custom Domain
+
 ```bash
 # In Railway dashboard:
 # Settings → Domains → Add Custom Domain
@@ -82,12 +91,14 @@ See [PRODUCTION_DEPLOYMENT.md Section 2](PRODUCTION_DEPLOYMENT.md#2-railway-envi
 ```
 
 **Check DNS propagation**:
+
 ```bash
 dig codesalvage.com
 # Should resolve to Railway's IP
 ```
 
 ### 4. Switch Stripe to Live Mode
+
 - [ ] Stripe Dashboard → Developers → API keys
 - [ ] Copy "Secret key" (starts with `sk_live_...`)
 - [ ] Copy "Publishable key" (starts with `pk_live_...`)
@@ -97,22 +108,27 @@ dig codesalvage.com
 - [ ] Set `STRIPE_WEBHOOK_SECRET` in Railway
 
 ### 5. Update GitHub OAuth App
+
 - [ ] GitHub → Settings → Developer settings → OAuth Apps
 - [ ] Update "Homepage URL": `https://codesalvage.com`
 - [ ] Update "Authorization callback URL": `https://codesalvage.com/api/auth/callback/github`
 
 ### 6. Configure SendGrid Domain Authentication
+
 See [PRODUCTION_DEPLOYMENT.md Section 7](PRODUCTION_DEPLOYMENT.md#7-sendgrid-email-configuration)
 
 ### 7. Setup Railway Cron Jobs
+
 See [PRODUCTION_DEPLOYMENT.md Section 8](PRODUCTION_DEPLOYMENT.md#8-cron-job-configuration)
 
 **3 cron jobs to configure**:
+
 1. **Escrow Release** - Every 6 hours
 2. **Featured Cleanup** - Every 1 hour
 3. **Expiration Warnings** - Every 12 hours
 
 ### 8. Deploy to Railway
+
 ```bash
 # Railway will auto-deploy on git push to main branch
 git push origin main
@@ -122,12 +138,14 @@ railway up
 ```
 
 **Monitor deployment**:
+
 ```bash
 railway logs
 # Watch for errors during deployment
 ```
 
 ### 9. Run Database Migrations
+
 ```bash
 # After deployment succeeds:
 railway run npm run db:migrate:deploy
@@ -140,6 +158,7 @@ railway run npm run db:migrate:deploy
 ## Post-Deployment Verification (15 minutes)
 
 ### 1. Run Automated Health Check
+
 ```bash
 bash scripts/post-deployment-check.sh https://codesalvage.com YOUR_CRON_SECRET
 
@@ -147,6 +166,7 @@ bash scripts/post-deployment-check.sh https://codesalvage.com YOUR_CRON_SECRET
 ```
 
 ### 2. Detailed Health Check
+
 ```bash
 curl -H "Authorization: Bearer YOUR_CRON_SECRET" \
   "https://codesalvage.com/api/health?detailed=true" | jq
@@ -155,12 +175,14 @@ curl -H "Authorization: Bearer YOUR_CRON_SECRET" \
 ```
 
 ### 3. Quick Manual Verification
+
 1. **Homepage**: https://codesalvage.com - Loads correctly
 2. **Login**: GitHub OAuth flow works
 3. **Browse Projects**: `/projects` page loads
 4. **Health Check**: `/api/health` returns 200
 
 ### 4. Monitor Dashboards
+
 - [ ] **Honeybadger**: No critical errors
 - [ ] **Railway**: CPU, memory within normal range
 - [ ] **Stripe**: Webhook endpoint reachable
@@ -173,6 +195,7 @@ curl -H "Authorization: Bearer YOUR_CRON_SECRET" \
 Follow [tests/SMOKE_TESTING_CHECKLIST.md](tests/SMOKE_TESTING_CHECKLIST.md)
 
 **Critical tests** (run these first):
+
 1. ✅ Authentication Flow (GitHub OAuth)
 2. ✅ Project Browsing
 3. ✅ Payment Flow (use test card: `4242 4242 4242 4242`)
@@ -186,6 +209,7 @@ Follow [tests/SMOKE_TESTING_CHECKLIST.md](tests/SMOKE_TESTING_CHECKLIST.md)
 ## Extended Testing (2-4 hours, within 24 hours)
 
 ### Load Testing
+
 ```bash
 cd tests/load-testing
 
@@ -202,15 +226,18 @@ k6 run spike-test.js
 **Expected**: All tests pass performance thresholds
 
 ### Cross-Browser Testing
+
 Follow [tests/CROSS_BROWSER_MOBILE_TESTING.md](tests/CROSS_BROWSER_MOBILE_TESTING.md)
 
 **Priority browsers**:
+
 1. Chrome Desktop
 2. Safari Desktop
 3. Mobile Safari (iPhone)
 4. Mobile Chrome (Android)
 
 ### Performance Audit
+
 ```bash
 # Run Lighthouse in Chrome DevTools
 # Expected scores: Performance ≥85, Accessibility ≥90, Best Practices ≥90, SEO ≥90
@@ -223,12 +250,14 @@ Follow [tests/CROSS_BROWSER_MOBILE_TESTING.md](tests/CROSS_BROWSER_MOBILE_TESTIN
 ### If deployment fails or critical issues found:
 
 1. **Immediate Rollback**
+
    ```bash
    # In Railway dashboard:
    # Deployments → Click previous successful deployment → Redeploy
    ```
 
 2. **Investigate Issues**
+
    ```bash
    railway logs
    # Check Honeybadger for errors
@@ -248,12 +277,14 @@ Follow [tests/CROSS_BROWSER_MOBILE_TESTING.md](tests/CROSS_BROWSER_MOBILE_TESTIN
 ## Monitoring (First 24-48 Hours)
 
 ### Every 2 Hours:
+
 - [ ] Check **Honeybadger** for errors
 - [ ] Check **Railway metrics** (CPU, memory, database)
 - [ ] Check **Stripe Dashboard** (payment success rate)
 - [ ] Check **SendGrid Activity** (email deliveries)
 
 ### Daily (First Week):
+
 - [ ] Review error trends in Honeybadger
 - [ ] Check Redis cache hit rate
 - [ ] Monitor database performance
@@ -292,6 +323,7 @@ railway logs -f               # Follow logs in real-time
 ## Success Criteria
 
 **Deployment is successful when**:
+
 - ✅ All health checks pass
 - ✅ Smoke tests complete without critical errors
 - ✅ No errors in Honeybadger
@@ -302,6 +334,7 @@ railway logs -f               # Follow logs in real-time
 - ✅ HTTPS certificate valid
 
 **Ready to announce launch** when:
+
 - ✅ Smoke tests pass
 - ✅ Load tests pass
 - ✅ Cross-browser tests pass

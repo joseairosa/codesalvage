@@ -21,7 +21,10 @@ import { r2Service, FileType } from '@/lib/services';
  *
  * Generate download link for purchased project
  */
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     // Check authentication
     const auth = await authenticateApiRequest(request);

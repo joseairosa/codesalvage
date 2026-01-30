@@ -116,9 +116,6 @@ export async function PUT(
     }
 
     // Handle generic errors
-    return NextResponse.json(
-      { error: 'Failed to resolve report' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to resolve report' }, { status: 500 });
   }
 }

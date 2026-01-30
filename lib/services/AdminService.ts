@@ -116,9 +116,7 @@ export class AdminService {
 
     // Validation: Reason must be meaningful
     if (!reason || reason.trim().length < 10) {
-      throw new AdminValidationError(
-        'Ban reason must be at least 10 characters'
-      );
+      throw new AdminValidationError('Ban reason must be at least 10 characters');
     }
 
     // Validation: Cannot ban yourself
@@ -204,11 +202,7 @@ export class AdminService {
    * @example
    * await adminService.unbanUser('admin123', 'user456', '192.168.1.1');
    */
-  async unbanUser(
-    adminId: string,
-    userId: string,
-    ipAddress?: string
-  ): Promise<User> {
+  async unbanUser(adminId: string, userId: string, ipAddress?: string): Promise<User> {
     console.log('[AdminService] unbanUser called:', { adminId, userId });
 
     // Check if user exists
@@ -355,9 +349,7 @@ export class AdminService {
 
     // Validation: Reason required
     if (!reason || reason.trim().length < 10) {
-      throw new AdminValidationError(
-        'Rejection reason must be at least 10 characters'
-      );
+      throw new AdminValidationError('Rejection reason must be at least 10 characters');
     }
 
     // Check if project exists
@@ -490,7 +482,9 @@ export class AdminService {
    * @example
    * const bannedUsers = await adminService.getUsers({ isBanned: true });
    */
-  async getUsers(options?: Parameters<UserRepository['getAllUsers']>[0]): Promise<User[]> {
+  async getUsers(
+    options?: Parameters<UserRepository['getAllUsers']>[0]
+  ): Promise<User[]> {
     console.log('[AdminService] getUsers called');
     return await this.userRepository.getAllUsers(options);
   }
@@ -595,9 +589,7 @@ export class AdminService {
 
     // Validation: Resolution required
     if (!resolution || resolution.trim().length < 5) {
-      throw new AdminValidationError(
-        'Resolution must be at least 5 characters'
-      );
+      throw new AdminValidationError('Resolution must be at least 5 characters');
     }
 
     try {
@@ -663,16 +655,13 @@ export class AdminService {
 
     // Validation: Reason required
     if (!reason || reason.trim().length < 10) {
-      throw new AdminValidationError(
-        'Release reason must be at least 10 characters'
-      );
+      throw new AdminValidationError('Release reason must be at least 10 characters');
     }
 
     try {
       // Release escrow
-      const transaction = await this.transactionRepository.releaseEscrowManually(
-        transactionId
-      );
+      const transaction =
+        await this.transactionRepository.releaseEscrowManually(transactionId);
 
       // Create audit log
       await this.adminRepository.createAuditLog({

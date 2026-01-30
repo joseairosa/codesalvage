@@ -106,7 +106,9 @@ export function AdminNav() {
                 )}
                 aria-current={isActive ? 'page' : undefined}
               >
-                <Icon className={cn('h-5 w-5', isActive ? 'text-blue-700' : 'text-gray-500')} />
+                <Icon
+                  className={cn('h-5 w-5', isActive ? 'text-blue-700' : 'text-gray-500')}
+                />
                 {item.label}
               </Link>
             );

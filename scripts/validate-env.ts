@@ -216,23 +216,36 @@ function validateEnvironment(): {
       }
 
       if (envVar.name === 'STRIPE_SECRET_KEY' && value.startsWith('sk_test_')) {
-        warnings.push('⚠️  STRIPE_SECRET_KEY is in TEST mode (sk_test_...). Use sk_live_... for production!');
+        warnings.push(
+          '⚠️  STRIPE_SECRET_KEY is in TEST mode (sk_test_...). Use sk_live_... for production!'
+        );
       }
 
-      if (envVar.name === 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY' && value.startsWith('pk_test_')) {
-        warnings.push('⚠️  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is in TEST mode (pk_test_...). Use pk_live_... for production!');
+      if (
+        envVar.name === 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY' &&
+        value.startsWith('pk_test_')
+      ) {
+        warnings.push(
+          '⚠️  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is in TEST mode (pk_test_...). Use pk_live_... for production!'
+        );
       }
 
       if (envVar.name === 'NODE_ENV' && value !== 'production') {
-        warnings.push(`⚠️  NODE_ENV is "${value}", should be "production" for production deployments`);
+        warnings.push(
+          `⚠️  NODE_ENV is "${value}", should be "production" for production deployments`
+        );
       }
 
       if (envVar.name === 'NEXTAUTH_URL' && value.includes('localhost')) {
-        warnings.push('⚠️  NEXTAUTH_URL contains "localhost", should be production domain');
+        warnings.push(
+          '⚠️  NEXTAUTH_URL contains "localhost", should be production domain'
+        );
       }
 
       if (envVar.name === 'NEXT_PUBLIC_APP_URL' && value.includes('localhost')) {
-        warnings.push('⚠️  NEXT_PUBLIC_APP_URL contains "localhost", should be production domain');
+        warnings.push(
+          '⚠️  NEXT_PUBLIC_APP_URL contains "localhost", should be production domain'
+        );
       }
     }
   }
@@ -286,7 +299,9 @@ function printResults(results: ReturnType<typeof validateEnvironment>) {
 
   // Summary
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-  console.log(`✅ Present: ${results.present.length}/${ENV_VARS.filter((v) => v.required).length} required variables`);
+  console.log(
+    `✅ Present: ${results.present.length}/${ENV_VARS.filter((v) => v.required).length} required variables`
+  );
   console.log(`❌ Missing: ${results.missing.length} required variables\n`);
 
   // Warnings

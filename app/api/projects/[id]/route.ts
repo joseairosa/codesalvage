@@ -89,7 +89,10 @@ const updateProjectSchema = z.object({
  *
  * Get project by ID
  */
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
 
@@ -127,7 +130,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
  *
  * Update project
  */
-export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     // Check authentication
     const auth = await authenticateApiRequest(request);
@@ -209,7 +215,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
  *
  * Delete project
  */
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     // Check authentication
     const auth = await authenticateApiRequest(request);

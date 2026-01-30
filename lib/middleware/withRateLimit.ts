@@ -6,7 +6,11 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { applyRateLimit, addRateLimitHeaders, type RateLimitPresets } from '@/lib/utils/rateLimit';
+import {
+  applyRateLimit,
+  addRateLimitHeaders,
+  type RateLimitPresets,
+} from '@/lib/utils/rateLimit';
 
 type RouteHandler = (request: NextRequest, context?: any) => Promise<NextResponse>;
 

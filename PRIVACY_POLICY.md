@@ -10,6 +10,7 @@
 Welcome to CodeSalvage ("we," "us," "our," or "the Platform"). We are committed to protecting your privacy and handling your personal information responsibly.
 
 This Privacy Policy explains:
+
 - What information we collect
 - How we use your information
 - How we share your information
@@ -27,6 +28,7 @@ By using CodeSalvage, you agree to the collection and use of information in acco
 ### 2.1 Information You Provide Directly
 
 **Account Information** (via GitHub OAuth):
+
 - GitHub username
 - GitHub user ID
 - Email address (from GitHub)
@@ -35,12 +37,14 @@ By using CodeSalvage, you agree to the collection and use of information in acco
 - GitHub repository information (when linking projects)
 
 **Profile Information** (optional):
+
 - Bio/description
 - Location
 - Website URL
 - Custom avatar (if you replace GitHub avatar)
 
 **Project Listings** (sellers only):
+
 - Project title and description
 - Tech stack and frameworks used
 - Known issues
@@ -51,18 +55,21 @@ By using CodeSalvage, you agree to the collection and use of information in acco
 - Pricing information
 
 **Payment Information** (via Stripe):
+
 - Bank account details (sellers only, stored by Stripe)
 - Payment method information (buyers, stored by Stripe)
 - Billing address
 - Tax identification information (sellers only)
 
 **Transaction Information**:
+
 - Purchase history
 - Payout history (sellers)
 - Refund requests
 - Dispute information
 
 **Communications**:
+
 - Messages sent via Platform messaging system
 - Email correspondence with support
 - Review content and ratings
@@ -70,6 +77,7 @@ By using CodeSalvage, you agree to the collection and use of information in acco
 ### 2.2 Information Collected Automatically
 
 **Usage Information**:
+
 - Pages visited
 - Features used
 - Search queries
@@ -78,6 +86,7 @@ By using CodeSalvage, you agree to the collection and use of information in acco
 - Session duration
 
 **Device Information**:
+
 - IP address
 - Browser type and version
 - Operating system
@@ -86,12 +95,14 @@ By using CodeSalvage, you agree to the collection and use of information in acco
 - Referring URL
 
 **Cookies and Tracking Technologies**:
+
 - Session cookies (required for login)
 - Analytics cookies (optional, can be disabled)
 - Preference cookies (optional, remember settings)
 - See our [Cookie Policy](COOKIE_POLICY.md) for details
 
 **Error and Performance Data** (via Honeybadger):
+
 - Error messages and stack traces
 - Performance metrics (page load times)
 - Browser console errors
@@ -100,17 +111,20 @@ By using CodeSalvage, you agree to the collection and use of information in acco
 ### 2.3 Information from Third Parties
 
 **GitHub OAuth**:
+
 - Public profile information
 - Email address
 - Repository information (when you link projects)
 
 **Stripe**:
+
 - Payment verification status
 - Payout eligibility
 - Identity verification results
 - Transaction status
 
 **Cloudflare R2**:
+
 - File upload metadata (timestamps, file sizes)
 
 ---
@@ -173,6 +187,7 @@ By using CodeSalvage, you agree to the collection and use of information in acco
 The following information is **publicly visible** to all Platform users:
 
 **Seller Profiles**:
+
 - Username
 - Full name (if provided)
 - Avatar
@@ -182,11 +197,13 @@ The following information is **publicly visible** to all Platform users:
 - Seller analytics (total sales, average rating)
 
 **Project Listings**:
+
 - All project information (title, description, tech stack, etc.)
 - Screenshots and demo videos
 - Seller information
 
 **Reviews**:
+
 - Review text, ratings
 - Reviewer username (unless marked anonymous)
 - Review date
@@ -194,10 +211,12 @@ The following information is **publicly visible** to all Platform users:
 ### 4.2 Shared with Transaction Counterparties
 
 **Buyers can see**:
+
 - Seller username, avatar, and profile
 - Seller contact information (via Platform messaging)
 
 **Sellers can see**:
+
 - Buyer username, avatar
 - Buyer contact information (via Platform messaging)
 
@@ -206,6 +225,7 @@ The following information is **publicly visible** to all Platform users:
 We share information with third-party services that help operate the Platform:
 
 **Stripe** (payment processing):
+
 - Transaction details
 - Payment method information
 - Seller payout information
@@ -213,32 +233,38 @@ We share information with third-party services that help operate the Platform:
 - **Privacy Policy**: https://stripe.com/privacy
 
 **GitHub** (authentication):
+
 - Email address (for account matching)
 - User ID (for authentication)
 - **Privacy Policy**: https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement
 
 **Cloudflare R2** (file storage):
+
 - Uploaded files (code zips, images, videos)
 - File metadata (timestamps, sizes)
 - **Privacy Policy**: https://www.cloudflare.com/privacypolicy/
 
 **SendGrid** (email delivery):
+
 - Email addresses
 - Email content (transaction confirmations, notifications)
 - **Privacy Policy**: https://www.twilio.com/legal/privacy
 
 **Honeybadger** (error monitoring):
+
 - Error logs and stack traces
 - Performance metrics
 - User ID (for error context, not personally identifiable)
 - **Privacy Policy**: https://www.honeybadger.io/privacy/
 
 **Railway** (hosting):
+
 - Server logs
 - Application data
 - **Privacy Policy**: https://railway.app/legal/privacy
 
 **Redis Cloud** (caching):
+
 - Cached data (search results, user profiles)
 - Rate limiting data (IP addresses, request counts)
 - **Privacy Policy**: https://redis.io/legal/privacy-policy/
@@ -246,6 +272,7 @@ We share information with third-party services that help operate the Platform:
 ### 4.4 Legal Requirements
 
 We may disclose your information if required by law or in response to:
+
 - Court orders or subpoenas
 - Government investigations
 - Legal proceedings
@@ -271,6 +298,7 @@ We retain your information as long as your account is active.
 ### 5.2 Closed Accounts
 
 **After account closure**:
+
 - Public information (project listings, reviews) may remain visible (anonymized)
 - Transaction records retained for 7 years (legal/tax requirements)
 - Payment information deleted immediately (stored by Stripe only)
@@ -279,6 +307,7 @@ We retain your information as long as your account is active.
 ### 5.3 Legal Retention
 
 Some information must be retained longer for legal compliance:
+
 - Transaction records: 7 years (IRS requirements)
 - Dispute records: 7 years (legal defense)
 - Tax documents: 7 years (US tax law)
@@ -294,6 +323,7 @@ Deleted data may persist in backups for up to 90 days.
 ### 6.1 Access and Correction
 
 **You have the right to**:
+
 - View your personal information
 - Update your profile information
 - Correct inaccurate data
@@ -303,6 +333,7 @@ Deleted data may persist in backups for up to 90 days.
 ### 6.2 Data Portability
 
 **You have the right to**:
+
 - Download your data in machine-readable format (JSON)
 - Includes: profile info, project listings, transactions, messages
 
@@ -311,21 +342,25 @@ Deleted data may persist in backups for up to 90 days.
 ### 6.3 Deletion
 
 **You have the right to**:
+
 - Delete your account and personal information
 
 **How to exercise**: Settings → Account → Delete Account
 
 **Limitations**:
+
 - Transaction records retained for legal compliance (7 years)
 - Public content (reviews) may be anonymized but not deleted
 
 ### 6.4 Marketing Opt-Out
 
 **You have the right to**:
+
 - Unsubscribe from marketing emails
 - Opt out of analytics cookies
 
 **How to exercise**:
+
 - Email: Click "Unsubscribe" link in any marketing email
 - Cookies: Settings → Privacy → Cookie Preferences
 
@@ -384,6 +419,7 @@ We process your personal data based on:
 CodeSalvage is **not intended for users under 18 years of age**. We do not knowingly collect personal information from children.
 
 If we discover that a user is under 18, we will:
+
 1. Delete their account immediately
 2. Delete all associated personal information
 3. Notify the user (via email if available)
@@ -399,6 +435,7 @@ If you believe a user is under 18, please report it to support@codesalvage.com.
 We implement industry-standard security measures:
 
 **Technical Safeguards**:
+
 - HTTPS encryption for all communications
 - Encrypted storage of sensitive data (at rest)
 - Regular security audits
@@ -406,12 +443,14 @@ We implement industry-standard security measures:
 - Automated vulnerability scanning
 
 **Administrative Safeguards**:
+
 - Access controls (role-based permissions)
 - Employee background checks
 - Security training for employees
 - Incident response procedures
 
 **Physical Safeguards**:
+
 - Data centers with physical security (Railway, Stripe)
 - Redundant systems and backups
 - Disaster recovery procedures
@@ -419,6 +458,7 @@ We implement industry-standard security measures:
 ### 9.2 Payment Security
 
 **Stripe PCI Compliance**:
+
 - We **do not store** credit card numbers or bank account details
 - All payment information stored by Stripe (PCI DSS Level 1 compliant)
 - Tokenized payment methods only
@@ -426,6 +466,7 @@ We implement industry-standard security measures:
 ### 9.3 Code File Security
 
 **Cloudflare R2**:
+
 - Private buckets (not publicly accessible)
 - Pre-signed URLs with expiration (7 days)
 - Encryption at rest
@@ -434,6 +475,7 @@ We implement industry-standard security measures:
 ### 9.4 Limitations
 
 **No system is 100% secure**. While we implement strong security measures, we cannot guarantee absolute security. You are responsible for:
+
 - Keeping your password secure
 - Logging out of shared devices
 - Monitoring your account for suspicious activity
@@ -445,15 +487,18 @@ We implement industry-standard security measures:
 ### 10.1 Types of Cookies
 
 **Essential Cookies** (required):
+
 - Session management (login)
 - Security tokens (CSRF protection)
 - Load balancing
 
 **Analytics Cookies** (optional):
+
 - Google Analytics (traffic analysis)
 - Cloudflare Analytics (performance monitoring)
 
 **Preference Cookies** (optional):
+
 - Language preferences
 - Theme selection (dark/light mode)
 - Notification settings
@@ -461,6 +506,7 @@ We implement industry-standard security measures:
 ### 10.2 Third-Party Cookies
 
 **Google Analytics**:
+
 - Tracks page views, user behavior
 - **Privacy Policy**: https://policies.google.com/privacy
 - **Opt-out**: https://tools.google.com/dlpage/gaoptout
@@ -468,6 +514,7 @@ We implement industry-standard security measures:
 ### 10.3 Cookie Management
 
 **Control cookies via**:
+
 - Settings → Privacy → Cookie Preferences
 - Browser settings (block all cookies or specific domains)
 
@@ -482,6 +529,7 @@ We implement industry-standard security measures:
 ### 11.1 Account Settings
 
 **Control what information is public**:
+
 - Settings → Profile → Privacy
   - Show email publicly (default: hidden)
   - Show transaction count (default: visible)
@@ -490,6 +538,7 @@ We implement industry-standard security measures:
 ### 11.2 Communication Preferences
 
 **Control what emails you receive**:
+
 - Settings → Notifications
   - Transaction confirmations (required)
   - Security alerts (required)
@@ -500,6 +549,7 @@ We implement industry-standard security measures:
 ### 11.3 Data Sharing
 
 **Opt out of analytics**:
+
 - Settings → Privacy → Analytics
   - Google Analytics (default: enabled)
   - Honeybadger error reporting (default: enabled for production)
@@ -533,6 +583,7 @@ If you are a California resident, you have the right to:
 **Email**: privacy@codesalvage.com
 **Subject**: "CCPA Request - [Your Name]"
 **Include**:
+
 - Full name
 - Email address
 - Specific request (access, deletion, etc.)
@@ -548,12 +599,14 @@ If you are a California resident, you have the right to:
 ### 13.1 Notification of Changes
 
 We may update this Privacy Policy from time to time. Changes will be effective:
+
 - **Immediately** for new users
 - **30 days after notice** for existing users
 
 ### 13.2 How We Notify You
 
 We will notify you of material changes via:
+
 - Email to your registered address
 - Notice on the Platform homepage
 - In-app notification
@@ -598,11 +651,13 @@ EU users have the right to lodge a complaint with their local data protection au
 ### 17.1 Analytics and Tracking
 
 **Google Analytics**:
+
 - We use Google Analytics to understand user behavior
 - Data collected: page views, session duration, device type
 - Opt-out: https://tools.google.com/dlpage/gaoptout
 
 **Honeybadger Error Monitoring**:
+
 - We use Honeybadger to monitor application errors
 - Data collected: error messages, stack traces, user ID (not personally identifiable)
 - Purpose: Improve Platform stability and fix bugs
@@ -610,6 +665,7 @@ EU users have the right to lodge a complaint with their local data protection au
 ### 17.2 Social Media
 
 **GitHub OAuth**:
+
 - We use GitHub for authentication only
 - We do not post to your GitHub account
 - We do not access private repositories without permission
@@ -617,6 +673,7 @@ EU users have the right to lodge a complaint with their local data protection au
 ### 17.3 Sensitive Personal Information
 
 We **do not collect** sensitive personal information such as:
+
 - Social Security numbers (except tax ID for sellers, stored securely)
 - Health information
 - Racial or ethnic origin
@@ -647,10 +704,12 @@ We **do not use** fully automated decision-making that produces legal effects or
 ### 19.2 Profiling
 
 We may use profiling for:
+
 - Fraud detection (flagging suspicious transactions)
 - Recommendation algorithms (suggesting projects based on browsing history)
 
 **You have the right to**:
+
 - Object to profiling
 - Request human review of automated decisions
 
@@ -706,6 +765,7 @@ All employees and contractors sign confidentiality agreements and receive privac
 ## 24. Acknowledgment
 
 BY USING THE PLATFORM, YOU ACKNOWLEDGE THAT:
+
 - You have read and understood this Privacy Policy
 - You consent to the collection, use, and sharing of your information as described
 - You are at least 18 years old

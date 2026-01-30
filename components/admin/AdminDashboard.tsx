@@ -103,9 +103,7 @@ export function AdminDashboard() {
         setStats(data.stats);
       } catch (err) {
         console.error('[AdminDashboard] Fetch error:', err);
-        setError(
-          err instanceof Error ? err.message : 'Failed to load statistics'
-        );
+        setError(err instanceof Error ? err.message : 'Failed to load statistics');
       } finally {
         setLoading(false);
       }

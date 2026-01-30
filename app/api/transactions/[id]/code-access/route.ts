@@ -45,7 +45,10 @@ const transactionService = new TransactionService(
  * - Payment must be successful
  * - Only buyer can access code
  */
-async function markCodeAccessed(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function markCodeAccessed(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const auth = await authenticateApiRequest(request);
     if (!auth) {

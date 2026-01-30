@@ -262,9 +262,7 @@ export class AdminRepository {
    * @example
    * const logs = await adminRepo.getAuditLogs({ limit: 50, offset: 0 });
    */
-  async getAuditLogs(
-    options: AdminPaginationOptions = {}
-  ): Promise<AuditLogWithAdmin[]> {
+  async getAuditLogs(options: AdminPaginationOptions = {}): Promise<AuditLogWithAdmin[]> {
     const { limit = 50, offset = 0, sortBy = 'createdAt', sortOrder = 'desc' } = options;
 
     console.log('[AdminRepository] getAuditLogs called:', { limit, offset });
@@ -312,7 +310,11 @@ export class AdminRepository {
   ): Promise<AuditLogWithAdmin[]> {
     const { limit = 50, offset = 0, sortBy = 'createdAt', sortOrder = 'desc' } = options;
 
-    console.log('[AdminRepository] getAuditLogsByAdmin called:', { adminId, limit, offset });
+    console.log('[AdminRepository] getAuditLogsByAdmin called:', {
+      adminId,
+      limit,
+      offset,
+    });
 
     try {
       const auditLogs = await this.prisma.adminAuditLog.findMany({
@@ -526,7 +528,10 @@ export class AdminRepository {
     id: string,
     data: UpdateContentReportInput
   ): Promise<ContentReport> {
-    console.log('[AdminRepository] updateContentReport called:', { id, status: data.status });
+    console.log('[AdminRepository] updateContentReport called:', {
+      id,
+      status: data.status,
+    });
 
     try {
       const report = await this.prisma.contentReport.update({

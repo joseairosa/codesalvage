@@ -64,10 +64,7 @@ async function getConversations(request: NextRequest) {
     console.log(`[${componentName}] Fetching conversations for user:`, auth.user.id);
 
     // Use MessageService to get conversations
-    const conversations = await messageService.getConversations(
-      auth.user.id,
-      projectId
-    );
+    const conversations = await messageService.getConversations(auth.user.id, projectId);
 
     console.log(`[${componentName}] Found ${conversations.length} conversations`);
 

@@ -104,7 +104,9 @@ export function TransactionOversight() {
 
   // Release escrow dialog state
   const [releaseDialogOpen, setReleaseDialogOpen] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(
+    null
+  );
   const [releaseReason, setReleaseReason] = useState('');
   const [releaseError, setReleaseError] = useState<string | null>(null);
 
@@ -234,10 +236,7 @@ export function TransactionOversight() {
             {/* Filter by payment status */}
             <div className="flex-1">
               <Label className="text-xs">Payment Status</Label>
-              <Select
-                value={paymentStatusFilter}
-                onValueChange={setPaymentStatusFilter}
-              >
+              <Select value={paymentStatusFilter} onValueChange={setPaymentStatusFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder="All payments" />
                 </SelectTrigger>
@@ -254,10 +253,7 @@ export function TransactionOversight() {
             {/* Filter by escrow status */}
             <div className="flex-1">
               <Label className="text-xs">Escrow Status</Label>
-              <Select
-                value={escrowStatusFilter}
-                onValueChange={setEscrowStatusFilter}
-              >
+              <Select value={escrowStatusFilter} onValueChange={setEscrowStatusFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder="All escrow" />
                 </SelectTrigger>
@@ -344,8 +340,8 @@ export function TransactionOversight() {
                               transaction.paymentStatus === 'succeeded'
                                 ? 'default'
                                 : transaction.paymentStatus === 'failed'
-                                ? 'destructive'
-                                : 'secondary'
+                                  ? 'destructive'
+                                  : 'secondary'
                             }
                           >
                             {transaction.paymentStatus}
@@ -425,8 +421,8 @@ export function TransactionOversight() {
             <DialogTitle>Release Escrow Manually</DialogTitle>
             <DialogDescription>
               You are about to release escrow for transaction{' '}
-              {selectedTransaction?.id.substring(0, 8)}. This will transfer funds to
-              the seller.
+              {selectedTransaction?.id.substring(0, 8)}. This will transfer funds to the
+              seller.
             </DialogDescription>
           </DialogHeader>
 
@@ -435,17 +431,12 @@ export function TransactionOversight() {
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="text-gray-600">Amount:</div>
                 <div className="font-medium">
-                  {selectedTransaction &&
-                    formatCurrency(selectedTransaction.amountCents)}
+                  {selectedTransaction && formatCurrency(selectedTransaction.amountCents)}
                 </div>
                 <div className="text-gray-600">Project:</div>
-                <div className="font-medium">
-                  {selectedTransaction?.project.title}
-                </div>
+                <div className="font-medium">{selectedTransaction?.project.title}</div>
                 <div className="text-gray-600">Seller:</div>
-                <div className="font-medium">
-                  {selectedTransaction?.seller.username}
-                </div>
+                <div className="font-medium">{selectedTransaction?.seller.username}</div>
               </div>
             </div>
 

@@ -129,7 +129,11 @@ export async function getCache(key: string): Promise<string | null> {
  * @example
  * await setCache('featured:projects', JSON.stringify(projects), CacheTTL.FEATURED_PROJECTS);
  */
-export async function setCache(key: string, value: string, ttlSeconds: number): Promise<void> {
+export async function setCache(
+  key: string,
+  value: string,
+  ttlSeconds: number
+): Promise<void> {
   try {
     const redis = await getCacheClient();
     await redis.setEx(key, ttlSeconds, value);

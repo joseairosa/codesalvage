@@ -1,6 +1,7 @@
 # Firebase API Routes Migration Guide
 
 This guide shows how to update existing API routes to support **dual authentication**:
+
 1. **Firebase session tokens** (httpOnly cookies) - for browser requests
 2. **API keys** (sk-xxx format) - for programmatic access
 3. **Firebase ID tokens** (Authorization header) - for mobile/external apps
@@ -16,6 +17,7 @@ We've implemented a unified authentication system that supports multiple authent
 ## New Helper Functions
 
 ### `authenticateApiRequest(request: Request)`
+
 Located in [`lib/api-auth.ts`](lib/api-auth.ts)
 
 Authenticates API requests using cookies OR Authorization header.
@@ -33,12 +35,13 @@ interface AuthResult {
     isVerifiedSeller: boolean;
     isBanned: boolean;
   };
-  firebaseUid?: string;  // Present if authenticated via Firebase
-  apiKeyId?: string;      // Present if authenticated via API key
+  firebaseUid?: string; // Present if authenticated via Firebase
+  apiKeyId?: string; // Present if authenticated via API key
 }
 ```
 
 ### `requireAdminApiAuth(request: Request)`
+
 Located in [`lib/api-auth.ts`](lib/api-auth.ts)
 
 Same as `authenticateApiRequest` but requires admin privileges.
@@ -50,12 +53,14 @@ Same as `authenticateApiRequest` but requires admin privileges.
 ### Step 1: Replace Auth.js imports
 
 **Before** (Auth.js):
+
 ```typescript
 import { auth } from '@/auth';
 import { requireAdminApi } from '@/lib/auth-helpers';
 ```
 
 **After** (Firebase):
+
 ```typescript
 import { authenticateApiRequest, requireAdminApiAuth } from '@/lib/api-auth';
 ```
@@ -65,6 +70,7 @@ import { authenticateApiRequest, requireAdminApiAuth } from '@/lib/api-auth';
 #### For Regular API Routes (requires any authenticated user)
 
 **Before**:
+
 ```typescript
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -78,6 +84,7 @@ export async function POST(request: NextRequest) {
 ```
 
 **After**:
+
 ```typescript
 export async function POST(request: NextRequest) {
   const auth = await authenticateApiRequest(request);
@@ -93,6 +100,7 @@ export async function POST(request: NextRequest) {
 #### For Admin API Routes (requires admin privileges)
 
 **Before**:
+
 ```typescript
 export async function GET(request: NextRequest) {
   const session = await requireAdminApi();
@@ -105,6 +113,7 @@ export async function GET(request: NextRequest) {
 ```
 
 **After**:
+
 ```typescript
 export async function GET(request: NextRequest) {
   const auth = await requireAdminApiAuth(request);
@@ -119,6 +128,7 @@ export async function GET(request: NextRequest) {
 ### Step 3: Update all references from `session` to `auth`
 
 Find and replace throughout the function:
+
 - `session.user.id` → `auth.user.id`
 - `session.user.email` → `auth.user.email`
 - `session.user.isAdmin` → `auth.user.isAdmin`
@@ -128,6 +138,7 @@ Find and replace throughout the function:
 ## Complete Example: Projects API
 
 ### Before (Auth.js):
+
 ```typescript
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
@@ -149,10 +160,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create project
-    const project = await projectService.createProject(
-      session.user.id,
-      createData
-    );
+    const project = await projectService.createProject(session.user.id, createData);
 
     return NextResponse.json(project, { status: 201 });
   } catch (error) {
@@ -162,6 +170,7 @@ export async function POST(request: NextRequest) {
 ```
 
 ### After (Firebase with Dual Auth):
+
 ```typescript
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/api-auth';
@@ -183,10 +192,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create project
-    const project = await projectService.createProject(
-      auth.user.id,
-      createData
-    );
+    const project = await projectService.createProject(auth.user.id, createData);
 
     return NextResponse.json(project, { status: 201 });
   } catch (error) {
@@ -216,6 +222,7 @@ grep -r "await auth()" app/api/
 ```
 
 Common routes that need updating:
+
 - `/api/messages/*` - Message endpoints
 - `/api/favorites/*` - Favorite endpoints
 - `/api/admin/*` - Admin endpoints (most already done)
@@ -226,6 +233,7 @@ Common routes that need updating:
 ## Testing Dual Authentication
 
 ### 1. Browser Requests (Cookie-based)
+
 Browser requests automatically use the Firebase session cookie. No changes needed for frontend.
 
 ```typescript
@@ -238,6 +246,7 @@ const response = await fetch('/api/projects', {
 ```
 
 ### 2. API Key Requests
+
 For programmatic access, use the `Authorization` header with an API key:
 
 ```bash
@@ -249,13 +258,14 @@ curl -X GET https://codesalvage.com/api/projects \
 // Node.js/External app
 const response = await fetch('https://codesalvage.com/api/projects', {
   headers: {
-    'Authorization': 'Bearer sk-abc123...',
-    'Content-Type': 'application/json'
-  }
+    Authorization: 'Bearer sk-abc123...',
+    'Content-Type': 'application/json',
+  },
 });
 ```
 
 ### 3. Firebase Token Requests
+
 For mobile/external apps using Firebase directly:
 
 ```typescript
@@ -265,9 +275,9 @@ const token = await user.getIdToken();
 
 const response = await fetch('https://codesalvage.com/api/projects', {
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  }
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  },
 });
 ```
 
@@ -280,13 +290,13 @@ Users can manage their API keys through these endpoints:
   ```json
   {
     "name": "Production API",
-    "expiresInDays": 90  // Optional
+    "expiresInDays": 90 // Optional
   }
   ```
 - `POST /api/user/api-keys/[keyId]/revoke` - Revoke an API key
   ```json
   {
-    "reason": "Compromised key"  // Optional
+    "reason": "Compromised key" // Optional
   }
   ```
 
@@ -311,6 +321,7 @@ Users can manage their API keys through these endpoints:
 ### Issue: API key not working
 
 **Checklist**:
+
 1. Is the Authorization header present? `Authorization: Bearer sk-xxx`
 2. Is the API key active? Check `status` field in database
 3. Has the API key expired? Check `expiresAt` field
@@ -333,6 +344,7 @@ Users can manage their API keys through these endpoints:
 ## Questions?
 
 If you encounter any issues or have questions about migrating a specific route, refer to:
+
 - [`lib/api-auth.ts`](lib/api-auth.ts) - Authentication helper implementation
 - [`lib/firebase-auth.ts`](lib/firebase-auth.ts) - Dual auth verification logic
 - [`app/api/user/api-keys/route.ts`](app/api/user/api-keys/route.ts) - API key management example

@@ -428,9 +428,7 @@ export class UserRepository {
       return user;
     } catch (error) {
       console.error('[UserRepository] banUser failed:', error);
-      throw new Error(
-        '[UserRepository] Failed to ban user - user may not exist'
-      );
+      throw new Error('[UserRepository] Failed to ban user - user may not exist');
     }
   }
 
@@ -464,9 +462,7 @@ export class UserRepository {
       return user;
     } catch (error) {
       console.error('[UserRepository] unbanUser failed:', error);
-      throw new Error(
-        '[UserRepository] Failed to unban user - user may not exist'
-      );
+      throw new Error('[UserRepository] Failed to unban user - user may not exist');
     }
   }
 
@@ -514,18 +510,16 @@ export class UserRepository {
    * @example
    * const bannedUsers = await userRepo.getAllUsers({ isBanned: true, limit: 50 });
    */
-  async getAllUsers(
-    options?: {
-      isBanned?: boolean;
-      isAdmin?: boolean;
-      isSeller?: boolean;
-      isVerifiedSeller?: boolean;
-      limit?: number;
-      offset?: number;
-      sortBy?: 'createdAt' | 'lastLogin' | 'email' | 'username';
-      sortOrder?: 'asc' | 'desc';
-    }
-  ): Promise<User[]> {
+  async getAllUsers(options?: {
+    isBanned?: boolean;
+    isAdmin?: boolean;
+    isSeller?: boolean;
+    isVerifiedSeller?: boolean;
+    limit?: number;
+    offset?: number;
+    sortBy?: 'createdAt' | 'lastLogin' | 'email' | 'username';
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<User[]> {
     const {
       isBanned,
       isAdmin,
@@ -584,14 +578,12 @@ export class UserRepository {
    * @example
    * const totalBanned = await userRepo.countUsers({ isBanned: true });
    */
-  async countUsers(
-    options?: {
-      isBanned?: boolean;
-      isAdmin?: boolean;
-      isSeller?: boolean;
-      isVerifiedSeller?: boolean;
-    }
-  ): Promise<number> {
+  async countUsers(options?: {
+    isBanned?: boolean;
+    isAdmin?: boolean;
+    isSeller?: boolean;
+    isVerifiedSeller?: boolean;
+  }): Promise<number> {
     const { isBanned, isAdmin, isSeller, isVerifiedSeller } = options || {};
 
     console.log('[UserRepository] countUsers called:', {

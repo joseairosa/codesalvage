@@ -21,11 +21,7 @@ import { AdminNav } from '@/components/admin/AdminNav';
  *
  * Protects all /admin/* routes and provides admin UI layout.
  */
-export default async function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   // Verify admin access (redirects if not admin)
   await requireAdmin();
 

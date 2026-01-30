@@ -156,9 +156,9 @@ describe('ProjectRepository - Admin Methods', () => {
       );
 
       // Act & Assert
-      await expect(
-        projectRepo.rejectProject('invalid', 'Reason')
-      ).rejects.toThrow('Failed to reject project: Record to update not found');
+      await expect(projectRepo.rejectProject('invalid', 'Reason')).rejects.toThrow(
+        'Failed to reject project: Record to update not found'
+      );
     });
   });
 
@@ -221,12 +221,7 @@ describe('ProjectRepository - Admin Methods', () => {
       (mockPrisma.project.update as any).mockResolvedValue(mockFeaturedProject);
 
       // Act
-      await projectRepo.toggleFeatured(
-        projectId,
-        featured,
-        featuredBy,
-        featuredDays
-      );
+      await projectRepo.toggleFeatured(projectId, featured, featuredBy, featuredDays);
 
       // Assert
       const call = (mockPrisma.project.update as any).mock.calls[0][0];
@@ -451,9 +446,7 @@ describe('ProjectRepository - Admin Methods', () => {
 
     it('should throw error if query fails', async () => {
       // Arrange
-      (mockPrisma.project.findMany as any).mockRejectedValue(
-        new Error('Database error')
-      );
+      (mockPrisma.project.findMany as any).mockRejectedValue(new Error('Database error'));
 
       // Act & Assert
       await expect(projectRepo.getAllProjects()).rejects.toThrow(

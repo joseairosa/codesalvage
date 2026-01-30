@@ -45,6 +45,7 @@
 ### Homepage
 
 The homepage features:
+
 - **Featured Projects**: Premium listings with high visibility
 - **Recently Listed**: Newest additions to the marketplace
 - **Popular Projects**: Trending by views and favorites
@@ -55,6 +56,7 @@ The homepage features:
 Access advanced search at `/projects`:
 
 #### Search Bar
+
 - Enter keywords (tech stack, project type, features)
 - Examples:
   - "react dashboard analytics"
@@ -64,21 +66,25 @@ Access advanced search at `/projects`:
 #### Filter Sidebar
 
 **Completion Percentage**
+
 - Slider range: 0% to 100%
 - Filter by how complete the project is
 - Example: 70-90% for nearly finished projects
 
 **Tech Stack**
+
 - Multi-select filter
 - Choose one or more technologies
 - Common stacks: React, Vue, Node.js, Python, PostgreSQL, etc.
 
 **Price Range**
+
 - Min and Max price fields
 - Currency: USD
 - Example: $100-$500 for mid-range projects
 
 **Category**
+
 - Dropdown selector
 - Options:
   - Web Application
@@ -91,6 +97,7 @@ Access advanced search at `/projects`:
   - Other
 
 **Primary Language**
+
 - Filter by main programming language
 - Useful if you specialize in specific languages
 
@@ -105,6 +112,7 @@ Access advanced search at `/projects`:
 ### Favorites / Watchlist
 
 **Save Projects for Later**:
+
 1. Click the heart icon on any project card
 2. Access your favorites at `/buyer/favorites`
 3. Receive notifications (coming soon):
@@ -123,6 +131,7 @@ Each project has a detailed page with:
 #### 1. **Overview Section**
 
 **Title & Description**
+
 - Read the full description carefully
 - Look for:
   - What features are complete
@@ -131,17 +140,20 @@ Each project has a detailed page with:
   - Technical highlights
 
 **Completion Status**
+
 - Percentage (e.g., 75% complete)
 - Estimated hours to finish remaining work
 - Known issues list (if provided by seller)
 
 **Pricing**
+
 - Display price in USD
 - Includes platform fees (no hidden costs)
 
 #### 2. **Seller Information**
 
 **Seller Profile Card**
+
 - Username and avatar
 - Pro badge (if verified Pro seller)
 - Average rating (if 3+ reviews)
@@ -149,6 +161,7 @@ Each project has a detailed page with:
 - Member since date
 
 **Why This Matters**:
+
 - ✅ Pro badge = verified, serious seller
 - ✅ High rating = trustworthy
 - ✅ Multiple sales = experience
@@ -156,19 +169,23 @@ Each project has a detailed page with:
 #### 3. **Technical Details**
 
 **Tech Stack Badges**
+
 - All technologies used (React, Node.js, PostgreSQL, etc.)
 - Verify you're comfortable with these technologies
 - Research unfamiliar technologies before purchasing
 
 **Primary Language**
+
 - Main programming language (JavaScript, Python, Go, etc.)
 
 **Frameworks**
+
 - Key frameworks used (Next.js, Express, Django, etc.)
 
 #### 4. **Media Gallery**
 
 **Screenshots**
+
 - View all project screenshots
 - Look for:
   - Quality of UI design
@@ -177,6 +194,7 @@ Each project has a detailed page with:
   - Any placeholder or broken screens (red flag)
 
 **Demo Video** (if available)
+
 - Watch the full video to understand functionality
 - See the project in action
 - Better than screenshots for understanding flow
@@ -184,6 +202,7 @@ Each project has a detailed page with:
 #### 5. **Links & Resources**
 
 **GitHub Repository** (if public)
+
 - Preview code quality before purchase
 - Check:
   - Code organization and structure
@@ -193,12 +212,14 @@ Each project has a detailed page with:
 - **Warning**: Many repos are private until purchase
 
 **Live Demo** (if available)
+
 - Test the project yourself
 - Click around, try features
 - Check for bugs or broken functionality
 - **Highly recommended**: If no demo, ask seller to provide one
 
 **Documentation** (if available)
+
 - Review setup instructions
 - Check if dependencies are documented
 - Look for architecture diagrams or explanations
@@ -206,20 +227,24 @@ Each project has a detailed page with:
 #### 6. **Engagement Metrics**
 
 **View Count**
+
 - How many buyers have viewed this project
 - Popular projects = higher demand
 
 **Favorite Count**
+
 - How many buyers saved this project
 - Indicates serious interest
 
 **Message Count**
+
 - How many buyers messaged about this project
 - Active discussion = good sign
 
 ### Red Flags to Watch For
 
 ❌ **Avoid projects with**:
+
 - Vague or minimal descriptions
 - No screenshots or only placeholder images
 - Completion % doesn't match description
@@ -229,6 +254,7 @@ Each project has a detailed page with:
 - GitHub repo (if public) shows very recent commits (rushed to list?)
 
 ✅ **Good signs**:
+
 - Detailed, honest description including known issues
 - High-quality screenshots showing actual features
 - Live demo or video walkthrough
@@ -245,6 +271,7 @@ Each project has a detailed page with:
 ### Step 1: Pre-Purchase Questions
 
 **Message the Seller First** (recommended):
+
 1. Click "Contact Seller" button
 2. Ask questions about:
    - Specific features or functionality
@@ -254,6 +281,7 @@ Each project has a detailed page with:
    - Post-purchase support availability
 
 **Response Time**:
+
 - Most sellers respond within 24 hours
 - Pro sellers typically respond faster
 - No response after 48 hours? Consider a different project
@@ -261,6 +289,7 @@ Each project has a detailed page with:
 ### Step 2: Review Carefully
 
 **Before clicking "Buy Now"**:
+
 - [ ] Read full description
 - [ ] View all screenshots/videos
 - [ ] Check completion percentage matches your needs
@@ -296,6 +325,7 @@ Each project has a detailed page with:
 ### Step 4: Confirmation
 
 **Email Confirmation**
+
 - Sent to your account email immediately
 - Includes:
   - Transaction ID
@@ -304,6 +334,7 @@ Each project has a detailed page with:
   - Receipt
 
 **Redirected to Download Page**
+
 - Download link for code (ZIP file)
 - Valid for 30 days (re-download if needed)
 - GitHub access (if applicable)
@@ -316,12 +347,14 @@ Each project has a detailed page with:
 ### Downloading the Code
 
 **ZIP File Download**:
+
 1. Click "Download Code" button on purchase confirmation page
 2. Or access from `/buyer/purchases`
 3. File downloads immediately (usually 10-100MB)
 4. Extract ZIP file to your development directory
 
 **GitHub Access** (if applicable):
+
 - Seller grants you read access to private repo
 - You'll receive GitHub collaboration invite
 - Accept invite to access repository
@@ -330,6 +363,7 @@ Each project has a detailed page with:
 ### Setting Up the Project
 
 **Typical Setup Steps**:
+
 1. **Extract/clone** the code
 2. **Read README** or setup documentation first
 3. **Install dependencies**:
@@ -349,6 +383,7 @@ Each project has a detailed page with:
    - Ruby: `rails server`
 
 **Setup Issues?**:
+
 - Check README for troubleshooting
 - Message seller for support (within 7 days)
 - Verify your environment matches requirements (Node version, Python version, etc.)
@@ -356,11 +391,13 @@ Each project has a detailed page with:
 ### Completing Development
 
 **What You Bought**:
+
 - A **head start**, not a finished product
 - Seller disclosed completion % (e.g., 70% means 30% remaining)
 - Known issues were listed in description
 
 **Your Responsibilities**:
+
 - Finish remaining features
 - Fix known bugs
 - Add your own features and customization
@@ -368,6 +405,7 @@ Each project has a detailed page with:
 - Handle deployment and hosting
 
 **Resources**:
+
 - Seller may provide estimate of hours needed
 - You can hire freelancers to finish (Upwork, Fiverr)
 - Or complete it yourself as a learning experience
@@ -379,6 +417,7 @@ Each project has a detailed page with:
 ### What is Escrow?
 
 **Escrow = Buyer Protection**:
+
 - When you purchase, payment is held for **7 days**
 - During this time:
   - You receive code immediately
@@ -391,6 +430,7 @@ Each project has a detailed page with:
 ### 7-Day Review Period
 
 **What to Check**:
+
 - [ ] Code downloads and extracts successfully
 - [ ] Project matches description
 - [ ] Completion % is accurate
@@ -399,6 +439,7 @@ Each project has a detailed page with:
 - [ ] Documentation is adequate (if promised)
 
 **Common Misconceptions**:
+
 - ❌ Code must be 100% perfect (NO - you bought unfinished code)
 - ❌ All bugs must be fixed (NO - known issues were disclosed)
 - ✅ Code must match the description (YES)
@@ -408,6 +449,7 @@ Each project has a detailed page with:
 ### Opening a Dispute
 
 **Valid Reasons**:
+
 - Project doesn't match description
 - Completion % significantly inflated (80% claimed, actually 40%)
 - Major features don't work or are missing
@@ -415,12 +457,14 @@ Each project has a detailed page with:
 - Seller misrepresented what was included
 
 **Invalid Reasons**:
+
 - Code has bugs (bugs were expected and disclosed)
 - You can't figure out how to set it up (ask seller for help first)
 - You changed your mind (all sales final unless description mismatch)
 - You want different tech stack (that was disclosed upfront)
 
 **How to Dispute**:
+
 1. Navigate to transaction at `/buyer/purchases/[transaction-id]`
 2. Click "Open Dispute" button (only available in 7-day window)
 3. Select reason for dispute
@@ -431,6 +475,7 @@ Each project has a detailed page with:
 5. Submit dispute
 
 **Resolution Process**:
+
 - Platform reviews both sides (usually 2-3 business days)
 - We check: Description, code, messages, evidence
 - Possible outcomes:
@@ -440,6 +485,7 @@ Each project has a detailed page with:
 - Decision is final
 
 **Avoiding Disputes**:
+
 - Read description thoroughly before purchase
 - Ask questions before buying
 - Understand you're buying **unfinished** code
@@ -453,11 +499,13 @@ Each project has a detailed page with:
 ### Why Reviews Matter
 
 **Help Other Buyers**:
+
 - Share your experience
 - Warn about issues or praise quality
 - Guide future buyers to good sellers
 
 **Help Sellers Improve**:
+
 - Constructive feedback helps sellers
 - Good reviews build seller reputation
 - Drives quality across the platform
@@ -465,11 +513,13 @@ Each project has a detailed page with:
 ### How to Leave a Review
 
 **Eligibility**:
+
 - You must have completed a purchase
 - Review window: 30 days after purchase
 - One review per transaction
 
 **Review Form**:
+
 1. Navigate to transaction at `/buyer/purchases/[transaction-id]`
 2. Click "Leave Review" button
 3. Fill out review form:
@@ -486,16 +536,19 @@ Each project has a detailed page with:
 **Review Tips**:
 
 **Be Specific**:
+
 - ❌ "Good project" (too vague)
 - ✅ "Well-structured React codebase with clear component organization. Authentication module worked perfectly out of the box."
 
 **Be Fair**:
+
 - Remember: You bought **unfinished** code
 - Don't penalize for disclosed known issues
 - Rate based on description accuracy and code quality
 - Consider seller's responsiveness to questions
 
 **Be Constructive**:
+
 - If rating low, explain why
 - Suggest improvements
 - Mention what could have been better
@@ -503,12 +556,15 @@ Each project has a detailed page with:
 **Example Reviews**:
 
 **5 Stars**:
+
 > "Excellent starting point for my SaaS project. 75% completion was accurate. Code is clean and well-commented. Seller responded to my setup questions within hours. Would buy from again."
 
 **3 Stars**:
+
 > "Project was closer to 60% complete than the 80% advertised. Code quality is good but documentation was sparse. Took me longer to set up than expected. Seller did help when I messaged, just needed more upfront info."
 
 **1 Star**:
+
 > "Project description said authentication was 'fully functional' but critical password reset flow was completely missing. This is a major feature, not a minor bug. Seller didn't respond to my messages."
 
 ### After You Submit
@@ -527,6 +583,7 @@ Each project has a detailed page with:
 Access at `/buyer/dashboard` or `/buyer/purchases`:
 
 **Table View** shows:
+
 - Project title (click to view project)
 - Seller name
 - Purchase date
@@ -538,6 +595,7 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
   - **Refunded**: Dispute resolved in your favor
 
 **Actions Available**:
+
 - **Download Code**: Re-download anytime within 30 days
 - **View Transaction**: See full details
 - **Message Seller**: Post-purchase questions
@@ -547,11 +605,13 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### Re-Downloading Code
 
 **Valid for 30 Days**:
+
 - Download link expires after 30 days
 - Download as many times as you need in that window
 - Lost files? Re-download easily
 
 **After 30 Days**:
+
 - Contact support for extended access
 - Seller may provide new link
 - Always keep local backups
@@ -563,6 +623,7 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### Pre-Purchase Messages
 
 **Before You Buy**:
+
 1. Click "Contact Seller" on project detail page
 2. Write your message:
    - Be specific with questions
@@ -576,20 +637,24 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 **Example Pre-Purchase Messages**:
 
 **Good**:
+
 > "Hi! Interested in your React dashboard project. Can you clarify if user role management is complete or in the remaining 25%? Also, what database are you using? Thanks!"
 
 **Too Vague**:
+
 > "Is this good?" (seller can't provide helpful answer)
 
 ### Post-Purchase Messages
 
 **After You Buy**:
+
 - Use messaging for setup questions
 - Ask for clarification on architecture
 - Report bugs (seller may have workarounds)
 - Discuss post-purchase support
 
 **Seller Obligations**:
+
 - No formal post-purchase support required
 - Most sellers are helpful and responsive
 - Sellers want good reviews, so usually assist
@@ -598,20 +663,24 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 **Example Post-Purchase Messages**:
 
 **Good**:
+
 > "Hey! I'm getting an error when running migrations: [error message]. I'm using PostgreSQL 14. Any ideas what might be wrong?"
 
 **Bad**:
+
 > "This doesn't work. Fix it." (not constructive, no details)
 
 ### Message Etiquette
 
 **Do**:
+
 - Be polite and professional
 - Provide context and details
 - Wait 24-48 hours for response
 - Thank sellers for helpful responses
 
 **Don't**:
+
 - Demand instant responses
 - Be rude or aggressive
 - Send multiple messages without waiting
@@ -624,11 +693,13 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### Issue: Can't download code after purchase
 
 **Check**:
+
 - Did payment complete successfully?
 - Check your email for confirmation
 - Check `/buyer/purchases` for transaction
 
 **Solutions**:
+
 - Check spam folder for confirmation email
 - Wait 5 minutes if payment just completed
 - Contact support if not showing after 10 minutes
@@ -638,12 +709,14 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### Issue: Code won't run / setup errors
 
 **Common Causes**:
+
 - Missing environment variables (API keys, database URLs)
 - Wrong Node.js/Python version
 - Dependencies not installed
 - Database not set up
 
 **Solutions**:
+
 1. Read README thoroughly
 2. Check `.env.example` for required variables
 3. Verify your environment matches requirements
@@ -656,11 +729,13 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### Issue: Project doesn't match description
 
 **If Within 7 Days**:
+
 - Document specific mismatches (screenshots)
 - Message seller first to clarify
 - If unresolved, open dispute with evidence
 
 **If After 7 Days**:
+
 - Escrow period ended, disputes not possible
 - Leave honest review to warn other buyers
 - Contact support if significant fraud suspected
@@ -670,11 +745,13 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### Issue: Seller not responding to messages
 
 **Wait 48 Hours**:
+
 - Sellers may be busy with jobs/life
 - Most respond within 24-48 hours
 - Pro sellers typically respond faster
 
 **If No Response**:
+
 - Check if your message was specific (vague questions may be ignored)
 - Send polite follow-up after 48 hours
 - Consider leaving review mentioning poor communication
@@ -684,10 +761,12 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### Issue: Lost access to downloaded code
 
 **If Within 30 Days**:
+
 - Re-download from `/buyer/purchases`
 - Download link is still valid
 
 **If After 30 Days**:
+
 - Message seller for new link
 - Contact support for assistance
 - Keep local backups in the future
@@ -697,10 +776,12 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### Issue: Want a refund but dispute period ended
 
 **After 7 Days**:
+
 - Escrow released, refunds not possible
 - Exception: Fraud or major platform error
 
 **Prevention**:
+
 - Review code within 7-day escrow period
 - Test major features before window closes
 - Open disputes early if issues found
@@ -710,11 +791,13 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### Issue: Charged incorrectly
 
 **Check**:
+
 - Review order confirmation email
 - Verify price on project detail page matched charge
 - Check for multiple charges (accidental double-purchase)
 
 **Solutions**:
+
 - Contact support immediately with transaction ID
 - Stripe charges are reversed if error confirmed
 - Accidental duplicate purchases refunded
@@ -724,11 +807,13 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### Issue: Can't leave a review
 
 **Requirements**:
+
 - Must be within 30 days of purchase
 - Must have completed purchase (not disputed/refunded)
 - One review per transaction only
 
 **If Eligible But Form Not Working**:
+
 - Try different browser
 - Clear cache and cookies
 - Contact support
@@ -740,6 +825,7 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### 1. Do Your Research
 
 **Before Purchasing**:
+
 - Compare multiple projects with similar functionality
 - Check seller ratings and reviews
 - Read descriptions carefully
@@ -748,6 +834,7 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### 2. Understand What You're Buying
 
 **Remember**:
+
 - You're buying **unfinished** code
 - Completion % tells you how much work remains
 - Known issues were disclosed
@@ -756,6 +843,7 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### 3. Verify Compatibility
 
 **Check**:
+
 - Tech stack matches your expertise
 - Database/framework versions you can work with
 - Dependencies are reasonable
@@ -764,6 +852,7 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### 4. Test During Escrow Period
 
 **Within 7 Days**:
+
 - Download and extract code
 - Install dependencies
 - Run the project locally
@@ -773,6 +862,7 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### 5. Communicate Effectively
 
 **With Sellers**:
+
 - Be specific with questions
 - Provide error messages and context
 - Be patient for responses
@@ -781,6 +871,7 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### 6. Leave Honest Reviews
 
 **Help the Community**:
+
 - Review every purchase
 - Be fair and constructive
 - Mention positives and negatives
@@ -789,6 +880,7 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### 7. Keep Backups
 
 **Protect Yourself**:
+
 - Download code immediately after purchase
 - Keep local backups
 - Don't rely on re-download link after 30 days
@@ -801,12 +893,14 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### For Hobbyists & Learners
 
 **Use Projects to**:
+
 - Learn new technologies
 - Study real-world codebases
 - Practice completing projects
 - Build portfolio faster
 
 **Budget-Friendly Tips**:
+
 - Filter by low prices ($10-$100)
 - Look for 80%+ completion (less work to finish)
 - Focus on learning popular tech stacks (React, Node.js)
@@ -815,12 +909,14 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### For Freelancers & Agencies
 
 **Use Projects to**:
+
 - Jumpstart client projects
 - Save development time (bill more for less work)
 - Offer faster turnaround times
 - Explore new tech stacks before committing
 
 **Best Practices**:
+
 - Buy projects with 50-70% completion (lots of customization room)
 - Verify code quality is production-ready
 - Budget time for finishing and customization
@@ -829,12 +925,14 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### For Startups & Entrepreneurs
 
 **Use Projects to**:
+
 - Launch MVPs faster
 - Validate ideas cheaply
 - Test tech stacks before building from scratch
 - Hire developers to finish (cheaper than full build)
 
 **ROI Tips**:
+
 - Buy 70%+ complete projects (faster to market)
 - Focus on projects with good documentation
 - Hire freelancer to finish remaining work
@@ -847,15 +945,18 @@ Access at `/buyer/dashboard` or `/buyer/purchases`:
 ### Support Channels
 
 **Email Support**: support@codesalvage.com
+
 - Response time: 24-48 hours
 - Include: Account email, transaction ID (if applicable), screenshots
 
 **Documentation**:
+
 - Buyer Guide (this document)
 - Seller Guide: `/seller-guide`
 - FAQ: `/faq`
 
 **Before Contacting Support**:
+
 - Check this guide for solutions
 - Read FAQ page
 - Try troubleshooting steps

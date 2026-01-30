@@ -56,11 +56,7 @@ async function getConversationThread(
     });
 
     // Use MessageService to get conversation (automatically marks as read)
-    const result = await messageService.getConversation(
-      auth.user.id,
-      userId,
-      projectId
-    );
+    const result = await messageService.getConversation(auth.user.id, userId, projectId);
 
     console.log(`[${componentName}] Found ${result.messages.length} messages`);
 

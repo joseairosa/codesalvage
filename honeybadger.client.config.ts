@@ -24,7 +24,15 @@ const config = {
   maxBreadcrumbs: 40,
 
   // Filters - sensitive data to exclude from error reports
-  filters: ['password', 'password_confirmation', 'credit_card', 'ssn', 'token', 'api_key', 'secret'],
+  filters: [
+    'password',
+    'password_confirmation',
+    'credit_card',
+    'ssn',
+    'token',
+    'api_key',
+    'secret',
+  ],
 
   // Error fingerprinting for better grouping
   beforeNotify: (notice: any) => {

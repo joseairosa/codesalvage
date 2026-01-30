@@ -311,9 +311,7 @@ export class EmailService {
     try {
       await this.client.sendEmail({
         From: `${this.fromName} <${this.fromEmail}>`,
-        To: recipient.name
-          ? `${recipient.name} <${recipient.email}>`
-          : recipient.email,
+        To: recipient.name ? `${recipient.name} <${recipient.email}>` : recipient.email,
         Subject: subject,
         HtmlBody: html,
         TextBody: text,

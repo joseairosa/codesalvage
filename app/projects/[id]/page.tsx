@@ -564,7 +564,10 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                     <p className="font-semibold">
                       {project.seller.fullName || project.seller.username}
                     </p>
-                    <ProBadge subscription={project.seller.subscription ?? null} size="sm" />
+                    <ProBadge
+                      subscription={project.seller.subscription ?? null}
+                      size="sm"
+                    />
                   </div>
                   <p className="text-sm text-muted-foreground">
                     @{project.seller.username}

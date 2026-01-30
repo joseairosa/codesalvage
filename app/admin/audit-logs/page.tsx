@@ -27,9 +27,7 @@ export default async function AdminAuditLogsPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          Audit Logs
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Audit Logs</h1>
         <p className="mt-2 text-sm text-gray-600">
           Complete audit trail of all administrative actions.
         </p>

@@ -52,7 +52,10 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('[Session API] Error creating session:', error);
     return NextResponse.json(
-      { error: 'Invalid token', details: error instanceof Error ? error.message : 'Unknown error' },
+      {
+        error: 'Invalid token',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 401 }
     );
   }

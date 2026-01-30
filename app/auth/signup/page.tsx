@@ -80,7 +80,10 @@ export default function SignUpPage() {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      console.log('[SignUp] Email/Password sign-up successful, redirecting to:', callbackUrl);
+      console.log(
+        '[SignUp] Email/Password sign-up successful, redirecting to:',
+        callbackUrl
+      );
       router.push(callbackUrl);
     } catch (err: any) {
       console.error('[SignUp] Email/Password sign-up error:', err);

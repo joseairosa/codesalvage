@@ -29,13 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  AlertTriangle,
-  Shield,
-  Clock,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import { AlertTriangle, Shield, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 
 /**
  * Audit Log Interface (matching API response)
@@ -140,7 +134,9 @@ export function AuditLogViewer() {
   /**
    * Get action badge color
    */
-  function getActionBadgeVariant(action: string): 'default' | 'destructive' | 'secondary' {
+  function getActionBadgeVariant(
+    action: string
+  ): 'default' | 'destructive' | 'secondary' {
     if (action.includes('ban') || action.includes('reject')) {
       return 'destructive';
     }
@@ -180,9 +176,7 @@ export function AuditLogViewer() {
                 <SelectItem value="project.reject">Project Reject</SelectItem>
                 <SelectItem value="project.feature">Project Feature</SelectItem>
                 <SelectItem value="project.unfeature">Project Unfeature</SelectItem>
-                <SelectItem value="transaction.release_escrow">
-                  Escrow Release
-                </SelectItem>
+                <SelectItem value="transaction.release_escrow">Escrow Release</SelectItem>
                 <SelectItem value="report.resolve">Report Resolve</SelectItem>
               </SelectContent>
             </Select>
@@ -272,7 +266,9 @@ export function AuditLogViewer() {
                             <div className="mb-1 text-xs font-semibold uppercase text-gray-500">
                               Reason
                             </div>
-                            <div className="rounded bg-white p-3 text-sm">{log.reason}</div>
+                            <div className="rounded bg-white p-3 text-sm">
+                              {log.reason}
+                            </div>
                           </div>
                         )}
 

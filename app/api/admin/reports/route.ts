@@ -47,10 +47,7 @@ export async function GET(request: NextRequest) {
     const contentType = searchParams.get('contentType') || undefined;
 
     // Pagination
-    const limit = Math.min(
-      parseInt(searchParams.get('limit') || '50', 10),
-      100
-    );
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
     // Fetch content reports via AdminService

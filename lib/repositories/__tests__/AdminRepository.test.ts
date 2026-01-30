@@ -105,9 +105,19 @@ describe('AdminRepository', () => {
     it('should handle zero revenue correctly', async () => {
       // Arrange
       const mockStats = [
-        10, 5, 3, 0, 5, 4, 1, 0, 0,
+        10,
+        5,
+        3,
+        0,
+        5,
+        4,
+        1,
+        0,
+        0,
         { _sum: { amountCents: null } }, // No revenue
-        0, 0, 0,
+        0,
+        0,
+        0,
       ];
 
       (mockPrisma.$transaction as any).mockResolvedValue(mockStats);

@@ -64,26 +64,23 @@ export async function GET(request: NextRequest) {
       searchParams.get('isFeatured') === 'true'
         ? true
         : searchParams.get('isFeatured') === 'false'
-        ? false
-        : undefined;
+          ? false
+          : undefined;
 
     // String filters
     const sellerId = searchParams.get('sellerId') || undefined;
 
     // Sorting
     const sortByParam = searchParams.get('sortBy') || 'createdAt';
-    const sortBy = ['createdAt', 'updatedAt', 'priceCents', 'viewCount'].includes(sortByParam)
+    const sortBy = ['createdAt', 'updatedAt', 'priceCents', 'viewCount'].includes(
+      sortByParam
+    )
       ? (sortByParam as 'createdAt' | 'updatedAt' | 'priceCents' | 'viewCount')
       : 'createdAt';
-    const sortOrder = (searchParams.get('sortOrder') || 'desc') as
-      | 'asc'
-      | 'desc';
+    const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
     // Pagination
-    const limit = Math.min(
-      parseInt(searchParams.get('limit') || '50', 10),
-      100
-    );
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
     // Fetch projects via AdminService
@@ -131,9 +128,6 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('[Admin API] Fetch projects error:', error);
 
-    return NextResponse.json(
-      { error: 'Failed to fetch projects' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch projects' }, { status: 500 });
   }
 }

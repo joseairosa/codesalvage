@@ -38,13 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  AlertTriangle,
-  User,
-  Flag,
-  CheckCircle,
-  XCircle,
-} from 'lucide-react';
+import { AlertTriangle, User, Flag, CheckCircle, XCircle } from 'lucide-react';
 
 /**
  * Content Report Interface (matching API response)
@@ -184,10 +178,7 @@ export function ContentReportManagement() {
   /**
    * Open resolve dialog
    */
-  function openResolveDialog(
-    report: ContentReport,
-    status: 'resolved' | 'dismissed'
-  ) {
+  function openResolveDialog(report: ContentReport, status: 'resolved' | 'dismissed') {
     setSelectedReport(report);
     setResolutionStatus(status);
     setResolutionText('');
@@ -304,8 +295,8 @@ export function ContentReportManagement() {
                             report.status === 'pending'
                               ? 'default'
                               : report.status === 'resolved'
-                              ? 'secondary'
-                              : 'outline'
+                                ? 'secondary'
+                                : 'outline'
                           }
                         >
                           {report.status}
@@ -426,8 +417,7 @@ export function ContentReportManagement() {
             <div className="rounded-lg border bg-gray-50 p-3">
               <div className="space-y-1 text-sm">
                 <div>
-                  <span className="font-medium">Type:</span>{' '}
-                  {selectedReport?.contentType}
+                  <span className="font-medium">Type:</span> {selectedReport?.contentType}
                 </div>
                 <div>
                   <span className="font-medium">Reason:</span> {selectedReport?.reason}
@@ -483,8 +473,8 @@ export function ContentReportManagement() {
                   ? 'Resolving...'
                   : 'Dismissing...'
                 : resolutionStatus === 'resolved'
-                ? 'Resolve Report'
-                : 'Dismiss Report'}
+                  ? 'Resolve Report'
+                  : 'Dismiss Report'}
             </Button>
           </DialogFooter>
         </DialogContent>

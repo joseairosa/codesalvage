@@ -10,6 +10,7 @@
 Honeybadger provides error monitoring and uptime tracking for CodeSalvage. It captures unhandled exceptions, promise rejections, and custom error reports from both client-side (browser) and server-side (Node.js) code.
 
 **Why Honeybadger?**
+
 - Simple, developer-friendly error tracking
 - Better privacy controls than alternatives
 - Excellent Next.js integration
@@ -21,39 +22,47 @@ Honeybadger provides error monitoring and uptime tracking for CodeSalvage. It ca
 ## Configuration Files
 
 ### 1. **honeybadger.client.config.ts**
+
 Client-side (browser) error monitoring configuration.
 
 **Features**:
+
 - Automatic error capture in browser JavaScript
 - Breadcrumb tracking for user actions
 - Custom error filtering
 - User context attachment
 
 **Environment Variables**:
+
 ```bash
 NEXT_PUBLIC_HONEYBADGER_API_KEY="your-api-key"
 HONEYBADGER_ENV="production"
 ```
 
 ### 2. **honeybadger.server.config.ts**
+
 Server-side (Node.js) error monitoring configuration.
 
 **Features**:
+
 - Automatic exception capture in API routes
 - Server context (Node version, memory usage)
 - Sensitive data filtering
 - Custom error handlers
 
 **Environment Variables**:
+
 ```bash
 HONEYBADGER_API_KEY="your-api-key"
 HONEYBADGER_ENV="production"
 ```
 
 ### 3. **lib/utils/honeybadger.ts**
+
 Utility functions for manual error reporting.
 
 **Functions**:
+
 - `captureException(error, context)` - Report errors manually
 - `captureMessage(message, severity, context)` - Log messages
 - `setUserContext(user)` - Attach user info to errors
@@ -62,9 +71,11 @@ Utility functions for manual error reporting.
 - `withErrorCapture(fn, context)` - Wrap functions for automatic error capture
 
 ### 4. **app/global-error.tsx**
+
 Global error boundary for unhandled errors.
 
 **Features**:
+
 - User-friendly error page
 - Automatic error reporting to Honeybadger
 - Development-only error details
@@ -84,6 +95,7 @@ Global error boundary for unhandled errors.
 ### Step 2: Configure Environment Variables
 
 **Local Development** (`.env.local`):
+
 ```bash
 # Honeybadger (Error Monitoring)
 HONEYBADGER_API_KEY="your-honeybadger-api-key"
@@ -92,6 +104,7 @@ HONEYBADGER_ENV="development"
 ```
 
 **Production** (Railway):
+
 ```bash
 # Honeybadger (Error Monitoring)
 HONEYBADGER_API_KEY="your-honeybadger-api-key"
@@ -103,6 +116,7 @@ NODE_ENV="production"
 ### Step 3: Verify Configuration
 
 **Test Client-Side Error Reporting**:
+
 ```typescript
 // In any client component
 'use client';
@@ -126,6 +140,7 @@ export default function TestButton() {
 ```
 
 **Test Server-Side Error Reporting**:
+
 ```typescript
 // In any API route
 import { captureException } from '@/lib/utils/honeybadger';
@@ -143,6 +158,7 @@ export async function GET(request: Request) {
 ```
 
 **Check Honeybadger Dashboard**:
+
 - Go to your Honeybadger project dashboard
 - Navigate to "Errors" tab
 - You should see your test errors appear within 1-2 minutes
@@ -154,6 +170,7 @@ export async function GET(request: Request) {
 ### 1. Automatic Error Capture
 
 Honeybadger automatically captures:
+
 - Unhandled exceptions
 - Unhandled promise rejections
 - React component errors (via error boundaries)
@@ -163,6 +180,7 @@ Honeybadger automatically captures:
 ### 2. Manual Error Reporting
 
 **Capture Exception**:
+
 ```typescript
 import { captureException } from '@/lib/utils/honeybadger';
 
@@ -171,26 +189,28 @@ try {
 } catch (error) {
   captureException(error as Error, {
     tags: { feature: 'payment', severity: 'critical' },
-    context: { userId: 'user123', amount: 500 }
+    context: { userId: 'user123', amount: 500 },
   });
   // Handle error gracefully
 }
 ```
 
 **Capture Message** (for warnings or info):
+
 ```typescript
 import { captureMessage } from '@/lib/utils/honeybadger';
 
 // Warning about unusual activity
 captureMessage('Unusual login pattern detected', 'warning', {
   tags: { feature: 'auth' },
-  context: { userId: 'user123', attempts: 5 }
+  context: { userId: 'user123', attempts: 5 },
 });
 ```
 
 ### 3. User Context
 
 **Set User Context** (on login):
+
 ```typescript
 import { setUserContext } from '@/lib/utils/honeybadger';
 
@@ -206,6 +226,7 @@ if (session?.user) {
 ```
 
 **Clear User Context** (on logout):
+
 ```typescript
 import { clearUserContext } from '@/lib/utils/honeybadger';
 
@@ -222,22 +243,34 @@ Track user actions leading up to errors:
 import { addBreadcrumb } from '@/lib/utils/honeybadger';
 
 // User clicked button
-addBreadcrumb('User clicked checkout', {
-  cartTotal: 500,
-  itemCount: 3
-}, 'user_action');
+addBreadcrumb(
+  'User clicked checkout',
+  {
+    cartTotal: 500,
+    itemCount: 3,
+  },
+  'user_action'
+);
 
 // API call made
-addBreadcrumb('Fetching user data', {
-  userId: 'user123',
-  endpoint: '/api/users/user123'
-}, 'api_call');
+addBreadcrumb(
+  'Fetching user data',
+  {
+    userId: 'user123',
+    endpoint: '/api/users/user123',
+  },
+  'api_call'
+);
 
 // Navigation
-addBreadcrumb('Navigated to dashboard', {
-  from: '/projects',
-  to: '/dashboard'
-}, 'navigation');
+addBreadcrumb(
+  'Navigated to dashboard',
+  {
+    from: '/projects',
+    to: '/dashboard',
+  },
+  'navigation'
+);
 ```
 
 ### 5. Wrap Functions
@@ -279,7 +312,7 @@ export async function POST(request: Request) {
   } catch (error) {
     captureException(error as Error, {
       tags: { route: '/api/projects', method: 'POST' },
-      context: { body: await request.json() }
+      context: { body: await request.json() },
     });
     return Response.json({ error: 'Failed to create project' }, { status: 500 });
   }
@@ -301,7 +334,7 @@ export async function createProject(data: FormData) {
   } catch (error) {
     captureException(error as Error, {
       tags: { action: 'createProject' },
-      context: { formData: Object.fromEntries(data) }
+      context: { formData: Object.fromEntries(data) },
     });
     return { success: false, error: 'Failed to create project' };
   }
@@ -342,11 +375,11 @@ Group errors by feature, severity, or component:
 ```typescript
 captureException(error, {
   tags: {
-    feature: 'payment',      // Feature area
-    severity: 'critical',    // Error severity
-    component: 'Checkout',   // Component name
-    user_type: 'buyer',      // User type
-  }
+    feature: 'payment', // Feature area
+    severity: 'critical', // Error severity
+    component: 'Checkout', // Component name
+    user_type: 'buyer', // User type
+  },
 });
 ```
 
@@ -362,13 +395,14 @@ captureException(error, {
     action: 'purchase',
     timestamp: Date.now(),
     // Avoid sensitive data (passwords, tokens, etc.)
-  }
+  },
 });
 ```
 
 ### 3. **Filter Sensitive Data**
 
 Honeybadger is configured to filter:
+
 - `password`, `password_confirmation`
 - `credit_card`, `ssn`
 - `token`, `api_key`, `secret`
@@ -409,12 +443,14 @@ captureException(error, {
 **Access**: [app.honeybadger.io](https://app.honeybadger.io)
 
 **Key Metrics**:
+
 - Error rate (errors per hour)
 - Most common errors
 - Affected users
 - Error trends over time
 
 **Filters**:
+
 - Environment (development, production)
 - Tags (feature, severity, component)
 - Time range (last hour, day, week)
@@ -422,6 +458,7 @@ captureException(error, {
 ### Email Alerts
 
 **Setup**:
+
 1. Go to Project Settings → Notifications
 2. Add email addresses for alerts
 3. Configure alert rules:
@@ -430,6 +467,7 @@ captureException(error, {
    - Critical errors (tagged `severity: critical`)
 
 **Recommended Alerts**:
+
 - Immediate: Errors with `severity: critical` tag
 - Daily digest: All errors in production
 - Weekly summary: Error trends and top issues
@@ -437,12 +475,14 @@ captureException(error, {
 ### Slack Integration
 
 **Setup**:
+
 1. Go to Project Settings → Integrations → Slack
 2. Connect your Slack workspace
 3. Choose channel (#engineering or #alerts)
 4. Configure notification rules
 
 **Recommended**:
+
 - Critical errors → #alerts
 - All errors → #engineering
 - Daily summary → #engineering
@@ -454,7 +494,9 @@ captureException(error, {
 ### Issue: Errors not appearing in Honeybadger
 
 **Check**:
+
 1. Is API key configured?
+
    ```bash
    echo $HONEYBADGER_API_KEY
    echo $NEXT_PUBLIC_HONEYBADGER_API_KEY
@@ -465,6 +507,7 @@ captureException(error, {
    - Modify config: `reportData: true` (for testing)
 
 3. Check browser console:
+
    ```
    [Honeybadger] Client error monitoring initialized
    ```
@@ -538,6 +581,7 @@ if (session?.user) {
 ### Manual Testing
 
 **1. Test Client-Side Error**:
+
 ```typescript
 // Add to any page
 <button onClick={() => { throw new Error('Test error'); }}>
@@ -546,11 +590,13 @@ if (session?.user) {
 ```
 
 **2. Test Server-Side Error**:
+
 ```bash
 curl http://localhost:3011/api/test-error
 ```
 
 **3. Verify in Honeybadger**:
+
 - Go to Honeybadger dashboard
 - Check "Errors" tab
 - Errors should appear within 1-2 minutes
@@ -558,6 +604,7 @@ curl http://localhost:3011/api/test-error
 ### Automated Testing
 
 **Disable Honeybadger in Tests**:
+
 ```typescript
 // vitest.config.ts
 export default defineConfig({
@@ -575,11 +622,13 @@ export default defineConfig({
 ## Cost
 
 **Free Tier**:
+
 - 25,000 error events/month
 - Unlimited team members
 - 30-day error retention
 
 **Recommended Plan** (after launch):
+
 - **Developer Plan**: $49/month
 - 125,000 error events/month
 - 3-month error retention

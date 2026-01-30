@@ -421,8 +421,8 @@ export function ProjectModeration() {
                               project.status === 'active'
                                 ? 'default'
                                 : project.status === 'sold'
-                                ? 'secondary'
-                                : 'outline'
+                                  ? 'secondary'
+                                  : 'outline'
                             }
                           >
                             {project.status}
@@ -526,9 +526,7 @@ export function ProjectModeration() {
                 rows={4}
                 className="mt-2"
               />
-              {rejectError && (
-                <p className="mt-2 text-sm text-red-600">{rejectError}</p>
-              )}
+              {rejectError && <p className="mt-2 text-sm text-red-600">{rejectError}</p>}
             </div>
           </div>
 
@@ -605,8 +603,8 @@ export function ProjectModeration() {
                   ? 'Unfeaturing...'
                   : 'Featuring...'
                 : selectedProject?.isFeatured
-                ? 'Unfeature'
-                : 'Feature Project'}
+                  ? 'Unfeature'
+                  : 'Feature Project'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -85,7 +85,9 @@ export async function requireAdmin() {
       },
     };
   } catch {
-    console.log('[AuthHelpers] requireAdmin: Token verification failed, redirecting to signin');
+    console.log(
+      '[AuthHelpers] requireAdmin: Token verification failed, redirecting to signin'
+    );
     redirect('/auth/signin');
   }
 }
@@ -180,7 +182,9 @@ export async function requireAuth() {
       },
     };
   } catch {
-    console.log('[AuthHelpers] requireAuth: Token verification failed, redirecting to signin');
+    console.log(
+      '[AuthHelpers] requireAuth: Token verification failed, redirecting to signin'
+    );
     redirect('/auth/signin');
   }
 }

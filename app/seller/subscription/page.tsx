@@ -65,9 +65,7 @@ export default async function SubscriptionManagementPage() {
     <div className="container mx-auto py-10">
       <div className="mb-8">
         <h1 className="mb-2 text-3xl font-bold">Subscription Management</h1>
-        <p className="text-gray-600">
-          Manage your CodeSalvage subscription and billing
-        </p>
+        <p className="text-gray-600">Manage your CodeSalvage subscription and billing</p>
       </div>
 
       {/* Current Plan Status */}

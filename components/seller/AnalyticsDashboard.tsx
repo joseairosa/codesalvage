@@ -15,7 +15,13 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -24,24 +30,55 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Download, TrendingUp, DollarSign, Eye, Heart, ShoppingCart, Loader2 } from 'lucide-react';
+import {
+  Download,
+  TrendingUp,
+  DollarSign,
+  Eye,
+  Heart,
+  ShoppingCart,
+  Loader2,
+} from 'lucide-react';
 
 // Dynamic import for Recharts to reduce initial bundle size
-const LineChart = dynamic(
-  () => import('recharts').then((mod) => mod.LineChart as any),
-  { ssr: false, loading: () => <div className="h-[300px] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div> }
+const LineChart = dynamic(() => import('recharts').then((mod) => mod.LineChart as any), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[300px] items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin" />
+    </div>
+  ),
+}) as any;
+const Line = dynamic(() => import('recharts').then((mod) => mod.Line as any), {
+  ssr: false,
+}) as any;
+const BarChart = dynamic(() => import('recharts').then((mod) => mod.BarChart as any), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[300px] items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin" />
+    </div>
+  ),
+}) as any;
+const Bar = dynamic(() => import('recharts').then((mod) => mod.Bar as any), {
+  ssr: false,
+}) as any;
+const XAxis = dynamic(() => import('recharts').then((mod) => mod.XAxis as any), {
+  ssr: false,
+}) as any;
+const YAxis = dynamic(() => import('recharts').then((mod) => mod.YAxis as any), {
+  ssr: false,
+}) as any;
+const CartesianGrid = dynamic(
+  () => import('recharts').then((mod) => mod.CartesianGrid as any),
+  { ssr: false }
 ) as any;
-const Line = dynamic(() => import('recharts').then((mod) => mod.Line as any), { ssr: false }) as any;
-const BarChart = dynamic(
-  () => import('recharts').then((mod) => mod.BarChart as any),
-  { ssr: false, loading: () => <div className="h-[300px] flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div> }
-) as any;
-const Bar = dynamic(() => import('recharts').then((mod) => mod.Bar as any), { ssr: false }) as any;
-const XAxis = dynamic(() => import('recharts').then((mod) => mod.XAxis as any), { ssr: false }) as any;
-const YAxis = dynamic(() => import('recharts').then((mod) => mod.YAxis as any), { ssr: false }) as any;
-const CartesianGrid = dynamic(() => import('recharts').then((mod) => mod.CartesianGrid as any), { ssr: false }) as any;
-const Tooltip = dynamic(() => import('recharts').then((mod) => mod.Tooltip as any), { ssr: false }) as any;
-const Legend = dynamic(() => import('recharts').then((mod) => mod.Legend as any), { ssr: false }) as any;
+const Tooltip = dynamic(() => import('recharts').then((mod) => mod.Tooltip as any), {
+  ssr: false,
+}) as any;
+const Legend = dynamic(() => import('recharts').then((mod) => mod.Legend as any), {
+  ssr: false,
+}) as any;
 const ResponsiveContainer = dynamic(
   () => import('recharts').then((mod) => mod.ResponsiveContainer as any),
   { ssr: false }
@@ -110,7 +147,8 @@ export function AnalyticsDashboard() {
       const params = new URLSearchParams({
         startDate: range.startDate.toISOString(),
         endDate: range.endDate.toISOString(),
-        granularity: selectedRange === '7' ? 'day' : selectedRange === '30' ? 'day' : 'week',
+        granularity:
+          selectedRange === '7' ? 'day' : selectedRange === '30' ? 'day' : 'week',
       });
 
       console.log(`[${componentName}] Fetching analytics:`, params.toString());
@@ -155,14 +193,13 @@ export function AnalyticsDashboard() {
 
     console.log(`[${componentName}] Exporting analytics to CSV`);
 
-    const csvData = analytics.topProjects
-      .map((project) => ({
-        Project: project.projectTitle,
-        Views: project.views,
-        Favorites: project.favorites,
-        Sales: project.transactionCount,
-        Revenue: formatCurrency(project.revenue),
-      }));
+    const csvData = analytics.topProjects.map((project) => ({
+      Project: project.projectTitle,
+      Views: project.views,
+      Favorites: project.favorites,
+      Sales: project.transactionCount,
+      Revenue: formatCurrency(project.revenue),
+    }));
 
     const headers = Object.keys(csvData[0] || {}).join(',');
     const rows = csvData.map((row) => Object.values(row).join(','));
@@ -227,7 +264,11 @@ export function AnalyticsDashboard() {
             </SelectContent>
           </Select>
 
-          <Button onClick={exportToCSV} variant="outline" disabled={topProjects.length === 0}>
+          <Button
+            onClick={exportToCSV}
+            variant="outline"
+            disabled={topProjects.length === 0}
+          >
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
@@ -242,7 +283,9 @@ export function AnalyticsDashboard() {
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(summary.totalRevenue)}</div>
+            <div className="text-2xl font-bold">
+              {formatCurrency(summary.totalRevenue)}
+            </div>
             <p className="text-xs text-gray-600">
               {summary.totalSold} {summary.totalSold === 1 ? 'sale' : 'sales'}
             </p>
@@ -266,7 +309,9 @@ export function AnalyticsDashboard() {
             <Eye className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{summary.totalViews.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {summary.totalViews.toLocaleString()}
+            </div>
             <p className="text-xs text-gray-600">All projects</p>
           </CardContent>
         </Card>
@@ -296,14 +341,23 @@ export function AnalyticsDashboard() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="date"
-                  tickFormatter={(date: any) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  tickFormatter={(date: any) =>
+                    new Date(date).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  }
                 />
-                <YAxis
-                  tickFormatter={(value: any) => `$${(value / 100).toFixed(0)}`}
-                />
+                <YAxis tickFormatter={(value: any) => `$${(value / 100).toFixed(0)}`} />
                 <Tooltip
                   formatter={(value: number) => formatCurrency(value)}
-                  labelFormatter={(date: any) => new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                  labelFormatter={(date: any) =>
+                    new Date(date).toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })
+                  }
                 />
                 <Legend />
                 <Line
@@ -355,7 +409,8 @@ export function AnalyticsDashboard() {
                         </span>
                         <span className="flex items-center gap-1">
                           <ShoppingCart className="h-3 w-3" />
-                          {project.transactionCount} {project.transactionCount === 1 ? 'sale' : 'sales'}
+                          {project.transactionCount}{' '}
+                          {project.transactionCount === 1 ? 'sale' : 'sales'}
                         </span>
                       </div>
                     </div>

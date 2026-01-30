@@ -88,14 +88,12 @@ describe('UserRepository - Admin Methods', () => {
 
     it('should throw error if database update fails', async () => {
       // Arrange
-      (mockPrisma.user.update as any).mockRejectedValue(
-        new Error('Connection timeout')
-      );
+      (mockPrisma.user.update as any).mockRejectedValue(new Error('Connection timeout'));
 
       // Act & Assert
-      await expect(
-        userRepo.banUser('user123', 'admin123', 'Reason')
-      ).rejects.toThrow('[UserRepository] Failed to ban user - user may not exist');
+      await expect(userRepo.banUser('user123', 'admin123', 'Reason')).rejects.toThrow(
+        '[UserRepository] Failed to ban user - user may not exist'
+      );
     });
   });
 
@@ -259,9 +257,7 @@ describe('UserRepository - Admin Methods', () => {
 
     it('should filter users by isBanned flag', async () => {
       // Arrange
-      const mockBannedUsers = [
-        { id: 'user1', email: 'banned@test.com', isBanned: true },
-      ];
+      const mockBannedUsers = [{ id: 'user1', email: 'banned@test.com', isBanned: true }];
 
       (mockPrisma.user.findMany as any).mockResolvedValue(mockBannedUsers);
 
@@ -279,9 +275,7 @@ describe('UserRepository - Admin Methods', () => {
 
     it('should filter users by isAdmin flag', async () => {
       // Arrange
-      const mockAdmins = [
-        { id: 'admin1', email: 'admin@test.com', isAdmin: true },
-      ];
+      const mockAdmins = [{ id: 'admin1', email: 'admin@test.com', isAdmin: true }];
 
       (mockPrisma.user.findMany as any).mockResolvedValue(mockAdmins);
 
@@ -299,9 +293,7 @@ describe('UserRepository - Admin Methods', () => {
 
     it('should filter users by isSeller flag', async () => {
       // Arrange
-      const mockSellers = [
-        { id: 'seller1', email: 'seller@test.com', isSeller: true },
-      ];
+      const mockSellers = [{ id: 'seller1', email: 'seller@test.com', isSeller: true }];
 
       (mockPrisma.user.findMany as any).mockResolvedValue(mockSellers);
 
@@ -405,9 +397,7 @@ describe('UserRepository - Admin Methods', () => {
 
     it('should throw error if query fails', async () => {
       // Arrange
-      (mockPrisma.user.findMany as any).mockRejectedValue(
-        new Error('Database error')
-      );
+      (mockPrisma.user.findMany as any).mockRejectedValue(new Error('Database error'));
 
       // Act & Assert
       await expect(userRepo.getAllUsers()).rejects.toThrow(
@@ -522,9 +512,7 @@ describe('UserRepository - Admin Methods', () => {
 
     it('should throw error if count fails', async () => {
       // Arrange
-      (mockPrisma.user.count as any).mockRejectedValue(
-        new Error('Connection timeout')
-      );
+      (mockPrisma.user.count as any).mockRejectedValue(new Error('Connection timeout'));
 
       // Act & Assert
       await expect(userRepo.countUsers()).rejects.toThrow(

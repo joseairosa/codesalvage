@@ -64,7 +64,10 @@ export function captureException(
     const Honeybadger = getHoneybadger();
 
     if (!Honeybadger.apiKey) {
-      console.warn('[Honeybadger] API key not configured, error not reported:', error.message);
+      console.warn(
+        '[Honeybadger] API key not configured, error not reported:',
+        error.message
+      );
       return;
     }
 
@@ -117,7 +120,10 @@ export function captureMessage(
     const Honeybadger = getHoneybadger();
 
     if (!Honeybadger.apiKey) {
-      console.warn('[Honeybadger] API key not configured, message not reported:', message);
+      console.warn(
+        '[Honeybadger] API key not configured, message not reported:',
+        message
+      );
       return;
     }
 

@@ -82,7 +82,10 @@ export default function SignInPage() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      console.log('[SignIn] Email/Password sign-in successful, redirecting to:', callbackUrl);
+      console.log(
+        '[SignIn] Email/Password sign-in successful, redirecting to:',
+        callbackUrl
+      );
       router.push(callbackUrl);
     } catch (err: any) {
       console.error('[SignIn] Email/Password sign-in error:', err);

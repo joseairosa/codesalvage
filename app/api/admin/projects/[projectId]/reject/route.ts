@@ -110,9 +110,6 @@ export async function PUT(
     }
 
     // Handle generic errors
-    return NextResponse.json(
-      { error: 'Failed to reject project' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to reject project' }, { status: 500 });
   }
 }

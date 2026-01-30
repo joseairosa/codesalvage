@@ -207,7 +207,9 @@ export function PurchaseFeaturedDialog({
                       >
                         <div>
                           <p className="font-semibold">{option.label}</p>
-                          <p className="text-sm text-muted-foreground">{option.days} days</p>
+                          <p className="text-sm text-muted-foreground">
+                            {option.days} days
+                          </p>
                         </div>
                         <div className="text-right">
                           <p className="text-lg font-bold">{pricing.price}</p>
@@ -265,7 +267,10 @@ export function PurchaseFeaturedDialog({
                   <>
                     Purchase {priceInfo?.price}
                     {isPro && priceInfo && priceInfo.savings > 0 && (
-                      <Badge variant="secondary" className="ml-2 bg-green-100 text-green-900">
+                      <Badge
+                        variant="secondary"
+                        className="ml-2 bg-green-100 text-green-900"
+                      >
                         Save ${(priceInfo.savings / 100).toFixed(0)}
                       </Badge>
                     )}

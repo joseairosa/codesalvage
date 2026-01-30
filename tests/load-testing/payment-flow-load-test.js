@@ -22,15 +22,15 @@ const paymentIntentSuccessRate = new Rate('payment_intent_success');
 // Test configuration
 export const options = {
   stages: [
-    { duration: '30s', target: 5 },   // Ramp up to 5 users
-    { duration: '1m', target: 20 },   // Ramp up to 20 users
-    { duration: '1m', target: 20 },   // Stay at 20 users
-    { duration: '30s', target: 0 },   // Ramp down to 0 users
+    { duration: '30s', target: 5 }, // Ramp up to 5 users
+    { duration: '1m', target: 20 }, // Ramp up to 20 users
+    { duration: '1m', target: 20 }, // Stay at 20 users
+    { duration: '30s', target: 0 }, // Ramp down to 0 users
   ],
   thresholds: {
-    'http_req_duration': ['p(95)<3000'],  // 95% of requests should be below 3s
-    'http_req_failed': ['rate<0.01'],     // Less than 1% errors
-    'payment_intent_success': ['rate>0.99'], // 99%+ payment intents created successfully
+    http_req_duration: ['p(95)<3000'], // 95% of requests should be below 3s
+    http_req_failed: ['rate<0.01'], // Less than 1% errors
+    payment_intent_success: ['rate>0.99'], // 99%+ payment intents created successfully
   },
 };
 
@@ -38,11 +38,7 @@ const BASE_URL = __ENV.BASE_URL || 'http://localhost:3011';
 const AUTH_TOKEN = __ENV.TEST_AUTH_TOKEN || '';
 
 // Test project IDs (update with actual IDs from your database)
-const testProjectIds = [
-  'test-project-id-1',
-  'test-project-id-2',
-  'test-project-id-3',
-];
+const testProjectIds = ['test-project-id-1', 'test-project-id-2', 'test-project-id-3'];
 
 export default function () {
   if (!AUTH_TOKEN) {
@@ -52,7 +48,7 @@ export default function () {
 
   const headers = {
     'Content-Type': 'application/json',
-    'Cookie': `authjs.session-token=${AUTH_TOKEN}`, // Auth.js session token
+    Cookie: `authjs.session-token=${AUTH_TOKEN}`, // Auth.js session token
   };
 
   // Select a random project

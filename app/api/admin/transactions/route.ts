@@ -59,15 +59,10 @@ export async function GET(request: NextRequest) {
     const sortBy = ['createdAt', 'amountCents', 'escrowReleaseDate'].includes(sortByParam)
       ? (sortByParam as 'createdAt' | 'amountCents' | 'escrowReleaseDate')
       : 'createdAt';
-    const sortOrder = (searchParams.get('sortOrder') || 'desc') as
-      | 'asc'
-      | 'desc';
+    const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
     // Pagination
-    const limit = Math.min(
-      parseInt(searchParams.get('limit') || '50', 10),
-      100
-    );
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
     // Fetch transactions via AdminService
@@ -117,9 +112,6 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('[Admin API] Fetch transactions error:', error);
 
-    return NextResponse.json(
-      { error: 'Failed to fetch transactions' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch transactions' }, { status: 500 });
   }
 }

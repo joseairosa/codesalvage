@@ -20,7 +20,13 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,7 +41,9 @@ export default function VerifyPage() {
   const emailFromUrl = searchParams.get('email') ?? '';
 
   const [email, setEmail] = useState(emailFromUrl);
-  const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'prompt'>('verifying');
+  const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'prompt'>(
+    'verifying'
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -82,7 +90,9 @@ export default function VerifyPage() {
 
       const firebaseErr = err as { code?: string; message?: string };
       if (firebaseErr.code === 'auth/invalid-action-code') {
-        setError('This link has expired or has already been used. Please request a new magic link.');
+        setError(
+          'This link has expired or has already been used. Please request a new magic link.'
+        );
       } else if (firebaseErr.code === 'auth/invalid-email') {
         setError('Invalid email address. Please check and try again.');
       } else {
@@ -105,7 +115,9 @@ export default function VerifyPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600">
-            {status === 'verifying' && <Loader2 className="h-8 w-8 animate-spin text-white" />}
+            {status === 'verifying' && (
+              <Loader2 className="h-8 w-8 animate-spin text-white" />
+            )}
             {status === 'success' && <CheckCircle className="h-8 w-8 text-white" />}
             {status === 'error' && <AlertCircle className="h-8 w-8 text-white" />}
             {status === 'prompt' && (
@@ -124,7 +136,8 @@ export default function VerifyPage() {
             {status === 'verifying' && 'Please wait while we verify your email...'}
             {status === 'success' && 'Redirecting you to your dashboard...'}
             {status === 'error' && error}
-            {status === 'prompt' && 'Please enter the email address you used to request the magic link'}
+            {status === 'prompt' &&
+              'Please enter the email address you used to request the magic link'}
           </CardDescription>
         </CardHeader>
 

@@ -64,10 +64,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('[API Keys] GET error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -103,7 +100,12 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log('[API Keys] POST: Creating API key for user:', auth.user.id, 'name:', name);
+    console.log(
+      '[API Keys] POST: Creating API key for user:',
+      auth.user.id,
+      'name:',
+      name
+    );
 
     // Generate secure random API key (sk-xxx format, 32 bytes = 64 hex chars)
     const randomBytes = crypto.randomBytes(32);
@@ -151,9 +153,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('[API Keys] POST error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
