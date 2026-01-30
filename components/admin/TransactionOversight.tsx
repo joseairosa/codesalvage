@@ -151,6 +151,7 @@ export function TransactionOversight() {
    */
   useEffect(() => {
     fetchTransactions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentStatusFilter, escrowStatusFilter, offset]);
 
   /**

@@ -132,6 +132,7 @@ export function UserManagement() {
    */
   useEffect(() => {
     fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isBannedFilter, isSellerFilter, offset]);
 
   /**

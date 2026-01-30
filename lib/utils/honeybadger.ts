@@ -27,6 +27,8 @@
  */
 
 // Dynamic import to handle client/server differences
+// require() is necessary here for synchronous conditional loading based on runtime environment
+/* eslint-disable @typescript-eslint/no-require-imports */
 const getHoneybadger = () => {
   if (typeof window !== 'undefined') {
     // Client-side
@@ -36,6 +38,7 @@ const getHoneybadger = () => {
     return require('../../honeybadger.server.config').default;
   }
 };
+/* eslint-enable @typescript-eslint/no-require-imports */
 
 /**
  * Capture and report an exception to Honeybadger

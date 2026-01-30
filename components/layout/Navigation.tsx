@@ -16,7 +16,7 @@
  */
 
 import Link from 'next/link';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/auth-helpers';
 import { Button } from '@/components/ui/button';
 import { NavigationLinks } from './NavigationLinks';
 import { UserMenu } from './UserMenu';
@@ -26,7 +26,7 @@ import { MobileMenu } from './MobileMenu';
  * Navigation Component
  */
 export async function Navigation() {
-  const session = await auth();
+  const session = await getSession();
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">

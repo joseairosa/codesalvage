@@ -54,7 +54,7 @@ export async function authenticateApiRequest(
       console.log('[API Auth] Cookie auth successful for user:', auth.user.id);
       return auth;
     }
-  } catch (error) {
+  } catch {
     console.log('[API Auth] Cookie auth failed, trying Authorization header');
   }
 
@@ -72,7 +72,7 @@ export async function authenticateApiRequest(
       );
       return auth;
     }
-  } catch (error) {
+  } catch {
     console.log('[API Auth] Authorization header auth failed');
   }
 

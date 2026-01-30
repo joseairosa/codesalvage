@@ -84,7 +84,7 @@ export async function requireAdmin() {
         isVerifiedSeller: auth.user.isVerifiedSeller,
       },
     };
-  } catch (error) {
+  } catch {
     console.log('[AuthHelpers] requireAdmin: Token verification failed, redirecting to signin');
     redirect('/auth/signin');
   }
@@ -140,7 +140,7 @@ export async function requireAdminApi() {
         isVerifiedSeller: auth.user.isVerifiedSeller,
       },
     };
-  } catch (error) {
+  } catch {
     console.log('[AuthHelpers] requireAdminApi: Token verification failed');
     return null;
   }
@@ -179,7 +179,7 @@ export async function requireAuth() {
         isVerifiedSeller: auth.user.isVerifiedSeller,
       },
     };
-  } catch (error) {
+  } catch {
     console.log('[AuthHelpers] requireAuth: Token verification failed, redirecting to signin');
     redirect('/auth/signin');
   }
@@ -214,7 +214,7 @@ export async function getSession() {
         isVerifiedSeller: auth.user.isVerifiedSeller,
       },
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }

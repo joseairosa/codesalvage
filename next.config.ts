@@ -45,6 +45,9 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
 
+  /* Server-only packages (not bundled by webpack for client) */
+  serverExternalPackages: ['firebase-admin'],
+
   /* Experimental features for Next.js 15 */
   experimental: {
     // Server Actions

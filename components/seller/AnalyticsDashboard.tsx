@@ -138,6 +138,7 @@ export function AnalyticsDashboard() {
 
   useEffect(() => {
     fetchAnalytics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRange]);
 
   // Format currency

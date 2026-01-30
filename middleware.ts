@@ -23,12 +23,15 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getAuth } from '@/lib/firebase-admin';
 
 /**
  * Middleware function - runs on every request matching config.matcher
+ *
+ * NOTE: firebase-admin cannot run in Edge Runtime (uses node:process, node:stream).
+ * Middleware only checks for session cookie presence as a lightweight gate.
+ * Full Firebase token verification happens in route handlers via requireAuth/requireAdmin.
  */
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   console.log('[Middleware] Checking route:', pathname);
@@ -56,39 +59,18 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/admin') ||
     pathname.startsWith('/projects');
 
-  if (isProtectedRoute) {
-    if (!sessionToken) {
-      console.log('[Middleware] No session token, redirecting to sign-in');
+  if (isProtectedRoute && !sessionToken) {
+    console.log('[Middleware] No session token, redirecting to sign-in');
 
-      // Redirect to sign-in with callback URL
-      const signInUrl = new URL('/auth/signin', request.url);
-      signInUrl.searchParams.set('callbackUrl', pathname);
+    // Redirect to sign-in with callback URL
+    const signInUrl = new URL('/auth/signin', request.url);
+    signInUrl.searchParams.set('callbackUrl', pathname);
 
-      return NextResponse.redirect(signInUrl);
-    }
-
-    // Lightweight token check (full verification happens in routes)
-    try {
-      await getAuth().verifyIdToken(sessionToken);
-      console.log('[Middleware] Token valid, allowing access');
-    } catch (error) {
-      console.log('[Middleware] Invalid/expired token, redirecting to sign-in');
-
-      // Token invalid/expired, clear cookie and redirect
-      const signInUrl = new URL('/auth/signin', request.url);
-      signInUrl.searchParams.set('callbackUrl', pathname);
-
-      const response = NextResponse.redirect(signInUrl);
-      response.cookies.delete('session');
-
-      return response;
-    }
-
-    // Note: Seller/admin-specific checks happen in route with requireAuth/requireAdmin
-    // Middleware only checks token validity for performance
+    return NextResponse.redirect(signInUrl);
   }
 
   // Allow request to proceed
+  // Full token verification happens in route handlers (requireAuth, requireAdmin)
   return NextResponse.next();
 }
 

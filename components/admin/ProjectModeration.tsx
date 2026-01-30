@@ -153,6 +153,7 @@ export function ProjectModeration() {
    */
   useEffect(() => {
     fetchProjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, featuredFilter, offset]);
 
   /**

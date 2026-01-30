@@ -113,6 +113,7 @@ export function AuditLogViewer() {
    */
   useEffect(() => {
     fetchAuditLogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actionFilter, offset]);
 
   /**

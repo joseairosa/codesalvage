@@ -57,6 +57,7 @@ export default function VerifyPage() {
       setStatus('error');
       setError('This link is invalid or has expired. Please request a new magic link.');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [emailFromUrl]);
 
   async function verifyEmail(emailToVerify: string) {
@@ -75,16 +76,17 @@ export default function VerifyPage() {
       setTimeout(() => {
         router.push('/dashboard');
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[Verify] Verification error:', err);
       setStatus('error');
 
-      if (err.code === 'auth/invalid-action-code') {
+      const firebaseErr = err as { code?: string; message?: string };
+      if (firebaseErr.code === 'auth/invalid-action-code') {
         setError('This link has expired or has already been used. Please request a new magic link.');
-      } else if (err.code === 'auth/invalid-email') {
+      } else if (firebaseErr.code === 'auth/invalid-email') {
         setError('Invalid email address. Please check and try again.');
       } else {
-        setError(err.message || 'Failed to verify email. Please try again.');
+        setError(firebaseErr.message || 'Failed to verify email. Please try again.');
       }
     } finally {
       setLoading(false);

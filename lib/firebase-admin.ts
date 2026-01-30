@@ -13,6 +13,7 @@
  */
 
 import admin from 'firebase-admin';
+import { readFileSync } from 'fs';
 
 let firebaseAdmin: admin.app.App | null = null;
 
@@ -51,7 +52,7 @@ export function getFirebaseAdmin(): admin.app.App {
 
     // Local: File path to service account
     if (serviceAccountPath) {
-      const serviceAccount = require(serviceAccountPath);
+      const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf-8'));
 
       firebaseAdmin = admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
