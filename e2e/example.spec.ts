@@ -56,7 +56,7 @@ test.describe('Playwright Setup Verification', () => {
     expect(page.url()).toContain('/auth/signin');
 
     // Verify GitHub sign-in button exists
-    const githubButton = page.getByRole('button', { name: /sign in with github/i });
+    const githubButton = page.getByRole('button', { name: /continue with github/i });
     await expect(githubButton).toBeVisible();
   });
 

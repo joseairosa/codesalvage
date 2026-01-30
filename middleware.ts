@@ -17,8 +17,11 @@
  * - /dashboard/* - All authenticated users
  * - /seller/* - Sellers only (full check in route)
  * - /buyer/* - Buyers only (all users by default)
- * - /projects/* - Protected routes
  * - /admin/* - Admins only (full check in route)
+ *
+ * Public Routes (auth handled in API routes):
+ * - /projects/* - Browse, search, view project details
+ * - /auth/* - Authentication pages
  */
 
 import { NextResponse } from 'next/server';
@@ -56,8 +59,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/seller') ||
     pathname.startsWith('/buyer') ||
-    pathname.startsWith('/admin') ||
-    pathname.startsWith('/projects');
+    pathname.startsWith('/admin');
 
   if (isProtectedRoute && !sessionToken) {
     console.log('[Middleware] No session token, redirecting to sign-in');
@@ -81,11 +83,5 @@ export function middleware(request: NextRequest) {
  * Uses matcher to include only protected routes for performance.
  */
 export const config = {
-  matcher: [
-    '/dashboard/:path*',
-    '/seller/:path*',
-    '/buyer/:path*',
-    '/admin/:path*',
-    '/projects/:path*',
-  ],
+  matcher: ['/dashboard/:path*', '/seller/:path*', '/buyer/:path*', '/admin/:path*'],
 };

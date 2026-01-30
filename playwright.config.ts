@@ -104,8 +104,10 @@ export default defineConfig({
   ],
 
   // Run your local dev server before starting the tests
+  // On CI: use production build (faster, pre-built by CI step)
+  // Locally: use dev server (hot reload, better DX)
   webServer: {
-    command: 'npm run dev',
+    command: process.env['CI'] ? 'npx next start -p 3011' : 'npm run dev',
     url: 'http://localhost:3011',
     reuseExistingServer: !process.env['CI'],
     timeout: 120 * 1000, // 2 minutes to start

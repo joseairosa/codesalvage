@@ -24,7 +24,7 @@ test.describe('Protected Routes - Authentication Required', () => {
     expect(url).toContain('/auth/signin');
 
     // Verify GitHub sign-in button is present
-    const githubButton = page.getByRole('button', { name: /sign in with github/i });
+    const githubButton = page.getByRole('button', { name: /continue with github/i });
     await expect(githubButton).toBeVisible();
   });
 
@@ -101,7 +101,7 @@ test.describe('Protected Routes - Multiple Pages', () => {
       expect(url).toContain('/auth/signin');
 
       // Verify sign-in page loaded
-      const githubButton = page.getByRole('button', { name: /sign in with github/i });
+      const githubButton = page.getByRole('button', { name: /continue with github/i });
       await expect(githubButton).toBeVisible();
     });
   }
