@@ -97,7 +97,11 @@ function VerifyContent() {
     }
 
     try {
-      const userCredential = await signInWithEmailLink(auth, emailToVerify, window.location.href);
+      const userCredential = await signInWithEmailLink(
+        auth,
+        emailToVerify,
+        window.location.href
+      );
       console.log('[Verify] Email verified successfully, creating session');
 
       const idToken = await userCredential.user.getIdToken();
