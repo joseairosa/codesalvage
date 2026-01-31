@@ -42,30 +42,67 @@ const ENV_VARS: EnvVar[] = [
     example: 'redis://host:6379',
   },
 
-  // Auth.js
+  // Firebase Client SDK (NEXT_PUBLIC_ = baked into client bundle at build time)
   {
-    name: 'AUTH_SECRET',
+    name: 'NEXT_PUBLIC_FIREBASE_API_KEY',
     required: true,
     category: 'Authentication',
-    description: 'Auth.js secret key (generate with: openssl rand -base64 32)',
+    description: 'Firebase client API key (baked into client bundle at build time)',
+    example: 'AIzaSy...',
   },
   {
-    name: 'AUTH_GITHUB_ID',
+    name: 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
     required: true,
     category: 'Authentication',
-    description: 'GitHub OAuth App Client ID',
+    description: 'Firebase auth domain',
+    example: 'myproject.firebaseapp.com',
   },
   {
-    name: 'AUTH_GITHUB_SECRET',
+    name: 'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
     required: true,
     category: 'Authentication',
-    description: 'GitHub OAuth App Client Secret',
+    description: 'Firebase project ID',
+    example: 'codesalvage-production',
+  },
+  {
+    name: 'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
+    required: false,
+    category: 'Authentication',
+    description: 'Firebase storage bucket',
+    example: 'myproject.appspot.com',
+  },
+  {
+    name: 'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
+    required: false,
+    category: 'Authentication',
+    description: 'Firebase messaging sender ID',
+  },
+  {
+    name: 'NEXT_PUBLIC_FIREBASE_APP_ID',
+    required: false,
+    category: 'Authentication',
+    description: 'Firebase app ID',
+  },
+
+  // Firebase Admin SDK (server-side)
+  {
+    name: 'FIREBASE_PROJECT_ID',
+    required: true,
+    category: 'Authentication',
+    description: 'Firebase project ID (server-side)',
+    example: 'codesalvage-production',
+  },
+  {
+    name: 'FIREBASE_SERVICE_ACCOUNT_BASE64',
+    required: true,
+    category: 'Authentication',
+    description: 'Base64-encoded Firebase service account JSON',
   },
   {
     name: 'NEXTAUTH_URL',
-    required: true,
+    required: false,
     category: 'Authentication',
-    description: 'Full application URL',
+    description: 'Full application URL (legacy, used by some components)',
     example: 'https://codesalvage.com',
   },
 

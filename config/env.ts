@@ -60,6 +60,22 @@ export const env = {
   POSTMARK_SERVER_TOKEN: getOptionalEnvVar('POSTMARK_SERVER_TOKEN'),
   POSTMARK_FROM_EMAIL: getOptionalEnvVar('POSTMARK_FROM_EMAIL'),
 
+  // Firebase Client SDK (required for auth, baked into client bundle at build time)
+  NEXT_PUBLIC_FIREBASE_API_KEY: getOptionalEnvVar('NEXT_PUBLIC_FIREBASE_API_KEY'),
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: getOptionalEnvVar('NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN'),
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: getOptionalEnvVar('NEXT_PUBLIC_FIREBASE_PROJECT_ID'),
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: getOptionalEnvVar(
+    'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET'
+  ),
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: getOptionalEnvVar(
+    'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID'
+  ),
+  NEXT_PUBLIC_FIREBASE_APP_ID: getOptionalEnvVar('NEXT_PUBLIC_FIREBASE_APP_ID'),
+
+  // Firebase Admin SDK (server-side)
+  FIREBASE_PROJECT_ID: getOptionalEnvVar('FIREBASE_PROJECT_ID'),
+  FIREBASE_SERVICE_ACCOUNT_BASE64: getOptionalEnvVar('FIREBASE_SERVICE_ACCOUNT_BASE64'),
+
   // Honeybadger (Error Monitoring)
   HONEYBADGER_API_KEY: getOptionalEnvVar('HONEYBADGER_API_KEY'),
   NEXT_PUBLIC_HONEYBADGER_API_KEY: getOptionalEnvVar('NEXT_PUBLIC_HONEYBADGER_API_KEY'),
@@ -75,14 +91,15 @@ export function validateEnv() {
     const requiredVars = [
       'DATABASE_URL',
       'REDIS_URL',
-      'AUTH_SECRET',
-      'AUTH_GITHUB_ID',
-      'AUTH_GITHUB_SECRET',
       'STRIPE_SECRET_KEY',
       'STRIPE_PUBLISHABLE_KEY',
       'R2_ENDPOINT',
       'R2_ACCESS_KEY_ID',
       'R2_SECRET_ACCESS_KEY',
+      'NEXT_PUBLIC_FIREBASE_API_KEY',
+      'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
+      'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+      'FIREBASE_PROJECT_ID',
     ];
 
     const missing = requiredVars.filter((key) => !env[key as keyof typeof env]);
