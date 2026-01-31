@@ -42,6 +42,10 @@ model User {
   // Firebase integration
   firebaseUid String? @unique @map("firebase_uid")
 
+  // GitHub repo access (OAuth token for private repo analysis, encrypted at rest)
+  githubAccessToken String?   @map("github_access_token") @db.Text
+  githubConnectedAt DateTime? @map("github_connected_at")
+
   // Seller specific
   payoutMethod    String? @map("payout_method") // 'stripe', 'paypal', 'bank_transfer'
   payoutEmail     String? @map("payout_email")

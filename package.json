@@ -40,6 +40,7 @@
     "verify:deployment": "bash scripts/verify-deployment.sh"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.72.1",
     "@auth/prisma-adapter": "^2.7.4",
     "@aws-sdk/client-s3": "^3.714.0",
     "@aws-sdk/s3-request-presigner": "^3.714.0",
