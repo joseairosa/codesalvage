@@ -5,7 +5,11 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { RepoAnalysisService, RepoAnalysisError, repoAnalysisSchema } from '../RepoAnalysisService';
+import {
+  RepoAnalysisService,
+  RepoAnalysisError,
+  repoAnalysisSchema,
+} from '../RepoAnalysisService';
 import type { RepoData } from '../GitHubService';
 
 // Mock Anthropic SDK

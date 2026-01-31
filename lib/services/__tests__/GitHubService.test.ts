@@ -9,17 +9,16 @@ import { GitHubService, GitHubServiceError } from '../GitHubService';
 
 describe('GitHubService', () => {
   let service: GitHubService;
-  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  const mockFetch = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
     service = new GitHubService();
-    // Spy on global fetch for each test
-    fetchSpy = vi.spyOn(globalThis, 'fetch');
+    vi.stubGlobal('fetch', mockFetch);
   });
 
   afterEach(() => {
-    fetchSpy.mockRestore();
+    vi.unstubAllGlobals();
   });
 
   // ============================================
@@ -53,9 +52,7 @@ describe('GitHubService', () => {
     });
 
     it('should handle owner/repo with dots and hyphens', () => {
-      const result = service.parseGitHubUrl(
-        'https://github.com/my-org/my.project-name'
-      );
+      const result = service.parseGitHubUrl('https://github.com/my-org/my.project-name');
       expect(result).toEqual({ owner: 'my-org', repo: 'my.project-name' });
     });
 
@@ -130,23 +127,19 @@ describe('GitHubService', () => {
 
     it('should pass access token in Authorization header', async () => {
       // Use mockImplementation to return appropriate responses based on URL
-      fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
+      mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
         const url = typeof input === 'string' ? input : input.toString();
         if (url.includes('/readme')) return mockJsonResponse(mockReadmeResponse);
         if (url.includes('/languages')) return mockJsonResponse(mockLanguagesResponse);
         if (url.includes('/contents/')) return mock404Response(); // no dep file
-        if (url.includes('/git/trees/'))
-          return mockJsonResponse(mockTreeResponse);
+        if (url.includes('/git/trees/')) return mockJsonResponse(mockTreeResponse);
         return mockJsonResponse(mockRepoResponse); // default: repo metadata
       });
 
-      await service.fetchRepoData(
-        'https://github.com/owner/test-repo',
-        'test-token'
-      );
+      await service.fetchRepoData('https://github.com/owner/test-repo', 'test-token');
 
       // Check that Authorization header was included
-      expect(fetchSpy).toHaveBeenCalledWith(
+      expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('/repos/owner/test-repo'),
         expect.objectContaining({
           headers: expect.objectContaining({
@@ -158,7 +151,7 @@ describe('GitHubService', () => {
 
     it('should throw GitHubServiceError when repo not found', async () => {
       // ALL GitHub API calls return 404
-      fetchSpy.mockImplementation(async () => mock404Response());
+      mockFetch.mockImplementation(async () => mock404Response());
 
       await expect(
         service.fetchRepoData('https://github.com/owner/nonexistent')
@@ -166,19 +159,16 @@ describe('GitHubService', () => {
     });
 
     it('should handle missing README gracefully', async () => {
-      fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
+      mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
         const url = typeof input === 'string' ? input : input.toString();
         if (url.includes('/readme')) return mock404Response();
         if (url.includes('/languages')) return mockJsonResponse(mockLanguagesResponse);
         if (url.includes('/contents/')) return mock404Response();
-        if (url.includes('/git/trees/'))
-          return mockJsonResponse(mockTreeResponse);
+        if (url.includes('/git/trees/')) return mockJsonResponse(mockTreeResponse);
         return mockJsonResponse(mockRepoResponse);
       });
 
-      const result = await service.fetchRepoData(
-        'https://github.com/owner/test-repo'
-      );
+      const result = await service.fetchRepoData('https://github.com/owner/test-repo');
 
       expect(result.readme).toBeNull();
       expect(result.metadata.name).toBe('test-repo');
@@ -190,26 +180,21 @@ describe('GitHubService', () => {
         devDependencies: { typescript: '^5.0.0' },
       };
 
-      fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
+      mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
         const url = typeof input === 'string' ? input : input.toString();
         if (url.includes('/readme')) return mockJsonResponse(mockReadmeResponse);
         if (url.includes('/languages')) return mockJsonResponse(mockLanguagesResponse);
         if (url.includes('/contents/package.json'))
           return mockJsonResponse({
             encoding: 'base64',
-            content: Buffer.from(JSON.stringify(packageJson)).toString(
-              'base64'
-            ),
+            content: Buffer.from(JSON.stringify(packageJson)).toString('base64'),
           });
         if (url.includes('/contents/')) return mock404Response();
-        if (url.includes('/git/trees/'))
-          return mockJsonResponse(mockTreeResponse);
+        if (url.includes('/git/trees/')) return mockJsonResponse(mockTreeResponse);
         return mockJsonResponse(mockRepoResponse);
       });
 
-      const result = await service.fetchRepoData(
-        'https://github.com/owner/test-repo'
-      );
+      const result = await service.fetchRepoData('https://github.com/owner/test-repo');
 
       expect(result.dependencies).toEqual({
         react: '^18.0.0',
@@ -219,19 +204,16 @@ describe('GitHubService', () => {
     });
 
     it('should return metadata fields correctly', async () => {
-      fetchSpy.mockImplementation(async (input: RequestInfo | URL) => {
+      mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
         const url = typeof input === 'string' ? input : input.toString();
         if (url.includes('/readme')) return mockJsonResponse(mockReadmeResponse);
         if (url.includes('/languages')) return mockJsonResponse(mockLanguagesResponse);
         if (url.includes('/contents/')) return mock404Response();
-        if (url.includes('/git/trees/'))
-          return mockJsonResponse(mockTreeResponse);
+        if (url.includes('/git/trees/')) return mockJsonResponse(mockTreeResponse);
         return mockJsonResponse(mockRepoResponse);
       });
 
-      const result = await service.fetchRepoData(
-        'https://github.com/owner/test-repo'
-      );
+      const result = await service.fetchRepoData('https://github.com/owner/test-repo');
 
       expect(result.metadata.name).toBe('test-repo');
       expect(result.metadata.fullName).toBe('owner/test-repo');

@@ -83,8 +83,7 @@ describe('encryption', () => {
       const encrypted = encrypt('secret');
 
       // Tamper with the base64 content
-      const tampered =
-        Buffer.from('tampered' + encrypted, 'utf-8').toString('base64');
+      const tampered = Buffer.from('tampered' + encrypted, 'utf-8').toString('base64');
 
       expect(() => decrypt(tampered)).toThrow();
     });
