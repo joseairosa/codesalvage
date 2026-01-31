@@ -114,7 +114,9 @@ describe('SignUpPage', () => {
 
     it('should call signInWithPopup when clicking Sign up with GitHub', async () => {
       const { signInWithPopup } = await import('firebase/auth');
-      (signInWithPopup as any).mockResolvedValue({ user: { uid: 'test-uid' } });
+      (signInWithPopup as any).mockResolvedValue({
+        user: { uid: 'test-uid', getIdToken: vi.fn().mockResolvedValue('mock-token') },
+      });
 
       render(<SignUpPage />);
       await userEvent.click(screen.getByText('Sign up with GitHub'));

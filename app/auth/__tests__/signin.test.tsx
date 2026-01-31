@@ -163,7 +163,9 @@ describe('SignInPage', () => {
     it('should call signInWithPopup when clicking Continue with GitHub', async () => {
       // Arrange
       const { signInWithPopup } = await import('firebase/auth');
-      (signInWithPopup as any).mockResolvedValue({ user: { uid: 'test-uid' } });
+      (signInWithPopup as any).mockResolvedValue({
+        user: { uid: 'test-uid', getIdToken: vi.fn().mockResolvedValue('mock-token') },
+      });
 
       render(<SignInPage />);
       const githubButton = screen.getByText('Continue with GitHub');
@@ -180,7 +182,9 @@ describe('SignInPage', () => {
     it('should call signInWithPopup when clicking Continue with Google', async () => {
       // Arrange
       const { signInWithPopup } = await import('firebase/auth');
-      (signInWithPopup as any).mockResolvedValue({ user: { uid: 'test-uid' } });
+      (signInWithPopup as any).mockResolvedValue({
+        user: { uid: 'test-uid', getIdToken: vi.fn().mockResolvedValue('mock-token') },
+      });
 
       render(<SignInPage />);
       const googleButton = screen.getByText('Continue with Google');
