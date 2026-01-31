@@ -50,13 +50,22 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[Session API] Error creating session:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[Session API] Error creating session:', errorMessage);
+
+    // Determine appropriate status code based on error type
+    const isConfigError =
+      errorMessage.includes('not configured') ||
+      errorMessage.includes('not set') ||
+      errorMessage.includes('No credentials');
+    const statusCode = isConfigError ? 500 : 401;
+
     return NextResponse.json(
       {
-        error: 'Invalid token',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: isConfigError ? 'Server configuration error' : 'Invalid token',
+        details: errorMessage,
       },
-      { status: 401 }
+      { status: statusCode }
     );
   }
 }

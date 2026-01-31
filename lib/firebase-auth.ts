@@ -40,15 +40,43 @@ export class AuthenticationError extends Error {
 
 /**
  * Verify Firebase ID token and return user
+ *
+ * Error handling separates three failure modes for clear diagnostics:
+ * 1. Admin SDK initialization failure (missing env vars, bad credentials)
+ * 2. Token verification failure (expired, wrong project, malformed)
+ * 3. Database failure (Prisma errors, user creation issues)
  */
 export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
+  // Step 1: Get Firebase Auth instance (may fail if Admin SDK not configured)
+  let authInstance: ReturnType<typeof getAuth>;
   try {
-    const decodedToken = await getAuth().verifyIdToken(token);
-    const firebaseUid = decodedToken.uid;
+    authInstance = getAuth();
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Unknown initialization error';
+    console.error('[Firebase Auth] Admin SDK initialization failed:', msg);
+    throw new AuthenticationError(`Firebase Admin SDK not configured: ${msg}`);
+  }
 
-    console.log('[Firebase Auth] Token verified for UID:', firebaseUid);
+  // Step 2: Verify the ID token
+  let decodedToken;
+  try {
+    decodedToken = await authInstance.verifyIdToken(token);
+  } catch (error) {
+    const firebaseError = error as { code?: string; message?: string };
+    console.error('[Firebase Auth] Token verification failed:', {
+      code: firebaseError.code,
+      message: firebaseError.message,
+    });
+    throw new AuthenticationError(
+      `Token verification failed: ${firebaseError.code ?? firebaseError.message ?? 'unknown error'}`
+    );
+  }
 
-    // Find user by Firebase UID
+  const firebaseUid = decodedToken.uid;
+  console.log('[Firebase Auth] Token verified for UID:', firebaseUid);
+
+  // Step 3: Find or create user in database
+  try {
     let user = await prisma.user.findUnique({
       where: { firebaseUid },
       select: {
@@ -89,7 +117,9 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
     }
 
     if (!user) {
-      throw new AuthenticationError('User not found');
+      throw new AuthenticationError(
+        'User not found and could not be auto-created (no email in token)'
+      );
     }
 
     if (user.isBanned) {
@@ -102,8 +132,10 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
     if (error instanceof AuthenticationError) {
       throw error;
     }
-    console.error('[Firebase Auth] Token verification error:', error);
-    throw new AuthenticationError('Invalid Firebase token');
+    console.error('[Firebase Auth] Database error during user lookup:', error);
+    throw new AuthenticationError(
+      `Database error: ${error instanceof Error ? error.message : 'unknown error'}`
+    );
   }
 }
 
