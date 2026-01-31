@@ -85,6 +85,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     console.log('[AuthProvider] Setting up auth state listener');
 
+    // Guard against null firebaseAuth (Firebase not configured)
+    if (!firebaseAuth) {
+      console.warn('[AuthProvider] Firebase not configured, skipping auth listener');
+      setStatus('unauthenticated');
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(
       firebaseAuth,
       async (firebaseUser: FirebaseUser | null) => {
@@ -151,7 +158,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     console.log('[AuthProvider] Sign out requested');
     try {
-      await firebaseSignOut(firebaseAuth);
+      if (firebaseAuth) {
+        await firebaseSignOut(firebaseAuth);
+      }
       await fetch('/api/auth/session', { method: 'DELETE' });
       setSession(null);
       setStatus('unauthenticated');
