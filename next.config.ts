@@ -1,5 +1,45 @@
 import type { NextConfig } from 'next';
 
+/**
+ * Build-time validation for critical client-side environment variables.
+ *
+ * NEXT_PUBLIC_ variables are baked into the client JS bundle at build time.
+ * If they're missing during `next build`, the deployed app will have null
+ * Firebase auth, broken Stripe checkout, etc. — with no way to fix it
+ * without rebuilding.
+ *
+ * This check fails the build early with a clear error message instead of
+ * shipping a broken app that crashes at runtime.
+ */
+function validateBuildEnv() {
+  // Only enforce in production builds (Railway sets NODE_ENV=production)
+  if (process.env.NODE_ENV !== 'production') {
+    return;
+  }
+
+  const requiredClientVars = [
+    'NEXT_PUBLIC_FIREBASE_API_KEY',
+    'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
+    'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+  ];
+
+  const missing = requiredClientVars.filter((key) => !process.env[key]);
+
+  if (missing.length > 0) {
+    console.error(
+      '\n[Build] FATAL: Missing required NEXT_PUBLIC_ environment variables:'
+    );
+    for (const key of missing) {
+      console.error(`  - ${key}`);
+    }
+    console.error('\nThese variables are baked into the client JS bundle at build time.');
+    console.error('Set them in your deployment environment BEFORE building.\n');
+    process.exit(1);
+  }
+}
+
+validateBuildEnv();
+
 const nextConfig: NextConfig = {
   /* Performance & Production */
   reactStrictMode: true,
