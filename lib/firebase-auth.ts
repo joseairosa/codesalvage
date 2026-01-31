@@ -52,8 +52,7 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
   try {
     authInstance = getAuth();
   } catch (error) {
-    const msg =
-      error instanceof Error ? error.message : 'Unknown initialization error';
+    const msg = error instanceof Error ? error.message : 'Unknown initialization error';
     console.error('[Firebase Auth] Admin SDK initialization failed:', msg);
     throw new AuthenticationError(`Firebase Admin SDK not configured: ${msg}`);
   }

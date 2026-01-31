@@ -54,7 +54,8 @@ export async function POST(request: Request) {
     console.error('[Session API] Error creating session:', errorMessage);
 
     // Determine appropriate status code based on error type
-    const isConfigError = errorMessage.includes('not configured') ||
+    const isConfigError =
+      errorMessage.includes('not configured') ||
       errorMessage.includes('not set') ||
       errorMessage.includes('No credentials');
     const statusCode = isConfigError ? 500 : 401;

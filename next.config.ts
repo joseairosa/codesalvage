@@ -39,10 +39,7 @@ function validateBuildEnv() {
 
   // Warn about server-side vars (these are runtime-only, so don't fail the build,
   // but missing them at build time often means they're also missing at runtime)
-  const requiredServerVars = [
-    'FIREBASE_PROJECT_ID',
-    'FIREBASE_SERVICE_ACCOUNT_BASE64',
-  ];
+  const requiredServerVars = ['FIREBASE_PROJECT_ID', 'FIREBASE_SERVICE_ACCOUNT_BASE64'];
 
   const missingServer = requiredServerVars.filter((key) => !process.env[key]);
 
@@ -53,8 +50,12 @@ function validateBuildEnv() {
     for (const key of missingServer) {
       console.warn(`  - ${key}`);
     }
-    console.warn('These are needed at runtime for Firebase Admin SDK (token verification).');
-    console.warn('If they are injected at runtime by your platform, this warning can be ignored.\n');
+    console.warn(
+      'These are needed at runtime for Firebase Admin SDK (token verification).'
+    );
+    console.warn(
+      'If they are injected at runtime by your platform, this warning can be ignored.\n'
+    );
   }
 }
 

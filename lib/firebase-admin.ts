@@ -89,9 +89,7 @@ export function getFirebaseAdmin(): admin.app.App {
       }
 
       firebaseAdmin = admin.initializeApp({
-        credential: admin.credential.cert(
-          serviceAccount as admin.ServiceAccount
-        ),
+        credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
         projectId,
       });
 
