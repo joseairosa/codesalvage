@@ -68,7 +68,7 @@ export function getFirebaseAdmin(): admin.app.App {
       let serviceAccount: Record<string, unknown>;
       try {
         serviceAccount = JSON.parse(serviceAccountJson);
-      } catch (parseError) {
+      } catch {
         throw new Error(
           `[Firebase Admin] FIREBASE_SERVICE_ACCOUNT_BASE64 decoded but is not valid JSON. Check the encoding.`
         );
