@@ -31,6 +31,13 @@ export function useAuth() {
   useEffect(() => {
     console.log('[useAuth] Setting up auth state listener');
 
+    // Guard against null auth (Firebase not configured)
+    if (!auth) {
+      console.warn('[useAuth] Firebase not configured, skipping auth listener');
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       console.log('[useAuth] Auth state changed:', user ? user.uid : 'null');
       setUser(user);
@@ -73,7 +80,9 @@ export function useAuth() {
   const signOut = async () => {
     console.log('[useAuth] Sign out requested');
     try {
-      await firebaseSignOut(auth);
+      if (auth) {
+        await firebaseSignOut(auth);
+      }
       await fetch('/api/auth/session', { method: 'DELETE' });
       console.log('[useAuth] Sign out complete, redirecting to home');
       router.push('/');

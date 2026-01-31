@@ -15,22 +15,55 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 // Redis client singleton
 let redisClient: ReturnType<typeof createClient> | null = null;
+let redisConnectionFailed = false;
+let redisErrorLogged = false;
 
 /**
  * Get or create Redis client
+ *
+ * Returns null if Redis is not configured or connection previously failed.
+ * Logs errors only once to prevent log spam.
  */
-async function getRedisClient() {
+async function getRedisClient(): Promise<ReturnType<typeof createClient> | null> {
+  // Skip if no REDIS_URL configured or previous connection failed
+  if (!process.env['REDIS_URL']) {
+    if (!redisErrorLogged) {
+      console.warn('[RateLimit] REDIS_URL not configured, rate limiting disabled');
+      redisErrorLogged = true;
+    }
+    return null;
+  }
+
+  if (redisConnectionFailed) {
+    return null;
+  }
+
   if (!redisClient) {
-    redisClient = createClient({
-      url: process.env['REDIS_URL'] || 'redis://localhost:6379',
-    });
+    try {
+      redisClient = createClient({
+        url: process.env['REDIS_URL'],
+      });
 
-    redisClient.on('error', (err) => {
-      console.error('[RateLimit] Redis error:', err);
-    });
+      redisClient.on('error', (err) => {
+        if (!redisErrorLogged) {
+          console.error('[RateLimit] Redis error:', err);
+          redisErrorLogged = true;
+        }
+        redisConnectionFailed = true;
+        redisClient = null;
+      });
 
-    await redisClient.connect();
-    console.log('[RateLimit] Redis connected');
+      await redisClient.connect();
+      console.log('[RateLimit] Redis connected');
+    } catch (err) {
+      if (!redisErrorLogged) {
+        console.error('[RateLimit] Redis connection failed:', err);
+        redisErrorLogged = true;
+      }
+      redisConnectionFailed = true;
+      redisClient = null;
+      return null;
+    }
   }
 
   return redisClient;
@@ -117,6 +150,18 @@ export async function checkRateLimit(config: RateLimitConfig): Promise<RateLimit
 
   try {
     const redis = await getRedisClient();
+
+    // If Redis is not available, fail open (allow all requests)
+    if (!redis) {
+      return {
+        allowed: true,
+        remaining: maxRequests,
+        limit: maxRequests,
+        resetSeconds: windowSeconds,
+        currentCount: 0,
+      };
+    }
+
     const key = `ratelimit:${namespace}:${identifier}`;
 
     // Get current count
@@ -342,6 +387,7 @@ export async function clearRateLimit(
 ): Promise<void> {
   try {
     const redis = await getRedisClient();
+    if (!redis) return;
     const key = `ratelimit:${namespace}:${identifier}`;
     await redis.del(key);
     console.log(`[RateLimit] Cleared rate limit for ${namespace}:${identifier}`);
