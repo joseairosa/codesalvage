@@ -97,9 +97,21 @@ function VerifyContent() {
     }
 
     try {
-      await signInWithEmailLink(auth, emailToVerify, window.location.href);
-      console.log('[Verify] Email verified successfully');
+      const userCredential = await signInWithEmailLink(
+        auth,
+        emailToVerify,
+        window.location.href
+      );
+      console.log('[Verify] Email verified successfully, creating session');
 
+      const idToken = await userCredential.user.getIdToken();
+      await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+
+      console.log('[Verify] Session created');
       setStatus('success');
 
       // Redirect after short delay to show success message

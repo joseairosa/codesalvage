@@ -93,11 +93,17 @@ function SignUpContent() {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      console.log(
-        '[SignUp] Email/Password sign-up successful, redirecting to:',
-        callbackUrl
-      );
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log('[SignUp] Email/Password sign-up successful, creating session');
+
+      const idToken = await userCredential.user.getIdToken();
+      await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+
+      console.log('[SignUp] Session created, redirecting to:', callbackUrl);
       router.push(callbackUrl);
     } catch (err: any) {
       console.error('[SignUp] Email/Password sign-up error:', err);
@@ -131,8 +137,17 @@ function SignUpContent() {
 
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      console.log('[SignUp] Google sign-up successful, redirecting to:', callbackUrl);
+      const userCredential = await signInWithPopup(auth, provider);
+      console.log('[SignUp] Google sign-up successful, creating session');
+
+      const idToken = await userCredential.user.getIdToken();
+      await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+
+      console.log('[SignUp] Session created, redirecting to:', callbackUrl);
       router.push(callbackUrl);
     } catch (err: any) {
       console.error('[SignUp] Google sign-up error:', err);
@@ -160,8 +175,17 @@ function SignUpContent() {
 
     try {
       const provider = new GithubAuthProvider();
-      await signInWithPopup(auth, provider);
-      console.log('[SignUp] GitHub sign-up successful, redirecting to:', callbackUrl);
+      const userCredential = await signInWithPopup(auth, provider);
+      console.log('[SignUp] GitHub sign-up successful, creating session');
+
+      const idToken = await userCredential.user.getIdToken();
+      await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+
+      console.log('[SignUp] Session created, redirecting to:', callbackUrl);
       router.push(callbackUrl);
     } catch (err: any) {
       console.error('[SignUp] GitHub sign-up error:', err);
