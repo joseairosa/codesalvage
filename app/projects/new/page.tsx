@@ -46,8 +46,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, Github, Sparkles } from 'lucide-react';
 import { ProjectLimitWarning } from '@/components/seller/ProjectLimitWarning';
+import type { RepoAnalysisResult } from '@/lib/services/RepoAnalysisService';
 
 const componentName = 'NewProjectPage';
 
@@ -65,6 +66,10 @@ export default function NewProjectPage() {
   const [isCheckingLimit, setIsCheckingLimit] = React.useState(true);
   const [projectLimitReached, setProjectLimitReached] = React.useState(false);
   const [projectCount, setProjectCount] = React.useState(0);
+  const [githubImportUrl, setGithubImportUrl] = React.useState('');
+  const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+  const [analyzeError, setAnalyzeError] = React.useState<string | null>(null);
+  const [analyzeSuccess, setAnalyzeSuccess] = React.useState(false);
 
   // ============================================
   // FORM SETUP
@@ -77,6 +82,7 @@ export default function NewProjectPage() {
     formState: { errors, isDirty },
     watch,
     setValue,
+    reset,
   } = useForm<CreateProjectFormData>({
     resolver: zodResolver(createProjectSchema),
     defaultValues: {
@@ -168,6 +174,68 @@ export default function NewProjectPage() {
   const handleUploadError = (error: Error) => {
     console.error(`[${componentName}] Upload error:`, error);
     setSubmitError(`Upload failed: ${error.message}`);
+  };
+
+  /**
+   * Analyze GitHub repo with AI and pre-fill form
+   */
+  const handleAnalyzeRepo = async () => {
+    if (!githubImportUrl.trim()) return;
+
+    setIsAnalyzing(true);
+    setAnalyzeError(null);
+    setAnalyzeSuccess(false);
+
+    try {
+      const response = await fetch('/api/projects/analyze-repo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ githubUrl: githubImportUrl.trim() }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to analyze repository');
+      }
+
+      const { analysis, repoMeta } = (await response.json()) as {
+        analysis: RepoAnalysisResult;
+        repoMeta: { fullName: string; htmlUrl: string };
+      };
+
+      // Pre-fill the form with AI analysis
+      reset({
+        title: analysis.title,
+        description: analysis.description,
+        category: analysis.category,
+        techStack: analysis.techStack,
+        primaryLanguage: analysis.primaryLanguage ?? '',
+        frameworks: analysis.frameworks ?? [],
+        completionPercentage: analysis.completionPercentage,
+        estimatedCompletionHours: analysis.estimatedCompletionHours,
+        knownIssues: analysis.knownIssues ?? '',
+        priceCents: analysis.suggestedPriceCents,
+        licenseType: analysis.licenseType,
+        accessLevel: analysis.accessLevel,
+        githubUrl: repoMeta.htmlUrl,
+        githubRepoName: repoMeta.fullName,
+        screenshotUrls: [],
+        demoUrl: '',
+        documentationUrl: '',
+        demoVideoUrl: '',
+      });
+
+      setAnalyzeSuccess(true);
+      console.log(
+        `[${componentName}] Form pre-filled from GitHub repo:`,
+        repoMeta.fullName
+      );
+    } catch (error) {
+      console.error(`[${componentName}] GitHub analysis error:`, error);
+      setAnalyzeError(error instanceof Error ? error.message : 'Analysis failed');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   /**
@@ -307,6 +375,68 @@ export default function NewProjectPage() {
             Sell your incomplete project to buyers who want to finish it
           </p>
         </div>
+
+        {/* Import from GitHub */}
+        <Card className="border-dashed border-purple-300 bg-gradient-to-r from-purple-50/50 to-blue-50/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Github className="h-5 w-5" />
+              Import from GitHub
+            </CardTitle>
+            <CardDescription>
+              Paste a public GitHub repo URL and AI will analyze it to pre-fill the form
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2">
+              <Input
+                placeholder="https://github.com/owner/repo"
+                value={githubImportUrl}
+                onChange={(e) => setGithubImportUrl(e.target.value)}
+                disabled={isAnalyzing}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAnalyzeRepo();
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                onClick={handleAnalyzeRepo}
+                disabled={isAnalyzing || !githubImportUrl.trim()}
+                className="shrink-0"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Analyze
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {analyzeError && (
+              <div className="mt-3 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                {analyzeError}
+              </div>
+            )}
+
+            {analyzeSuccess && (
+              <div className="mt-3 flex items-center gap-2 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+                Form pre-filled from repository analysis. Review the fields below and edit
+                as needed.
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Error Alert */}
         {submitError && (

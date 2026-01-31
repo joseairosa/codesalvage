@@ -68,6 +68,8 @@ export function createMockUser(overrides?: Partial<User>): User {
     bannedReason: null,
     bannedBy: null,
     firebaseUid: null,
+    githubAccessToken: null,
+    githubConnectedAt: null,
     sellerVerificationDate: null,
     createdAt: new Date(),
     updatedAt: new Date(),

@@ -109,3 +109,19 @@ export {
   AdminValidationError,
   AdminAuthorizationError,
 } from './AdminService';
+
+export { GitHubService, GitHubServiceError, githubService } from './GitHubService';
+export type {
+  RepoMetadata,
+  RepoLanguages,
+  RepoFileEntry,
+  RepoData,
+} from './GitHubService';
+
+export {
+  RepoAnalysisService,
+  RepoAnalysisError,
+  getRepoAnalysisService,
+  repoAnalysisSchema,
+} from './RepoAnalysisService';
+export type { RepoAnalysisResult } from './RepoAnalysisService';

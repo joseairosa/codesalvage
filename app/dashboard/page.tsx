@@ -5,8 +5,10 @@
  * Redirects to sign-in if user is not authenticated.
  */
 
+import Link from 'next/link';
 import { requireAuth } from '@/lib/auth-helpers';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export default async function DashboardPage() {
   const session = await requireAuth();
@@ -19,6 +21,22 @@ export default async function DashboardPage() {
           Welcome back, {session.user.username || session.user.email}
         </p>
       </div>
+
+      {!session.user.isSeller && (
+        <Card className="mb-8 border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
+          <CardContent className="flex items-center justify-between py-6">
+            <div>
+              <h2 className="text-lg font-semibold">Start Selling on CodeSalvage</h2>
+              <p className="mt-1 text-sm text-gray-600">
+                List your unfinished projects and turn incomplete code into revenue.
+              </p>
+            </div>
+            <Button asChild>
+              <Link href="/seller/onboard">Become a Seller</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
