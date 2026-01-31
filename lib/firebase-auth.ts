@@ -76,44 +76,79 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
   console.log('[Firebase Auth] Token verified for UID:', firebaseUid);
 
   // Step 3: Find or create user in database
+  //
+  // Migration strategy for Auth.js → Firebase:
+  // 1. Look up by firebaseUid (returning Firebase users)
+  // 2. If not found, look up by email (existing Auth.js users)
+  //    → Link their account by setting firebaseUid
+  // 3. If neither found, create a new user
+  const userSelect = {
+    id: true,
+    email: true,
+    username: true,
+    isAdmin: true,
+    isSeller: true,
+    isVerifiedSeller: true,
+    isBanned: true,
+  } as const;
+
   try {
     let user = await prisma.user.findUnique({
       where: { firebaseUid },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        isAdmin: true,
-        isSeller: true,
-        isVerifiedSeller: true,
-        isBanned: true,
-      },
+      select: userSelect,
     });
 
-    // Auto-create user on first Firebase sign-in (migration support)
+    // Not found by firebaseUid — check if an existing user has this email
+    // (Auth.js users who haven't been linked to Firebase yet)
     if (!user && decodedToken.email) {
-      console.log('[Firebase Auth] Auto-creating user for:', decodedToken.email);
-
-      const email = decodedToken.email!;
-      user = await prisma.user.create({
-        data: {
-          firebaseUid,
-          email,
-          username: email.split('@')[0] ?? email,
-          emailVerified: decodedToken.email_verified ? new Date() : null,
-        },
-        select: {
-          id: true,
-          email: true,
-          username: true,
-          isAdmin: true,
-          isSeller: true,
-          isVerifiedSeller: true,
-          isBanned: true,
-        },
+      const existingUser = await prisma.user.findUnique({
+        where: { email: decodedToken.email },
+        select: { ...userSelect, firebaseUid: true },
       });
 
-      console.log('[Firebase Auth] Auto-created user:', user.id);
+      if (existingUser && !existingUser.firebaseUid) {
+        // Link existing Auth.js user to their Firebase account
+        console.log(
+          '[Firebase Auth] Linking existing user to Firebase:',
+          existingUser.id,
+          '→',
+          firebaseUid
+        );
+
+        user = await prisma.user.update({
+          where: { email: decodedToken.email },
+          data: {
+            firebaseUid,
+            ...(decodedToken.email_verified ? { emailVerified: new Date() } : {}),
+          },
+          select: userSelect,
+        });
+
+        console.log('[Firebase Auth] Successfully linked user:', user.id);
+      } else if (!existingUser) {
+        // No user exists at all — create a new one
+        console.log('[Firebase Auth] Creating new user for:', decodedToken.email);
+
+        const email = decodedToken.email;
+        user = await prisma.user.create({
+          data: {
+            firebaseUid,
+            email,
+            username: email.split('@')[0] ?? email,
+            emailVerified: decodedToken.email_verified ? new Date() : null,
+          },
+          select: userSelect,
+        });
+
+        console.log('[Firebase Auth] Created new user:', user.id);
+      } else {
+        // User exists but already linked to a different Firebase UID
+        console.warn(
+          '[Firebase Auth] Email already linked to different Firebase UID:',
+          existingUser.id
+        );
+        user = existingUser;
+      }
     }
 
     if (!user) {
