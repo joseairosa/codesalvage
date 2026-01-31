@@ -122,6 +122,9 @@ export async function GET(request: Request) {
   try {
     const startRedis = Date.now();
     const redis = await getCacheClient();
+    if (!redis) {
+      throw new Error('Redis not configured');
+    }
     await redis.ping();
     const redisLatency = Date.now() - startRedis;
 

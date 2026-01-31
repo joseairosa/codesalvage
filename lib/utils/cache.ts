@@ -15,22 +15,55 @@ import { createClient } from 'redis';
 
 // Redis client singleton
 let cacheClient: ReturnType<typeof createClient> | null = null;
+let cacheConnectionFailed = false;
+let cacheErrorLogged = false;
 
 /**
  * Get or create Redis cache client
+ *
+ * Returns null if Redis is not configured or connection previously failed.
+ * Logs errors only once to prevent log spam.
  */
-export async function getCacheClient() {
+export async function getCacheClient(): Promise<ReturnType<typeof createClient> | null> {
+  // Skip if no REDIS_URL configured or previous connection failed
+  if (!process.env['REDIS_URL']) {
+    if (!cacheErrorLogged) {
+      console.warn('[Cache] REDIS_URL not configured, caching disabled');
+      cacheErrorLogged = true;
+    }
+    return null;
+  }
+
+  if (cacheConnectionFailed) {
+    return null;
+  }
+
   if (!cacheClient) {
-    cacheClient = createClient({
-      url: process.env['REDIS_URL'] || 'redis://localhost:6379',
-    });
+    try {
+      cacheClient = createClient({
+        url: process.env['REDIS_URL'],
+      });
 
-    cacheClient.on('error', (err) => {
-      console.error('[Cache] Redis error:', err);
-    });
+      cacheClient.on('error', (err) => {
+        if (!cacheErrorLogged) {
+          console.error('[Cache] Redis error:', err);
+          cacheErrorLogged = true;
+        }
+        cacheConnectionFailed = true;
+        cacheClient = null;
+      });
 
-    await cacheClient.connect();
-    console.log('[Cache] Redis connected');
+      await cacheClient.connect();
+      console.log('[Cache] Redis connected');
+    } catch (err) {
+      if (!cacheErrorLogged) {
+        console.error('[Cache] Redis connection failed:', err);
+        cacheErrorLogged = true;
+      }
+      cacheConnectionFailed = true;
+      cacheClient = null;
+      return null;
+    }
   }
 
   return cacheClient;
@@ -104,6 +137,7 @@ export const CacheTTL = {
 export async function getCache(key: string): Promise<string | null> {
   try {
     const redis = await getCacheClient();
+    if (!redis) return null;
     const value = await redis.get(key);
 
     if (value) {
@@ -136,6 +170,7 @@ export async function setCache(
 ): Promise<void> {
   try {
     const redis = await getCacheClient();
+    if (!redis) return;
     await redis.setEx(key, ttlSeconds, value);
     console.log(`[Cache] SET: ${key} (TTL: ${ttlSeconds}s)`);
   } catch (error) {
@@ -156,6 +191,7 @@ export async function setCache(
 export async function deleteCache(pattern: string): Promise<void> {
   try {
     const redis = await getCacheClient();
+    if (!redis) return;
 
     if (pattern.includes('*')) {
       // Delete multiple keys matching pattern
@@ -406,6 +442,7 @@ export async function warmupCache(): Promise<void> {
 export async function clearAllCache(): Promise<void> {
   try {
     const redis = await getCacheClient();
+    if (!redis) return;
     await redis.flushDb();
     console.log('[Cache] All cache cleared');
   } catch (error) {
