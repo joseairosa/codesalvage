@@ -88,6 +88,12 @@ function SignInContent() {
 
     console.log('[SignIn] Email/Password sign-in attempt for:', email);
 
+    if (!auth) {
+      setError('Authentication is not configured. Please contact support.');
+      setLoading(false);
+      return;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log(
@@ -110,6 +116,12 @@ function SignInContent() {
 
     console.log('[SignIn] Magic link sign-in attempt for:', email);
 
+    if (!auth) {
+      setError('Authentication is not configured. Please contact support.');
+      setLoading(false);
+      return;
+    }
+
     try {
       await sendSignInLinkToEmail(auth, email, {
         url: `${window.location.origin}/auth/verify?email=${encodeURIComponent(email)}`,
@@ -131,6 +143,12 @@ function SignInContent() {
 
     console.log('[SignIn] Google sign-in attempt');
 
+    if (!auth) {
+      setError('Authentication is not configured. Please contact support.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
@@ -148,6 +166,12 @@ function SignInContent() {
     setLoading(true);
 
     console.log('[SignIn] GitHub sign-in attempt');
+
+    if (!auth) {
+      setError('Authentication is not configured. Please contact support.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const provider = new GithubAuthProvider();

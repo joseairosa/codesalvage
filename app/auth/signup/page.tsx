@@ -86,6 +86,12 @@ function SignUpContent() {
 
     console.log('[SignUp] Email/Password sign-up attempt for:', email);
 
+    if (!auth) {
+      setError('Authentication is not configured. Please contact support.');
+      setLoading(false);
+      return;
+    }
+
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       console.log(
@@ -117,6 +123,12 @@ function SignUpContent() {
 
     console.log('[SignUp] Google sign-up attempt');
 
+    if (!auth) {
+      setError('Authentication is not configured. Please contact support.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
@@ -139,6 +151,12 @@ function SignUpContent() {
     setLoading(true);
 
     console.log('[SignUp] GitHub sign-up attempt');
+
+    if (!auth) {
+      setError('Authentication is not configured. Please contact support.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const provider = new GithubAuthProvider();
