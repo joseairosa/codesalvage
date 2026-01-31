@@ -56,6 +56,13 @@ function VerifyContent() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Guard against null auth (Firebase not configured)
+    if (!auth) {
+      setStatus('error');
+      setError('Authentication is not configured. Please contact support.');
+      return;
+    }
+
     // Check if this is a valid sign-in link
     if (isSignInWithEmailLink(auth, window.location.href)) {
       console.log('[Verify] Valid sign-in link detected');
@@ -81,6 +88,13 @@ function VerifyContent() {
     setStatus('verifying');
 
     console.log('[Verify] Verifying email:', emailToVerify);
+
+    if (!auth) {
+      setStatus('error');
+      setError('Authentication is not configured. Please contact support.');
+      setLoading(false);
+      return;
+    }
 
     try {
       await signInWithEmailLink(auth, emailToVerify, window.location.href);
