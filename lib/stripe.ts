@@ -152,15 +152,19 @@ export const STRIPE_CONNECT_CONFIG = {
   /**
    * Controller configuration for Connect accounts
    *
+   * Express dashboard requires platform to be loss-liable, but MY-based
+   * platforms cannot be loss-liable. Solution: use 'full' dashboard type
+   * where Stripe handles losses and the connected account gets a full dashboard.
+   *
    * - losses.payments: 'stripe' — Stripe is loss-liable (required for MY-based platforms)
-   * - fees.payer: 'application' — Platform pays Stripe fees
-   * - stripe_dashboard.type: 'express' — Seller gets Express dashboard
+   * - fees.payer: 'account' — Connected account pays Stripe fees
+   * - stripe_dashboard.type: 'full' — Seller gets full Stripe dashboard
    * - requirement_collection: 'stripe' — Stripe collects identity/verification requirements
    */
   controller: {
     losses: { payments: 'stripe' as const },
-    fees: { payer: 'application' as const },
-    stripe_dashboard: { type: 'express' as const },
+    fees: { payer: 'account' as const },
+    stripe_dashboard: { type: 'full' as const },
     requirement_collection: 'stripe' as const,
   },
 
