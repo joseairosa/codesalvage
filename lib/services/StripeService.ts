@@ -53,9 +53,9 @@ export class StripeService {
     try {
       const country = process.env['STRIPE_CONNECT_COUNTRY'] || 'US';
       const account = await stripe.accounts.create({
-        type: STRIPE_CONNECT_CONFIG.accountType,
         country,
         email: user.email,
+        controller: STRIPE_CONNECT_CONFIG.controller,
         capabilities: STRIPE_CONNECT_CONFIG.capabilities as any,
         business_type: STRIPE_CONNECT_CONFIG.businessType,
         metadata: {

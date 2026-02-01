@@ -143,13 +143,26 @@ export function calculateEscrowReleaseDate(paymentDate: Date = new Date()): Date
 
 /**
  * Stripe Connect configuration
+ *
+ * Uses the `controller` parameter instead of `type` to support
+ * platforms in countries with loss-liability restrictions (e.g. Malaysia).
+ * With controller, Stripe is set as loss-liable instead of the platform.
  */
 export const STRIPE_CONNECT_CONFIG = {
   /**
-   * Type of Stripe Connect account
-   * Express: Fast onboarding, Stripe handles compliance
+   * Controller configuration for Connect accounts
+   *
+   * - losses.payments: 'stripe' — Stripe is loss-liable (required for MY-based platforms)
+   * - fees.payer: 'application' — Platform pays Stripe fees
+   * - stripe_dashboard.type: 'express' — Seller gets Express dashboard
+   * - requirement_collection: 'stripe' — Stripe collects identity/verification requirements
    */
-  accountType: 'express' as const,
+  controller: {
+    losses: { payments: 'stripe' as const },
+    fees: { payer: 'application' as const },
+    stripe_dashboard: { type: 'express' as const },
+    requirement_collection: 'stripe' as const,
+  },
 
   /**
    * Capabilities required for seller accounts
