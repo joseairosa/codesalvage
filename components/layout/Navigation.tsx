@@ -9,25 +9,19 @@
  * - Accessibility support (keyboard navigation, ARIA labels)
  *
  * Architecture:
- * - Server Component (can access auth() directly)
- * - Conditional rendering based on session state
- * - Composition pattern (NavigationLinks, UserMenu components)
- * - Mobile-first responsive design
+ * - Server Component for the static shell (logo, structure)
+ * - Delegates auth-dependent rendering to NavigationAuthArea (Client Component)
+ * - This fixes the Next.js layout caching issue where layouts don't re-render
+ *   on client-side navigation, causing stale auth state in the navbar
  */
 
 import Link from 'next/link';
-import { getSession } from '@/lib/auth-helpers';
-import { Button } from '@/components/ui/button';
-import { NavigationLinks } from './NavigationLinks';
-import { UserMenu } from './UserMenu';
-import { MobileMenu } from './MobileMenu';
+import { NavigationAuthArea } from './NavigationAuthArea';
 
 /**
  * Navigation Component
  */
-export async function Navigation() {
-  const session = await getSession();
-
+export function Navigation() {
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -45,41 +39,8 @@ export async function Navigation() {
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex md:items-center md:gap-8">
-          <NavigationLinks
-            isAuthenticated={!!session}
-            isSeller={session?.user?.isSeller ?? false}
-          />
-        </div>
-
-        {/* Right side - Auth buttons or User menu */}
-        <div className="flex items-center gap-4">
-          {session ? (
-            <>
-              {/* User menu (desktop) */}
-              <div className="hidden md:block">
-                <UserMenu user={session.user} />
-              </div>
-
-              {/* Mobile menu button */}
-              <div className="md:hidden">
-                <MobileMenu user={session.user} />
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Sign in button (unauthenticated) */}
-              <Button variant="ghost" asChild className="hidden sm:inline-flex">
-                <Link href="/auth/signin">Sign In</Link>
-              </Button>
-
-              <Button asChild className="shadow-md transition-transform hover:scale-105">
-                <Link href="/auth/signin">Get Started</Link>
-              </Button>
-            </>
-          )}
-        </div>
+        {/* Auth-aware navigation and user menu (Client Component) */}
+        <NavigationAuthArea />
       </div>
     </nav>
   );
