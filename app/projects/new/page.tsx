@@ -46,7 +46,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertCircle, CheckCircle2, Github, Sparkles } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, Github, Sparkles, Link2, ExternalLink } from 'lucide-react';
 import { ProjectLimitWarning } from '@/components/seller/ProjectLimitWarning';
 import type { RepoAnalysisResult } from '@/lib/services/RepoAnalysisService';
 
@@ -70,6 +70,8 @@ export default function NewProjectPage() {
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [analyzeError, setAnalyzeError] = React.useState<string | null>(null);
   const [analyzeSuccess, setAnalyzeSuccess] = React.useState(false);
+  const [githubConnected, setGithubConnected] = React.useState(false);
+  const [isCheckingGithub, setIsCheckingGithub] = React.useState(true);
 
   // ============================================
   // FORM SETUP
@@ -149,6 +151,36 @@ export default function NewProjectPage() {
     };
 
     checkProjectLimit();
+  }, []);
+
+  /**
+   * Check GitHub connection status on page load
+   */
+  React.useEffect(() => {
+    const checkGithubStatus = async () => {
+      try {
+        const response = await fetch('/api/user/github-status');
+        if (response.ok) {
+          const data = await response.json();
+          setGithubConnected(data.connected);
+        }
+      } catch (error) {
+        console.error(`[${componentName}] Error checking GitHub status:`, error);
+      } finally {
+        setIsCheckingGithub(false);
+      }
+    };
+
+    // Check for github_connected query param (redirect from OAuth callback)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('github_connected') === 'true') {
+      setGithubConnected(true);
+      setIsCheckingGithub(false);
+      // Clean up URL
+      window.history.replaceState({}, '', '/projects/new');
+    } else {
+      checkGithubStatus();
+    }
   }, []);
 
   // ============================================
@@ -379,13 +411,44 @@ export default function NewProjectPage() {
         {/* Import from GitHub */}
         <Card className="border-dashed border-purple-300 bg-gradient-to-r from-purple-50/50 to-blue-50/50">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Github className="h-5 w-5" />
-              Import from GitHub
-            </CardTitle>
-            <CardDescription>
-              Paste a public GitHub repo URL and AI will analyze it to pre-fill the form
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Github className="h-5 w-5" />
+                  Import from GitHub
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  {githubConnected
+                    ? 'Paste a GitHub repo URL (public or private) and AI will analyze it to pre-fill the form'
+                    : 'Paste a public GitHub repo URL and AI will analyze it to pre-fill the form'}
+                </CardDescription>
+              </div>
+
+              {/* GitHub connection status */}
+              {!isCheckingGithub && (
+                <div className="shrink-0">
+                  {githubConnected ? (
+                    <div className="flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      GitHub Connected
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        window.location.href = '/api/github/connect';
+                      }}
+                      className="gap-1.5"
+                    >
+                      <Link2 className="h-3.5 w-3.5" />
+                      Connect GitHub
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <div className="flex gap-2">
@@ -420,6 +483,19 @@ export default function NewProjectPage() {
                 )}
               </Button>
             </div>
+
+            {!githubConnected && !isCheckingGithub && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Want to import a private repo?{' '}
+                <a
+                  href="/api/github/connect"
+                  className="font-medium text-blue-600 hover:underline"
+                >
+                  Connect your GitHub account
+                  <ExternalLink className="ml-0.5 inline h-3 w-3" />
+                </a>
+              </p>
+            )}
 
             {analyzeError && (
               <div className="mt-3 flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
