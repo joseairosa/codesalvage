@@ -172,6 +172,7 @@ export const STRIPE_CONNECT_CONFIG = {
    * Capabilities required for seller accounts
    */
   capabilities: {
+    card_payments: { requested: true },
     transfers: { requested: true },
   },
 
