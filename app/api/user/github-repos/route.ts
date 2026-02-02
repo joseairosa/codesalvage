@@ -22,10 +22,7 @@ export async function GET(request: Request) {
   });
 
   if (!user?.githubAccessToken) {
-    return NextResponse.json(
-      { error: 'GitHub not connected' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'GitHub not connected' }, { status: 400 });
   }
 
   try {
@@ -69,9 +66,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ repos: mapped });
   } catch (error) {
     console.error('[GitHub Repos] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch repositories' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch repositories' }, { status: 500 });
   }
 }

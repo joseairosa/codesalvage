@@ -48,7 +48,7 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
-        run: npm run lint
+        run: npm run lint -- --quiet
 
       - name: Check formatting with Prettier
         run: npx prettier --check "**/*.{ts,tsx,js,jsx,json,md}"

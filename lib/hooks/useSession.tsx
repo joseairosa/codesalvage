@@ -15,6 +15,7 @@ import React, {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   useCallback,
 } from 'react';
@@ -69,6 +70,7 @@ const AuthContext = createContext<AuthContextValue>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState<SessionStatus>('loading');
+  const sessionRef = useRef<Session | null>(null);
 
   const fetchUserData = useCallback(async (): Promise<SessionUser | null> => {
     try {
@@ -80,6 +82,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('[AuthProvider] Failed to fetch user data');
       return null;
     }
+  }, []);
+
+  const updateSession = useCallback((newSession: Session | null) => {
+    sessionRef.current = newSession;
+    setSession(newSession);
   }, []);
 
   useEffect(() => {
@@ -117,11 +124,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             // Only fetch user data if we don't have a session yet
             // (avoid re-fetching on every token refresh)
-            if (!session) {
+            if (!sessionRef.current) {
               const userData = await fetchUserData();
 
               if (userData) {
-                setSession({
+                updateSession({
                   user: {
                     ...userData,
                     name: firebaseUser.displayName || userData.email,
@@ -131,7 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 console.log('[AuthProvider] Authenticated:', userData.id);
               } else {
                 // User exists in Firebase but not in database yet
-                setSession(null);
+                updateSession(null);
                 setStatus('unauthenticated');
                 console.log('[AuthProvider] Firebase user exists but no database user');
               }
@@ -140,7 +147,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
           } catch (error) {
             console.error('[AuthProvider] Session sync error:', error);
-            setSession(null);
+            updateSession(null);
             setStatus('unauthenticated');
           }
         } else {
@@ -150,7 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } catch {
             // Ignore cleanup errors
           }
-          setSession(null);
+          updateSession(null);
           setStatus('unauthenticated');
           console.log('[AuthProvider] Unauthenticated');
         }
@@ -161,7 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('[AuthProvider] Cleaning up auth state listener');
       unsubscribe();
     };
-  }, [fetchUserData]);
+  }, [fetchUserData, updateSession]);
 
   const signOut = async () => {
     console.log('[AuthProvider] Sign out requested');
@@ -170,7 +177,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await firebaseSignOut(firebaseAuth);
       }
       await fetch('/api/auth/session', { method: 'DELETE' });
-      setSession(null);
+      updateSession(null);
       setStatus('unauthenticated');
     } catch (error) {
       console.error('[AuthProvider] Sign out error:', error);

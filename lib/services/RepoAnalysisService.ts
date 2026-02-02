@@ -63,7 +63,7 @@ You MUST return ONLY a valid JSON object (no markdown, no explanation, no code f
 
 {
   "title": "A compelling marketplace title for the project (5-100 chars, not just the repo name)",
-  "description": "A detailed marketplace description explaining what the project does, its current state, what's been built, and what a buyer would get. Written in second person ('You'll get...'). (50-5000 chars)",
+  "description": "A detailed marketplace description in **Markdown format**. Use headings (##), bullet lists, bold, and paragraphs to structure the content. Include sections like: overview, what's been built, tech highlights, and what the buyer gets. Written in second person ('You'll get...'). (50-5000 chars)",
   "category": one of: "web_app", "mobile_app", "desktop_app", "backend_api", "cli_tool", "library", "dashboard", "game", "other",
   "techStack": ["array", "of", "technologies", "used"],
   "primaryLanguage": "The main programming language",
@@ -80,6 +80,7 @@ Rules:
 - completionPercentage should reflect the actual state of the code, not aspirations
 - Price should reflect market value: simple projects $100-$500, moderate $500-$5000, complex $5000+
 - techStack should include all significant technologies (languages, frameworks, databases, tools)
+- Description MUST be formatted in Markdown with headings (##), bullet lists, and bold text for key points. Structure it with clear sections.
 - Description should be marketing-quality but honest about the project's state
 - If the README or code shows clear issues or TODOs, mention them in knownIssues
 - Always recommend "full_code" for licenseType unless there's a reason not to
