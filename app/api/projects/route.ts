@@ -83,13 +83,22 @@ const createProjectSchema = z.object({
   techStack: z.array(z.string()).min(1).max(20),
   primaryLanguage: z.string().optional(),
   frameworks: z.array(z.string()).optional(),
-  githubUrl: z.string().url().optional(),
+  githubUrl: z.preprocess((v) => (v === '' ? undefined : v), z.string().url().optional()),
   githubRepoName: z.string().optional(),
-  demoUrl: z.string().url().optional(),
-  documentationUrl: z.string().url().optional(),
-  thumbnailImageUrl: z.string().url().optional(),
+  demoUrl: z.preprocess((v) => (v === '' ? undefined : v), z.string().url().optional()),
+  documentationUrl: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.string().url().optional()
+  ),
+  thumbnailImageUrl: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.string().url().optional()
+  ),
   screenshotUrls: z.array(z.string().url()).optional(),
-  demoVideoUrl: z.string().url().optional(),
+  demoVideoUrl: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.string().url().optional()
+  ),
 });
 
 /**
