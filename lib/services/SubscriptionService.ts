@@ -395,7 +395,25 @@ export class SubscriptionService {
   async getSubscriptionStatus(userId: string): Promise<SubscriptionStatusResponse> {
     console.log('[SubscriptionService] Getting subscription status:', userId);
 
-    const subscription = await this.subscriptionRepository.findByUserId(userId);
+    let subscription;
+    try {
+      subscription = await this.subscriptionRepository.findByUserId(userId);
+    } catch (error) {
+      // Gracefully fall back to free plan if subscription lookup fails
+      // (e.g. table not yet migrated, database error)
+      console.warn(
+        '[SubscriptionService] Subscription lookup failed, defaulting to free plan:',
+        error
+      );
+      return {
+        subscriptionId: null,
+        plan: 'free',
+        status: null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        benefits: FREE_PLAN_BENEFITS,
+      };
+    }
 
     if (!subscription) {
       // User is on free plan
