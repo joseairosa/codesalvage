@@ -1,17 +1,17 @@
 /**
  * CategorySelector Component
  *
- * Select dropdown for choosing project category.
+ * Visual card grid for choosing project category.
  *
  * Responsibilities:
- * - Display list of valid project categories
+ * - Display list of valid project categories as selectable cards
  * - Allow selecting a single category
- * - Provide category descriptions
+ * - Provide category descriptions and icons
  *
  * Architecture:
  * - Client Component (uses React hooks for state)
  * - Controlled component pattern
- * - Uses Radix UI Select primitive
+ * - Card-grid layout with icons
  *
  * @example
  * <CategorySelector
@@ -23,15 +23,20 @@
 'use client';
 
 import * as React from 'react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import {
+  Globe,
+  Smartphone,
+  Monitor,
+  Server,
+  Terminal,
+  Package,
+  LayoutDashboard,
+  Gamepad2,
+  MoreHorizontal,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -74,55 +79,69 @@ interface CategorySelectorProps {
 // ============================================
 
 /**
- * Project categories with descriptions
+ * Project categories with descriptions and icons
  */
-const PROJECT_CATEGORIES = [
+const PROJECT_CATEGORIES: ReadonlyArray<{
+  value: string;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+}> = [
   {
     value: 'web_app',
     label: 'Web Application',
-    description: 'Full-stack web applications, SPAs, dashboards',
+    description: 'Full-stack web apps, SPAs',
+    icon: Globe,
   },
   {
     value: 'mobile_app',
-    label: 'Mobile Application',
-    description: 'iOS, Android, React Native, Flutter apps',
+    label: 'Mobile App',
+    description: 'iOS, Android, React Native',
+    icon: Smartphone,
   },
   {
     value: 'desktop_app',
-    label: 'Desktop Application',
-    description: 'Electron, native desktop applications',
+    label: 'Desktop App',
+    description: 'Electron, native apps',
+    icon: Monitor,
   },
   {
     value: 'backend_api',
     label: 'Backend API',
-    description: 'REST APIs, GraphQL servers, microservices',
+    description: 'REST, GraphQL, microservices',
+    icon: Server,
   },
   {
     value: 'cli_tool',
     label: 'CLI Tool',
-    description: 'Command-line utilities and tools',
+    description: 'Command-line utilities',
+    icon: Terminal,
   },
   {
     value: 'library',
-    label: 'Library/Package',
-    description: 'Reusable libraries, npm packages, SDKs',
+    label: 'Library / Package',
+    description: 'npm packages, SDKs',
+    icon: Package,
   },
   {
     value: 'dashboard',
     label: 'Dashboard',
-    description: 'Admin panels, analytics dashboards, monitoring tools',
+    description: 'Admin panels, analytics',
+    icon: LayoutDashboard,
   },
   {
     value: 'game',
     label: 'Game',
-    description: 'Web games, mobile games, game engines',
+    description: 'Web, mobile, game engines',
+    icon: Gamepad2,
   },
   {
     value: 'other',
     label: 'Other',
-    description: 'Other types of projects',
+    description: 'Other project types',
+    icon: MoreHorizontal,
   },
-] as const;
+];
 
 // ============================================
 // CATEGORY SELECTOR COMPONENT
@@ -141,58 +160,61 @@ export function CategorySelector({
   console.log(`[${componentName}] Rendered with:`, { value });
 
   // ============================================
-  // EVENT HANDLERS
-  // ============================================
-
-  /**
-   * Handle category change
-   */
-  const handleValueChange = (newValue: string) => {
-    console.log(`[${componentName}] Category changed:`, newValue);
-    onChange(newValue);
-  };
-
-  // ============================================
-  // COMPUTED VALUES
-  // ============================================
-
-  /**
-   * Get selected category details
-   */
-  const selectedCategory = PROJECT_CATEGORIES.find((cat) => cat.value === value);
-
-  // ============================================
   // RENDER
   // ============================================
 
   return (
     <div className={cn('space-y-2', className)}>
       {/* Label */}
-      <Label htmlFor="category-select">{label}</Label>
+      <Label>{label}</Label>
 
-      {/* Select Dropdown */}
-      <Select value={value} onValueChange={handleValueChange} disabled={disabled}>
-        <SelectTrigger id="category-select" className={cn(error && 'border-destructive')}>
-          <SelectValue placeholder="Select a category" />
-        </SelectTrigger>
-        <SelectContent>
-          {PROJECT_CATEGORIES.map((category) => (
-            <SelectItem key={category.value} value={category.value}>
-              <div className="flex flex-col">
-                <span className="font-medium">{category.label}</span>
-                <span className="text-xs text-muted-foreground">
-                  {category.description}
-                </span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* Helper Text */}
-      {!error && selectedCategory && (
-        <p className="text-xs text-muted-foreground">{selectedCategory.description}</p>
-      )}
+      {/* Category Grid */}
+      <div
+        className={cn(
+          'grid grid-cols-2 gap-2 sm:grid-cols-3',
+          disabled && 'pointer-events-none opacity-50'
+        )}
+      >
+        {PROJECT_CATEGORIES.map((category) => {
+          const Icon = category.icon;
+          const isSelected = value === category.value;
+          return (
+            <button
+              key={category.value}
+              type="button"
+              onClick={() => {
+                console.log(`[${componentName}] Category changed:`, category.value);
+                onChange(category.value);
+              }}
+              className={cn(
+                'flex flex-col items-center gap-1.5 rounded-lg border-2 px-3 py-3 text-center transition-all',
+                isSelected
+                  ? 'border-purple-500 bg-purple-50 text-purple-700 shadow-sm'
+                  : 'border-transparent bg-muted/40 text-muted-foreground hover:border-gray-300 hover:bg-muted/70',
+                error && !isSelected && 'border-red-100'
+              )}
+            >
+              <Icon
+                className={cn(
+                  'h-5 w-5',
+                  isSelected ? 'text-purple-600' : 'text-muted-foreground'
+                )}
+              />
+              <span
+                className={cn(
+                  'text-xs font-medium leading-tight',
+                  isSelected && 'text-purple-700'
+                )}
+              >
+                {category.label}
+              </span>
+              <span className="text-[10px] leading-tight text-muted-foreground">
+                {category.description}
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
       {/* Error Message */}
       {error && <p className="text-xs text-destructive">{error}</p>}
