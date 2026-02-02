@@ -35,6 +35,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import ReactMarkdown from 'react-markdown';
 import { ProBadge } from '@/components/seller/ProBadge';
 import {
   Star,
@@ -325,11 +326,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             </CardHeader>
             <CardContent>
               <div className="prose prose-sm dark:prose-invert max-w-none">
-                {project.description.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4 whitespace-pre-line last:mb-0">
-                    {paragraph}
-                  </p>
-                ))}
+                <ReactMarkdown>{project.description}</ReactMarkdown>
               </div>
             </CardContent>
           </Card>

@@ -47,6 +47,7 @@ import {
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle, CheckCircle2, Github, Sparkles, Link2, ExternalLink, Lock, Globe } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { ProjectLimitWarning } from '@/components/seller/ProjectLimitWarning';
 import type { RepoAnalysisResult } from '@/lib/services/RepoAnalysisService';
 
@@ -85,6 +86,7 @@ export default function NewProjectPage() {
   }>>([]);
   const [isLoadingRepos, setIsLoadingRepos] = React.useState(false);
   const [repoSearchQuery, setRepoSearchQuery] = React.useState('');
+  const [showDescriptionPreview, setShowDescriptionPreview] = React.useState(false);
 
   // ============================================
   // FORM SETUP
@@ -663,18 +665,54 @@ export default function NewProjectPage() {
 
               {/* Description */}
               <div className="space-y-2">
-                <Label htmlFor="description">
-                  Description <span className="text-destructive">*</span>
-                </Label>
-                <Textarea
-                  id="description"
-                  placeholder="Describe your project in detail. What does it do? What's implemented? What needs to be finished?"
-                  rows={6}
-                  {...register('description')}
-                  className={errors.description ? 'border-destructive' : ''}
-                />
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="description">
+                    Description <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="flex gap-1 rounded-md border p-0.5 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setShowDescriptionPreview(false)}
+                      className={`rounded px-2 py-1 transition-colors ${
+                        !showDescriptionPreview
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      Write
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowDescriptionPreview(true)}
+                      className={`rounded px-2 py-1 transition-colors ${
+                        showDescriptionPreview
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      Preview
+                    </button>
+                  </div>
+                </div>
+                {showDescriptionPreview ? (
+                  <div className="prose prose-sm dark:prose-invert max-w-none rounded-md border bg-muted/30 p-4 min-h-[10rem]">
+                    {description ? (
+                      <ReactMarkdown>{description}</ReactMarkdown>
+                    ) : (
+                      <p className="text-muted-foreground italic">Nothing to preview</p>
+                    )}
+                  </div>
+                ) : (
+                  <Textarea
+                    id="description"
+                    placeholder="Describe your project in detail using Markdown. What does it do? What's implemented? What needs to be finished?"
+                    rows={8}
+                    {...register('description')}
+                    className={errors.description ? 'border-destructive' : ''}
+                  />
+                )}
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{errors.description?.message || 'Minimum 50 characters'}</span>
+                  <span>{errors.description?.message || 'Supports Markdown — minimum 50 characters'}</span>
                   <span>{description?.length || 0} / 5000 characters</span>
                 </div>
               </div>
