@@ -46,7 +46,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertCircle, CheckCircle2, Github, Sparkles, Link2, ExternalLink } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, Github, Sparkles, Link2, ExternalLink, Lock, Globe } from 'lucide-react';
 import { ProjectLimitWarning } from '@/components/seller/ProjectLimitWarning';
 import type { RepoAnalysisResult } from '@/lib/services/RepoAnalysisService';
 
@@ -72,6 +72,18 @@ export default function NewProjectPage() {
   const [analyzeSuccess, setAnalyzeSuccess] = React.useState(false);
   const [githubConnected, setGithubConnected] = React.useState(false);
   const [isCheckingGithub, setIsCheckingGithub] = React.useState(true);
+  const [githubRepos, setGithubRepos] = React.useState<Array<{
+    fullName: string;
+    name: string;
+    owner: string;
+    description: string | null;
+    private: boolean;
+    url: string;
+    language: string | null;
+    stars: number;
+    updatedAt: string;
+  }>>([]);
+  const [isLoadingRepos, setIsLoadingRepos] = React.useState(false);
 
   // ============================================
   // FORM SETUP
@@ -154,6 +166,24 @@ export default function NewProjectPage() {
   }, []);
 
   /**
+   * Fetch user's GitHub repos
+   */
+  const fetchGithubRepos = React.useCallback(async () => {
+    setIsLoadingRepos(true);
+    try {
+      const response = await fetch('/api/user/github-repos');
+      if (response.ok) {
+        const data = await response.json();
+        setGithubRepos(data.repos || []);
+      }
+    } catch (error) {
+      console.error(`[${componentName}] Error fetching GitHub repos:`, error);
+    } finally {
+      setIsLoadingRepos(false);
+    }
+  }, []);
+
+  /**
    * Check GitHub connection status on page load
    */
   React.useEffect(() => {
@@ -163,6 +193,9 @@ export default function NewProjectPage() {
         if (response.ok) {
           const data = await response.json();
           setGithubConnected(data.connected);
+          if (data.connected) {
+            fetchGithubRepos();
+          }
         }
       } catch (error) {
         console.error(`[${componentName}] Error checking GitHub status:`, error);
@@ -176,12 +209,13 @@ export default function NewProjectPage() {
     if (params.get('github_connected') === 'true') {
       setGithubConnected(true);
       setIsCheckingGithub(false);
+      fetchGithubRepos();
       // Clean up URL
       window.history.replaceState({}, '', '/projects/new');
     } else {
       checkGithubStatus();
     }
-  }, []);
+  }, [fetchGithubRepos]);
 
   // ============================================
   // EVENT HANDLERS
@@ -451,6 +485,56 @@ export default function NewProjectPage() {
             </div>
           </CardHeader>
           <CardContent>
+            {/* Repo selector when GitHub is connected */}
+            {githubConnected && (
+              <div className="mb-3">
+                {isLoadingRepos ? (
+                  <div className="flex items-center gap-2 rounded-md border bg-gray-50 px-3 py-2.5 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading your repositories...
+                  </div>
+                ) : githubRepos.length > 0 ? (
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Select a repository</Label>
+                    <div className="max-h-48 overflow-y-auto rounded-md border bg-white">
+                      {githubRepos.map((repo) => (
+                        <button
+                          key={repo.fullName}
+                          type="button"
+                          onClick={() => {
+                            setGithubImportUrl(repo.url);
+                            setAnalyzeError(null);
+                            setAnalyzeSuccess(false);
+                          }}
+                          className={`flex w-full items-center gap-3 border-b px-3 py-2 text-left text-sm transition-colors last:border-b-0 hover:bg-purple-50 ${
+                            githubImportUrl === repo.url ? 'bg-purple-50 ring-1 ring-inset ring-purple-300' : ''
+                          }`}
+                        >
+                          {repo.private ? (
+                            <Lock className="h-3.5 w-3.5 shrink-0 text-amber-500" />
+                          ) : (
+                            <Globe className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate font-medium">{repo.fullName}</div>
+                            {repo.description && (
+                              <div className="truncate text-xs text-muted-foreground">{repo.description}</div>
+                            )}
+                          </div>
+                          <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                            {repo.language && (
+                              <span className="rounded bg-gray-100 px-1.5 py-0.5">{repo.language}</span>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            )}
+
+            {/* URL input + Analyze button */}
             <div className="flex gap-2">
               <Input
                 placeholder="https://github.com/owner/repo"

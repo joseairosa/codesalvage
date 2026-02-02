@@ -8,7 +8,7 @@
  *
  * These tests exist because a production crash occurred when Firebase
  * client SDK environment variables were missing at build time, causing
- * `auth` to be null. The AuthProvider called `onAuthStateChanged(null, ...)`
+ * `auth` to be null. The AuthProvider called `onIdTokenChanged(null, ...)`
  * which threw "Cannot read properties of null (reading 'app')".
  */
 
@@ -22,7 +22,7 @@ let mockFirebaseAuth: any = null;
 
 // Mock firebase/auth module
 vi.mock('firebase/auth', () => ({
-  onAuthStateChanged: vi.fn((auth: any, callback: any) => {
+  onIdTokenChanged: vi.fn((auth: any, callback: any) => {
     if (!auth) {
       throw new TypeError("Cannot read properties of null (reading '_canInitEmulator')");
     }
@@ -78,10 +78,10 @@ describe('AuthProvider', () => {
       expect(screen.getByTestId('user').textContent).toBe('none');
     });
 
-    it('should not call onAuthStateChanged when auth is null', async () => {
+    it('should not call onIdTokenChanged when auth is null', async () => {
       // Arrange
       mockFirebaseAuth = null;
-      const { onAuthStateChanged } = await import('firebase/auth');
+      const { onIdTokenChanged } = await import('firebase/auth');
 
       // Act
       render(
@@ -90,11 +90,11 @@ describe('AuthProvider', () => {
         </AuthProvider>
       );
 
-      // Assert - onAuthStateChanged should NOT be called with null
+      // Assert - onIdTokenChanged should NOT be called with null
       await waitFor(() => {
         expect(screen.getByTestId('status').textContent).toBe('unauthenticated');
       });
-      expect(onAuthStateChanged).not.toHaveBeenCalled();
+      expect(onIdTokenChanged).not.toHaveBeenCalled();
     });
 
     it('should handle sign-out gracefully when auth is null', async () => {
@@ -134,7 +134,7 @@ describe('AuthProvider', () => {
     it('should subscribe to auth state changes', async () => {
       // Arrange - provide a mock auth object
       mockFirebaseAuth = { app: { name: 'test' } };
-      const { onAuthStateChanged } = await import('firebase/auth');
+      const { onIdTokenChanged } = await import('firebase/auth');
 
       // Act
       render(
@@ -143,9 +143,9 @@ describe('AuthProvider', () => {
         </AuthProvider>
       );
 
-      // Assert - should have called onAuthStateChanged with the mock auth
+      // Assert - should have called onIdTokenChanged with the mock auth
       await waitFor(() => {
-        expect(onAuthStateChanged).toHaveBeenCalledWith(
+        expect(onIdTokenChanged).toHaveBeenCalledWith(
           mockFirebaseAuth,
           expect.any(Function)
         );

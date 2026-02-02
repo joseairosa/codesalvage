@@ -19,7 +19,7 @@ import React, {
   useCallback,
 } from 'react';
 import {
-  onAuthStateChanged,
+  onIdTokenChanged,
   signOut as firebaseSignOut,
   type User as FirebaseUser,
 } from 'firebase/auth';
@@ -92,16 +92,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(
+    // Use onIdTokenChanged instead of onAuthStateChanged so the session
+    // cookie stays fresh. Firebase ID tokens expire after 1 hour — this
+    // listener fires on sign-in, sign-out, AND automatic token refreshes
+    // (~every 55 minutes), keeping the httpOnly cookie up to date.
+    const unsubscribe = onIdTokenChanged(
       firebaseAuth,
       async (firebaseUser: FirebaseUser | null) => {
         console.log(
-          '[AuthProvider] Auth state changed:',
+          '[AuthProvider] Token state changed:',
           firebaseUser ? firebaseUser.uid : 'null'
         );
 
         if (firebaseUser) {
-          // Store ID token in httpOnly cookie
+          // Store fresh ID token in httpOnly cookie
           try {
             const idToken = await firebaseUser.getIdToken();
 
@@ -111,24 +115,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               body: JSON.stringify({ idToken }),
             });
 
-            // Fetch database user data
-            const userData = await fetchUserData();
+            // Only fetch user data if we don't have a session yet
+            // (avoid re-fetching on every token refresh)
+            if (!session) {
+              const userData = await fetchUserData();
 
-            if (userData) {
-              setSession({
-                user: {
-                  ...userData,
-                  name: firebaseUser.displayName || userData.email,
-                },
-              });
-              setStatus('authenticated');
-              console.log('[AuthProvider] Authenticated:', userData.id);
+              if (userData) {
+                setSession({
+                  user: {
+                    ...userData,
+                    name: firebaseUser.displayName || userData.email,
+                  },
+                });
+                setStatus('authenticated');
+                console.log('[AuthProvider] Authenticated:', userData.id);
+              } else {
+                // User exists in Firebase but not in database yet
+                setSession(null);
+                setStatus('unauthenticated');
+                console.log('[AuthProvider] Firebase user exists but no database user');
+              }
             } else {
-              // User exists in Firebase but not in database yet
-              // This can happen on first sign-in before auto-create completes
-              setSession(null);
-              setStatus('unauthenticated');
-              console.log('[AuthProvider] Firebase user exists but no database user');
+              console.log('[AuthProvider] Token refreshed, cookie updated');
             }
           } catch (error) {
             console.error('[AuthProvider] Session sync error:', error);
