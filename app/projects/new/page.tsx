@@ -84,6 +84,7 @@ export default function NewProjectPage() {
     updatedAt: string;
   }>>([]);
   const [isLoadingRepos, setIsLoadingRepos] = React.useState(false);
+  const [repoSearchQuery, setRepoSearchQuery] = React.useState('');
 
   // ============================================
   // FORM SETUP
@@ -496,8 +497,24 @@ export default function NewProjectPage() {
                 ) : githubRepos.length > 0 ? (
                   <div className="space-y-1.5">
                     <Label className="text-xs text-muted-foreground">Select a repository</Label>
+                    <Input
+                      placeholder="Search repositories..."
+                      value={repoSearchQuery}
+                      onChange={(e) => setRepoSearchQuery(e.target.value)}
+                      className="mb-1.5 h-8 text-sm"
+                    />
                     <div className="max-h-48 overflow-y-auto rounded-md border bg-white">
-                      {githubRepos.map((repo) => (
+                      {githubRepos
+                        .filter((repo) => {
+                          if (!repoSearchQuery.trim()) return true;
+                          const q = repoSearchQuery.toLowerCase();
+                          return (
+                            repo.fullName.toLowerCase().includes(q) ||
+                            repo.description?.toLowerCase().includes(q) ||
+                            repo.language?.toLowerCase().includes(q)
+                          );
+                        })
+                        .map((repo) => (
                         <button
                           key={repo.fullName}
                           type="button"
@@ -528,6 +545,19 @@ export default function NewProjectPage() {
                           </div>
                         </button>
                       ))}
+                      {repoSearchQuery.trim() &&
+                        !githubRepos.some((repo) => {
+                          const q = repoSearchQuery.toLowerCase();
+                          return (
+                            repo.fullName.toLowerCase().includes(q) ||
+                            repo.description?.toLowerCase().includes(q) ||
+                            repo.language?.toLowerCase().includes(q)
+                          );
+                        }) && (
+                          <div className="px-3 py-3 text-center text-sm text-muted-foreground">
+                            No repositories match &quot;{repoSearchQuery}&quot;
+                          </div>
+                        )}
                     </div>
                   </div>
                 ) : null}
