@@ -46,7 +46,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertCircle, CheckCircle2, Github, Sparkles, Link2, ExternalLink, Lock, Globe } from 'lucide-react';
+import {
+  Loader2,
+  AlertCircle,
+  CheckCircle2,
+  Github,
+  Sparkles,
+  Link2,
+  ExternalLink,
+  Lock,
+  Globe,
+} from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { ProjectLimitWarning } from '@/components/seller/ProjectLimitWarning';
 import type { RepoAnalysisResult } from '@/lib/services/RepoAnalysisService';
@@ -73,17 +83,19 @@ export default function NewProjectPage() {
   const [analyzeSuccess, setAnalyzeSuccess] = React.useState(false);
   const [githubConnected, setGithubConnected] = React.useState(false);
   const [isCheckingGithub, setIsCheckingGithub] = React.useState(true);
-  const [githubRepos, setGithubRepos] = React.useState<Array<{
-    fullName: string;
-    name: string;
-    owner: string;
-    description: string | null;
-    private: boolean;
-    url: string;
-    language: string | null;
-    stars: number;
-    updatedAt: string;
-  }>>([]);
+  const [githubRepos, setGithubRepos] = React.useState<
+    Array<{
+      fullName: string;
+      name: string;
+      owner: string;
+      description: string | null;
+      private: boolean;
+      url: string;
+      language: string | null;
+      stars: number;
+      updatedAt: string;
+    }>
+  >([]);
   const [isLoadingRepos, setIsLoadingRepos] = React.useState(false);
   const [repoSearchQuery, setRepoSearchQuery] = React.useState('');
   const [showDescriptionPreview, setShowDescriptionPreview] = React.useState(false);
@@ -498,7 +510,9 @@ export default function NewProjectPage() {
                   </div>
                 ) : githubRepos.length > 0 ? (
                   <div className="space-y-1.5">
-                    <Label className="text-xs text-muted-foreground">Select a repository</Label>
+                    <Label className="text-xs text-muted-foreground">
+                      Select a repository
+                    </Label>
                     <Input
                       placeholder="Search repositories..."
                       value={repoSearchQuery}
@@ -517,36 +531,42 @@ export default function NewProjectPage() {
                           );
                         })
                         .map((repo) => (
-                        <button
-                          key={repo.fullName}
-                          type="button"
-                          onClick={() => {
-                            setGithubImportUrl(repo.url);
-                            setAnalyzeError(null);
-                            setAnalyzeSuccess(false);
-                          }}
-                          className={`flex w-full items-center gap-3 border-b px-3 py-2 text-left text-sm transition-colors last:border-b-0 hover:bg-purple-50 ${
-                            githubImportUrl === repo.url ? 'bg-purple-50 ring-1 ring-inset ring-purple-300' : ''
-                          }`}
-                        >
-                          {repo.private ? (
-                            <Lock className="h-3.5 w-3.5 shrink-0 text-amber-500" />
-                          ) : (
-                            <Globe className="h-3.5 w-3.5 shrink-0 text-gray-400" />
-                          )}
-                          <div className="min-w-0 flex-1">
-                            <div className="truncate font-medium">{repo.fullName}</div>
-                            {repo.description && (
-                              <div className="truncate text-xs text-muted-foreground">{repo.description}</div>
+                          <button
+                            key={repo.fullName}
+                            type="button"
+                            onClick={() => {
+                              setGithubImportUrl(repo.url);
+                              setAnalyzeError(null);
+                              setAnalyzeSuccess(false);
+                            }}
+                            className={`flex w-full items-center gap-3 border-b px-3 py-2 text-left text-sm transition-colors last:border-b-0 hover:bg-purple-50 ${
+                              githubImportUrl === repo.url
+                                ? 'bg-purple-50 ring-1 ring-inset ring-purple-300'
+                                : ''
+                            }`}
+                          >
+                            {repo.private ? (
+                              <Lock className="h-3.5 w-3.5 shrink-0 text-amber-500" />
+                            ) : (
+                              <Globe className="h-3.5 w-3.5 shrink-0 text-gray-400" />
                             )}
-                          </div>
-                          <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
-                            {repo.language && (
-                              <span className="rounded bg-gray-100 px-1.5 py-0.5">{repo.language}</span>
-                            )}
-                          </div>
-                        </button>
-                      ))}
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate font-medium">{repo.fullName}</div>
+                              {repo.description && (
+                                <div className="truncate text-xs text-muted-foreground">
+                                  {repo.description}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+                              {repo.language && (
+                                <span className="rounded bg-gray-100 px-1.5 py-0.5">
+                                  {repo.language}
+                                </span>
+                              )}
+                            </div>
+                          </button>
+                        ))}
                       {repoSearchQuery.trim() &&
                         !githubRepos.some((repo) => {
                           const q = repoSearchQuery.toLowerCase();
@@ -695,11 +715,11 @@ export default function NewProjectPage() {
                   </div>
                 </div>
                 {showDescriptionPreview ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none rounded-md border bg-muted/30 p-4 min-h-[10rem]">
+                  <div className="prose prose-sm dark:prose-invert min-h-[10rem] max-w-none rounded-md border bg-muted/30 p-4">
                     {description ? (
                       <ReactMarkdown>{description}</ReactMarkdown>
                     ) : (
-                      <p className="text-muted-foreground italic">Nothing to preview</p>
+                      <p className="italic text-muted-foreground">Nothing to preview</p>
                     )}
                   </div>
                 ) : (
@@ -712,7 +732,10 @@ export default function NewProjectPage() {
                   />
                 )}
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{errors.description?.message || 'Supports Markdown — minimum 50 characters'}</span>
+                  <span>
+                    {errors.description?.message ||
+                      'Supports Markdown — minimum 50 characters'}
+                  </span>
                   <span>{description?.length || 0} / 5000 characters</span>
                 </div>
               </div>
