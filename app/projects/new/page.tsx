@@ -47,6 +47,14 @@ import {
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress';
+import {
   Loader2,
   AlertCircle,
   CheckCircle2,
@@ -56,12 +64,38 @@ import {
   ExternalLink,
   Lock,
   Globe,
+  Code2,
+  Brain,
+  FileSearch,
+  Wand2,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { ProjectLimitWarning } from '@/components/seller/ProjectLimitWarning';
 import type { RepoAnalysisResult } from '@/lib/services/RepoAnalysisService';
 
 const componentName = 'NewProjectPage';
+
+const ANALYSIS_STAGES = [
+  { label: 'Connecting to GitHub...', targetProgress: 15, durationMs: 1500 },
+  {
+    label: 'Fetching repository data...',
+    targetProgress: 35,
+    durationMs: 2500,
+  },
+  { label: 'Reading code structure...', targetProgress: 50, durationMs: 2000 },
+  {
+    label: 'AI is analyzing your project...',
+    targetProgress: 85,
+    durationMs: 8000,
+  },
+  {
+    label: 'Generating listing details...',
+    targetProgress: 95,
+    durationMs: 4000,
+  },
+] as const;
+
+const STAGE_ICONS = [Github, Code2, FileSearch, Brain, Wand2];
 
 export default function NewProjectPage() {
   console.log(`[${componentName}] Page rendered`);
@@ -99,6 +133,9 @@ export default function NewProjectPage() {
   const [isLoadingRepos, setIsLoadingRepos] = React.useState(false);
   const [repoSearchQuery, setRepoSearchQuery] = React.useState('');
   const [showDescriptionPreview, setShowDescriptionPreview] = React.useState(false);
+  const [analyzeProgress, setAnalyzeProgress] = React.useState(0);
+  const [analyzeStageIndex, setAnalyzeStageIndex] = React.useState(0);
+  const [analyzeComplete, setAnalyzeComplete] = React.useState(false);
 
   // ============================================
   // FORM SETUP
@@ -231,6 +268,66 @@ export default function NewProjectPage() {
       checkGithubStatus();
     }
   }, [fetchGithubRepos]);
+
+  /**
+   * Simulated progress bar for repo analysis modal.
+   * Advances through stages on a timer; snaps to 100% on success or
+   * stays open on error once the fetch resolves.
+   */
+  React.useEffect(() => {
+    if (!isAnalyzing) {
+      // Fetch resolved — handle completion
+      if (analyzeProgress > 0 && !analyzeComplete) {
+        if (analyzeSuccess) {
+          setAnalyzeProgress(100);
+          setAnalyzeStageIndex(ANALYSIS_STAGES.length);
+          setAnalyzeComplete(true);
+          const timeout = setTimeout(() => {
+            setAnalyzeProgress(0);
+            setAnalyzeStageIndex(0);
+            setAnalyzeComplete(false);
+          }, 1500);
+          return () => clearTimeout(timeout);
+        }
+        if (analyzeError) {
+          setAnalyzeComplete(true);
+        }
+      }
+      return;
+    }
+
+    // Starting analysis — reset and begin simulation
+    setAnalyzeProgress(0);
+    setAnalyzeStageIndex(0);
+    setAnalyzeComplete(false);
+
+    let currentStage = 0;
+    let currentProgress = 0;
+
+    const intervalId = setInterval(() => {
+      if (currentStage >= ANALYSIS_STAGES.length) return;
+
+      const stage = ANALYSIS_STAGES[currentStage]!;
+      const prevTarget =
+        currentStage > 0 ? ANALYSIS_STAGES[currentStage - 1]!.targetProgress : 0;
+      const range = stage.targetProgress - prevTarget;
+      const increment = range / (stage.durationMs / 200);
+
+      currentProgress = Math.min(currentProgress + increment, stage.targetProgress);
+      setAnalyzeProgress(Math.round(currentProgress));
+
+      if (currentProgress >= stage.targetProgress - 0.5) {
+        currentStage++;
+        setAnalyzeStageIndex(currentStage);
+        if (currentStage < ANALYSIS_STAGES.length) {
+          currentProgress = stage.targetProgress;
+        }
+      }
+    }, 200);
+
+    return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAnalyzing, analyzeSuccess, analyzeError]);
 
   // ============================================
   // EVENT HANDLERS
@@ -1039,6 +1136,140 @@ export default function NewProjectPage() {
           </div>
         </form>
       </div>
+
+      {/* ============================================ */}
+      {/* ANALYSIS MODAL                              */}
+      {/* ============================================ */}
+      <Dialog
+        open={isAnalyzing || (analyzeComplete && analyzeProgress > 0)}
+        onOpenChange={() => {
+          /* controlled only — no manual close during analysis */
+        }}
+      >
+        <DialogContent
+          className="overflow-hidden sm:max-w-md [&>button]:hidden"
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => {
+            if (isAnalyzing) e.preventDefault();
+          }}
+        >
+          {/* Animated gradient header */}
+          <div className="relative -mx-6 -mt-6 mb-4 overflow-hidden bg-gradient-to-br from-purple-600 via-blue-500 to-indigo-600 px-6 pb-8 pt-6">
+            {/* Animated blobs */}
+            <div className="absolute -left-4 -top-4 h-32 w-32 animate-blob rounded-full bg-purple-300 opacity-30 mix-blend-multiply blur-xl" />
+            <div className="animation-delay-2000 absolute -right-4 top-4 h-32 w-32 animate-blob rounded-full bg-blue-300 opacity-30 mix-blend-multiply blur-xl" />
+            <div className="animation-delay-4000 absolute -bottom-4 left-16 h-32 w-32 animate-blob rounded-full bg-indigo-300 opacity-30 mix-blend-multiply blur-xl" />
+
+            <DialogHeader className="relative z-10">
+              <DialogTitle className="text-center text-white">
+                {analyzeComplete && analyzeError
+                  ? 'Analysis Failed'
+                  : analyzeComplete && analyzeProgress === 100
+                    ? 'Analysis Complete!'
+                    : 'Analyzing Repository'}
+              </DialogTitle>
+              <DialogDescription className="text-center text-white/80">
+                {analyzeComplete && analyzeError
+                  ? 'Something went wrong during the analysis'
+                  : analyzeComplete && analyzeProgress === 100
+                    ? 'Your form has been pre-filled'
+                    : 'AI is inspecting your repository to pre-fill the listing'}
+              </DialogDescription>
+            </DialogHeader>
+
+            {/* Center icon */}
+            <div className="relative z-10 mt-4 flex justify-center">
+              {analyzeComplete && analyzeError ? (
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500/20">
+                  <AlertCircle className="h-8 w-8 text-white" />
+                </div>
+              ) : analyzeComplete && analyzeProgress === 100 ? (
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
+                  <CheckCircle2 className="h-8 w-8 animate-bounce text-white" />
+                </div>
+              ) : (
+                (() => {
+                  const IconComponent =
+                    STAGE_ICONS[Math.min(analyzeStageIndex, STAGE_ICONS.length - 1)] ??
+                    Github;
+                  return (
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20">
+                      <IconComponent className="h-8 w-8 animate-pulse text-white" />
+                    </div>
+                  );
+                })()
+              )}
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="space-y-2 px-1">
+            <Progress value={analyzeProgress} className="h-2" />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>
+                {analyzeComplete && analyzeError
+                  ? 'Error'
+                  : analyzeComplete && analyzeProgress === 100
+                    ? 'Done!'
+                    : (ANALYSIS_STAGES[
+                        Math.min(analyzeStageIndex, ANALYSIS_STAGES.length - 1)
+                      ]?.label ?? 'Processing...')}
+              </span>
+              <span>{analyzeProgress}%</span>
+            </div>
+          </div>
+
+          {/* Stage checklist */}
+          <div className="mt-2 space-y-2 px-1">
+            {ANALYSIS_STAGES.map((stage, index) => (
+              <div key={stage.label} className="flex items-center gap-3 text-sm">
+                {index < analyzeStageIndex ? (
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />
+                ) : index === analyzeStageIndex && !analyzeComplete ? (
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin text-blue-500" />
+                ) : (
+                  <div className="h-4 w-4 shrink-0 rounded-full border-2 border-gray-200" />
+                )}
+                <span
+                  className={
+                    index < analyzeStageIndex
+                      ? 'text-muted-foreground line-through'
+                      : index === analyzeStageIndex && !analyzeComplete
+                        ? 'font-medium text-foreground'
+                        : 'text-muted-foreground'
+                  }
+                >
+                  {stage.label}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Error state */}
+          {analyzeComplete && analyzeError && (
+            <div className="mt-3 space-y-3">
+              <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  {analyzeError}
+                </div>
+              </div>
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={() => {
+                  setAnalyzeProgress(0);
+                  setAnalyzeStageIndex(0);
+                  setAnalyzeComplete(false);
+                  setAnalyzeError(null);
+                }}
+              >
+                Close
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
