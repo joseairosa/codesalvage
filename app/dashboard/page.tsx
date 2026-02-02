@@ -24,7 +24,11 @@ export default async function DashboardPage() {
           </p>
         </div>
         {session.user.isSeller && (
-          <Button asChild size="lg" className="shadow-md transition-transform hover:scale-105">
+          <Button
+            asChild
+            size="lg"
+            className="shadow-md transition-transform hover:scale-105"
+          >
             <Link href="/projects/new">
               <Plus className="mr-2 h-5 w-5" />
               List your Project
@@ -39,8 +43,8 @@ export default async function DashboardPage() {
             <div>
               <h2 className="text-lg font-semibold">List a New Project</h2>
               <p className="mt-1 text-sm text-gray-600">
-                Turn your unfinished side projects into revenue. Import from GitHub for instant
-                AI-powered analysis.
+                Turn your unfinished side projects into revenue. Import from GitHub for
+                instant AI-powered analysis.
               </p>
             </div>
             <Button asChild className="bg-green-600 hover:bg-green-700">
