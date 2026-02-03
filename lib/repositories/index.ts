@@ -71,6 +71,13 @@ export type {
   SubscriptionWithUser,
 } from './SubscriptionRepository';
 
+export { NotificationRepository } from './NotificationRepository';
+export type {
+  CreateNotificationInput,
+  NotificationType,
+  NotificationQueryOptions,
+} from './NotificationRepository';
+
 export { AdminRepository } from './AdminRepository';
 export type {
   PlatformStats,

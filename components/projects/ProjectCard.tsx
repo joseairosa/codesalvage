@@ -49,6 +49,7 @@ export interface ProjectCardData {
   priceCents: number;
   techStack: string[];
   thumbnailImageUrl?: string | null;
+  screenshotUrls?: string[];
   isFeatured: boolean;
   viewCount: number;
   favoriteCount: number;
@@ -146,9 +147,9 @@ export function ProjectCard({
       >
         {/* Thumbnail Image */}
         <div className="relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted">
-          {project.thumbnailImageUrl ? (
+          {project.thumbnailImageUrl || project.screenshotUrls?.[0] ? (
             <img
-              src={project.thumbnailImageUrl}
+              src={project.thumbnailImageUrl || project.screenshotUrls![0]}
               alt={project.title}
               className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
             />

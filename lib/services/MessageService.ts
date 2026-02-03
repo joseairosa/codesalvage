@@ -109,7 +109,8 @@ export class MessageService {
     private messageRepository: MessageRepository,
     private userRepository: UserRepository,
     private projectRepository: ProjectRepository,
-    private emailService?: any // EmailService type (optional for now)
+    private emailService?: any, // EmailService type (optional for now)
+    private notificationService?: any // NotificationService (optional)
   ) {
     console.log('[MessageService] Initialized');
   }
@@ -157,6 +158,22 @@ export class MessageService {
       this.emailService.sendNewMessageNotification(message).catch((err: Error) => {
         console.error('[MessageService] Failed to send email notification:', err);
       });
+    }
+
+    // Create in-app notification (async, don't wait)
+    if (this.notificationService) {
+      const senderName = message.sender.fullName || message.sender.username;
+      this.notificationService
+        .notifyNewMessage({
+          recipientId: data.recipientId,
+          senderName,
+          messagePreview: data.content.trim().slice(0, 100),
+          projectTitle: message.project?.title,
+          conversationUrl: `/messages/${senderId}${data.projectId ? `?projectId=${data.projectId}` : ''}`,
+        })
+        .catch((err: Error) => {
+          console.error('[MessageService] Failed to create notification:', err);
+        });
     }
 
     console.log('[MessageService] Message sent successfully:', message.id);

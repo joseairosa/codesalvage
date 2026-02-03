@@ -77,6 +77,7 @@ model User {
   adminAuditLogs       AdminAuditLog[]
   contentReports       ContentReport[]
   apiKeys              ApiKey[]
+  notifications        Notification[]
 
   @@index([email])
   @@index([githubId], map: "idx_github_id")
@@ -512,4 +513,33 @@ model ApiKey {
   @@index([keyHash], map: "idx_api_key_hash")
   @@index([status], map: "idx_api_key_status")
   @@map("api_keys")
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+model Notification {
+  id String @id // ULID generated in repository layer
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type    String // 'new_message', 'project_sold', 'new_review', 'project_featured'
+  title   String
+  message String @db.Text
+
+  actionUrl String? @map("action_url")
+
+  relatedEntityType String? @map("related_entity_type") // 'message', 'transaction', 'review', 'project'
+  relatedEntityId   String? @map("related_entity_id")
+
+  isRead Boolean   @default(false) @map("is_read")
+  readAt DateTime? @map("read_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, isRead], map: "idx_notification_user_unread")
+  @@index([userId, createdAt], map: "idx_notification_user_created")
+  @@map("notifications")
 }

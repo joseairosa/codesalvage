@@ -105,6 +105,19 @@ export type {
 } from './SubscriptionService';
 
 export {
+  NotificationService,
+  NotificationValidationError,
+  NotificationNotFoundError,
+} from './NotificationService';
+export type {
+  NotifyNewMessageParams,
+  NotifyProjectSoldParams,
+  NotifyNewReviewParams,
+  NotifyProjectFeaturedParams,
+  NotificationsResponse,
+} from './NotificationService';
+
+export {
   AdminService,
   AdminValidationError,
   AdminAuthorizationError,

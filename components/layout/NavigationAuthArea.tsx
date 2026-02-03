@@ -23,6 +23,7 @@ import { NavigationLinks } from './NavigationLinks';
 import { UserMenu } from './UserMenu';
 import { MobileMenu } from './MobileMenu';
 import { Skeleton } from '@/components/ui/skeleton';
+import { NotificationBell } from './NotificationBell';
 
 /**
  * NavigationAuthArea Component
@@ -60,6 +61,9 @@ export function NavigationAuthArea() {
           <Skeleton className="h-9 w-9 rounded-full" />
         ) : isAuthenticated && session ? (
           <>
+            {/* Notification bell (desktop + mobile) */}
+            <NotificationBell />
+
             {/* User menu (desktop) */}
             <div className="hidden md:block">
               <UserMenu user={session.user} />
