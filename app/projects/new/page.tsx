@@ -1103,7 +1103,7 @@ export default function NewProjectPage() {
                 type="button"
                 variant="outline"
                 onClick={handleSubmit(onSubmitDraft)}
-                disabled={isSubmitting || !isDirty}
+                disabled={isSubmitting || (!isDirty && !analyzeSuccess)}
               >
                 {isSubmitting ? (
                   <>
@@ -1118,7 +1118,7 @@ export default function NewProjectPage() {
               <Button
                 type="button"
                 onClick={handleSubmit(onSubmitPublish)}
-                disabled={isSubmitting || !isDirty}
+                disabled={isSubmitting || (!isDirty && !analyzeSuccess)}
               >
                 {isSubmitting ? (
                   <>
