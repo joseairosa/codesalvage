@@ -46,6 +46,7 @@ interface UserMenuProps {
     username?: string | null;
     isSeller?: boolean;
     isVerifiedSeller?: boolean;
+    isAdmin?: boolean;
   };
 }
 
@@ -114,6 +115,16 @@ export function UserMenu({ user }: UserMenuProps) {
             <span>Dashboard</span>
           </Link>
         </DropdownMenuItem>
+
+        {/* Admin link */}
+        {user.isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin" className="flex cursor-pointer items-center gap-2">
+              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+              <span>Admin Panel</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
 
         {/* Seller-specific links */}
         {user.isSeller && (
