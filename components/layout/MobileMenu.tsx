@@ -36,6 +36,7 @@ import {
   LayoutDashboard,
   Package,
   Star,
+  ShieldCheck,
 } from 'lucide-react';
 import { NavigationLinks } from './NavigationLinks';
 
@@ -48,6 +49,7 @@ interface MobileMenuProps {
     username?: string | null;
     isSeller?: boolean;
     isVerifiedSeller?: boolean;
+    isAdmin?: boolean;
   };
 }
 
@@ -126,6 +128,15 @@ export function MobileMenu({ user }: MobileMenuProps) {
                 Dashboard
               </Link>
             </Button>
+
+            {user.isAdmin && (
+              <Button variant="ghost" asChild className="justify-start">
+                <Link href="/admin" onClick={() => setIsOpen(false)}>
+                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  Admin Panel
+                </Link>
+              </Button>
+            )}
 
             {user.isSeller && (
               <>
