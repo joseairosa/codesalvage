@@ -54,6 +54,10 @@ const mockEmailService = {
   sendNewMessageNotification: vi.fn().mockResolvedValue(undefined),
 };
 
+const mockNotificationService = {
+  notifyNewMessage: vi.fn().mockResolvedValue({ id: 'notif-123' }),
+};
+
 // Mock user helper
 const createMockUser = (id: string, username: string) => ({
   id,
@@ -591,6 +595,123 @@ describe('MessageService', () => {
       const result = await messageService.getUnreadCount(userId);
 
       expect(result).toBe(0);
+    });
+  });
+
+  // ============================================
+  // NOTIFICATION INTEGRATION TESTS
+  // ============================================
+
+  describe('notification integration', () => {
+    let messageServiceWithNotifications: MessageService;
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      messageServiceWithNotifications = new MessageService(
+        mockMessageRepository,
+        mockUserRepository,
+        mockProjectRepository,
+        mockEmailService,
+        mockNotificationService
+      );
+    });
+
+    it('should create in-app notification when sending a message', async () => {
+      const senderId = 'sender123';
+      const recipientId = 'recipient123';
+      const mockMessage = createMockMessage(senderId, recipientId);
+
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(
+        createMockUser(recipientId, 'recipient') as any
+      );
+      vi.mocked(mockMessageRepository.create).mockResolvedValue(mockMessage);
+
+      await messageServiceWithNotifications.sendMessage(senderId, {
+        recipientId,
+        content: 'Hello!',
+      });
+
+      expect(mockNotificationService.notifyNewMessage).toHaveBeenCalledWith({
+        recipientId,
+        senderName: 'sender Name',
+        messagePreview: 'Hello!',
+        projectTitle: undefined,
+        conversationUrl: `/messages/${senderId}`,
+      });
+    });
+
+    it('should include project title in notification when message has project', async () => {
+      const senderId = 'sender123';
+      const recipientId = 'recipient123';
+      const projectId = 'proj789';
+      const mockMessage = {
+        ...createMockMessage(senderId, recipientId),
+        projectId,
+        project: { id: projectId, title: 'My Cool App', thumbnailImageUrl: null },
+      };
+
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(
+        createMockUser(recipientId, 'recipient') as any
+      );
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(
+        createMockProject(projectId, senderId) as any
+      );
+      vi.mocked(mockMessageRepository.create).mockResolvedValue(mockMessage);
+
+      await messageServiceWithNotifications.sendMessage(senderId, {
+        recipientId,
+        content: 'Interested in your project',
+        projectId,
+      });
+
+      expect(mockNotificationService.notifyNewMessage).toHaveBeenCalledWith({
+        recipientId,
+        senderName: 'sender Name',
+        messagePreview: 'Interested in your project',
+        projectTitle: 'My Cool App',
+        conversationUrl: `/messages/${senderId}?projectId=${projectId}`,
+      });
+    });
+
+    it('should not fail if notification service throws', async () => {
+      const senderId = 'sender123';
+      const recipientId = 'recipient123';
+      const mockMessage = createMockMessage(senderId, recipientId);
+
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(
+        createMockUser(recipientId, 'recipient') as any
+      );
+      vi.mocked(mockMessageRepository.create).mockResolvedValue(mockMessage);
+      mockNotificationService.notifyNewMessage.mockRejectedValue(
+        new Error('Notification failed')
+      );
+
+      // Should not throw
+      const result = await messageServiceWithNotifications.sendMessage(senderId, {
+        recipientId,
+        content: 'Hello!',
+      });
+
+      expect(result).toEqual(mockMessage);
+    });
+
+    it('should not call notification service when not provided', async () => {
+      const senderId = 'sender123';
+      const recipientId = 'recipient123';
+      const mockMessage = createMockMessage(senderId, recipientId);
+
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(
+        createMockUser(recipientId, 'recipient') as any
+      );
+      vi.mocked(mockMessageRepository.create).mockResolvedValue(mockMessage);
+
+      // Use messageService without notificationService
+      await messageService.sendMessage(senderId, {
+        recipientId,
+        content: 'Hello!',
+      });
+
+      expect(mockNotificationService.notifyNewMessage).not.toHaveBeenCalled();
     });
   });
 });

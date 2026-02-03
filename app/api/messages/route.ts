@@ -24,19 +24,24 @@ import { MessageRepository } from '@/lib/repositories/MessageRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 import { emailService } from '@/lib/services';
+import { NotificationService } from '@/lib/services/NotificationService';
+import { NotificationRepository } from '@/lib/repositories/NotificationRepository';
 import { z } from 'zod';
 
 const componentName = 'MessagesAPI';
 
-// Initialize repositories and service
+// Initialize repositories and services
 const messageRepository = new MessageRepository(prisma);
 const userRepository = new UserRepository(prisma);
 const projectRepository = new ProjectRepository(prisma);
+const notificationRepository = new NotificationRepository(prisma);
+const notificationService = new NotificationService(notificationRepository);
 const messageService = new MessageService(
   messageRepository,
   userRepository,
   projectRepository,
-  emailService as any
+  emailService as any,
+  notificationService
 );
 
 const sendMessageSchema = z.object({
