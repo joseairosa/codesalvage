@@ -337,7 +337,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               <CardTitle>Project Description</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-sm dark:prose-invert max-w-none">
+              <div className="prose prose-sm max-w-none dark:prose-invert">
                 <ReactMarkdown>{project.description}</ReactMarkdown>
               </div>
             </CardContent>
@@ -398,7 +398,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                 <CardDescription>What still needs to be completed</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-sm dark:prose-invert max-w-none">
+                <div className="prose prose-sm max-w-none dark:prose-invert">
                   {project.knownIssues.split('\n').map((issue, index) => (
                     <p key={index} className="mb-2 last:mb-0">
                       {issue}

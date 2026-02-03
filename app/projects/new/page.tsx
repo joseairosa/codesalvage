@@ -812,7 +812,7 @@ export default function NewProjectPage() {
                   </div>
                 </div>
                 {showDescriptionPreview ? (
-                  <div className="prose prose-sm dark:prose-invert min-h-[10rem] max-w-none rounded-md border bg-muted/30 p-4">
+                  <div className="prose prose-sm min-h-[10rem] max-w-none rounded-md border bg-muted/30 p-4 dark:prose-invert">
                     {description ? (
                       <ReactMarkdown>{description}</ReactMarkdown>
                     ) : (
