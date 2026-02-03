@@ -7,12 +7,32 @@
 
 import Link from 'next/link';
 import { requireAuth } from '@/lib/auth-helpers';
+import { prisma } from '@/lib/prisma';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 
 export default async function DashboardPage() {
   const session = await requireAuth();
+
+  // Fetch real stats for the dashboard
+  const [projectCount, messageCount, transactionCount, user] = await Promise.all([
+    prisma.project.count({ where: { sellerId: session.user.id } }),
+    prisma.message.count({
+      where: {
+        OR: [{ senderId: session.user.id }, { recipientId: session.user.id }],
+      },
+    }),
+    prisma.transaction.count({
+      where: {
+        OR: [{ buyerId: session.user.id }, { sellerId: session.user.id }],
+      },
+    }),
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { createdAt: true },
+    }),
+  ]);
 
   return (
     <div className="container mx-auto py-10">
@@ -102,13 +122,13 @@ export default async function DashboardPage() {
           <CardContent>
             <div className="space-y-2">
               <div>
-                <span className="font-medium">Projects:</span> 0
+                <span className="font-medium">Projects:</span> {projectCount}
               </div>
               <div>
-                <span className="font-medium">Transactions:</span> 0
+                <span className="font-medium">Transactions:</span> {transactionCount}
               </div>
               <div>
-                <span className="font-medium">Messages:</span> 0
+                <span className="font-medium">Messages:</span> {messageCount}
               </div>
             </div>
           </CardContent>
@@ -125,7 +145,13 @@ export default async function DashboardPage() {
                 {session.user.isVerifiedSeller ? 'Yes' : 'No'}
               </div>
               <div>
-                <span className="font-medium">Member Since:</span> Recently
+                <span className="font-medium">Member Since:</span>{' '}
+                {user?.createdAt
+                  ? new Intl.DateTimeFormat('en-US', {
+                      month: 'long',
+                      year: 'numeric',
+                    }).format(user.createdAt)
+                  : 'Recently'}
               </div>
             </div>
           </CardContent>
