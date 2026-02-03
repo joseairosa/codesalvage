@@ -458,7 +458,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         {/* Sidebar - Right Column (1/3 width) */}
         <div className="space-y-6">
           {/* Purchase Card */}
-          <Card className="sticky top-4">
+          <Card className="sticky top-20 z-30">
             <CardHeader>
               <CardTitle className="text-3xl">
                 {formatPrice(project.priceCents)}
