@@ -18,7 +18,8 @@ import { Badge } from '@/components/ui/badge';
 
 interface Subscription {
   status: string;
-  benefits: {
+  plan?: string;
+  benefits?: {
     verificationBadge: boolean;
     unlimitedProjects: boolean;
     advancedAnalytics: boolean;
@@ -32,12 +33,15 @@ interface ProBadgeProps {
 }
 
 export function ProBadge({ subscription, size = 'md' }: ProBadgeProps) {
-  // Only show badge if subscription is active and has verificationBadge benefit
-  if (
-    !subscription ||
-    subscription.status !== 'active' ||
-    !subscription.benefits.verificationBadge
-  ) {
+  // Show badge if subscription is active with verificationBadge benefit,
+  // or if it's an active pro plan (API shape without benefits object)
+  if (!subscription || subscription.status !== 'active') {
+    return null;
+  }
+
+  const hasBadge =
+    subscription.benefits?.verificationBadge || subscription.plan === 'pro';
+  if (!hasBadge) {
     return null;
   }
 

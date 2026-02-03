@@ -58,84 +58,47 @@ import {
 const componentName = 'ProjectDetailPage';
 
 /**
- * Mock project data (in production, fetch from API)
+ * Project data shape from API
  */
-const mockProject = {
-  id: '1',
-  title: 'E-commerce Dashboard with Analytics',
-  description: `A comprehensive e-commerce admin dashboard built with modern web technologies. This project provides a complete solution for managing online stores with real-time analytics, inventory management, order tracking, and customer insights.
-
-The dashboard is built with a focus on performance and user experience, featuring:
-
-- **Real-time Analytics**: Live sales data, revenue charts, and customer behavior tracking
-- **Inventory Management**: Track stock levels, manage products, handle variants and SKUs
-- **Order Processing**: Complete order lifecycle management from placement to fulfillment
-- **Customer Management**: Customer profiles, purchase history, and engagement metrics
-- **Payment Integration**: Fully functional Stripe integration with webhook handling
-- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
-
-The backend is built with Node.js and Express, using PostgreSQL for data storage and Redis for caching. Authentication is handled via JWT with refresh token rotation for security.`,
-  category: 'web_app',
-  completionPercentage: 85,
-  priceCents: 75000, // $750
-  techStack: [
-    'React',
-    'Node.js',
-    'PostgreSQL',
-    'Tailwind CSS',
-    'Stripe',
-    'Redis',
-    'TypeScript',
-  ],
-  primaryLanguage: 'TypeScript',
-  frameworks: ['Next.js', 'Express', 'Prisma'],
-  licenseType: 'full_code',
-  accessLevel: 'full',
-  thumbnailImageUrl:
-    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
-  screenshotUrls: [
-    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
-    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop',
-    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop',
-  ],
-  githubUrl: 'https://github.com/techbuilder/ecommerce-dashboard',
-  githubRepoName: 'ecommerce-dashboard',
-  demoUrl: 'https://demo.ecommerce-dashboard.com',
-  documentationUrl: 'https://docs.ecommerce-dashboard.com',
-  demoVideoUrl: null,
-  estimatedCompletionHours: 40,
-  knownIssues: `- Missing admin user role management UI
-- Email notifications need to be connected to SendGrid
-- Product import/export CSV functionality is stubbed but not fully implemented
-- Mobile responsiveness needs polish on the analytics charts
-- Test coverage is at 60%, needs to reach 80%`,
-  isFeatured: true,
-  status: 'active',
-  viewCount: 245,
-  favoriteCount: 32,
-  createdAt: new Date('2026-01-20'),
-  updatedAt: new Date('2026-01-24'),
+interface ProjectData {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  completionPercentage: number;
+  priceCents: number;
+  techStack: string[];
+  primaryLanguage: string | null;
+  frameworks: string[];
+  licenseType: string;
+  accessLevel: string;
+  thumbnailImageUrl: string | null;
+  screenshotUrls: string[];
+  githubUrl: string | null;
+  githubRepoName: string | null;
+  demoUrl: string | null;
+  documentationUrl: string | null;
+  demoVideoUrl: string | null;
+  estimatedCompletionHours: number | null;
+  knownIssues: string | null;
+  isFeatured: boolean;
+  status: string;
+  viewCount: number;
+  favoriteCount: number;
+  createdAt: string;
+  updatedAt: string;
   seller: {
-    id: 'seller1',
-    username: 'techbuilder',
-    fullName: 'Sarah Chen',
-    avatarUrl: 'https://i.pravatar.cc/150?img=1',
-    bio: 'Full-stack developer with 8 years of experience. Specialized in React, Node.js, and building scalable web applications.',
-    projectsCount: 12,
-    soldCount: 8,
-    averageRating: 4.8,
-    reviewCount: 15,
+    id: string;
+    username: string;
+    fullName: string | null;
+    avatarUrl: string | null;
+    isVerifiedSeller: boolean;
     subscription: {
-      status: 'active',
-      benefits: {
-        verificationBadge: true,
-        unlimitedProjects: true,
-        advancedAnalytics: true,
-        featuredListingDiscount: true,
-      },
-    },
-  },
-};
+      plan: string;
+      status: string;
+    } | null;
+  };
+}
 
 /**
  * Format price in cents to USD display
@@ -150,14 +113,16 @@ function formatPrice(cents: number): string {
 }
 
 /**
- * Format date
+ * Format date from string or Date
  */
-function formatDate(date: Date): string {
+function formatDate(date: Date | string): string {
+  const d = date instanceof Date ? date : new Date(date);
+  if (isNaN(d.getTime())) return '—';
   return new Intl.DateTimeFormat('en-US', {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
-  }).format(date);
+  }).format(d);
 }
 
 /**
@@ -201,34 +166,81 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   const router = useRouter();
   const [selectedImage, setSelectedImage] = React.useState(0);
   const [isFavorited, setIsFavorited] = React.useState(false);
+  const [project, setProject] = React.useState<ProjectData | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
-  // In production, fetch project data using params.id
-  const project = mockProject;
+  React.useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        const response = await fetch(`/api/projects/${params.id}`);
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError('Project not found');
+          } else {
+            setError('Failed to load project');
+          }
+          return;
+        }
+        const data = await response.json();
+        setProject(data);
+      } catch (err) {
+        console.error(`[${componentName}] Fetch error:`, err);
+        setError('Failed to load project');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProject();
+  }, [params.id]);
 
   const handleBuyNow = () => {
+    if (!project) return;
     console.log(`[${componentName}] Buy Now clicked for project:`, project.id);
-    // Navigate to checkout page
     router.push(`/checkout/${project.id}`);
   };
 
   const handleContactSeller = () => {
+    if (!project) return;
     console.log(`[${componentName}] Contact Seller clicked`);
-    // Navigate to messaging page
     router.push(`/messages/new?seller=${project.seller.id}&project=${project.id}`);
   };
 
   const handleToggleFavorite = () => {
     console.log(`[${componentName}] Toggle favorite:`, !isFavorited);
     setIsFavorited(!isFavorited);
-    // In production, call API to save favorite
   };
 
   const handleShare = () => {
     console.log(`[${componentName}] Share clicked`);
-    // Copy URL to clipboard
     navigator.clipboard.writeText(window.location.href);
-    // Show toast notification
   };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto max-w-7xl py-20">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+          <p className="text-muted-foreground">Loading project...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !project) {
+    return (
+      <div className="container mx-auto max-w-7xl py-20">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <AlertCircle className="h-8 w-8 text-muted-foreground" />
+          <p className="text-muted-foreground">{error || 'Project not found'}</p>
+          <Button variant="outline" onClick={() => router.push('/projects')}>
+            Browse Projects
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto max-w-7xl py-10">
@@ -572,27 +584,12 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                 </div>
               </div>
 
-              {project.seller.bio && (
-                <p className="text-sm text-muted-foreground">{project.seller.bio}</p>
+              {project.seller.isVerifiedSeller && (
+                <div className="flex items-center gap-1.5 text-sm text-green-600">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Verified Seller
+                </div>
               )}
-
-              <Separator />
-
-              {/* Seller Stats */}
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-2xl font-bold">{project.seller.projectsCount}</p>
-                  <p className="text-xs text-muted-foreground">Projects</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{project.seller.soldCount}</p>
-                  <p className="text-xs text-muted-foreground">Sold</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{project.seller.averageRating}</p>
-                  <p className="text-xs text-muted-foreground">Rating</p>
-                </div>
-              </div>
 
               <Button
                 variant="outline"
