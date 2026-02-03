@@ -91,8 +91,8 @@ interface SellerProject {
   priceCents: number;
   viewCount: number;
   favoriteCount: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 /**
@@ -166,12 +166,14 @@ function formatPrice(cents: number): string {
 /**
  * Format date
  */
-function formatDate(date: Date): string {
+function formatDate(date: Date | string): string {
+  const d = date instanceof Date ? date : new Date(date);
+  if (isNaN(d.getTime())) return '—';
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
-  }).format(date);
+  }).format(d);
 }
 
 /**
