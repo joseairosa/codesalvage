@@ -204,7 +204,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   const handleContactSeller = () => {
     if (!project) return;
     console.log(`[${componentName}] Contact Seller clicked`);
-    router.push(`/messages/new?seller=${project.seller.id}&project=${project.id}`);
+    router.push(`/messages/${project.seller.id}?projectId=${project.id}`);
   };
 
   const handleToggleFavorite = () => {
