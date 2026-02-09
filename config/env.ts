@@ -83,6 +83,9 @@ export const env = {
 
   // Cron
   CRON_SECRET: getOptionalEnvVar('CRON_SECRET'),
+
+  // Image Generation (script-only, not needed at runtime)
+  GEMINI_API_KEY: getOptionalEnvVar('GEMINI_API_KEY'),
 } as const;
 
 // Type-safe env check for production

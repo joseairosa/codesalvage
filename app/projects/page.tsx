@@ -21,6 +21,7 @@
 'use client';
 
 import * as React from 'react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ProjectCard, type ProjectCardData } from '@/components/projects/ProjectCard';
 import { Button } from '@/components/ui/button';
@@ -651,9 +652,13 @@ function ProjectSearchContent() {
               {!isLoading && !error && projects.length === 0 && (
                 <Card className="p-12 text-center">
                   <div className="mx-auto max-w-md space-y-4">
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                      <Search className="h-6 w-6 text-muted-foreground" />
-                    </div>
+                    <Image
+                      src="/images/empty-projects.png"
+                      alt="No projects found"
+                      width={160}
+                      height={160}
+                      className="mx-auto"
+                    />
                     <h3 className="text-lg font-semibold">No projects found</h3>
                     <p className="text-sm text-muted-foreground">
                       Try adjusting your filters or search query to find more results.

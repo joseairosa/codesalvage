@@ -18,13 +18,14 @@
 'use client';
 
 import * as React from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/lib/hooks/useSession';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, Inbox } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 const componentName = 'MessagesPage';
@@ -292,9 +293,13 @@ export default function MessagesPage() {
         {!isLoading && !error && conversations.length === 0 && (
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                <Inbox className="h-6 w-6 text-muted-foreground" />
-              </div>
+              <Image
+                src="/images/empty-messages.png"
+                alt="No messages yet"
+                width={160}
+                height={160}
+                className="mb-4"
+              />
               <h3 className="mb-2 text-lg font-semibold">No messages yet</h3>
               <p className="mb-6 max-w-sm text-sm text-muted-foreground">
                 Start a conversation by contacting a seller on a project page, or wait for
