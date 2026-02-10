@@ -14,6 +14,7 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -46,6 +47,8 @@ export const metadata: Metadata = {
 
 interface ProcessStep {
   icon: React.ElementType;
+  image: string;
+  imageAlt: string;
   title: string;
   description: string;
   details: string;
@@ -55,6 +58,8 @@ export default function HowItWorksPage() {
   const buyerSteps: ProcessStep[] = [
     {
       icon: Search,
+      image: '/images/step-list.png',
+      imageAlt: 'Browse projects in the marketplace',
       title: '1. Browse Projects',
       description: 'Explore our marketplace of incomplete software projects',
       details:
@@ -62,6 +67,8 @@ export default function HowItWorksPage() {
     },
     {
       icon: ShoppingCart,
+      image: '/images/step-secure.png',
+      imageAlt: 'Secure payment with escrow',
       title: '2. Purchase Securely',
       description: 'Buy with confidence using our secure checkout',
       details:
@@ -69,6 +76,8 @@ export default function HowItWorksPage() {
     },
     {
       icon: Download,
+      image: '/images/step-download.png',
+      imageAlt: 'Download code package',
       title: '3. Download Code',
       description: 'Get immediate access to the complete codebase',
       details:
@@ -76,6 +85,8 @@ export default function HowItWorksPage() {
     },
     {
       icon: Code,
+      image: '/images/step-complete.png',
+      imageAlt: 'Launch your completed project',
       title: '4. Complete & Launch',
       description: 'Finish development and ship your product',
       details:
@@ -86,6 +97,8 @@ export default function HowItWorksPage() {
   const sellerSteps: ProcessStep[] = [
     {
       icon: Upload,
+      image: '/images/step-list.png',
+      imageAlt: 'Upload your project to the marketplace',
       title: '1. List Your Project',
       description: 'Upload your incomplete project with details',
       details:
@@ -93,6 +106,8 @@ export default function HowItWorksPage() {
     },
     {
       icon: DollarSign,
+      image: '/images/step-price.png',
+      imageAlt: 'Set your project price',
       title: '2. Set Your Price',
       description: 'Choose a fair price based on completeness',
       details:
@@ -100,6 +115,8 @@ export default function HowItWorksPage() {
     },
     {
       icon: CheckCircle,
+      image: '/images/step-connect.png',
+      imageAlt: 'Connect with potential buyers',
       title: '3. Await Purchase',
       description: 'Your project is now live in the marketplace',
       details:
@@ -107,6 +124,8 @@ export default function HowItWorksPage() {
     },
     {
       icon: Lock,
+      image: '/images/step-earn.png',
+      imageAlt: 'Earn money from your project',
       title: '4. Get Paid',
       description: 'Receive payment after escrow release',
       details:
@@ -176,10 +195,22 @@ export default function HowItWorksPage() {
               {buyerSteps.map((step, index) => {
                 const Icon = step.icon;
                 return (
-                  <Card key={index} className="transition-shadow hover:shadow-lg">
+                  <Card
+                    key={index}
+                    className="overflow-hidden transition-shadow hover:shadow-lg"
+                  >
+                    <div className="flex h-40 items-center justify-center bg-blue-50">
+                      <Image
+                        src={step.image}
+                        alt={step.imageAlt}
+                        width={160}
+                        height={160}
+                        className="h-32 w-32 object-contain"
+                      />
+                    </div>
                     <CardHeader>
-                      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
-                        <Icon className="h-6 w-6 text-blue-600" />
+                      <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+                        <Icon className="h-5 w-5 text-blue-600" />
                       </div>
                       <CardTitle className="text-xl">{step.title}</CardTitle>
                       <CardDescription className="text-base">
@@ -226,10 +257,22 @@ export default function HowItWorksPage() {
               {sellerSteps.map((step, index) => {
                 const Icon = step.icon;
                 return (
-                  <Card key={index} className="transition-shadow hover:shadow-lg">
+                  <Card
+                    key={index}
+                    className="overflow-hidden transition-shadow hover:shadow-lg"
+                  >
+                    <div className="flex h-40 items-center justify-center bg-purple-50">
+                      <Image
+                        src={step.image}
+                        alt={step.imageAlt}
+                        width={160}
+                        height={160}
+                        className="h-32 w-32 object-contain"
+                      />
+                    </div>
                     <CardHeader>
-                      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100">
-                        <Icon className="h-6 w-6 text-purple-600" />
+                      <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
+                        <Icon className="h-5 w-5 text-purple-600" />
                       </div>
                       <CardTitle className="text-xl">{step.title}</CardTitle>
                       <CardDescription className="text-base">

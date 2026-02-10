@@ -23,6 +23,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Card,
   CardContent,
@@ -154,11 +155,13 @@ export function ProjectCard({
               className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted-foreground/10">
-              <span className="text-4xl font-bold text-muted-foreground/30">
-                {project.title[0]?.toUpperCase() || '?'}
-              </span>
-            </div>
+            <Image
+              src="/images/placeholder-project.png"
+              alt={project.title}
+              width={400}
+              height={225}
+              className="h-full w-full object-cover"
+            />
           )}
 
           {/* Featured Badge */}
