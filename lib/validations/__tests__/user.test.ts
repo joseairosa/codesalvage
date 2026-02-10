@@ -133,12 +133,20 @@ describe('updateProfileSchema', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.errors[0]?.message).toContain('letters, numbers, underscores');
+        expect(result.error.errors[0]?.message).toContain(
+          'letters, numbers, underscores'
+        );
       }
     });
 
     it('should reject username with special characters', () => {
-      const specialChars = ['test@user', 'test.user', 'test!user', 'test#user', 'test$user'];
+      const specialChars = [
+        'test@user',
+        'test.user',
+        'test!user',
+        'test#user',
+        'test$user',
+      ];
 
       for (const username of specialChars) {
         const result = updateProfileSchema.safeParse({ username });

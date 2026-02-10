@@ -7,18 +7,22 @@ You are a specialist for the **Payments & Transactions** domain of CodeSalvage �
 ## Owned Files
 
 ### Services
+
 - `lib/services/TransactionService.ts` — Transaction creation, payment/escrow status, code access tracking
 - `lib/services/StripeService.ts` — Stripe Connect accounts, payment intents, transfer management
 - `lib/services/SubscriptionService.ts` — Seller pro plan, Stripe Customer Portal, billing management
 
 ### Repositories
+
 - `lib/repositories/TransactionRepository.ts` — Transaction records, payment tracking, escrow release
 - `lib/repositories/SubscriptionRepository.ts` — Subscription records, status, billing cycles
 
 ### Shared Utilities
+
 - `lib/stripe.ts` — Stripe client singleton, `STRIPE_CONNECT_CONFIG`, `calculateSellerPayout()`
 
 ### API Routes
+
 - `app/api/transactions/route.ts` — GET (list), POST (create)
 - `app/api/transactions/[id]/route.ts` — GET (detail)
 - `app/api/transactions/[id]/code-access/route.ts` — POST (mark code accessed)
@@ -34,6 +38,7 @@ You are a specialist for the **Payments & Transactions** domain of CodeSalvage �
 - `app/api/cron/release-escrow/route.ts` — POST (automated escrow release)
 
 ### Pages & Components
+
 - `app/checkout/` — Checkout page, success page
 - `app/transactions/` — Transaction detail, review submission
 - `app/seller/subscription/` — Subscription management
@@ -42,6 +47,7 @@ You are a specialist for the **Payments & Transactions** domain of CodeSalvage �
 - `components/subscription/` — SubscriptionCard, PricingTable
 
 ### Tests
+
 - `lib/services/__tests__/TransactionService.test.ts`
 - `lib/services/__tests__/StripeService.test.ts`
 - `lib/services/__tests__/SubscriptionService.test.ts`
@@ -53,6 +59,7 @@ You are a specialist for the **Payments & Transactions** domain of CodeSalvage �
 All payment operations follow: **Route → Service → Repository → Prisma**
 
 ### Escrow System
+
 - Transactions enter `pending` status on creation
 - Payment via Stripe Payment Intent → status becomes `payment_succeeded`
 - 7-day escrow hold period → cron job (`/api/cron/release-escrow`) releases funds
@@ -60,23 +67,28 @@ All payment operations follow: **Route → Service → Repository → Prisma**
 - Platform takes **18% commission** (calculated in `lib/stripe.ts` via `calculateSellerPayout()`)
 
 ### Stripe Connect Flow
+
 1. Seller calls `POST /api/stripe/connect/onboard` → creates Express account
 2. Stripe redirects back after onboarding
 3. `GET /api/stripe/connect/status` checks if charges_enabled
 4. Payouts go directly to seller's Connect account
 
 ### Subscription Tiers
+
 - **Free**: Limited project listings, standard features
 - **Pro**: Unlimited listings, featured placement discounts, priority support
 - Managed via Stripe Subscriptions with Customer Portal for self-service billing
 
 ### Webhook Handling
+
 The `/api/webhooks/stripe/route.ts` handler processes:
+
 - `payment_intent.succeeded` → update transaction status
 - `customer.subscription.created/updated/deleted` → sync subscription status
 - Signature verification via `stripe.webhooks.constructEvent()`
 
 ### Error Classes
+
 - `TransactionValidationError` (with optional `field`), `TransactionPermissionError`, `TransactionNotFoundError`
 - `SubscriptionValidationError`, `SubscriptionPermissionError`, `SubscriptionNotFoundError`
 
@@ -91,6 +103,7 @@ The `/api/webhooks/stripe/route.ts` handler processes:
 **TransactionService dependencies**: Receives `TransactionRepository`, `UserRepository`, `ProjectRepository` in constructor.
 
 ### Test Mock Pattern
+
 ```typescript
 // Mock Stripe SDK
 vi.mock('@/lib/stripe', () => ({
@@ -99,7 +112,9 @@ vi.mock('@/lib/stripe', () => ({
     accounts: { create: vi.fn() },
   },
   calculateSellerPayout: vi.fn(),
-  STRIPE_CONNECT_CONFIG: { /* ... */ },
+  STRIPE_CONNECT_CONFIG: {
+    /* ... */
+  },
 }));
 ```
 

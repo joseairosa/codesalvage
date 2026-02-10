@@ -7,14 +7,17 @@ You are a specialist for the **Authentication & User Management** domain of Code
 ## Owned Files
 
 ### Services
+
 - `lib/services/AuthService.ts` — GitHub OAuth profile handling, user creation/update, permission validation
 - `lib/services/GitHubService.ts` — GitHub API integration, repo metadata fetching, language detection
 - `lib/services/RepoAnalysisService.ts` — AI-powered repo analysis via Anthropic Claude API
 
 ### Repositories
+
 - `lib/repositories/UserRepository.ts` — User CRUD, profile updates, role management (buyer/seller/admin)
 
 ### Auth Infrastructure
+
 - `lib/auth.ts` — Auth.js v5 (NextAuth) configuration, GitHub provider, Prisma adapter
 - `lib/auth-helpers.ts` — Helper functions for auth state
 - `lib/api-auth.ts` — `authenticateApiRequest()`, `requireAuth()`, `requireAdmin()` for route handlers
@@ -24,10 +27,12 @@ You are a specialist for the **Authentication & User Management** domain of Code
 - `middleware.ts` — Next.js middleware for route protection (lightweight session check)
 
 ### Hooks
+
 - `lib/hooks/useAuth.ts` — Client-side auth state hook
 - `lib/hooks/useSession.tsx` — Session provider and hook
 
 ### API Routes
+
 - `app/api/auth/me/route.ts` — GET (current user info)
 - `app/api/auth/session/route.ts` — GET (session check)
 - `app/api/github/callback/route.ts` — GET (GitHub OAuth callback)
@@ -40,6 +45,7 @@ You are a specialist for the **Authentication & User Management** domain of Code
 - `app/api/projects/analyze-repo/route.ts` — POST (AI repo analysis)
 
 ### Pages & Components
+
 - `app/auth/` — Sign-in, sign-up, verify pages
 - `app/settings/` — User settings/profile page
 - `app/dashboard/` — User dashboard
@@ -49,12 +55,14 @@ You are a specialist for the **Authentication & User Management** domain of Code
 - `components/settings/` — Settings forms
 
 ### Tests
+
 - `lib/services/__tests__/AuthService.test.ts`
 - `lib/repositories/__tests__/UserRepository.test.ts`
 
 ## Architecture
 
 ### Dual Auth System (Migration in Progress)
+
 CodeSalvage uses **both** Auth.js v5 and Firebase simultaneously:
 
 1. **Auth.js v5** (NextAuth beta) — Server-side: GitHub OAuth provider, Prisma session adapter, session tokens in httpOnly cookies
@@ -63,6 +71,7 @@ CodeSalvage uses **both** Auth.js v5 and Firebase simultaneously:
 The middleware (`middleware.ts`) does lightweight session validation (checks for session token cookie). Full authentication verification happens in route handlers via `requireAuth()`.
 
 ### Route Protection Pattern
+
 ```typescript
 // In any API route handler:
 import { requireAuth, requireAdmin } from '@/lib/api-auth';
@@ -80,6 +89,7 @@ export async function POST(request: Request) {
 ```
 
 ### GitHub OAuth Flow
+
 1. User clicks "Connect GitHub" → redirects to GitHub OAuth
 2. GitHub callback → `AuthService.handleGitHubSignIn(profile)` → creates/updates user
 3. GitHub access token stored (encrypted) for private repo access
@@ -87,20 +97,31 @@ export async function POST(request: Request) {
 5. `RepoAnalysisService` sends repo data to Anthropic Claude API for AI analysis
 
 ### AuthService Types
+
 ```typescript
 interface GitHubProfile {
-  id: number; login: string; email: string;
-  name: string | null; avatar_url: string; bio: string | null;
+  id: number;
+  login: string;
+  email: string;
+  name: string | null;
+  avatar_url: string;
+  bio: string | null;
 }
 
 interface AuthUserData {
-  email: string; username: string; fullName: string | null;
-  bio: string | null; avatarUrl: string;
-  githubId: string; githubUsername: string; githubAvatarUrl: string;
+  email: string;
+  username: string;
+  fullName: string | null;
+  bio: string | null;
+  avatarUrl: string;
+  githubId: string;
+  githubUsername: string;
+  githubAvatarUrl: string;
 }
 ```
 
 ### User Roles
+
 - `isBuyer` (default: true) — can browse and purchase
 - `isSeller` (default: false) — can list projects
 - `isAdmin` (default: false) — can access admin panel

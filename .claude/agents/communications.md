@@ -7,15 +7,18 @@ You are a specialist for the **Communications** domain of CodeSalvage — handli
 ## Owned Files
 
 ### Services
+
 - `lib/services/MessageService.ts` — Send messages, get conversations, mark as read, unread counts
 - `lib/services/NotificationService.ts` — Create in-app notifications for events, query with pagination, manage read status
 - `lib/services/EmailService.ts` — Transactional email delivery via Postmark (all email types across the platform)
 
 ### Repositories
+
 - `lib/repositories/MessageRepository.ts` — Message CRUD, conversation retrieval, read status
 - `lib/repositories/NotificationRepository.ts` — Notification creation, querying, read status
 
 ### API Routes
+
 - `app/api/messages/route.ts` — GET (list conversations), POST (send message)
 - `app/api/messages/[userId]/route.ts` — GET (conversation with specific user)
 - `app/api/messages/read/route.ts` — POST (mark messages as read)
@@ -23,11 +26,13 @@ You are a specialist for the **Communications** domain of CodeSalvage — handli
 - `app/api/notifications/unread-count/route.ts` — GET (unread notification count)
 
 ### Pages & Components
+
 - `app/messages/` — Conversations list, individual conversation
 - `components/layout/NotificationBell.tsx` — Notification icon with unread count (polls for updates)
 - `components/layout/NotificationItem.tsx` — Individual notification display
 
 ### Tests
+
 - `lib/services/__tests__/MessageService.test.ts`
 - `lib/services/__tests__/NotificationService.test.ts`
 - `lib/services/__tests__/EmailService.test.ts`
@@ -39,6 +44,7 @@ You are a specialist for the **Communications** domain of CodeSalvage — handli
 All communication operations follow: **Route → Service → Repository → Prisma**
 
 ### Message System
+
 - Buyer-seller DMs with optional project/transaction context linking
 - `MessageService` validates: recipient exists, sender ≠ recipient, content length constraints
 - Content constraints: `MIN_CONTENT_LENGTH` (1), `MAX_CONTENT_LENGTH` (5000)
@@ -46,6 +52,7 @@ All communication operations follow: **Route → Service → Repository → Pris
 - Sends email notification on new message via EmailService (fire-and-forget)
 
 ### Notification System
+
 - In-app notifications created when events occur across the platform
 - Convenience methods: `notifyNewMessage()`, `notifyProjectSold()`, `notifyNewReview()`, `notifyProjectFeatured()`
 - IDs generated with ULID via `generateUlid()` from `ulidx`
@@ -53,6 +60,7 @@ All communication operations follow: **Route → Service → Repository → Pris
 - Constructor: `new NotificationService(notificationRepo)`
 
 ### Email System (Postmark)
+
 - **Largest service** (1256 lines) — sends all transactional emails across the platform
 - Email types: purchase confirmation, escrow release, new message, new review, review reminder, featured listing, ban/unban, featured expiration warning
 - Postmark client initialized from `POSTMARK_API_TOKEN` env var
@@ -61,12 +69,14 @@ All communication operations follow: **Route → Service → Repository → Pris
 - Constructor: `new EmailService()` (no dependencies — standalone)
 
 ### Error Classes
+
 - `MessageValidationError` (with optional `field`), `MessagePermissionError` — from MessageService
 - `NotificationValidationError` (with optional `field`), `NotificationNotFoundError` — from NotificationService
 
 ### Key Patterns
 
 **Fire-and-forget email**:
+
 ```typescript
 // In other services that use EmailService
 this.emailService.sendNewMessageNotification(data).catch((err) => {
@@ -75,6 +85,7 @@ this.emailService.sendNewMessageNotification(data).catch((err) => {
 ```
 
 **Notification creation** (from NotificationService):
+
 ```typescript
 await this.notifyNewMessage({
   recipientId: message.recipientId,
@@ -85,6 +96,7 @@ await this.notifyNewMessage({
 ```
 
 ### Test Mock Pattern
+
 ```typescript
 // Mock Postmark client
 vi.mock('postmark', () => ({

@@ -7,15 +7,19 @@ You are a specialist for the **Admin Panel** domain of CodeSalvage — handling 
 ## Owned Files
 
 ### Services
+
 - `lib/services/AdminService.ts` — Ban/unban users, approve/reject projects, release escrow, platform stats, audit logging, content report management
 
 ### Repositories
+
 - `lib/repositories/AdminRepository.ts` — Audit log CRUD, content reports, platform statistics
 
 ### Utility
+
 - `lib/utils/admin-services.ts` — `getAdminService()` singleton initializer (wires all 5 dependencies)
 
 ### API Routes
+
 - `app/api/admin/stats/route.ts` — GET (platform statistics)
 - `app/api/admin/users/route.ts` — GET (list users with filters)
 - `app/api/admin/users/[userId]/ban/route.ts` — POST (ban user)
@@ -31,10 +35,12 @@ You are a specialist for the **Admin Panel** domain of CodeSalvage — handling 
 - `app/api/admin/audit-logs/route.ts` — GET (audit log history)
 
 ### Pages & Components
+
 - `app/admin/` — Admin dashboard, users, projects, transactions, reports, audit logs pages
 - `components/admin/` — AdminUserTable, AdminProjectList, AuditLogViewer, ContentReportCard, etc.
 
 ### Tests
+
 - `lib/services/__tests__/AdminService.test.ts`
 - `lib/repositories/__tests__/AdminRepository.test.ts`
 - `lib/repositories/__tests__/ProjectRepository.admin.test.ts`
@@ -54,7 +60,7 @@ class AdminService {
     private userRepository: UserRepository,
     private projectRepository: ProjectRepository,
     private transactionRepository: TransactionRepository,
-    private emailService: EmailService,
+    private emailService: EmailService
   ) {}
 }
 ```
@@ -62,9 +68,11 @@ class AdminService {
 Instantiated via `getAdminService()` from `lib/utils/admin-services.ts`.
 
 ### Authorization
+
 All admin routes use `requireAdmin()` from `lib/api-auth.ts` — this checks both authentication and `isAdmin` flag on the user.
 
 ### Audit Logging
+
 **Every admin action creates an audit log entry.** Pattern:
 
 ```typescript
@@ -78,24 +86,29 @@ await this.adminRepository.createAuditLog({
 ```
 
 ### Ban/Unban Flow
+
 1. Validate user exists and is not already banned/unbanned
 2. Update user record via UserRepository
 3. Create audit log
 4. Send email notification via EmailService (ban reason or unban confirmation)
 
 ### Content Moderation
+
 - Content reports have states: `pending` → `resolved` / `dismissed`
 - Resolution includes admin notes and action taken
 - Reports link to projects or users
 
 ### Manual Escrow Release
+
 Admin can override the 7-day escrow hold for dispute resolution via `/api/admin/transactions/[id]/release-escrow`.
 
 ### Error Classes
+
 - `AdminValidationError` — Invalid input to admin operations
 - `AdminAuthorizationError` — Non-admin attempting admin operations
 
 ### Platform Statistics
+
 `AdminService.getPlatformStats()` returns aggregated counts: total users, sellers, buyers, projects, transactions, revenue, active subscriptions.
 
 ## Boundaries

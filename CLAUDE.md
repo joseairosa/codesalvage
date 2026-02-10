@@ -60,22 +60,23 @@ Services receive repositories via constructor injection. All services are instan
 
 ### Key Services & Their Responsibilities
 
-| Service | Domain |
-|---------|--------|
-| `ProjectService` | CRUD, publishing, search, GitHub repo analysis |
-| `TransactionService` | Purchase flow, 7-day escrow, Stripe Payment Intents |
-| `StripeService` | Connect onboarding, payment processing, webhooks |
-| `MessageService` | Buyer-seller direct messaging |
-| `SubscriptionService` | Seller membership tiers via Stripe |
-| `EmailService` | Transactional emails via Postmark |
-| `AdminService` | User management, content moderation, audit logs |
-| `NotificationService` | In-app notification system |
-| `R2Service` | File uploads to Cloudflare R2 (AWS S3 SDK) |
-| `RepoAnalysisService` | GitHub repo analysis via Anthropic Claude API |
+| Service               | Domain                                              |
+| --------------------- | --------------------------------------------------- |
+| `ProjectService`      | CRUD, publishing, search, GitHub repo analysis      |
+| `TransactionService`  | Purchase flow, 7-day escrow, Stripe Payment Intents |
+| `StripeService`       | Connect onboarding, payment processing, webhooks    |
+| `MessageService`      | Buyer-seller direct messaging                       |
+| `SubscriptionService` | Seller membership tiers via Stripe                  |
+| `EmailService`        | Transactional emails via Postmark                   |
+| `AdminService`        | User management, content moderation, audit logs     |
+| `NotificationService` | In-app notification system                          |
+| `R2Service`           | File uploads to Cloudflare R2 (AWS S3 SDK)          |
+| `RepoAnalysisService` | GitHub repo analysis via Anthropic Claude API       |
 
 ### Authentication
 
 Dual auth system (migration in progress):
+
 - **Auth.js v5** (NextAuth beta) — GitHub OAuth, Prisma session adapter
 - **Firebase Client SDK** — Client-side auth state
 - Route protection: lightweight `middleware.ts` + full verification via `requireAuth()` / `requireAdmin()` helpers in route handlers
@@ -88,18 +89,19 @@ Dual auth system (migration in progress):
 
 ### External Integrations
 
-| Integration | Config Location |
-|------------|-----------------|
-| Stripe (Connect + Payments) | `lib/services/StripeService.ts` |
-| Postmark (Email) | `lib/services/EmailService.ts` |
-| Cloudflare R2 (Storage) | `lib/services/R2Service.ts` |
-| Anthropic Claude (AI Analysis) | `lib/services/RepoAnalysisService.ts` |
-| Firebase | `lib/firebase.ts`, `lib/firebase-admin.ts` |
-| Honeybadger (Monitoring) | `next.config.ts` |
+| Integration                    | Config Location                            |
+| ------------------------------ | ------------------------------------------ |
+| Stripe (Connect + Payments)    | `lib/services/StripeService.ts`            |
+| Postmark (Email)               | `lib/services/EmailService.ts`             |
+| Cloudflare R2 (Storage)        | `lib/services/R2Service.ts`                |
+| Anthropic Claude (AI Analysis) | `lib/services/RepoAnalysisService.ts`      |
+| Firebase                       | `lib/firebase.ts`, `lib/firebase-admin.ts` |
+| Honeybadger (Monitoring)       | `next.config.ts`                           |
 
 ### Environment Variables
 
 All defined in `config/env.ts` with strict validation. Key variables:
+
 - `DATABASE_URL` — PostgreSQL (default: `localhost:5444`)
 - `REDIS_URL` — Redis (default: `localhost:6390`)
 - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
@@ -146,6 +148,7 @@ Guidelines for getting maximum throughput from Claude Code sessions on this code
 ### How to Prompt Effectively
 
 **Feature requests** — state all deliverables upfront so Claude can parallelize:
+
 ```
 Add a report-abuse button to project cards. Implement the React component,
 the POST /api/reports endpoint using AdminService, and unit tests for the
@@ -153,17 +156,20 @@ service method — in parallel.
 ```
 
 **Bug fixes** — use "alongside" to signal parallel fix + regression test:
+
 ```
 Fix the escrow release cron skipping transactions with null buyerId.
 Write a regression test alongside the fix.
 ```
 
 **Exploration** — prefix read-only tasks with `/fast`:
+
 ```
 /fast How does the StripeService handle Connect onboarding failures?
 ```
 
 **Multi-step tasks** — numbered lists with explicit parallelization hints:
+
 ```
 1. Add a `reportCount` field to the Project model
 2. Create a migration (don't run it — ask me)
@@ -173,12 +179,12 @@ Write a regression test alongside the fix.
 
 #### Anti-Patterns
 
-| Instead of (sequential) | Do this (goal-oriented) |
-|--------------------------|------------------------|
-| "First read ProjectService" then "now read ProjectRepository" then "now explain how projects are created" | "Explain the project creation flow from API route through service to database" |
-| "Add the field" then "now add the test" then "now add the API route" | "Add field X with repository method, service method, API route, and tests — in parallel where possible" |
-| "What does this function do?" (without context) | "In `lib/services/TransactionService.ts`, what does `releaseEscrow` do and what are its failure modes?" |
-| Running lint, then type-check, then tests separately | "Run lint, type-check, and unit tests" (Claude batches independent commands) |
+| Instead of (sequential)                                                                                   | Do this (goal-oriented)                                                                                 |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| "First read ProjectService" then "now read ProjectRepository" then "now explain how projects are created" | "Explain the project creation flow from API route through service to database"                          |
+| "Add the field" then "now add the test" then "now add the API route"                                      | "Add field X with repository method, service method, API route, and tests — in parallel where possible" |
+| "What does this function do?" (without context)                                                           | "In `lib/services/TransactionService.ts`, what does `releaseEscrow` do and what are its failure modes?" |
+| Running lint, then type-check, then tests separately                                                      | "Run lint, type-check, and unit tests" (Claude batches independent commands)                            |
 
 ### Parallel Tool Usage
 
@@ -195,24 +201,26 @@ This project has 8 specialized agents in `.claude/agents/`. Use them to delegate
 
 **Agent selection guide:**
 
-| Task | Primary Agent | Also Dispatch |
-|------|--------------|---------------|
-| Project CRUD, search, favorites, featured, reviews | `marketplace` | |
-| Payments, escrow, subscriptions, Stripe | `payments` | |
-| Messages, emails, notifications | `communications` | |
-| Moderation, bans, audit logs, reports | `admin` | |
-| Auth, GitHub OAuth, sessions, user profile | `auth` | |
-| Seller dashboard, analytics, onboarding | `seller` | |
-| Run tests, check coverage, diagnose failures | `test-runner` | |
-| Schema design, migration planning | `schema` | affected domain agent(s) |
+| Task                                               | Primary Agent    | Also Dispatch            |
+| -------------------------------------------------- | ---------------- | ------------------------ |
+| Project CRUD, search, favorites, featured, reviews | `marketplace`    |                          |
+| Payments, escrow, subscriptions, Stripe            | `payments`       |                          |
+| Messages, emails, notifications                    | `communications` |                          |
+| Moderation, bans, audit logs, reports              | `admin`          |                          |
+| Auth, GitHub OAuth, sessions, user profile         | `auth`           |                          |
+| Seller dashboard, analytics, onboarding            | `seller`         |                          |
+| Run tests, check coverage, diagnose failures       | `test-runner`    |                          |
+| Schema design, migration planning                  | `schema`         | affected domain agent(s) |
 
 **When to dispatch multiple agents in parallel:**
+
 - **Schema changes**: `schema` (design change) + domain agent (implement service/repo/route)
 - **Cross-domain features**: e.g., dispute system → `payments` + `admin` + `communications`
 - **Post-implementation**: domain agent (code) + `test-runner` (verify)
 - **Integration changes**: e.g., swap email provider → `communications` + `test-runner`
 
 **When to use a single agent:**
+
 - Bug fix within one domain
 - New API endpoint in an existing domain
 - UI component update within a single page section
@@ -220,12 +228,14 @@ This project has 8 specialized agents in `.claude/agents/`. Use them to delegate
 ### Fast Mode
 
 Use `/fast` (same Opus 4.6 model, ~2.5x faster output) for:
+
 - Reading files and answering questions about existing code
 - Simple edits: renaming, adding a field, updating imports
 - Generating boilerplate: new test file scaffolding, new API route skeleton
 - Lookup tasks: "which service handles X?", "where is Y defined?"
 
 Use **normal mode** for:
+
 - Architecture decisions (new service design, schema changes)
 - Complex debugging (multi-file investigation, reproduction)
 - Large refactors touching 5+ files

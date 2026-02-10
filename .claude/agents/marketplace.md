@@ -7,18 +7,21 @@ You are a specialist for the **Marketplace** domain of CodeSalvage — the proje
 ## Owned Files
 
 ### Services
+
 - `lib/services/ProjectService.ts` — Project CRUD, publishing, search, validation, R2 upload coordination
 - `lib/services/FavoriteService.ts` — Toggle favorites, favorite lists, pagination
 - `lib/services/FeaturedListingService.ts` — Featured placement purchase, expiration, pro-tier checks
 - `lib/services/ReviewService.ts` — Review creation, seller rating stats, one-review-per-transaction enforcement
 
 ### Repositories
+
 - `lib/repositories/ProjectRepository.ts` — Project CRUD, search filtering, pagination
 - `lib/repositories/FavoriteRepository.ts` — Favorite tracking, user favorites list
 - `lib/repositories/FeaturedListingRepository.ts` — Featured listing records, expiration tracking
 - `lib/repositories/ReviewRepository.ts` — Review CRUD, seller rating aggregation
 
 ### API Routes
+
 - `app/api/projects/route.ts` — GET (list/search), POST (create)
 - `app/api/projects/[id]/route.ts` — GET, PATCH, DELETE
 - `app/api/projects/[id]/publish/route.ts` — POST (publish project)
@@ -36,11 +39,13 @@ You are a specialist for the **Marketplace** domain of CodeSalvage — the proje
 - `app/api/reviews/stats/[sellerId]/route.ts` — GET (seller rating stats)
 
 ### Pages & Components
+
 - `app/projects/` — Browse, detail, create pages
 - `components/projects/` — ProjectCard, ProjectList, ProjectDetail, etc.
 - `components/reviews/` — ReviewForm, ReviewDisplay, RatingStars
 
 ### Tests
+
 - `lib/services/__tests__/ProjectService.test.ts`
 - `lib/services/__tests__/FavoriteService.test.ts`
 - `lib/services/__tests__/FeaturedListingService.test.ts`
@@ -57,6 +62,7 @@ All marketplace operations follow: **Route → Service → Repository → Prisma
 Services receive repositories via constructor injection and are exported as singletons from `lib/services/index.ts`.
 
 ### Error Classes
+
 - `ProjectValidationError`, `ProjectPermissionError` — from ProjectService
 - `FavoriteValidationError`, `FavoritePermissionError` — from FavoriteService
 - `FeaturedListingValidationError`, `FeaturedListingPermissionError`, `FeaturedListingNotFoundError` — from FeaturedListingService
@@ -79,6 +85,7 @@ Services receive repositories via constructor injection and are exported as sing
 **Review constraints**: ReviewService enforces one review per transaction, ratings 1-5, requires completed payment.
 
 ### Test Mock Pattern
+
 ```typescript
 const mockProjectRepo = {
   create: vi.fn(),
@@ -86,7 +93,11 @@ const mockProjectRepo = {
   // ... all methods as vi.fn()
 } as unknown as ProjectRepository;
 
-const service = new ProjectService(mockProjectRepo, mockR2Service, mockSubscriptionService);
+const service = new ProjectService(
+  mockProjectRepo,
+  mockR2Service,
+  mockSubscriptionService
+);
 ```
 
 ## Boundaries

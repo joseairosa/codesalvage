@@ -121,7 +121,9 @@ async function generateImage(manifest: ImageManifest): Promise<Buffer | null> {
     if (response.status === 429) {
       if (attempt < MAX_RETRIES) {
         const waitSec = (BASE_DELAY_MS * (attempt + 1)) / 1000;
-        console.error(`       Rate limited. Waiting ${waitSec}s before retry ${attempt + 1}/${MAX_RETRIES}...`);
+        console.error(
+          `       Rate limited. Waiting ${waitSec}s before retry ${attempt + 1}/${MAX_RETRIES}...`
+        );
         await sleep(BASE_DELAY_MS * (attempt + 1));
         continue;
       }

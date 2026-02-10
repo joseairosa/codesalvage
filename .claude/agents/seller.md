@@ -7,15 +7,19 @@ You are a specialist for the **Seller Management** domain of CodeSalvage — han
 ## Owned Files
 
 ### Services
+
 - `lib/services/AnalyticsService.ts` — Revenue metrics, project performance, date range normalization, seller permission validation
 
 ### Repositories
+
 - `lib/repositories/AnalyticsRepository.ts` — Revenue aggregation queries, project performance metrics, date-range filtering
 
 ### API Routes
+
 - `app/api/analytics/overview/route.ts` — GET (seller analytics overview with date range)
 
 ### Pages & Components
+
 - `app/seller/dashboard/` — Seller dashboard with revenue stats
 - `app/seller/projects/` — Seller's project listing management
 - `app/seller/onboard/` — Seller onboarding flow
@@ -23,6 +27,7 @@ You are a specialist for the **Seller Management** domain of CodeSalvage — han
 - `components/seller/` — AnalyticsDashboard, DashboardStats, ProjectsList, SubscriptionCard, ProBadge, ProjectLimitWarning
 
 ### Tests
+
 - `lib/services/__tests__/AnalyticsService.test.ts`
 - `lib/repositories/__tests__/AnalyticsRepository.test.ts`
 
@@ -31,19 +36,22 @@ You are a specialist for the **Seller Management** domain of CodeSalvage — han
 Seller analytics follow: **Route → AnalyticsService → AnalyticsRepository → Prisma**
 
 ### AnalyticsService
+
 Constructor: `new AnalyticsService(analyticsRepo, userRepo)`
 
 Key operations:
+
 - `getSellerOverview(sellerId, request)` — Main analytics endpoint
 - Validates seller permission (user must be seller)
 - Normalizes date ranges (defaults to last 30 days)
 - Returns formatted `AnalyticsOverviewResponse`
 
 ### Analytics Data Model
+
 ```typescript
 interface AnalyticsOverviewRequest {
-  startDate?: string;  // ISO date string
-  endDate?: string;    // ISO date string
+  startDate?: string; // ISO date string
+  endDate?: string; // ISO date string
   granularity?: 'day' | 'week' | 'month';
 }
 
@@ -53,17 +61,21 @@ interface AnalyticsOverviewResponse {
 ```
 
 The `SellerAnalytics` Prisma model stores denormalized stats:
+
 - Total projects listed and sold
 - Total revenue
 - Average rating
 - Updated when transactions complete or reviews are submitted
 
 ### Error Classes
+
 - `AnalyticsPermissionError` — Non-seller attempting to access analytics
 - `AnalyticsValidationError` (with optional `field`) — Invalid date range or parameters
 
 ### Seller Onboarding
+
 The onboarding flow involves multiple domains:
+
 1. User signs up → `auth` agent domain
 2. Connects Stripe → `payments` agent domain (StripeService.createConnectAccount)
 3. Creates first project → `marketplace` agent domain

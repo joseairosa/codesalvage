@@ -36,6 +36,7 @@ npm run test:ui                    # Open Vitest UI dashboard
 ## Test Configuration
 
 ### Vitest (Unit + Integration)
+
 - Config: `vitest.config.ts` (unit), `vitest.integration.config.ts` (integration)
 - Environment: jsdom
 - Setup file: `tests/setup.ts`
@@ -44,12 +45,14 @@ npm run test:ui                    # Open Vitest UI dashboard
 - Coverage provider: v8
 
 ### Coverage Thresholds (must pass)
+
 - Lines: **70%**
 - Functions: **70%**
 - Branches: **70%**
 - Statements: **70%**
 
 ### Playwright (E2E)
+
 - Config: `playwright.config.ts`
 - Browser: chromium
 - Test directory: `e2e/`
@@ -57,16 +60,20 @@ npm run test:ui                    # Open Vitest UI dashboard
 ## Test File Locations
 
 ### Unit Tests
+
 - `lib/services/__tests__/*.test.ts` — Service unit tests
 - `lib/repositories/__tests__/*.test.ts` — Repository unit tests
 
 ### Integration Tests
+
 - `tests/integration/` — Integration tests (require test DB)
 
 ### E2E Tests
+
 - `e2e/` — Playwright end-to-end tests
 
 ### Admin-Specific Tests
+
 - `lib/repositories/__tests__/ProjectRepository.admin.test.ts`
 - `lib/repositories/__tests__/TransactionRepository.admin.test.ts`
 - `lib/repositories/__tests__/UserRepository.admin.test.ts`
@@ -84,6 +91,7 @@ npm run test:ui                    # Open Vitest UI dashboard
 ## Diagnosing Failures
 
 When tests fail:
+
 1. Read the full error output carefully — identify which test and which assertion failed
 2. Check if it's a test infrastructure issue (DB not running, missing env vars) vs a code logic issue
 3. For DB-related failures: verify test containers are running with `docker ps`
@@ -93,6 +101,7 @@ When tests fail:
 ## CI/CD Pipeline
 
 GitHub Actions runs on every PR:
+
 1. `npm run lint` — ESLint
 2. `npm run type-check` — TypeScript
 3. `npm run test:ci` — Unit tests with coverage

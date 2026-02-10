@@ -195,7 +195,10 @@ export default function HowItWorksPage() {
               {buyerSteps.map((step, index) => {
                 const Icon = step.icon;
                 return (
-                  <Card key={index} className="overflow-hidden transition-shadow hover:shadow-lg">
+                  <Card
+                    key={index}
+                    className="overflow-hidden transition-shadow hover:shadow-lg"
+                  >
                     <div className="flex h-40 items-center justify-center bg-blue-50">
                       <Image
                         src={step.image}
@@ -254,7 +257,10 @@ export default function HowItWorksPage() {
               {sellerSteps.map((step, index) => {
                 const Icon = step.icon;
                 return (
-                  <Card key={index} className="overflow-hidden transition-shadow hover:shadow-lg">
+                  <Card
+                    key={index}
+                    className="overflow-hidden transition-shadow hover:shadow-lg"
+                  >
                     <div className="flex h-40 items-center justify-center bg-purple-50">
                       <Image
                         src={step.image}
