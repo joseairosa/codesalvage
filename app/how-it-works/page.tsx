@@ -342,9 +342,7 @@ export default function HowItWorksPage() {
           <div className="mx-auto max-w-3xl">
             <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 p-px">
               <div className="rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 px-8 py-10 sm:px-12">
-                <h3 className="text-2xl font-bold text-white">
-                  Transparent Pricing
-                </h3>
+                <h3 className="text-2xl font-bold text-white">Transparent Pricing</h3>
                 <p className="mt-2 text-blue-100">
                   No hidden fees. Know exactly what you pay or earn.
                 </p>
@@ -354,9 +352,7 @@ export default function HowItWorksPage() {
                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
                       <DollarSign className="h-5 w-5 text-white" />
                     </div>
-                    <p className="font-semibold text-white">
-                      Buyers: Listed Price
-                    </p>
+                    <p className="font-semibold text-white">Buyers: Listed Price</p>
                     <p className="mt-1 text-sm text-blue-100">
                       No additional fees. What you see is what you pay.
                     </p>
@@ -366,11 +362,10 @@ export default function HowItWorksPage() {
                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
                       <CheckCircle className="h-5 w-5 text-white" />
                     </div>
-                    <p className="font-semibold text-white">
-                      Sellers: 82% Earnings
-                    </p>
+                    <p className="font-semibold text-white">Sellers: 82% Earnings</p>
                     <p className="mt-1 text-sm text-blue-100">
-                      18% platform commission covers payments, escrow, hosting, and support.
+                      18% platform commission covers payments, escrow, hosting, and
+                      support.
                     </p>
                   </div>
 
@@ -378,9 +373,7 @@ export default function HowItWorksPage() {
                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
                       <Shield className="h-5 w-5 text-white" />
                     </div>
-                    <p className="font-semibold text-white">
-                      7-Day Escrow
-                    </p>
+                    <p className="font-semibold text-white">7-Day Escrow</p>
                     <p className="mt-1 text-sm text-blue-100">
                       Payments held to protect buyers. Automatic release if no disputes.
                     </p>
