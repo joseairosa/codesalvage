@@ -92,6 +92,61 @@ export interface NotifyProjectFeaturedParams {
 }
 
 /**
+ * Parameters for creating a new offer notification
+ */
+export interface NotifyNewOfferParams {
+  sellerId: string;
+  buyerName: string;
+  projectTitle: string;
+  offeredPrice: string;
+  offerId: string;
+}
+
+/**
+ * Parameters for creating an offer accepted notification
+ */
+export interface NotifyOfferAcceptedParams {
+  recipientId: string;
+  otherPartyName: string;
+  projectTitle: string;
+  agreedPrice: string;
+  offerId: string;
+  actionUrl: string;
+}
+
+/**
+ * Parameters for creating an offer rejected notification
+ */
+export interface NotifyOfferRejectedParams {
+  recipientId: string;
+  otherPartyName: string;
+  projectTitle: string;
+  offerId: string;
+  actionUrl: string;
+}
+
+/**
+ * Parameters for creating an offer countered notification
+ */
+export interface NotifyOfferCounteredParams {
+  buyerId: string;
+  sellerName: string;
+  projectTitle: string;
+  counterPrice: string;
+  offerId: string;
+}
+
+/**
+ * Parameters for creating an offer expired notification
+ */
+export interface NotifyOfferExpiredParams {
+  recipientId: string;
+  projectTitle: string;
+  offerId: string;
+  actionUrl: string;
+}
+
+/**
  * Response shape for getNotifications
  */
 export interface NotificationsResponse {
@@ -309,6 +364,102 @@ export class NotificationService {
       actionUrl: `/projects/${params.projectId}`,
       relatedEntityType: 'project',
       relatedEntityId: params.projectId,
+    });
+  }
+
+  /**
+   * Create a notification for a new offer
+   */
+  async notifyNewOffer(params: NotifyNewOfferParams): Promise<Notification> {
+    console.log('[NotificationService] notifyNewOffer:', {
+      sellerId: params.sellerId,
+      buyerName: params.buyerName,
+    });
+
+    return this.createNotification({
+      userId: params.sellerId,
+      type: 'new_offer',
+      title: 'New offer received!',
+      message: `${params.buyerName} offered ${params.offeredPrice} for "${params.projectTitle}"`,
+      actionUrl: '/seller/offers',
+      relatedEntityType: 'offer',
+      relatedEntityId: params.offerId,
+    });
+  }
+
+  /**
+   * Create a notification for an accepted offer
+   */
+  async notifyOfferAccepted(params: NotifyOfferAcceptedParams): Promise<Notification> {
+    console.log('[NotificationService] notifyOfferAccepted:', {
+      recipientId: params.recipientId,
+    });
+
+    return this.createNotification({
+      userId: params.recipientId,
+      type: 'offer_accepted',
+      title: 'Offer accepted!',
+      message: `${params.otherPartyName} accepted the offer of ${params.agreedPrice} for "${params.projectTitle}"`,
+      actionUrl: params.actionUrl,
+      relatedEntityType: 'offer',
+      relatedEntityId: params.offerId,
+    });
+  }
+
+  /**
+   * Create a notification for a rejected offer
+   */
+  async notifyOfferRejected(params: NotifyOfferRejectedParams): Promise<Notification> {
+    console.log('[NotificationService] notifyOfferRejected:', {
+      recipientId: params.recipientId,
+    });
+
+    return this.createNotification({
+      userId: params.recipientId,
+      type: 'offer_rejected',
+      title: 'Offer rejected',
+      message: `${params.otherPartyName} rejected your offer for "${params.projectTitle}"`,
+      actionUrl: params.actionUrl,
+      relatedEntityType: 'offer',
+      relatedEntityId: params.offerId,
+    });
+  }
+
+  /**
+   * Create a notification for a counter-offer
+   */
+  async notifyOfferCountered(params: NotifyOfferCounteredParams): Promise<Notification> {
+    console.log('[NotificationService] notifyOfferCountered:', {
+      buyerId: params.buyerId,
+    });
+
+    return this.createNotification({
+      userId: params.buyerId,
+      type: 'offer_countered',
+      title: 'Counter-offer received!',
+      message: `${params.sellerName} counter-offered ${params.counterPrice} for "${params.projectTitle}"`,
+      actionUrl: '/dashboard/offers',
+      relatedEntityType: 'offer',
+      relatedEntityId: params.offerId,
+    });
+  }
+
+  /**
+   * Create a notification for an expired offer
+   */
+  async notifyOfferExpired(params: NotifyOfferExpiredParams): Promise<Notification> {
+    console.log('[NotificationService] notifyOfferExpired:', {
+      recipientId: params.recipientId,
+    });
+
+    return this.createNotification({
+      userId: params.recipientId,
+      type: 'offer_expired',
+      title: 'Offer expired',
+      message: `An offer for "${params.projectTitle}" has expired`,
+      actionUrl: params.actionUrl,
+      relatedEntityType: 'offer',
+      relatedEntityId: params.offerId,
     });
   }
 

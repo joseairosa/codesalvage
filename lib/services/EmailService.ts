@@ -72,6 +72,17 @@ export interface FeaturedListingEmailData {
   projectUrl: string;
 }
 
+export interface OfferEmailData {
+  recipientName: string;
+  otherPartyName: string;
+  projectTitle: string;
+  projectId: string;
+  offeredPriceCents: number;
+  listingPriceCents: number;
+  offerUrl: string;
+  checkoutUrl?: string;
+}
+
 export interface UserBannedEmailData {
   username: string;
   reason: string;
@@ -1051,6 +1062,70 @@ ${appUrl}
   }
 
   /**
+   * Send new offer notification to seller
+   */
+  async sendNewOfferNotification(
+    recipient: EmailRecipient,
+    data: OfferEmailData
+  ): Promise<void> {
+    const subject = `New Offer on ${data.projectTitle}`;
+    const html = this.getNewOfferHTML(data);
+    const text = this.getNewOfferText(data);
+
+    await this.sendEmail(recipient, subject, html, text);
+
+    console.log(`[${componentName}] New offer notification sent:`, recipient.email);
+  }
+
+  /**
+   * Send offer accepted notification
+   */
+  async sendOfferAcceptedNotification(
+    recipient: EmailRecipient,
+    data: OfferEmailData
+  ): Promise<void> {
+    const subject = `Offer Accepted - ${data.projectTitle}`;
+    const html = this.getOfferAcceptedHTML(data);
+    const text = this.getOfferAcceptedText(data);
+
+    await this.sendEmail(recipient, subject, html, text);
+
+    console.log(`[${componentName}] Offer accepted notification sent:`, recipient.email);
+  }
+
+  /**
+   * Send offer rejected notification
+   */
+  async sendOfferRejectedNotification(
+    recipient: EmailRecipient,
+    data: OfferEmailData
+  ): Promise<void> {
+    const subject = `Offer Update - ${data.projectTitle}`;
+    const html = this.getOfferRejectedHTML(data);
+    const text = this.getOfferRejectedText(data);
+
+    await this.sendEmail(recipient, subject, html, text);
+
+    console.log(`[${componentName}] Offer rejected notification sent:`, recipient.email);
+  }
+
+  /**
+   * Send counter-offer notification to buyer
+   */
+  async sendOfferCounteredNotification(
+    recipient: EmailRecipient,
+    data: OfferEmailData
+  ): Promise<void> {
+    const subject = `Counter-Offer on ${data.projectTitle}`;
+    const html = this.getOfferCounteredHTML(data);
+    const text = this.getOfferCounteredText(data);
+
+    await this.sendEmail(recipient, subject, html, text);
+
+    console.log(`[${componentName}] Counter-offer notification sent:`, recipient.email);
+  }
+
+  /**
    * Send user banned notification
    */
   async sendUserBannedNotification(
@@ -1080,6 +1155,310 @@ ${appUrl}
     await this.sendEmail(recipient, subject, html, text);
 
     console.log(`[${componentName}] User unbanned notification sent:`, recipient.email);
+  }
+
+  /**
+   * Email Templates - New Offer
+   */
+  private getNewOfferHTML(data: OfferEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+    const discount = Math.round(
+      ((data.listingPriceCents - data.offeredPriceCents) / data.listingPriceCents) * 100
+    );
+
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px;">
+    New Offer Received!
+  </h1>
+
+  <p>Hi ${data.recipientName},</p>
+
+  <p>${data.otherPartyName} has made an offer on your project.</p>
+
+  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h2 style="margin-top: 0;">Offer Details</h2>
+    <p><strong>Project:</strong> ${data.projectTitle}</p>
+    <p><strong>Listed Price:</strong> ${this.formatPrice(data.listingPriceCents)}</p>
+    <p><strong>Offered Price:</strong> ${this.formatPrice(data.offeredPriceCents)}</p>
+    <p><strong>Discount:</strong> ${discount}% off listing price</p>
+  </div>
+
+  <p>You can accept, reject, or counter this offer from your seller dashboard.</p>
+
+  <a href="${appUrl}/seller/offers" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0;">
+    Review Offer
+  </a>
+
+  <p style="font-size: 14px; color: #666; margin-top: 20px;">
+    This offer will expire in 7 days if no action is taken.
+  </p>
+
+  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+  <p style="font-size: 12px; color: #999;">
+    CodeSalvage - Marketplace for Incomplete Software Projects<br>
+    <a href="${appUrl}">Visit our website</a>
+  </p>
+</body>
+</html>
+    `.trim();
+  }
+
+  private getNewOfferText(data: OfferEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+    const discount = Math.round(
+      ((data.listingPriceCents - data.offeredPriceCents) / data.listingPriceCents) * 100
+    );
+
+    return `
+New Offer Received!
+
+Hi ${data.recipientName},
+
+${data.otherPartyName} has made an offer on your project.
+
+OFFER DETAILS
+Project: ${data.projectTitle}
+Listed Price: ${this.formatPrice(data.listingPriceCents)}
+Offered Price: ${this.formatPrice(data.offeredPriceCents)}
+Discount: ${discount}% off listing price
+
+You can accept, reject, or counter this offer from your seller dashboard.
+
+Review offer: ${appUrl}/seller/offers
+
+This offer will expire in 7 days if no action is taken.
+
+CodeSalvage - Marketplace for Incomplete Software Projects
+${appUrl}
+    `.trim();
+  }
+
+  /**
+   * Email Templates - Offer Accepted
+   */
+  private getOfferAcceptedHTML(data: OfferEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #10b981; border-bottom: 2px solid #10b981; padding-bottom: 10px;">
+    Offer Accepted!
+  </h1>
+
+  <p>Hi ${data.recipientName},</p>
+
+  <p>Great news! ${data.otherPartyName} has accepted the offer for <strong>${data.projectTitle}</strong>.</p>
+
+  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h2 style="margin-top: 0;">Agreed Price</h2>
+    <p><strong>Project:</strong> ${data.projectTitle}</p>
+    <p><strong>Agreed Price:</strong> ${this.formatPrice(data.offeredPriceCents)}</p>
+    <p><strong>Original Price:</strong> <span style="text-decoration: line-through;">${this.formatPrice(data.listingPriceCents)}</span></p>
+  </div>
+
+  ${
+    data.checkoutUrl
+      ? `
+  <p>You can now proceed to checkout at the agreed price:</p>
+  <a href="${data.checkoutUrl}" style="display: inline-block; background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0;">
+    Complete Purchase
+  </a>
+  `
+      : `
+  <p>The buyer can now proceed to checkout at the agreed price.</p>
+  <a href="${appUrl}/seller/offers" style="display: inline-block; background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0;">
+    View Offers
+  </a>
+  `
+  }
+
+  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+  <p style="font-size: 12px; color: #999;">
+    CodeSalvage - Marketplace for Incomplete Software Projects<br>
+    <a href="${appUrl}">Visit our website</a>
+  </p>
+</body>
+</html>
+    `.trim();
+  }
+
+  private getOfferAcceptedText(data: OfferEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+Offer Accepted!
+
+Hi ${data.recipientName},
+
+Great news! ${data.otherPartyName} has accepted the offer for ${data.projectTitle}.
+
+AGREED PRICE
+Project: ${data.projectTitle}
+Agreed Price: ${this.formatPrice(data.offeredPriceCents)}
+Original Price: ${this.formatPrice(data.listingPriceCents)}
+
+${data.checkoutUrl ? `Complete your purchase: ${data.checkoutUrl}` : `The buyer can now proceed to checkout at the agreed price.\n\nView offers: ${appUrl}/seller/offers`}
+
+CodeSalvage - Marketplace for Incomplete Software Projects
+${appUrl}
+    `.trim();
+  }
+
+  /**
+   * Email Templates - Offer Rejected
+   */
+  private getOfferRejectedHTML(data: OfferEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #6b7280; border-bottom: 2px solid #6b7280; padding-bottom: 10px;">
+    Offer Update
+  </h1>
+
+  <p>Hi ${data.recipientName},</p>
+
+  <p>${data.otherPartyName} has declined the offer for <strong>${data.projectTitle}</strong>.</p>
+
+  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <p><strong>Project:</strong> ${data.projectTitle}</p>
+    <p><strong>Offered Price:</strong> ${this.formatPrice(data.offeredPriceCents)}</p>
+  </div>
+
+  <p>You can still purchase this project at the listed price of ${this.formatPrice(data.listingPriceCents)}, or make a new offer.</p>
+
+  <a href="${appUrl}/projects/${data.projectId}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0;">
+    View Project
+  </a>
+
+  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+  <p style="font-size: 12px; color: #999;">
+    CodeSalvage - Marketplace for Incomplete Software Projects<br>
+    <a href="${appUrl}">Visit our website</a>
+  </p>
+</body>
+</html>
+    `.trim();
+  }
+
+  private getOfferRejectedText(data: OfferEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+Offer Update
+
+Hi ${data.recipientName},
+
+${data.otherPartyName} has declined the offer for ${data.projectTitle}.
+
+Project: ${data.projectTitle}
+Offered Price: ${this.formatPrice(data.offeredPriceCents)}
+
+You can still purchase this project at the listed price of ${this.formatPrice(data.listingPriceCents)}, or make a new offer.
+
+View project: ${appUrl}/projects/${data.projectId}
+
+CodeSalvage - Marketplace for Incomplete Software Projects
+${appUrl}
+    `.trim();
+  }
+
+  /**
+   * Email Templates - Counter-Offer
+   */
+  private getOfferCounteredHTML(data: OfferEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #f59e0b; border-bottom: 2px solid #f59e0b; padding-bottom: 10px;">
+    Counter-Offer Received!
+  </h1>
+
+  <p>Hi ${data.recipientName},</p>
+
+  <p>${data.otherPartyName} has made a counter-offer on <strong>${data.projectTitle}</strong>.</p>
+
+  <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0;">
+    <h2 style="margin-top: 0;">Counter-Offer Details</h2>
+    <p><strong>Project:</strong> ${data.projectTitle}</p>
+    <p><strong>Listed Price:</strong> ${this.formatPrice(data.listingPriceCents)}</p>
+    <p><strong>Counter-Offer Price:</strong> ${this.formatPrice(data.offeredPriceCents)}</p>
+  </div>
+
+  <p>You can accept this counter-offer, reject it, or continue the negotiation.</p>
+
+  <a href="${appUrl}/dashboard/offers" style="display: inline-block; background: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0;">
+    Review Counter-Offer
+  </a>
+
+  <p style="font-size: 14px; color: #666; margin-top: 20px;">
+    This counter-offer will expire in 7 days if no action is taken.
+  </p>
+
+  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+  <p style="font-size: 12px; color: #999;">
+    CodeSalvage - Marketplace for Incomplete Software Projects<br>
+    <a href="${appUrl}">Visit our website</a>
+  </p>
+</body>
+</html>
+    `.trim();
+  }
+
+  private getOfferCounteredText(data: OfferEmailData): string {
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+
+    return `
+Counter-Offer Received!
+
+Hi ${data.recipientName},
+
+${data.otherPartyName} has made a counter-offer on ${data.projectTitle}.
+
+COUNTER-OFFER DETAILS
+Project: ${data.projectTitle}
+Listed Price: ${this.formatPrice(data.listingPriceCents)}
+Counter-Offer Price: ${this.formatPrice(data.offeredPriceCents)}
+
+You can accept this counter-offer, reject it, or continue the negotiation.
+
+Review counter-offer: ${appUrl}/dashboard/offers
+
+This counter-offer will expire in 7 days if no action is taken.
+
+CodeSalvage - Marketplace for Incomplete Software Projects
+${appUrl}
+    `.trim();
   }
 
   /**

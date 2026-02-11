@@ -18,7 +18,7 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from '@/lib/hooks/useSession';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -31,7 +31,7 @@ import {
 } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, AlertCircle, ShieldCheck, Lock } from 'lucide-react';
+import { Loader2, AlertCircle, ShieldCheck, Lock, Tag } from 'lucide-react';
 import { env } from '@/config/env';
 import { CheckoutForm } from '@/components/checkout/CheckoutForm';
 
@@ -67,6 +67,8 @@ export default function CheckoutPage({ params }: { params: { projectId: string }
   console.log(`[${componentName}] Page rendered for project:`, params.projectId);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const offerId = searchParams.get('offerId');
   const { data: _session, status: sessionStatus } = useSession();
 
   const [project, setProject] = React.useState<Project | null>(null);
@@ -107,10 +109,17 @@ export default function CheckoutPage({ params }: { params: { projectId: string }
         console.log(`[${componentName}] Project loaded:`, projectData.title);
 
         // Create payment intent
+        const intentBody: { projectId: string; offerId?: string } = {
+          projectId: params.projectId,
+        };
+        if (offerId) {
+          intentBody.offerId = offerId;
+        }
+
         const intentResponse = await fetch('/api/checkout/create-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ projectId: params.projectId }),
+          body: JSON.stringify(intentBody),
         });
 
         if (!intentResponse.ok) {
@@ -133,7 +142,7 @@ export default function CheckoutPage({ params }: { params: { projectId: string }
     }
 
     initialize();
-  }, [params.projectId, sessionStatus, router]);
+  }, [params.projectId, offerId, sessionStatus, router]);
 
   /**
    * Format price in cents to USD
@@ -200,11 +209,26 @@ export default function CheckoutPage({ params }: { params: { projectId: string }
 
                   <Separator />
 
+                  {/* Offer Price Indicator */}
+                  {offerId && project.priceCents !== breakdown.total && (
+                    <div className="flex items-center gap-2 rounded-md bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950 dark:text-green-300">
+                      <Tag className="h-4 w-4" />
+                      <span>Purchasing at negotiated offer price</span>
+                    </div>
+                  )}
+
                   {/* Price Breakdown */}
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Project Price</span>
-                      <span className="font-medium">{formatPrice(breakdown.total)}</span>
+                      <div className="text-right">
+                        {offerId && project.priceCents !== breakdown.total && (
+                          <span className="mr-2 text-xs text-muted-foreground line-through">
+                            {formatPrice(project.priceCents)}
+                          </span>
+                        )}
+                        <span className="font-medium">{formatPrice(breakdown.total)}</span>
+                      </div>
                     </div>
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>Platform Fee (15%)</span>

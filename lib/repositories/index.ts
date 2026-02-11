@@ -88,3 +88,10 @@ export type {
   ContentReportWithReporter,
   AdminPaginationOptions,
 } from './AdminRepository';
+
+export { OfferRepository } from './OfferRepository';
+export type {
+  CreateOfferInput,
+  OfferWithRelations,
+  OfferQueryOptions,
+} from './OfferRepository';

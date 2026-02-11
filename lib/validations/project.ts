@@ -85,6 +85,13 @@ export const createProjectSchema = z.object({
     .min(10000, 'Price must be at least $100')
     .max(10000000, 'Price cannot exceed $100,000'),
 
+  minimumOfferCents: z
+    .number()
+    .int('Minimum offer must be a whole number')
+    .min(1000, 'Minimum offer must be at least $10')
+    .nullable()
+    .optional(),
+
   // Licensing
   licenseType: z.enum(LICENSE_TYPES, {
     errorMap: () => ({ message: 'Please select a valid license type' }),

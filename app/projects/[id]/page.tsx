@@ -37,6 +37,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import ReactMarkdown from 'react-markdown';
 import { ProBadge } from '@/components/seller/ProBadge';
+import { MakeOfferDialog } from '@/components/offers/MakeOfferDialog';
 import {
   Star,
   Eye,
@@ -53,6 +54,7 @@ import {
   DollarSign,
   ShieldCheck,
   Download,
+  Tag,
 } from 'lucide-react';
 
 const componentName = 'ProjectDetailPage';
@@ -81,6 +83,7 @@ interface ProjectData {
   demoVideoUrl: string | null;
   estimatedCompletionHours: number | null;
   knownIssues: string | null;
+  minimumOfferCents: number | null;
   isFeatured: boolean;
   status: string;
   viewCount: number;
@@ -169,6 +172,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   const [project, setProject] = React.useState<ProjectData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [offerDialogOpen, setOfferDialogOpen] = React.useState(false);
 
   React.useEffect(() => {
     const fetchProject = async () => {
@@ -528,6 +532,15 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                   Buy Now
                 </Button>
                 <Button
+                  onClick={() => setOfferDialogOpen(true)}
+                  variant="outline"
+                  size="lg"
+                  className="w-full"
+                >
+                  <Tag className="mr-2 h-4 w-4" />
+                  Make an Offer
+                </Button>
+                <Button
                   onClick={handleContactSeller}
                   variant="outline"
                   size="lg"
@@ -537,6 +550,13 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                   Contact Seller
                 </Button>
               </div>
+
+              {/* Minimum Offer Hint */}
+              {project.minimumOfferCents && (
+                <p className="text-center text-xs text-muted-foreground">
+                  Minimum offer: {formatPrice(project.minimumOfferCents)}
+                </p>
+              )}
 
               {/* Trust Indicators */}
               <div className="flex items-center justify-center gap-4 pt-2 text-xs text-muted-foreground">
@@ -602,6 +622,16 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           </Card>
         </div>
       </div>
+
+      {/* Make Offer Dialog */}
+      <MakeOfferDialog
+        isOpen={offerDialogOpen}
+        onClose={() => setOfferDialogOpen(false)}
+        projectId={project.id}
+        projectTitle={project.title}
+        priceCents={project.priceCents}
+        minimumOfferCents={project.minimumOfferCents}
+      />
     </div>
   );
 }

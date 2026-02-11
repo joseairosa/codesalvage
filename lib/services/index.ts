@@ -138,3 +138,15 @@ export {
   repoAnalysisSchema,
 } from './RepoAnalysisService';
 export type { RepoAnalysisResult } from './RepoAnalysisService';
+
+export {
+  OfferService,
+  OfferValidationError,
+  OfferPermissionError,
+  OfferNotFoundError,
+} from './OfferService';
+export type {
+  CreateOfferRequest,
+  CounterOfferRequest,
+  RejectOfferRequest,
+} from './OfferService';

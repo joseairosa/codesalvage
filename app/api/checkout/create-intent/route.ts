@@ -21,6 +21,7 @@ import { z } from 'zod';
 
 const createIntentSchema = z.object({
   projectId: z.string(),
+  offerId: z.string().optional(),
 });
 
 /**
@@ -50,11 +51,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const { projectId } = validatedData.data;
+    const { projectId, offerId } = validatedData.data;
 
     console.log('[Create Intent] Creating payment intent:', {
       projectId,
       buyerId: auth.user.id,
+      offerId: offerId || null,
     });
 
     // Get project with seller info
@@ -101,8 +103,48 @@ export async function POST(request: Request) {
       );
     }
 
-    // Calculate payment breakdown
-    const breakdown = calculatePaymentBreakdown(project.priceCents);
+    // Determine the purchase price (offer price or listing price)
+    let purchasePriceCents = project.priceCents;
+    let linkedOfferId: string | undefined;
+
+    if (offerId) {
+      // Validate the accepted offer
+      const offer = await prisma.offer.findUnique({ where: { id: offerId } });
+
+      if (!offer) {
+        return NextResponse.json({ error: 'Offer not found' }, { status: 404 });
+      }
+      if (offer.status !== 'accepted') {
+        return NextResponse.json(
+          { error: 'Offer must be accepted before checkout' },
+          { status: 400 }
+        );
+      }
+      if (offer.buyerId !== auth.user.id) {
+        return NextResponse.json(
+          { error: 'This offer does not belong to you' },
+          { status: 403 }
+        );
+      }
+      if (offer.projectId !== projectId) {
+        return NextResponse.json(
+          { error: 'Offer does not match this project' },
+          { status: 400 }
+        );
+      }
+
+      purchasePriceCents = offer.offeredPriceCents;
+      linkedOfferId = offer.id;
+
+      console.log('[Create Intent] Using offer price:', {
+        offerId: offer.id,
+        offerPrice: purchasePriceCents,
+        listingPrice: project.priceCents,
+      });
+    }
+
+    // Calculate payment breakdown using the determined price
+    const breakdown = calculatePaymentBreakdown(purchasePriceCents);
     const escrowReleaseDate = calculateEscrowReleaseDate();
 
     console.log('[Create Intent] Payment breakdown:', breakdown);
@@ -125,8 +167,16 @@ export async function POST(request: Request) {
 
     console.log('[Create Intent] Transaction created:', transaction.id);
 
+    // Link offer to transaction if applicable
+    if (linkedOfferId) {
+      await prisma.offer.update({
+        where: { id: linkedOfferId },
+        data: { transactionId: transaction.id },
+      });
+    }
+
     // Create Stripe Payment Intent
-    const paymentIntent = await stripeService.createPaymentIntent(project.priceCents, {
+    const paymentIntent = await stripeService.createPaymentIntent(purchasePriceCents, {
       projectId: project.id,
       sellerId: project.sellerId,
       buyerId: auth.user.id,

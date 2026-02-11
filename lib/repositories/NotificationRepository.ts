@@ -28,7 +28,12 @@ export type NotificationType =
   | 'new_message'
   | 'project_sold'
   | 'new_review'
-  | 'project_featured';
+  | 'project_featured'
+  | 'new_offer'
+  | 'offer_accepted'
+  | 'offer_rejected'
+  | 'offer_countered'
+  | 'offer_expired';
 
 /**
  * Notification creation input
