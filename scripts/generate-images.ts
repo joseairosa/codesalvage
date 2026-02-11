@@ -93,6 +93,46 @@ const IMAGES: ImageManifest[] = [
     filename: 'logo.png',
     prompt: `${STYLE_PREFIX} a logomark icon: a recycling symbol made of code angle brackets < > and curly braces { }, blue to purple gradient, simple bold design, no text, centered on white background, square composition`,
   },
+  {
+    filename: 'auth-illustration.png',
+    prompt: `${STYLE_PREFIX} a developer unlocking a door shaped like a code editor window, a key made of angle brackets <>, welcoming open doorway with warm light, wide composition`,
+  },
+  {
+    filename: 'checkout-success.png',
+    prompt: `${STYLE_PREFIX} a celebration scene with confetti and sparkles around a gift box containing source code, a checkmark badge, purchase complete concept, wide composition`,
+  },
+  {
+    filename: 'error-illustration.png',
+    prompt: `${STYLE_PREFIX} a broken gear with a sad face, tangled wires, a wrench nearby suggesting fixability, friendly error concept, square composition`,
+  },
+  {
+    filename: 'empty-offers.png',
+    prompt: `${STYLE_PREFIX} an empty price tag next to a quiet marketplace stall, no offers concept, peaceful and expectant, square composition`,
+  },
+  {
+    filename: 'empty-reviews.png',
+    prompt: `${STYLE_PREFIX} empty star outlines floating above an open book, no reviews yet concept, clean and inviting, square composition`,
+  },
+  {
+    filename: 'seller-onboard.png',
+    prompt: `${STYLE_PREFIX} a developer standing at a launchpad with a rocket made of code brackets, onboarding journey concept, pathway with milestone markers, wide composition`,
+  },
+  {
+    filename: 'not-found.png',
+    prompt: `${STYLE_PREFIX} a lost astronaut floating in space near a broken hyperlink chain, 404 not found concept, whimsical and friendly, square composition`,
+  },
+  {
+    filename: 'settings-header.png',
+    prompt: `${STYLE_PREFIX} a developer adjusting sliders and toggles on a control panel, profile settings concept, customization dials, wide composition`,
+  },
+  {
+    filename: 'pricing-header.png',
+    prompt: `${STYLE_PREFIX} two treasure chests side by side, one open with a free tag and one glowing with a pro badge, pricing tiers concept, wide composition`,
+  },
+  {
+    filename: 'opengraph-image.png',
+    prompt: `${STYLE_PREFIX} the text "CodeSalvage" in bold modern font next to a recycling symbol made of code brackets <> and curly braces {}, blue to purple gradient, centered on white background, social media card layout, 1200x630 aspect ratio`,
+  },
 ];
 
 function sleep(ms: number): Promise<void> {

@@ -16,6 +16,7 @@
  */
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { NavigationAuthArea } from './NavigationAuthArea';
 
 /**
@@ -31,9 +32,14 @@ export function Navigation() {
           className="flex items-center gap-2 transition-transform hover:scale-105"
           aria-label="CodeSalvage home"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-md">
-            <span className="text-xl font-bold text-white">CS</span>
-          </div>
+          <Image
+            src="/images/logo.png"
+            alt="CodeSalvage logo"
+            width={40}
+            height={40}
+            className="rounded-lg shadow-md"
+            priority
+          />
           <span className="hidden text-xl font-bold text-gray-900 sm:inline">
             Code<span className="text-blue-600">Salvage</span>
           </span>

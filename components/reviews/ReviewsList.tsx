@@ -22,6 +22,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Star, Loader2, AlertCircle } from 'lucide-react';
+import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 
 const componentName = 'ReviewsList';
@@ -183,7 +184,14 @@ export function ReviewsList({ sellerId, limit = 10 }: ReviewsListProps) {
   if (reviews.length === 0) {
     return (
       <Card className="border-dashed">
-        <CardContent className="py-8 text-center text-muted-foreground">
+        <CardContent className="flex flex-col items-center py-8 text-center text-muted-foreground">
+          <Image
+            src="/images/empty-reviews.png"
+            alt="No reviews yet"
+            width={160}
+            height={160}
+            className="mb-4"
+          />
           <p>No reviews yet</p>
         </CardContent>
       </Card>

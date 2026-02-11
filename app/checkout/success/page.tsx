@@ -29,13 +29,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
-  CheckCircle2,
   Download,
   FileCode,
   ArrowRight,
   Loader2,
   AlertCircle,
 } from 'lucide-react';
+import Image from 'next/image';
 
 const componentName = 'CheckoutSuccessPage';
 
@@ -157,9 +157,13 @@ function CheckoutSuccessContent() {
             {/* Success Header */}
             <Card className="border-green-500">
               <CardHeader className="text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500">
-                  <CheckCircle2 className="h-10 w-10 text-white" />
-                </div>
+                <Image
+                  src="/images/checkout-success.png"
+                  alt="Payment successful"
+                  width={600}
+                  height={338}
+                  className="mx-auto mb-4 rounded-lg"
+                />
                 <CardTitle className="text-2xl">Payment Successful!</CardTitle>
                 <CardDescription>
                   Your purchase has been completed and is now in escrow

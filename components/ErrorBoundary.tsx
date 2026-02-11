@@ -29,7 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
+import { Home, RefreshCw } from 'lucide-react';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -128,9 +128,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
           <Card className="w-full max-w-md border-2 border-red-200 shadow-xl">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-                <AlertTriangle className="h-8 w-8 text-red-600" aria-hidden="true" />
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/error-illustration.png"
+                alt="Something went wrong"
+                width={160}
+                height={160}
+                className="mx-auto mb-4"
+              />
 
               <CardTitle className="text-2xl font-bold">
                 Oops! Something went wrong

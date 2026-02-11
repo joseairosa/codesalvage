@@ -33,12 +33,21 @@ export const metadata: Metadata = {
     description:
       'Buy and sell incomplete software projects. Turn your 80% complete side project into revenue.',
     siteName: 'CodeSalvage',
+    images: [
+      {
+        url: '/images/opengraph-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'CodeSalvage - Marketplace for Incomplete Software Projects',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'CodeSalvage - Marketplace for Incomplete Software Projects',
     description:
       'Buy and sell incomplete software projects. Turn your 80% complete side project into revenue.',
+    images: ['/images/opengraph-image.png'],
   },
   robots: {
     index: true,

@@ -37,6 +37,7 @@ import {
   TrendingUp,
   ArrowRight,
 } from 'lucide-react';
+import Image from 'next/image';
 
 const componentName = 'SellerOnboardPage';
 
@@ -137,6 +138,14 @@ export default function SellerOnboardPage() {
       <div className="space-y-8">
         {/* Header */}
         <div className="text-center">
+          <Image
+            src="/images/seller-onboard.png"
+            alt="Become a seller on CodeSalvage"
+            width={600}
+            height={338}
+            className="mx-auto mb-6 rounded-lg"
+            priority
+          />
           <h1 className="text-3xl font-bold">Become a Seller</h1>
           <p className="mt-2 text-muted-foreground">
             Set up your seller account to start listing projects
