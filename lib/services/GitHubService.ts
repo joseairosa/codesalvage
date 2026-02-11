@@ -271,6 +271,215 @@ export class GitHubService {
     return response.json() as Promise<any>;
   }
 
+  // ============================================
+  // COLLABORATOR MANAGEMENT
+  // ============================================
+
+  /**
+   * Add a collaborator to a GitHub repository.
+   *
+   * @param owner - Repository owner
+   * @param repo - Repository name
+   * @param username - GitHub username to add
+   * @param token - OAuth access token
+   * @param permission - Permission level (default: 'admin')
+   * @returns Object indicating whether an invitation was created or user was already a collaborator
+   */
+  async addCollaborator(
+    owner: string,
+    repo: string,
+    username: string,
+    token: string,
+    permission: string = 'admin'
+  ): Promise<{ invitationId?: string; alreadyCollaborator: boolean }> {
+    console.log('[GitHubService] Adding collaborator', {
+      owner,
+      repo,
+      username,
+      permission,
+    });
+
+    const response = await this.githubRequest(
+      `/repos/${owner}/${repo}/collaborators/${username}`,
+      'PUT',
+      token,
+      { permission }
+    );
+
+    if (response.status === 201) {
+      const data = await response.json();
+      console.log('[GitHubService] Invitation created for collaborator', {
+        username,
+        invitationId: data.id,
+      });
+      return { invitationId: String(data.id), alreadyCollaborator: false };
+    }
+
+    if (response.status === 204) {
+      console.log('[GitHubService] User is already a collaborator', { username });
+      return { alreadyCollaborator: true };
+    }
+
+    if (response.status === 404) {
+      throw new GitHubServiceError(
+        `Repository ${owner}/${repo} not found or user ${username} does not exist`,
+        404
+      );
+    }
+
+    if (response.status === 403) {
+      throw new GitHubServiceError(
+        `Forbidden: insufficient permissions to add collaborator to ${owner}/${repo}`,
+        403
+      );
+    }
+
+    if (response.status === 422) {
+      throw new GitHubServiceError(
+        `Validation failed: unable to add ${username} as collaborator`,
+        422
+      );
+    }
+
+    throw new GitHubServiceError(
+      `GitHub API error: ${response.status} ${response.statusText}`,
+      response.status
+    );
+  }
+
+  /**
+   * Check if a user is a collaborator on a repository.
+   *
+   * @param owner - Repository owner
+   * @param repo - Repository name
+   * @param username - GitHub username to check
+   * @param token - OAuth access token
+   * @returns true if user is a collaborator, false otherwise
+   */
+  async checkCollaboratorAccess(
+    owner: string,
+    repo: string,
+    username: string,
+    token: string
+  ): Promise<boolean> {
+    console.log('[GitHubService] Checking collaborator access', {
+      owner,
+      repo,
+      username,
+    });
+
+    try {
+      const response = await this.githubRequest(
+        `/repos/${owner}/${repo}/collaborators/${username}`,
+        'GET',
+        token
+      );
+
+      if (response.status === 204) {
+        console.log('[GitHubService] User is a collaborator', { username });
+        return true;
+      }
+
+      if (response.status === 404) {
+        console.log('[GitHubService] User is not a collaborator', { username });
+        return false;
+      }
+
+      throw new GitHubServiceError(
+        `GitHub API error: ${response.status} ${response.statusText}`,
+        response.status
+      );
+    } catch (error) {
+      if (error instanceof GitHubServiceError) {
+        throw error;
+      }
+      throw new GitHubServiceError(
+        `Failed to check collaborator access: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Remove a collaborator from a GitHub repository.
+   *
+   * @param owner - Repository owner
+   * @param repo - Repository name
+   * @param username - GitHub username to remove
+   * @param token - OAuth access token
+   */
+  async removeCollaborator(
+    owner: string,
+    repo: string,
+    username: string,
+    token: string
+  ): Promise<void> {
+    console.log('[GitHubService] Removing collaborator', { owner, repo, username });
+
+    const response = await this.githubRequest(
+      `/repos/${owner}/${repo}/collaborators/${username}`,
+      'DELETE',
+      token
+    );
+
+    if (response.status === 204) {
+      console.log('[GitHubService] Collaborator removed successfully', { username });
+      return;
+    }
+
+    if (response.status === 404) {
+      throw new GitHubServiceError(
+        `Repository ${owner}/${repo} not found or user ${username} is not a collaborator`,
+        404
+      );
+    }
+
+    if (response.status === 403) {
+      throw new GitHubServiceError(
+        `Forbidden: insufficient permissions to remove collaborator from ${owner}/${repo}`,
+        403
+      );
+    }
+
+    throw new GitHubServiceError(
+      `GitHub API error: ${response.status} ${response.statusText}`,
+      response.status
+    );
+  }
+
+  /**
+   * Generic GitHub API request helper that supports different HTTP methods.
+   *
+   * Unlike `githubFetch` (GET-only with auto-JSON parsing), this returns
+   * the raw Response so callers can inspect status codes.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async githubRequest(
+    path: string,
+    method: string,
+    token?: string,
+    body?: Record<string, unknown>
+  ): Promise<Response> {
+    const headers: Record<string, string> = {
+      Accept: 'application/vnd.github.v3+json',
+      'User-Agent': 'CodeSalvage/1.0',
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    if (body) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    const options: RequestInit = { method, headers };
+    if (body) {
+      options.body = JSON.stringify(body);
+    }
+
+    return fetch(`${GITHUB_API_BASE}${path}`, options);
+  }
+
   // --- Dependency file parsers ---
 
   private parsePackageJson(content: string): Record<string, string> {

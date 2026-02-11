@@ -44,6 +44,8 @@ export interface TransactionWithRelations extends Transaction {
     thumbnailImageUrl: string | null;
     priceCents: number;
     status: string;
+    githubUrl: string | null;
+    githubRepoName: string | null;
   };
   seller: {
     id: string;
@@ -52,6 +54,8 @@ export interface TransactionWithRelations extends Transaction {
     avatarUrl: string | null;
     stripeAccountId: string | null;
     email: string | null;
+    githubUsername: string | null;
+    githubAccessToken: string | null;
   };
   buyer: {
     id: string;
@@ -59,11 +63,35 @@ export interface TransactionWithRelations extends Transaction {
     fullName: string | null;
     avatarUrl: string | null;
     email: string | null;
+    githubUsername: string | null;
   };
   review?: {
     id: string;
     overallRating: number;
     comment: string | null;
+    createdAt: Date;
+  } | null;
+  offer?: {
+    id: string;
+    status: string;
+    offeredPriceCents: number;
+    respondedAt: Date | null;
+  } | null;
+  repositoryTransfer?: {
+    id: string;
+    githubRepoFullName: string;
+    method: string;
+    status: string;
+    githubInvitationId: string | null;
+    sellerGithubUsername: string;
+    buyerGithubUsername: string | null;
+    initiatedAt: Date | null;
+    invitationSentAt: Date | null;
+    acceptedAt: Date | null;
+    completedAt: Date | null;
+    failedAt: Date | null;
+    errorMessage: string | null;
+    retryCount: number;
     createdAt: Date;
   } | null;
 }
@@ -120,6 +148,8 @@ export class TransactionRepository {
               thumbnailImageUrl: true,
               priceCents: true,
               status: true,
+              githubUrl: true,
+              githubRepoName: true,
             },
           },
           seller: {
@@ -130,6 +160,8 @@ export class TransactionRepository {
               avatarUrl: true,
               stripeAccountId: true,
               email: true,
+              githubUsername: true,
+              githubAccessToken: true,
             },
           },
           buyer: {
@@ -139,6 +171,7 @@ export class TransactionRepository {
               fullName: true,
               avatarUrl: true,
               email: true,
+              githubUsername: true,
             },
           },
           review: {
@@ -149,6 +182,15 @@ export class TransactionRepository {
               createdAt: true,
             },
           },
+          offer: {
+            select: {
+              id: true,
+              status: true,
+              offeredPriceCents: true,
+              respondedAt: true,
+            },
+          },
+          repositoryTransfer: true,
         },
       });
 
@@ -231,7 +273,7 @@ export class TransactionRepository {
       const totalPages = Math.ceil(total / limit);
 
       return {
-        transactions: transactions as TransactionWithRelations[],
+        transactions: transactions as unknown as TransactionWithRelations[],
         total,
         page,
         limit,
@@ -317,7 +359,7 @@ export class TransactionRepository {
       const totalPages = Math.ceil(total / limit);
 
       return {
-        transactions: transactions as TransactionWithRelations[],
+        transactions: transactions as unknown as TransactionWithRelations[],
         total,
         page,
         limit,
@@ -403,7 +445,7 @@ export class TransactionRepository {
       const totalPages = Math.ceil(total / limit);
 
       return {
-        transactions: transactions as TransactionWithRelations[],
+        transactions: transactions as unknown as TransactionWithRelations[],
         total,
         page,
         limit,
@@ -799,7 +841,7 @@ export class TransactionRepository {
         '[TransactionRepository] Found transactions (admin):',
         transactions.length
       );
-      return transactions as TransactionWithRelations[];
+      return transactions as unknown as unknown as TransactionWithRelations[];
     } catch (error) {
       console.error('[TransactionRepository] getAllTransactions failed:', error);
       throw new Error('[TransactionRepository] Failed to get all transactions');

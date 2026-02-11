@@ -257,9 +257,10 @@ model Transaction {
   completedAt DateTime? @map("completed_at")
 
   // Relations
-  review   Review?
-  messages Message[]
-  offer    Offer?
+  review             Review?
+  messages           Message[]
+  offer              Offer?
+  repositoryTransfer RepositoryTransfer?
 
   @@index([projectId], map: "idx_project_id")
   @@index([sellerId], map: "idx_transaction_seller_id")
@@ -596,4 +597,49 @@ model Offer {
   @@index([status], map: "idx_offer_status")
   @@index([expiresAt], map: "idx_offer_expires_at")
   @@map("offers")
+}
+
+// ============================================
+// REPOSITORY TRANSFERS
+// ============================================
+
+model RepositoryTransfer {
+  id String @id // ULID generated in repository layer
+
+  transactionId String      @unique @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict)
+
+  // GitHub repo info
+  githubRepoFullName String @map("github_repo_full_name") // "owner/repo"
+
+  // Transfer method
+  method String @default("github_collaborator") @map("method") // 'github_collaborator', 'manual'
+
+  // Status
+  status String @default("pending") @map("status") // 'pending', 'invitation_sent', 'accepted', 'completed', 'failed'
+
+  // GitHub invitation
+  githubInvitationId String? @map("github_invitation_id")
+
+  // Participants
+  sellerGithubUsername String  @map("seller_github_username")
+  buyerGithubUsername  String? @map("buyer_github_username")
+
+  // Timestamps
+  initiatedAt    DateTime? @map("initiated_at")
+  invitationSentAt DateTime? @map("invitation_sent_at")
+  acceptedAt     DateTime? @map("accepted_at")
+  completedAt    DateTime? @map("completed_at")
+  failedAt       DateTime? @map("failed_at")
+
+  // Error tracking
+  errorMessage String? @map("error_message") @db.Text
+  retryCount   Int     @default(0) @map("retry_count")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([transactionId], map: "idx_repo_transfer_transaction_id")
+  @@index([status], map: "idx_repo_transfer_status")
+  @@map("repository_transfers")
 }

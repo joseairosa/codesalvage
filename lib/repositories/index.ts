@@ -95,3 +95,6 @@ export type {
   OfferWithRelations,
   OfferQueryOptions,
 } from './OfferRepository';
+
+export { RepositoryTransferRepository } from './RepositoryTransferRepository';
+export type { CreateRepositoryTransferInput } from './RepositoryTransferRepository';

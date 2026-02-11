@@ -66,6 +66,8 @@ const createMockTransactionWithRelations = (
     thumbnailImageUrl: 'https://example.com/thumb.jpg',
     priceCents: 10000,
     status: 'active',
+    githubUrl: null,
+    githubRepoName: null,
   },
   seller: {
     id: 'seller789',
@@ -74,6 +76,8 @@ const createMockTransactionWithRelations = (
     avatarUrl: 'https://example.com/seller.jpg',
     stripeAccountId: 'acct_123',
     email: 'seller@example.com',
+    githubUsername: null,
+    githubAccessToken: null,
   },
   buyer: {
     id: 'buyer012',
@@ -81,8 +85,11 @@ const createMockTransactionWithRelations = (
     fullName: 'Buyer Name',
     avatarUrl: 'https://example.com/buyer.jpg',
     email: 'buyer@example.com',
+    githubUsername: null,
   },
   review: null,
+  offer: null,
+  repositoryTransfer: null,
   ...overrides,
 });
 
@@ -115,6 +122,8 @@ describe('TransactionRepository', () => {
               thumbnailImageUrl: true,
               priceCents: true,
               status: true,
+              githubUrl: true,
+              githubRepoName: true,
             },
           },
           seller: {
@@ -125,6 +134,8 @@ describe('TransactionRepository', () => {
               avatarUrl: true,
               stripeAccountId: true,
               email: true,
+              githubUsername: true,
+              githubAccessToken: true,
             },
           },
           buyer: {
@@ -134,6 +145,7 @@ describe('TransactionRepository', () => {
               fullName: true,
               avatarUrl: true,
               email: true,
+              githubUsername: true,
             },
           },
           review: {
@@ -144,6 +156,15 @@ describe('TransactionRepository', () => {
               createdAt: true,
             },
           },
+          offer: {
+            select: {
+              id: true,
+              status: true,
+              offeredPriceCents: true,
+              respondedAt: true,
+            },
+          },
+          repositoryTransfer: true,
         },
       });
     });

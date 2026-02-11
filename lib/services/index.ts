@@ -114,6 +114,8 @@ export type {
   NotifyProjectSoldParams,
   NotifyNewReviewParams,
   NotifyProjectFeaturedParams,
+  NotifyRepoTransferInitiatedParams,
+  NotifyRepoTransferConfirmedParams,
   NotificationsResponse,
 } from './NotificationService';
 
@@ -150,3 +152,15 @@ export type {
   CounterOfferRequest,
   RejectOfferRequest,
 } from './OfferService';
+
+export {
+  RepositoryTransferService,
+  RepositoryTransferValidationError,
+  RepositoryTransferPermissionError,
+  RepositoryTransferNotFoundError,
+} from './RepositoryTransferService';
+export type {
+  TimelineStageStatus,
+  TimelineAction,
+  TimelineStage,
+} from './RepositoryTransferService';
