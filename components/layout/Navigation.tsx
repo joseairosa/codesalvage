@@ -35,9 +35,8 @@ export function Navigation() {
           <Image
             src="/images/logo.png"
             alt="CodeSalvage logo"
-            width={40}
-            height={40}
-            className="rounded-lg shadow-md"
+            width={48}
+            height={48}
             priority
           />
           <span className="hidden text-xl font-bold text-gray-900 sm:inline">
