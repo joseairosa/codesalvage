@@ -28,13 +28,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  Download,
-  FileCode,
-  ArrowRight,
-  Loader2,
-  AlertCircle,
-} from 'lucide-react';
+import { Download, FileCode, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 
 const componentName = 'CheckoutSuccessPage';
