@@ -340,51 +340,54 @@ export default function HowItWorksPage() {
       <div className="bg-gray-50 py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl">
-            <Card className="border-2 border-blue-200 bg-blue-50">
-              <CardHeader>
-                <CardTitle className="text-2xl">Transparent Pricing</CardTitle>
-                <CardDescription className="text-base">
+            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 p-px">
+              <div className="rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 px-8 py-10 sm:px-12">
+                <h3 className="text-2xl font-bold text-white">
+                  Transparent Pricing
+                </h3>
+                <p className="mt-2 text-blue-100">
                   No hidden fees. Know exactly what you pay or earn.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600" />
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      For Buyers: Pay Listed Price
+                </p>
+
+                <div className="mt-8 grid gap-6 sm:grid-cols-3">
+                  <div className="rounded-xl bg-white/10 p-5 backdrop-blur-sm">
+                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                      <DollarSign className="h-5 w-5 text-white" />
+                    </div>
+                    <p className="font-semibold text-white">
+                      Buyers: Listed Price
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="mt-1 text-sm text-blue-100">
                       No additional fees. What you see is what you pay.
                     </p>
                   </div>
-                </div>
 
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600" />
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      For Sellers: 18% Platform Commission
+                  <div className="rounded-xl bg-white/10 p-5 backdrop-blur-sm">
+                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                      <CheckCircle className="h-5 w-5 text-white" />
+                    </div>
+                    <p className="font-semibold text-white">
+                      Sellers: 82% Earnings
                     </p>
-                    <p className="text-sm text-gray-600">
-                      We take 18% of sale price. You keep 82%. Covers payment processing,
-                      escrow, hosting, and support.
+                    <p className="mt-1 text-sm text-blue-100">
+                      18% platform commission covers payments, escrow, hosting, and support.
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl bg-white/10 p-5 backdrop-blur-sm">
+                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                      <Shield className="h-5 w-5 text-white" />
+                    </div>
+                    <p className="font-semibold text-white">
+                      7-Day Escrow
+                    </p>
+                    <p className="mt-1 text-sm text-blue-100">
+                      Payments held to protect buyers. Automatic release if no disputes.
                     </p>
                   </div>
                 </div>
-
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600" />
-                  <div>
-                    <p className="font-medium text-gray-900">7-Day Escrow Period</p>
-                    <p className="text-sm text-gray-600">
-                      Payments held for 7 days to protect buyers. Automatic release if no
-                      disputes.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </div>
