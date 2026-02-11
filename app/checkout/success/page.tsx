@@ -28,7 +28,14 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Download, FileCode, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import {
+  Download,
+  FileCode,
+  FileText,
+  ArrowRight,
+  Loader2,
+  AlertCircle,
+} from 'lucide-react';
 import Image from 'next/image';
 
 const componentName = 'CheckoutSuccessPage';
@@ -265,6 +272,15 @@ function CheckoutSuccessContent() {
               >
                 <Download className="mr-2 h-4 w-4" />
                 Download Code
+              </Button>
+              <Button
+                onClick={() => router.push(`/transactions/${transaction.id}`)}
+                variant="outline"
+                className="flex-1"
+                size="lg"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                View Transaction Details
               </Button>
               <Button
                 onClick={() => router.push('/buyer/purchases')}

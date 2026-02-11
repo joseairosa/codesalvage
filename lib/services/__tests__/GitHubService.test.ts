@@ -224,4 +224,156 @@ describe('GitHubService', () => {
       expect(result.metadata.isPrivate).toBe(false);
     });
   });
+
+  // ============================================
+  // COLLABORATOR MANAGEMENT
+  // ============================================
+
+  describe('addCollaborator', () => {
+    it('should send invitation and return invitationId on 201 response', async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ id: 12345 }), {
+          status: 201,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      );
+
+      const result = await service.addCollaborator(
+        'owner',
+        'repo',
+        'newuser',
+        'test-token'
+      );
+
+      expect(result).toEqual({ invitationId: '12345', alreadyCollaborator: false });
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://api.github.com/repos/owner/repo/collaborators/newuser',
+        expect.objectContaining({
+          method: 'PUT',
+          headers: expect.objectContaining({
+            Authorization: 'Bearer test-token',
+            'Content-Type': 'application/json',
+          }),
+          body: JSON.stringify({ permission: 'admin' }),
+        })
+      );
+    });
+
+    it('should detect already collaborator on 204 response', async () => {
+      mockFetch.mockResolvedValueOnce(new Response(null, { status: 204 }));
+
+      const result = await service.addCollaborator(
+        'owner',
+        'repo',
+        'existinguser',
+        'test-token'
+      );
+
+      expect(result).toEqual({ alreadyCollaborator: true });
+    });
+
+    it('should throw GitHubServiceError on 404 response', async () => {
+      mockFetch.mockResolvedValue(
+        new Response('Not Found', { status: 404, statusText: 'Not Found' })
+      );
+
+      await expect(
+        service.addCollaborator('owner', 'nonexistent', 'user', 'test-token')
+      ).rejects.toThrow(GitHubServiceError);
+
+      await expect(
+        service.addCollaborator('owner', 'nonexistent', 'user', 'test-token')
+      ).rejects.toThrow(/not found/i);
+    });
+
+    it('should throw GitHubServiceError on 422 response', async () => {
+      mockFetch.mockResolvedValue(
+        new Response('Unprocessable Entity', {
+          status: 422,
+          statusText: 'Unprocessable Entity',
+        })
+      );
+
+      await expect(
+        service.addCollaborator('owner', 'repo', 'baduser', 'test-token')
+      ).rejects.toThrow(GitHubServiceError);
+
+      await expect(
+        service.addCollaborator('owner', 'repo', 'baduser', 'test-token')
+      ).rejects.toThrow(/validation failed/i);
+    });
+  });
+
+  describe('checkCollaboratorAccess', () => {
+    it('should return true when user is a collaborator (204)', async () => {
+      mockFetch.mockResolvedValueOnce(new Response(null, { status: 204 }));
+
+      const result = await service.checkCollaboratorAccess(
+        'owner',
+        'repo',
+        'collab-user',
+        'test-token'
+      );
+
+      expect(result).toBe(true);
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://api.github.com/repos/owner/repo/collaborators/collab-user',
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            Authorization: 'Bearer test-token',
+          }),
+        })
+      );
+    });
+
+    it('should return false when user is not a collaborator (404)', async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response('Not Found', { status: 404, statusText: 'Not Found' })
+      );
+
+      const result = await service.checkCollaboratorAccess(
+        'owner',
+        'repo',
+        'stranger',
+        'test-token'
+      );
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('removeCollaborator', () => {
+    it('should remove collaborator successfully (204)', async () => {
+      mockFetch.mockResolvedValueOnce(new Response(null, { status: 204 }));
+
+      await expect(
+        service.removeCollaborator('owner', 'repo', 'olduser', 'test-token')
+      ).resolves.toBeUndefined();
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://api.github.com/repos/owner/repo/collaborators/olduser',
+        expect.objectContaining({
+          method: 'DELETE',
+          headers: expect.objectContaining({
+            Authorization: 'Bearer test-token',
+          }),
+        })
+      );
+    });
+
+    it('should throw GitHubServiceError on error response', async () => {
+      mockFetch.mockResolvedValue(
+        new Response('Forbidden', { status: 403, statusText: 'Forbidden' })
+      );
+
+      await expect(
+        service.removeCollaborator('owner', 'repo', 'user', 'test-token')
+      ).rejects.toThrow(GitHubServiceError);
+
+      await expect(
+        service.removeCollaborator('owner', 'repo', 'user', 'test-token')
+      ).rejects.toThrow(/forbidden/i);
+    });
+  });
 });

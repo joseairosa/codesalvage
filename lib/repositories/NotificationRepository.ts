@@ -33,7 +33,10 @@ export type NotificationType =
   | 'offer_accepted'
   | 'offer_rejected'
   | 'offer_countered'
-  | 'offer_expired';
+  | 'offer_expired'
+  | 'repo_transfer_initiated'
+  | 'repo_transfer_confirmed'
+  | 'escrow_released';
 
 /**
  * Notification creation input

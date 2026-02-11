@@ -147,6 +147,24 @@ export interface NotifyOfferExpiredParams {
 }
 
 /**
+ * Parameters for creating a repo transfer initiated notification
+ */
+export interface NotifyRepoTransferInitiatedParams {
+  buyerId: string;
+  projectTitle: string;
+  transactionId: string;
+}
+
+/**
+ * Parameters for creating a repo transfer confirmed notification
+ */
+export interface NotifyRepoTransferConfirmedParams {
+  sellerId: string;
+  projectTitle: string;
+  transactionId: string;
+}
+
+/**
  * Response shape for getNotifications
  */
 export interface NotificationsResponse {
@@ -460,6 +478,50 @@ export class NotificationService {
       actionUrl: params.actionUrl,
       relatedEntityType: 'offer',
       relatedEntityId: params.offerId,
+    });
+  }
+
+  /**
+   * Create a notification when a seller initiates a repository transfer
+   */
+  async notifyRepoTransferInitiated(
+    params: NotifyRepoTransferInitiatedParams
+  ): Promise<Notification> {
+    console.log('[NotificationService] notifyRepoTransferInitiated:', {
+      buyerId: params.buyerId,
+      transactionId: params.transactionId,
+    });
+
+    return this.createNotification({
+      userId: params.buyerId,
+      type: 'repo_transfer_initiated',
+      title: 'Repository Transfer Started',
+      message: `The seller has initiated the repository transfer for ${params.projectTitle}`,
+      actionUrl: `/transactions/${params.transactionId}`,
+      relatedEntityType: 'transaction',
+      relatedEntityId: params.transactionId,
+    });
+  }
+
+  /**
+   * Create a notification when a buyer confirms the repository transfer
+   */
+  async notifyRepoTransferConfirmed(
+    params: NotifyRepoTransferConfirmedParams
+  ): Promise<Notification> {
+    console.log('[NotificationService] notifyRepoTransferConfirmed:', {
+      sellerId: params.sellerId,
+      transactionId: params.transactionId,
+    });
+
+    return this.createNotification({
+      userId: params.sellerId,
+      type: 'repo_transfer_confirmed',
+      title: 'Repository Transfer Confirmed',
+      message: `The buyer has confirmed access to ${params.projectTitle}`,
+      actionUrl: `/transactions/${params.transactionId}`,
+      relatedEntityType: 'transaction',
+      relatedEntityId: params.transactionId,
     });
   }
 
