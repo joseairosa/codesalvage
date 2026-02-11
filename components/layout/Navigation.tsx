@@ -32,14 +32,7 @@ export function Navigation() {
           className="flex items-center gap-2 transition-transform hover:scale-105"
           aria-label="CodeSalvage home"
         >
-          <Image
-            src="/images/logo.png"
-            alt="CodeSalvage logo"
-            width={40}
-            height={40}
-            className="rounded-lg shadow-md"
-            priority
-          />
+          <Image src="/images/logo.png" alt="CodeSalvage logo" width={48} height={48} priority />
           <span className="hidden text-xl font-bold text-gray-900 sm:inline">
             Code<span className="text-blue-600">Salvage</span>
           </span>
