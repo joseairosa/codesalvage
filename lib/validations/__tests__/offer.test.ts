@@ -26,9 +26,7 @@ describe('Offer Validation Schemas', () => {
 
       expect(result.success).toBe(false);
       expect(result.error?.errors).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ['projectId'] }),
-        ])
+        expect.arrayContaining([expect.objectContaining({ path: ['projectId'] })])
       );
     });
 
@@ -40,9 +38,7 @@ describe('Offer Validation Schemas', () => {
 
       expect(result.success).toBe(false);
       expect(result.error?.errors).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ['projectId'] }),
-        ])
+        expect.arrayContaining([expect.objectContaining({ path: ['projectId'] })])
       );
     });
 
@@ -54,9 +50,7 @@ describe('Offer Validation Schemas', () => {
 
       expect(result.success).toBe(false);
       expect(result.error?.errors).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ['offeredPriceCents'] }),
-        ])
+        expect.arrayContaining([expect.objectContaining({ path: ['offeredPriceCents'] })])
       );
     });
 
@@ -68,9 +62,7 @@ describe('Offer Validation Schemas', () => {
 
       expect(result.success).toBe(false);
       expect(result.error?.errors).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ['offeredPriceCents'] }),
-        ])
+        expect.arrayContaining([expect.objectContaining({ path: ['offeredPriceCents'] })])
       );
     });
 
@@ -102,9 +94,7 @@ describe('Offer Validation Schemas', () => {
 
       expect(result.success).toBe(false);
       expect(result.error?.errors).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ['message'] }),
-        ])
+        expect.arrayContaining([expect.objectContaining({ path: ['message'] })])
       );
     });
 
@@ -117,9 +107,7 @@ describe('Offer Validation Schemas', () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.message).toBe(
-          'Hello, I am interested in this project.'
-        );
+        expect(result.data.message).toBe('Hello, I am interested in this project.');
       }
     });
   });
@@ -141,9 +129,7 @@ describe('Offer Validation Schemas', () => {
 
       expect(result.success).toBe(false);
       expect(result.error?.errors).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ['counterPriceCents'] }),
-        ])
+        expect.arrayContaining([expect.objectContaining({ path: ['counterPriceCents'] })])
       );
     });
 
@@ -154,9 +140,7 @@ describe('Offer Validation Schemas', () => {
 
       expect(result.success).toBe(false);
       expect(result.error?.errors).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ['counterPriceCents'] }),
-        ])
+        expect.arrayContaining([expect.objectContaining({ path: ['counterPriceCents'] })])
       );
     });
 
@@ -176,9 +160,7 @@ describe('Offer Validation Schemas', () => {
 
       expect(result.success).toBe(false);
       expect(result.error?.errors).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ['message'] }),
-        ])
+        expect.arrayContaining([expect.objectContaining({ path: ['message'] })])
       );
     });
   });
@@ -213,9 +195,7 @@ describe('Offer Validation Schemas', () => {
 
       expect(result.success).toBe(false);
       expect(result.error?.errors).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ path: ['reason'] }),
-        ])
+        expect.arrayContaining([expect.objectContaining({ path: ['reason'] })])
       );
     });
   });

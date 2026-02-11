@@ -118,8 +118,12 @@ describe('OfferService', () => {
       const project = createMockProject();
       const offer = createMockOffer();
 
-      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(project);
-      (mockOfferRepository.findByBuyerAndProject as ReturnType<typeof vi.fn>).mockResolvedValue([]);
+      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        project
+      );
+      (
+        mockOfferRepository.findByBuyerAndProject as ReturnType<typeof vi.fn>
+      ).mockResolvedValue([]);
       (mockOfferRepository.create as ReturnType<typeof vi.fn>).mockResolvedValue(offer);
 
       const result = await service.createOffer('buyer-123', {
@@ -143,7 +147,9 @@ describe('OfferService', () => {
     });
 
     it('should reject when project not found', async () => {
-      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        null
+      );
 
       await expect(
         service.createOffer('buyer-123', {
@@ -155,7 +161,9 @@ describe('OfferService', () => {
 
     it('should reject when project is not active', async () => {
       const project = createMockProject({ status: 'sold' });
-      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(project);
+      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        project
+      );
 
       await expect(
         service.createOffer('buyer-123', {
@@ -167,7 +175,9 @@ describe('OfferService', () => {
 
     it('should reject self-offer (buyer === seller)', async () => {
       const project = createMockProject({ sellerId: 'buyer-123' });
-      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(project);
+      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        project
+      );
 
       await expect(
         service.createOffer('buyer-123', {
@@ -179,7 +189,9 @@ describe('OfferService', () => {
 
     it('should reject offer below MINIMUM_OFFER_CENTS ($10 = 1000 cents)', async () => {
       const project = createMockProject();
-      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(project);
+      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        project
+      );
 
       await expect(
         service.createOffer('buyer-123', {
@@ -191,7 +203,9 @@ describe('OfferService', () => {
 
     it('should reject offer below project.minimumOfferCents', async () => {
       const project = createMockProject({ minimumOfferCents: 30000 });
-      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(project);
+      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        project
+      );
 
       await expect(
         service.createOffer('buyer-123', {
@@ -203,7 +217,9 @@ describe('OfferService', () => {
 
     it('should reject offer >= listing price', async () => {
       const project = createMockProject();
-      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(project);
+      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        project
+      );
 
       await expect(
         service.createOffer('buyer-123', {
@@ -217,10 +233,12 @@ describe('OfferService', () => {
       const project = createMockProject();
       const existingOffer = createMockOffer();
 
-      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(project);
-      (mockOfferRepository.findByBuyerAndProject as ReturnType<typeof vi.fn>).mockResolvedValue([
-        existingOffer,
-      ]);
+      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        project
+      );
+      (
+        mockOfferRepository.findByBuyerAndProject as ReturnType<typeof vi.fn>
+      ).mockResolvedValue([existingOffer]);
 
       await expect(
         service.createOffer('buyer-123', {
@@ -242,11 +260,15 @@ describe('OfferService', () => {
         parentOfferId: 'offer-123',
       });
 
-      (mockOfferRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(originalOffer);
+      (mockOfferRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        originalOffer
+      );
       (mockOfferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(
         createMockOffer({ status: 'countered' })
       );
-      (mockOfferRepository.create as ReturnType<typeof vi.fn>).mockResolvedValue(counterOffer);
+      (mockOfferRepository.create as ReturnType<typeof vi.fn>).mockResolvedValue(
+        counterOffer
+      );
 
       const result = await service.counterOffer('seller-123', 'offer-123', {
         counterPriceCents: 75000,
@@ -313,7 +335,9 @@ describe('OfferService', () => {
       const accepted = createMockOffer({ status: 'accepted' });
 
       (mockOfferRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(offer);
-      (mockOfferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(accepted);
+      (mockOfferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(
+        accepted
+      );
 
       const result = await service.acceptOffer('seller-123', 'offer-123');
 
@@ -336,8 +360,12 @@ describe('OfferService', () => {
         status: 'accepted',
       });
 
-      (mockOfferRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(counterOffer);
-      (mockOfferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(accepted);
+      (mockOfferRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        counterOffer
+      );
+      (mockOfferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(
+        accepted
+      );
 
       const result = await service.acceptOffer('buyer-123', 'counter-456');
 
@@ -385,7 +413,9 @@ describe('OfferService', () => {
       const rejected = createMockOffer({ status: 'rejected' });
 
       (mockOfferRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(offer);
-      (mockOfferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(rejected);
+      (mockOfferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(
+        rejected
+      );
 
       const result = await service.rejectOffer('seller-123', 'offer-123');
 
@@ -433,7 +463,9 @@ describe('OfferService', () => {
       const withdrawn = createMockOffer({ status: 'withdrawn' });
 
       (mockOfferRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(offer);
-      (mockOfferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(withdrawn);
+      (mockOfferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(
+        withdrawn
+      );
 
       const result = await service.withdrawOffer('buyer-123', 'offer-123');
 
@@ -507,7 +539,9 @@ describe('OfferService', () => {
   describe('getBuyerOffers', () => {
     it('should delegate to repository.findByBuyerId', async () => {
       const expected = { offers: [createMockOffer()], total: 1 };
-      (mockOfferRepository.findByBuyerId as ReturnType<typeof vi.fn>).mockResolvedValue(expected);
+      (mockOfferRepository.findByBuyerId as ReturnType<typeof vi.fn>).mockResolvedValue(
+        expected
+      );
 
       const result = await service.getBuyerOffers('buyer-123', { page: 1, limit: 10 });
 
@@ -524,7 +558,9 @@ describe('OfferService', () => {
   describe('getSellerOffers', () => {
     it('should delegate to repository.findBySellerId', async () => {
       const expected = { offers: [createMockOffer()], total: 1 };
-      (mockOfferRepository.findBySellerId as ReturnType<typeof vi.fn>).mockResolvedValue(expected);
+      (mockOfferRepository.findBySellerId as ReturnType<typeof vi.fn>).mockResolvedValue(
+        expected
+      );
 
       const result = await service.getSellerOffers('seller-123', { page: 1, limit: 10 });
 
@@ -543,8 +579,12 @@ describe('OfferService', () => {
       const project = createMockProject();
       const expected = { offers: [createMockOffer()], total: 1 };
 
-      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(project);
-      (mockOfferRepository.findByProjectId as ReturnType<typeof vi.fn>).mockResolvedValue(expected);
+      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        project
+      );
+      (mockOfferRepository.findByProjectId as ReturnType<typeof vi.fn>).mockResolvedValue(
+        expected
+      );
 
       const result = await service.getProjectOffers('project-123', 'seller-123');
 
@@ -556,16 +596,20 @@ describe('OfferService', () => {
     });
 
     it('should reject when project not found', async () => {
-      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        null
+      );
 
-      await expect(
-        service.getProjectOffers('nonexistent', 'seller-123')
-      ).rejects.toThrow(OfferValidationError);
+      await expect(service.getProjectOffers('nonexistent', 'seller-123')).rejects.toThrow(
+        OfferValidationError
+      );
     });
 
     it('should reject when user is not project seller', async () => {
       const project = createMockProject();
-      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(project);
+      (mockProjectRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        project
+      );
 
       await expect(
         service.getProjectOffers('project-123', 'stranger-999')
@@ -581,12 +625,12 @@ describe('OfferService', () => {
       const expired2 = createMockOffer({ id: 'offer-2' });
       const expired3 = createMockOffer({ id: 'offer-3' });
 
-      (mockOfferRepository.findExpiredOffers as ReturnType<typeof vi.fn>).mockResolvedValue([
-        expired1,
-        expired2,
-        expired3,
-      ]);
-      (mockOfferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue({});
+      (
+        mockOfferRepository.findExpiredOffers as ReturnType<typeof vi.fn>
+      ).mockResolvedValue([expired1, expired2, expired3]);
+      (mockOfferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(
+        {}
+      );
 
       const result = await service.expireOffers();
 
@@ -598,7 +642,9 @@ describe('OfferService', () => {
     });
 
     it('should return 0 when no expired offers found', async () => {
-      (mockOfferRepository.findExpiredOffers as ReturnType<typeof vi.fn>).mockResolvedValue([]);
+      (
+        mockOfferRepository.findExpiredOffers as ReturnType<typeof vi.fn>
+      ).mockResolvedValue([]);
 
       const result = await service.expireOffers();
 

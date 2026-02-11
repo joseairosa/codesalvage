@@ -357,10 +357,7 @@ export class OfferRepository {
 
   // ---------- linkTransaction ----------
 
-  async linkTransaction(
-    id: string,
-    transactionId: string
-  ): Promise<OfferWithRelations> {
+  async linkTransaction(id: string, transactionId: string): Promise<OfferWithRelations> {
     try {
       console.log('[OfferRepository] Linking transaction to offer', {
         id,

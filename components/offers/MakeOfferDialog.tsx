@@ -197,9 +197,7 @@ export function MakeOfferDialog({
         {status === 'success' && (
           <Alert className="border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-300">
             <CheckCircle2 className="h-4 w-4" />
-            <AlertDescription>
-              Offer sent! The seller will be notified.
-            </AlertDescription>
+            <AlertDescription>Offer sent! The seller will be notified.</AlertDescription>
           </Alert>
         )}
 
@@ -282,8 +280,8 @@ export function MakeOfferDialog({
 
             {/* Info */}
             <p className="text-xs text-muted-foreground">
-              Your offer will expire in 7 days if the seller doesn&apos;t respond.
-              The seller can accept, reject, or counter your offer.
+              Your offer will expire in 7 days if the seller doesn&apos;t respond. The
+              seller can accept, reject, or counter your offer.
             </p>
           </>
         )}
@@ -293,10 +291,7 @@ export function MakeOfferDialog({
             {status === 'success' ? 'Close' : 'Cancel'}
           </Button>
           {status !== 'success' && (
-            <Button
-              onClick={handleSubmit}
-              disabled={!isValid || isSubmitting}
-            >
+            <Button onClick={handleSubmit} disabled={!isValid || isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

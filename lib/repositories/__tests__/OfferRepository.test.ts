@@ -110,9 +110,7 @@ describe('OfferRepository', () => {
       },
     };
 
-    offerRepository = new OfferRepository(
-      mockPrismaClient as unknown as PrismaClient
-    );
+    offerRepository = new OfferRepository(mockPrismaClient as unknown as PrismaClient);
   });
 
   describe('create', () => {
@@ -211,9 +209,7 @@ describe('OfferRepository', () => {
     });
 
     it('should throw on database error', async () => {
-      mockPrismaClient.offer.create.mockRejectedValue(
-        new Error('DB connection failed')
-      );
+      mockPrismaClient.offer.create.mockRejectedValue(new Error('DB connection failed'));
 
       await expect(
         offerRepository.create({
@@ -461,10 +457,7 @@ describe('OfferRepository', () => {
       const mockOffer = createMockOffer({ status: 'expired' });
       mockPrismaClient.offer.update.mockResolvedValue(mockOffer);
 
-      const result = await offerRepository.updateStatus(
-        'mock-ulid-123',
-        'expired'
-      );
+      const result = await offerRepository.updateStatus('mock-ulid-123', 'expired');
 
       expect(mockPrismaClient.offer.update).toHaveBeenCalledWith({
         where: { id: 'mock-ulid-123' },
@@ -514,10 +507,7 @@ describe('OfferRepository', () => {
         status: 'countered',
         expiresAt: new Date('2026-02-09T00:00:00Z'),
       });
-      mockPrismaClient.offer.findMany.mockResolvedValue([
-        expiredOffer1,
-        expiredOffer2,
-      ]);
+      mockPrismaClient.offer.findMany.mockResolvedValue([expiredOffer1, expiredOffer2]);
 
       const result = await offerRepository.findExpiredOffers();
 
@@ -538,8 +528,7 @@ describe('OfferRepository', () => {
     it('should count pending and countered offers for a project', async () => {
       mockPrismaClient.offer.count.mockResolvedValue(3);
 
-      const result =
-        await offerRepository.countActiveByProject('project123');
+      const result = await offerRepository.countActiveByProject('project123');
 
       expect(mockPrismaClient.offer.count).toHaveBeenCalledWith({
         where: {

@@ -53,7 +53,10 @@ export const counterOfferSchema = z.object({
   counterPriceCents: z
     .number()
     .int('Counter-offer must be a whole number of cents')
-    .min(MINIMUM_OFFER_CENTS, `Counter-offer must be at least $${MINIMUM_OFFER_CENTS / 100}`),
+    .min(
+      MINIMUM_OFFER_CENTS,
+      `Counter-offer must be at least $${MINIMUM_OFFER_CENTS / 100}`
+    ),
   message: z
     .string()
     .max(1000, 'Message must be less than 1000 characters')

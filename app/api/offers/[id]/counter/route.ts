@@ -59,11 +59,7 @@ export async function POST(
       counterData.message = validated.data.message;
     }
 
-    const offer = await offerService.counterOffer(
-      auth.user.id,
-      id,
-      counterData
-    );
+    const offer = await offerService.counterOffer(auth.user.id, id, counterData);
 
     return NextResponse.json(offer, { status: 201 });
   } catch (error) {

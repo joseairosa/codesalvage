@@ -55,7 +55,13 @@ const componentName = 'BuyerOffersPage';
 /**
  * Offer status type
  */
-type OfferStatus = 'pending' | 'accepted' | 'rejected' | 'countered' | 'withdrawn' | 'expired';
+type OfferStatus =
+  | 'pending'
+  | 'accepted'
+  | 'rejected'
+  | 'countered'
+  | 'withdrawn'
+  | 'expired';
 
 /**
  * Offer item from the API
@@ -228,7 +234,12 @@ export default function BuyerOffersPage() {
         return;
       }
 
-      console.log(`[${componentName}] Fetching buyer offers, page:`, page, 'filter:', statusFilter);
+      console.log(
+        `[${componentName}] Fetching buyer offers, page:`,
+        page,
+        'filter:',
+        statusFilter
+      );
       setIsLoading(true);
       setError(null);
 
@@ -250,7 +261,9 @@ export default function BuyerOffersPage() {
         }
 
         const data = await response.json();
-        console.log(`[${componentName}] Fetched ${data.offers.length} offers, total: ${data.pagination.total}`);
+        console.log(
+          `[${componentName}] Fetched ${data.offers.length} offers, total: ${data.pagination.total}`
+        );
 
         setOffers(data.offers);
         setPagination(data.pagination);
@@ -365,7 +378,12 @@ export default function BuyerOffersPage() {
    * Handle proceed to checkout
    */
   const handleCheckout = (projectId: string, offerId: string) => {
-    console.log(`[${componentName}] Proceed to checkout, project:`, projectId, 'offer:', offerId);
+    console.log(
+      `[${componentName}] Proceed to checkout, project:`,
+      projectId,
+      'offer:',
+      offerId
+    );
     router.push(`/checkout/${projectId}?offerId=${offerId}`);
   };
 
@@ -462,7 +480,10 @@ export default function BuyerOffersPage() {
         {!isLoading && offers.length > 0 && (
           <div className="space-y-4">
             {offers.map((offer) => {
-              const discount = calcDiscount(offer.offeredPriceCents, offer.originalPriceCents);
+              const discount = calcDiscount(
+                offer.offeredPriceCents,
+                offer.originalPriceCents
+              );
               const isActionLoading = actionLoading === offer.id;
 
               return (
@@ -585,7 +606,9 @@ export default function BuyerOffersPage() {
                                 <div className="flex gap-2">
                                   <Button
                                     size="sm"
-                                    onClick={() => handleAcceptCounter(offer.counterOffer!.id)}
+                                    onClick={() =>
+                                      handleAcceptCounter(offer.counterOffer!.id)
+                                    }
                                     disabled={isActionLoading}
                                   >
                                     {isActionLoading ? (
@@ -598,7 +621,9 @@ export default function BuyerOffersPage() {
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => handleRejectCounter(offer.counterOffer!.id)}
+                                    onClick={() =>
+                                      handleRejectCounter(offer.counterOffer!.id)
+                                    }
                                     disabled={isActionLoading}
                                   >
                                     {isActionLoading ? (
@@ -679,8 +704,8 @@ export default function BuyerOffersPage() {
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
               Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{' '}
-              {Math.min(currentPage * ITEMS_PER_PAGE, pagination.total)} of {pagination.total}{' '}
-              offers
+              {Math.min(currentPage * ITEMS_PER_PAGE, pagination.total)} of{' '}
+              {pagination.total} offers
             </p>
             <div className="flex gap-2">
               <Button

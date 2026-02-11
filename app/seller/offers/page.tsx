@@ -426,7 +426,8 @@ export default function SellerOffersPage() {
       await fetchOffers(currentPage);
     } catch (err) {
       console.error(`[${componentName}] Counter-offer error:`, err);
-      const message = err instanceof Error ? err.message : 'Failed to submit counter-offer';
+      const message =
+        err instanceof Error ? err.message : 'Failed to submit counter-offer';
       setActionStatus((prev) => ({ ...prev, [offerId]: 'error' }));
       setActionError((prev) => ({ ...prev, [offerId]: message }));
     }
@@ -482,14 +483,12 @@ export default function SellerOffersPage() {
 
     if (status === 'countered') {
       return (
-        <p className="text-sm text-muted-foreground italic">Awaiting buyer response</p>
+        <p className="text-sm italic text-muted-foreground">Awaiting buyer response</p>
       );
     }
 
     if (status === 'accepted') {
-      return (
-        <p className="text-sm text-green-700 font-medium">Buyer can now checkout</p>
-      );
+      return <p className="text-sm font-medium text-green-700">Buyer can now checkout</p>;
     }
 
     // rejected, withdrawn, expired — no actions
@@ -503,13 +502,16 @@ export default function SellerOffersPage() {
     if (counterFormOpen !== offer.id) return null;
 
     return (
-      <div className="mt-4 rounded-lg border bg-muted/50 p-4 space-y-3">
+      <div className="mt-4 space-y-3 rounded-lg border bg-muted/50 p-4">
         <div className="flex items-center gap-2">
           <DollarSign className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium">Counter-Offer</span>
         </div>
         <div className="space-y-2">
-          <label htmlFor={`counter-price-${offer.id}`} className="text-sm text-muted-foreground">
+          <label
+            htmlFor={`counter-price-${offer.id}`}
+            className="text-sm text-muted-foreground"
+          >
             Your counter price (USD)
           </label>
           <Input
@@ -523,7 +525,10 @@ export default function SellerOffersPage() {
           />
         </div>
         <div className="space-y-2">
-          <label htmlFor={`counter-message-${offer.id}`} className="text-sm text-muted-foreground">
+          <label
+            htmlFor={`counter-message-${offer.id}`}
+            className="text-sm text-muted-foreground"
+          >
             Message (optional)
           </label>
           <Textarea
@@ -563,9 +568,7 @@ export default function SellerOffersPage() {
           <div>
             <h1 className="text-3xl font-bold">Offers Received</h1>
             <p className="mt-2 text-muted-foreground">
-              {isLoading
-                ? 'Loading offers...'
-                : `${pagination.total} offer(s) total`}
+              {isLoading ? 'Loading offers...' : `${pagination.total} offer(s) total`}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -603,7 +606,11 @@ export default function SellerOffersPage() {
             <AlertDescription>
               <div className="flex items-center justify-between">
                 <span>{error}</span>
-                <Button onClick={() => fetchOffers(currentPage)} variant="outline" size="sm">
+                <Button
+                  onClick={() => fetchOffers(currentPage)}
+                  variant="outline"
+                  size="sm"
+                >
                   Try Again
                 </Button>
               </div>
@@ -640,7 +647,10 @@ export default function SellerOffersPage() {
         {!isLoading && offers.length > 0 && (
           <div className="space-y-4">
             {offers.map((offer) => {
-              const discount = calcDiscount(offer.offeredPriceCents, offer.originalPriceCents);
+              const discount = calcDiscount(
+                offer.offeredPriceCents,
+                offer.originalPriceCents
+              );
               const isCounterOffer = !!offer.parentOfferId;
 
               return (
@@ -703,12 +713,18 @@ export default function SellerOffersPage() {
                         </div>
                       </div>
                       {discount > 0 && (
-                        <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                        <Badge
+                          variant="secondary"
+                          className="bg-orange-100 text-orange-800"
+                        >
                           {discount}% below listing
                         </Badge>
                       )}
                       {discount < 0 && (
-                        <Badge variant="secondary" className="bg-green-100 text-green-800">
+                        <Badge
+                          variant="secondary"
+                          className="bg-green-100 text-green-800"
+                        >
                           {Math.abs(discount)}% above listing
                         </Badge>
                       )}
@@ -726,15 +742,19 @@ export default function SellerOffersPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-sm font-medium">{getBuyerDisplayName(offer.buyer)}</p>
-                        <p className="text-xs text-muted-foreground">{offer.buyer.email}</p>
+                        <p className="text-sm font-medium">
+                          {getBuyerDisplayName(offer.buyer)}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {offer.buyer.email}
+                        </p>
                       </div>
                     </div>
 
                     {/* Buyer Message */}
                     {offer.message && (
                       <div className="rounded-md bg-muted/50 p-3">
-                        <div className="flex items-center gap-1 mb-1">
+                        <div className="mb-1 flex items-center gap-1">
                           <MessageCircle className="h-3 w-3 text-muted-foreground" />
                           <span className="text-xs font-medium text-muted-foreground">
                             Buyer message

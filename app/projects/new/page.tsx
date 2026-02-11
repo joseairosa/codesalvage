@@ -978,8 +978,8 @@ export default function NewProjectPage() {
                 )}
               />
               <p className="text-xs text-muted-foreground">
-                Leave at $0 to accept any offer amount for review. Buyers won&apos;t be able to
-                offer less than this amount.
+                Leave at $0 to accept any offer amount for review. Buyers won&apos;t be
+                able to offer less than this amount.
               </p>
 
               {/* License Type */}

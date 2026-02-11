@@ -51,10 +51,11 @@ async function createOffer(request: Request) {
       );
     }
 
-    const createData: { projectId: string; offeredPriceCents: number; message?: string } = {
-      projectId: validated.data.projectId,
-      offeredPriceCents: validated.data.offeredPriceCents,
-    };
+    const createData: { projectId: string; offeredPriceCents: number; message?: string } =
+      {
+        projectId: validated.data.projectId,
+        offeredPriceCents: validated.data.offeredPriceCents,
+      };
     if (validated.data.message !== undefined && validated.data.message !== '') {
       createData.message = validated.data.message;
     }

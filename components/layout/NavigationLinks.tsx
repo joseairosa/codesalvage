@@ -53,7 +53,11 @@ export function NavigationLinks({
           ...(isSeller
             ? [
                 { href: '/seller/projects', label: 'My Projects', requiresSeller: true },
-                { href: '/seller/offers', label: 'Offers Received', requiresSeller: true },
+                {
+                  href: '/seller/offers',
+                  label: 'Offers Received',
+                  requiresSeller: true,
+                },
                 { href: '/projects/new', label: 'List Project', requiresSeller: true },
               ]
             : []),

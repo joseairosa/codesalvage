@@ -227,7 +227,9 @@ export default function CheckoutPage({ params }: { params: { projectId: string }
                             {formatPrice(project.priceCents)}
                           </span>
                         )}
-                        <span className="font-medium">{formatPrice(breakdown.total)}</span>
+                        <span className="font-medium">
+                          {formatPrice(breakdown.total)}
+                        </span>
                       </div>
                     </div>
                     <div className="flex justify-between text-xs text-muted-foreground">

@@ -110,10 +110,7 @@ export class OfferService {
       throw new OfferValidationError('Project not found', 'projectId');
     }
     if (project.status !== 'active') {
-      throw new OfferValidationError(
-        'Project is not available for offers',
-        'projectId'
-      );
+      throw new OfferValidationError('Project is not available for offers', 'projectId');
     }
 
     // Prevent self-offers
@@ -220,10 +217,7 @@ export class OfferService {
       throw new OfferPermissionError('You can only counter-offer on offers sent to you');
     }
     if (originalOffer.status !== 'pending') {
-      throw new OfferValidationError(
-        'Can only counter a pending offer',
-        'status'
-      );
+      throw new OfferValidationError('Can only counter a pending offer', 'status');
     }
 
     // Validate counter price
@@ -241,11 +235,7 @@ export class OfferService {
     }
 
     // Mark original offer as countered
-    await this.offerRepository.updateStatus(
-      offerId,
-      'countered',
-      new Date()
-    );
+    await this.offerRepository.updateStatus(offerId, 'countered', new Date());
 
     // Calculate new expiry
     const expiresAt = new Date();
@@ -288,10 +278,7 @@ export class OfferService {
    * - Offer exists with status 'pending'
    * - User is the intended recipient
    */
-  async acceptOffer(
-    userId: string,
-    offerId: string
-  ): Promise<OfferWithRelations> {
+  async acceptOffer(userId: string, offerId: string): Promise<OfferWithRelations> {
     console.log('[OfferService] Accepting offer:', { userId, offerId });
 
     const offer = await this.offerRepository.findById(offerId);
@@ -299,10 +286,7 @@ export class OfferService {
       throw new OfferNotFoundError('Offer not found');
     }
     if (offer.status !== 'pending') {
-      throw new OfferValidationError(
-        'Can only accept a pending offer',
-        'status'
-      );
+      throw new OfferValidationError('Can only accept a pending offer', 'status');
     }
 
     // Determine who should accept:
@@ -351,10 +335,7 @@ export class OfferService {
       throw new OfferNotFoundError('Offer not found');
     }
     if (offer.status !== 'pending') {
-      throw new OfferValidationError(
-        'Can only reject a pending offer',
-        'status'
-      );
+      throw new OfferValidationError('Can only reject a pending offer', 'status');
     }
 
     // Determine who should reject (same logic as accept)
@@ -384,10 +365,7 @@ export class OfferService {
   /**
    * Withdraw an offer (buyer cancels their own offer)
    */
-  async withdrawOffer(
-    userId: string,
-    offerId: string
-  ): Promise<OfferWithRelations> {
+  async withdrawOffer(userId: string, offerId: string): Promise<OfferWithRelations> {
     console.log('[OfferService] Withdrawing offer:', { userId, offerId });
 
     const offer = await this.offerRepository.findById(offerId);
@@ -395,10 +373,7 @@ export class OfferService {
       throw new OfferNotFoundError('Offer not found');
     }
     if (offer.status !== 'pending') {
-      throw new OfferValidationError(
-        'Can only withdraw a pending offer',
-        'status'
-      );
+      throw new OfferValidationError('Can only withdraw a pending offer', 'status');
     }
 
     // Only the original offerer can withdraw
@@ -425,10 +400,7 @@ export class OfferService {
   /**
    * Get a single offer by ID (access-controlled)
    */
-  async getOfferById(
-    offerId: string,
-    userId: string
-  ): Promise<OfferWithRelations> {
+  async getOfferById(offerId: string, userId: string): Promise<OfferWithRelations> {
     console.log('[OfferService] Getting offer:', { offerId, userId });
 
     const offer = await this.offerRepository.findById(offerId);
@@ -521,10 +493,8 @@ export class OfferService {
   // ---------- Private notification helpers ----------
 
   private async notifyNewOffer(offer: OfferWithRelations): Promise<void> {
-    const buyerName =
-      offer.buyer.fullName || offer.buyer.username || 'A buyer';
-    const sellerName =
-      offer.seller.fullName || offer.seller.username || 'Seller';
+    const buyerName = offer.buyer.fullName || offer.buyer.username || 'A buyer';
+    const sellerName = offer.seller.fullName || offer.seller.username || 'Seller';
     const projectTitle = offer.project.title;
     const offeredPrice = `$${(offer.offeredPriceCents / 100).toFixed(2)}`;
 
@@ -561,10 +531,8 @@ export class OfferService {
   }
 
   private async notifyCounterOffer(offer: OfferWithRelations): Promise<void> {
-    const sellerName =
-      offer.seller.fullName || offer.seller.username || 'The seller';
-    const buyerName =
-      offer.buyer.fullName || offer.buyer.username || 'Buyer';
+    const sellerName = offer.seller.fullName || offer.seller.username || 'The seller';
+    const buyerName = offer.buyer.fullName || offer.buyer.username || 'Buyer';
     const projectTitle = offer.project.title;
     const counterPrice = `$${(offer.offeredPriceCents / 100).toFixed(2)}`;
 
@@ -629,7 +597,9 @@ export class OfferService {
     // Email notification (fire-and-forget)
     if (recipientEmail) {
       // Buyer gets checkout URL, seller doesn't
-      const emailData: Parameters<typeof this.emailService.sendOfferAcceptedNotification>[1] = {
+      const emailData: Parameters<
+        typeof this.emailService.sendOfferAcceptedNotification
+      >[1] = {
         recipientName,
         otherPartyName,
         projectTitle,
