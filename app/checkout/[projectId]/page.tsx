@@ -168,7 +168,11 @@ export default function CheckoutPage({ params }: { params: { projectId: string }
         {error && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>
+              {error === 'Seller has not completed payment setup'
+                ? 'This seller hasn\u2019t completed their payment setup yet, so purchases are temporarily unavailable. Please try again later or contact the seller.'
+                : error}
+            </AlertDescription>
           </Alert>
         )}
 
