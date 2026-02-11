@@ -157,6 +157,7 @@ export default function NewProjectPage() {
       category: 'web_app',
       completionPercentage: 75,
       priceCents: 50000, // $500
+      minimumOfferCents: null,
       techStack: [],
       licenseType: 'full_code',
       accessLevel: 'full',
@@ -958,6 +959,28 @@ export default function NewProjectPage() {
                   />
                 )}
               />
+
+              {/* Minimum Offer Amount */}
+              <Controller
+                name="minimumOfferCents"
+                control={control}
+                render={({ field }) => (
+                  <PriceInput
+                    value={field.value ?? 0}
+                    onChange={(cents) => field.onChange(cents === 0 ? null : cents)}
+                    minCents={1000}
+                    maxCents={watch('priceCents') - 1}
+                    label="Minimum Offer Amount"
+                    {...(errors.minimumOfferCents?.message && {
+                      error: errors.minimumOfferCents.message,
+                    })}
+                  />
+                )}
+              />
+              <p className="text-xs text-muted-foreground">
+                Leave at $0 to accept any offer amount for review. Buyers won&apos;t be
+                able to offer less than this amount.
+              </p>
 
               {/* License Type */}
               <div className="space-y-2">

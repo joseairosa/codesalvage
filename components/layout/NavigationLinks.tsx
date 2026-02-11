@@ -49,9 +49,15 @@ export function NavigationLinks({
     ...(isAuthenticated
       ? [
           { href: '/dashboard', label: 'Dashboard', requiresAuth: true },
+          { href: '/dashboard/offers', label: 'My Offers', requiresAuth: true },
           ...(isSeller
             ? [
                 { href: '/seller/projects', label: 'My Projects', requiresSeller: true },
+                {
+                  href: '/seller/offers',
+                  label: 'Offers Received',
+                  requiresSeller: true,
+                },
                 { href: '/projects/new', label: 'List Project', requiresSeller: true },
               ]
             : []),
