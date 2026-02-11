@@ -199,7 +199,7 @@ export default function HowItWorksPage() {
                     key={index}
                     className="overflow-hidden transition-shadow hover:shadow-lg"
                   >
-                    <div className="flex h-40 items-center justify-center bg-blue-50">
+                    <div className="flex h-40 items-center justify-center">
                       <Image
                         src={step.image}
                         alt={step.imageAlt}
