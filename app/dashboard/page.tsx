@@ -10,7 +10,7 @@ import { requireAuth } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, AlertTriangle, CreditCard } from 'lucide-react';
 
 export default async function DashboardPage() {
   const session = await requireAuth();
@@ -56,6 +56,31 @@ export default async function DashboardPage() {
           </Button>
         )}
       </div>
+
+      {session.user.isSeller && !session.user.isVerifiedSeller && (
+        <Card className="mb-8 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50">
+          <CardContent className="flex items-center justify-between py-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-6 w-6 flex-shrink-0 text-amber-600" />
+              <div>
+                <h2 className="text-lg font-semibold text-amber-900">
+                  Complete Your Payment Setup
+                </h2>
+                <p className="mt-1 text-sm text-amber-800">
+                  You need to connect your Stripe account before buyers can purchase your
+                  projects. This only takes a few minutes.
+                </p>
+              </div>
+            </div>
+            <Button asChild className="bg-amber-600 hover:bg-amber-700">
+              <Link href="/seller/onboard">
+                <CreditCard className="mr-2 h-4 w-4" />
+                Set Up Payments
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {session.user.isSeller && (
         <Card className="mb-8 border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
@@ -140,9 +165,18 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <div>
-                <span className="font-medium">Verified:</span>{' '}
-                {session.user.isVerifiedSeller ? 'Yes' : 'No'}
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Payments:</span>{' '}
+                {session.user.isVerifiedSeller ? (
+                  <span className="text-green-600">Connected</span>
+                ) : (
+                  <Link
+                    href="/seller/onboard"
+                    className="text-amber-600 underline hover:text-amber-700"
+                  >
+                    Not set up
+                  </Link>
+                )}
               </div>
               <div>
                 <span className="font-medium">Member Since:</span>{' '}
