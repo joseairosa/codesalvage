@@ -15,6 +15,7 @@
  * - SEO-friendly structure
  */
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { Github, Twitter, Linkedin, Mail } from 'lucide-react';
 
@@ -109,9 +110,12 @@ export function Footer() {
               className="flex items-center gap-2"
               aria-label="CodeSalvage home"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-md">
-                <span className="text-xl font-bold text-white">CS</span>
-              </div>
+              <Image
+                src="/images/logo.png"
+                alt="CodeSalvage logo"
+                width={48}
+                height={48}
+              />
               <span className="text-xl font-bold text-gray-900">
                 Code<span className="text-blue-600">Salvage</span>
               </span>
