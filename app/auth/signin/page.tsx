@@ -31,6 +31,9 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   sendSignInLinkToEmail,
+  fetchSignInMethodsForEmail,
+  linkWithCredential,
+  OAuthCredential,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
@@ -172,7 +175,22 @@ function SignInContent() {
       router.push(callbackUrl);
     } catch (err: any) {
       console.error('[SignIn] Google sign-in error:', err);
-      setError(err.message || 'Failed to sign in with Google');
+      if (err.code === 'auth/account-exists-with-different-credential') {
+        const email = err.customData?.email;
+        if (email) {
+          setError(
+            `This email (${email}) is already linked to a different sign-in method. Please try signing in with GitHub instead.`
+          );
+        } else {
+          setError(
+            'This email is already linked to a different sign-in method. Please try signing in with GitHub instead.'
+          );
+        }
+      } else if (err.code === 'auth/popup-closed-by-user') {
+        // User closed the popup, no error needed
+      } else {
+        setError(err.message || 'Failed to sign in with Google');
+      }
       setLoading(false);
     }
   }
@@ -205,7 +223,22 @@ function SignInContent() {
       router.push(callbackUrl);
     } catch (err: any) {
       console.error('[SignIn] GitHub sign-in error:', err);
-      setError(err.message || 'Failed to sign in with GitHub');
+      if (err.code === 'auth/account-exists-with-different-credential') {
+        const email = err.customData?.email;
+        if (email) {
+          setError(
+            `This email (${email}) is already linked to a different sign-in method. Please try signing in with Google instead.`
+          );
+        } else {
+          setError(
+            'This email is already linked to a different sign-in method. Please try signing in with Google instead.'
+          );
+        }
+      } else if (err.code === 'auth/popup-closed-by-user') {
+        // User closed the popup, no error needed
+      } else {
+        setError(err.message || 'Failed to sign in with GitHub');
+      }
       setLoading(false);
     }
   }
