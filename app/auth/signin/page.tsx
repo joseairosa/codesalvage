@@ -31,9 +31,6 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   sendSignInLinkToEmail,
-  fetchSignInMethodsForEmail,
-  linkWithCredential,
-  OAuthCredential,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
