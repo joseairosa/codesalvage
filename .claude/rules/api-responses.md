@@ -16,10 +16,7 @@ Always include `error` field. Optional: `message`, `details`, `field`.
 
 ```typescript
 // Simple error
-return NextResponse.json(
-  { error: 'Unauthorized' },
-  { status: 401 }
-);
+return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
 // With message
 return NextResponse.json(
@@ -109,21 +106,25 @@ try {
 ## Anti-Patterns
 
 ❌ **Don't return raw data:**
+
 ```typescript
 return NextResponse.json(data); // Missing status
 ```
 
 ✅ **Always include status:**
+
 ```typescript
 return NextResponse.json(data, { status: 200 });
 ```
 
 ❌ **Don't use generic error messages:**
+
 ```typescript
 return NextResponse.json({ error: 'Error' }, { status: 500 });
 ```
 
 ✅ **Be specific:**
+
 ```typescript
 return NextResponse.json(
   { error: 'Failed to create project', message: error.message },

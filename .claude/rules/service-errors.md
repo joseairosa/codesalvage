@@ -45,12 +45,12 @@ export class ServiceNotFoundError extends Error {
 
 ## When to Use Each
 
-| Error                   | HTTP Status | Use When                                    |
-| ----------------------- | ----------- | ------------------------------------------- |
-| `ValidationError`       | 400         | Input data fails business rules             |
-| `PermissionError`       | 403         | User lacks permission for operation         |
-| `NotFoundError`         | 404         | Resource doesn't exist                      |
-| Generic `Error`         | 500         | Unexpected failures, database errors        |
+| Error             | HTTP Status | Use When                             |
+| ----------------- | ----------- | ------------------------------------ |
+| `ValidationError` | 400         | Input data fails business rules      |
+| `PermissionError` | 403         | User lacks permission for operation  |
+| `NotFoundError`   | 404         | Resource doesn't exist               |
+| Generic `Error`   | 500         | Unexpected failures, database errors |
 
 ## Service Example
 
@@ -58,7 +58,10 @@ export class ServiceNotFoundError extends Error {
 // lib/services/ProjectService.ts
 
 export class ProjectValidationError extends Error {
-  constructor(message: string, public field?: string) {
+  constructor(
+    message: string,
+    public field?: string
+  ) {
     super(message);
     this.name = 'ProjectValidationError';
   }
@@ -145,7 +148,7 @@ try {
 
 ## Key Principles
 
-1. **One service = one set of error classes** (ProjectService → Project*Error)
+1. **One service = one set of error classes** (ProjectService → Project\*Error)
 2. **Always include the service name prefix** for clarity
 3. **ValidationError can have optional `field` property** to identify which field failed
 4. **Set `this.name`** to match the class name for better debugging
@@ -154,22 +157,26 @@ try {
 ## Anti-Patterns
 
 ❌ **Don't reuse generic Error:**
+
 ```typescript
 throw new Error('Invalid input'); // Lost context
 ```
 
 ✅ **Use typed errors:**
+
 ```typescript
 throw new ProjectValidationError('Invalid input', 'title');
 ```
 
 ❌ **Don't create one error class per method:**
+
 ```typescript
 export class CreateProjectError extends Error {}
 export class UpdateProjectError extends Error {}
 ```
 
 ✅ **Use semantic categories:**
+
 ```typescript
 export class ProjectValidationError extends Error {}
 export class ProjectPermissionError extends Error {}
