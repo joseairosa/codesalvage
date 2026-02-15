@@ -49,37 +49,39 @@ npm run build                   # prisma generate && next build
 
 ### Layered Architecture: Route → Service → Repository → Prisma
 
-```
+```text
 app/api/**/route.ts      → HTTP handlers, auth checks (requireAuth/requireAdmin)
-lib/services/*.ts        → Business logic, validation, orchestration (16 services)
-lib/repositories/*.ts    → Data access, Prisma queries (11 repositories)
-prisma/schema.prisma     → PostgreSQL schema (20+ models, CUID primary keys)
+lib/services/*.ts        → Business logic, validation, orchestration (18 services)
+lib/repositories/*.ts    → Data access, Prisma queries (13 repositories)
+prisma/schema.prisma     → PostgreSQL schema (17 models, CUID primary keys)
 ```
 
 Services receive repositories via constructor injection. All services are instantiated as singletons in `lib/services/index.ts` and `lib/repositories/index.ts`.
 
 ### Key Services & Their Responsibilities
 
-| Service               | Domain                                              |
-| --------------------- | --------------------------------------------------- |
-| `ProjectService`      | CRUD, publishing, search, GitHub repo analysis      |
-| `TransactionService`  | Purchase flow, 7-day escrow, Stripe Payment Intents |
-| `StripeService`       | Connect onboarding, payment processing, webhooks    |
-| `MessageService`      | Buyer-seller direct messaging                       |
-| `SubscriptionService` | Seller membership tiers via Stripe                  |
-| `EmailService`        | Transactional emails via Postmark                   |
-| `AdminService`        | User management, content moderation, audit logs     |
-| `NotificationService` | In-app notification system                          |
-| `R2Service`           | File uploads to Cloudflare R2 (AWS S3 SDK)          |
-| `RepoAnalysisService` | GitHub repo analysis via Anthropic Claude API       |
+| Service                     | Domain                                              |
+| --------------------------- | --------------------------------------------------- |
+| `ProjectService`            | CRUD, publishing, search, GitHub repo analysis      |
+| `TransactionService`        | Purchase flow, 7-day escrow, Stripe Payment Intents |
+| `StripeService`             | Connect onboarding, payment processing, webhooks    |
+| `MessageService`            | Buyer-seller direct messaging                       |
+| `SubscriptionService`       | Seller membership tiers via Stripe                  |
+| `EmailService`              | Transactional emails via Postmark                   |
+| `AdminService`              | User management, content moderation, audit logs     |
+| `NotificationService`       | In-app notification system                          |
+| `R2Service`                 | File uploads to Cloudflare R2 (AWS S3 SDK)          |
+| `RepoAnalysisService`       | GitHub repo analysis via Anthropic Claude API       |
+| `OfferService`              | Buyer-seller offer/negotiation flow                 |
+| `GitHubService`             | GitHub API integration, repo operations             |
+| `RepositoryTransferService` | Post-purchase repo transfer to buyer                |
 
 ### Authentication
 
-Dual auth system (migration in progress):
+Dual auth system (migration in progress — Firebase is primary):
 
-- **Auth.js v5** (NextAuth beta) — GitHub OAuth, Prisma session adapter
-- **Firebase Client SDK** — Client-side auth state
-- Route protection: lightweight `middleware.ts` + full verification via `requireAuth()` / `requireAdmin()` helpers in route handlers
+- **Firebase** (primary) — Client SDK for browser auth (`lib/firebase.ts`), Admin SDK for server-side token verification (`lib/firebase-admin.ts`, `lib/firebase-auth.ts`). `middleware.ts` checks the `session` cookie (Firebase token). Route handlers use `requireAuth()` / `requireAdmin()` from `lib/auth-helpers.ts` (Firebase-based).
+- **Auth.js v5** (secondary) — GitHub OAuth provider configured in `lib/auth.ts` with Prisma session adapter. Being phased out in favor of Firebase.
 
 ### State Management (Client)
 
@@ -149,7 +151,7 @@ Guidelines for getting maximum throughput from Claude Code sessions on this code
 
 **Feature requests** — state all deliverables upfront so Claude can parallelize:
 
-```
+```text
 Add a report-abuse button to project cards. Implement the React component,
 the POST /api/reports endpoint using AdminService, and unit tests for the
 service method — in parallel.
@@ -157,20 +159,20 @@ service method — in parallel.
 
 **Bug fixes** — use "alongside" to signal parallel fix + regression test:
 
-```
+```text
 Fix the escrow release cron skipping transactions with null buyerId.
 Write a regression test alongside the fix.
 ```
 
 **Exploration** — prefix read-only tasks with `/fast`:
 
-```
+```text
 /fast How does the StripeService handle Connect onboarding failures?
 ```
 
 **Multi-step tasks** — numbered lists with explicit parallelization hints:
 
-```
+```text
 1. Add a `reportCount` field to the Project model
 2. Create a migration (don't run it — ask me)
 3. Add repository method + service method + unit tests — parallelize where possible
