@@ -28,6 +28,9 @@ import {
   UserCheck,
   UserX,
   Package,
+  Clock,
+  Lock,
+  TrendingDown,
 } from 'lucide-react';
 
 /**
@@ -47,6 +50,19 @@ interface PlatformStats {
   totalPendingReports: number;
   totalResolvedReports: number;
   totalDismissedReports: number;
+}
+
+/**
+ * Escrow Analytics Interface
+ */
+interface EscrowAnalytics {
+  totalHeldCents: number;
+  totalHeldCount: number;
+  totalReleasedCount: number;
+  totalPendingCount: number;
+  totalDisputedCount: number;
+  overdueCount: number;
+  overdueAmountCents: number;
 }
 
 /**
@@ -86,6 +102,8 @@ export function AdminDashboard() {
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [escrowAnalytics, setEscrowAnalytics] = useState<EscrowAnalytics | null>(null);
+  const [escrowLoading, setEscrowLoading] = useState(true);
 
   /**
    * Fetch platform statistics
@@ -112,7 +130,30 @@ export function AdminDashboard() {
     fetchStats();
   }, []);
 
-  // Loading state
+  /**
+   * Fetch escrow analytics
+   */
+  useEffect(() => {
+    async function fetchEscrowAnalytics() {
+      try {
+        const res = await fetch('/api/admin/escrow-analytics');
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch escrow analytics');
+        }
+
+        const data = await res.json();
+        setEscrowAnalytics(data.analytics);
+      } catch (err) {
+        console.error('[AdminDashboard] Escrow analytics fetch error:', err);
+      } finally {
+        setEscrowLoading(false);
+      }
+    }
+
+    fetchEscrowAnalytics();
+  }, []);
+
   if (loading) {
     return (
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -130,7 +171,6 @@ export function AdminDashboard() {
     );
   }
 
-  // Error state
   if (error || !stats) {
     return (
       <Alert variant="destructive">
@@ -210,33 +250,147 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-      {statCards.map((card) => {
-        const Icon = card.icon;
+    <div className="space-y-8">
+      {/* Platform Stats Grid */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {statCards.map((card) => {
+          const Icon = card.icon;
 
-        return (
-          <Card key={card.title} className="transition-shadow hover:shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                {card.title}
-              </CardTitle>
-              <div
-                className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                  colorClasses[card.color]
-                }`}
-              >
-                <Icon className="h-5 w-5" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{card.value}</div>
-              {card.subtitle && (
-                <p className="mt-1 text-xs text-gray-500">{card.subtitle}</p>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+          return (
+            <Card key={card.title} className="transition-shadow hover:shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">
+                  {card.title}
+                </CardTitle>
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                    colorClasses[card.color]
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">{card.value}</div>
+                {card.subtitle && (
+                  <p className="mt-1 text-xs text-gray-500">{card.subtitle}</p>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Escrow Overview Section */}
+      <div>
+        <h2 className="mb-4 text-lg font-semibold text-gray-800">Escrow Overview</h2>
+        {escrowLoading ? (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <Card key={i} className="animate-pulse">
+                <CardHeader>
+                  <div className="h-4 w-24 rounded bg-gray-200" />
+                </CardHeader>
+                <CardContent>
+                  <div className="h-8 w-16 rounded bg-gray-200" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : escrowAnalytics ? (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {/* In Escrow (total $) */}
+            <Card className="transition-shadow hover:shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">
+                  In Escrow
+                </CardTitle>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+                  <Lock className="h-5 w-5" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">
+                  {formatCurrency(escrowAnalytics.totalHeldCents)}
+                </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  {formatNumber(escrowAnalytics.totalHeldCount)} held
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Overdue Escrow */}
+            <Card className="transition-shadow hover:shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">
+                  Overdue Escrow
+                </CardTitle>
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                    escrowAnalytics.overdueCount > 0
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-green-100 text-green-700'
+                  }`}
+                >
+                  <AlertTriangle className="h-5 w-5" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div
+                  className={`text-2xl font-bold ${
+                    escrowAnalytics.overdueCount > 0 ? 'text-red-700' : 'text-gray-900'
+                  }`}
+                >
+                  {formatNumber(escrowAnalytics.overdueCount)}
+                </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  {formatCurrency(escrowAnalytics.overdueAmountCents)} overdue
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Held Count */}
+            <Card className="transition-shadow hover:shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">
+                  Active Holds
+                </CardTitle>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 text-orange-700">
+                  <Clock className="h-5 w-5" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">
+                  {formatNumber(escrowAnalytics.totalHeldCount)}
+                </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  {formatNumber(escrowAnalytics.totalPendingCount)} pending
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Released Count */}
+            <Card className="transition-shadow hover:shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">
+                  Released
+                </CardTitle>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-700">
+                  <TrendingDown className="h-5 w-5" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">
+                  {formatNumber(escrowAnalytics.totalReleasedCount)}
+                </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  {formatNumber(escrowAnalytics.totalDisputedCount)} disputed
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

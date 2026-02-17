@@ -36,7 +36,6 @@ import { getAdminService, getTransactionRepository } from '@/lib/utils/admin-ser
  * Fetch all transactions with optional filters and pagination.
  */
 export async function GET(request: NextRequest) {
-  // Verify admin session
   const auth = await requireAdminApiAuth(request);
 
   if (!auth) {
@@ -44,31 +43,28 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Parse query parameters
     const searchParams = request.nextUrl.searchParams;
 
-    // String filters
     const paymentStatus = searchParams.get('paymentStatus') || undefined;
     const escrowStatus = searchParams.get('escrowStatus') || undefined;
     const sellerId = searchParams.get('sellerId') || undefined;
     const buyerId = searchParams.get('buyerId') || undefined;
     const projectId = searchParams.get('projectId') || undefined;
 
-    // Sorting
     const sortByParam = searchParams.get('sortBy') || 'createdAt';
     const sortBy = ['createdAt', 'amountCents', 'escrowReleaseDate'].includes(sortByParam)
       ? (sortByParam as 'createdAt' | 'amountCents' | 'escrowReleaseDate')
       : 'createdAt';
-    const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
+    const sortOrderParam = searchParams.get('sortOrder') || 'desc';
+    const sortOrder = (
+      ['asc', 'desc'].includes(sortOrderParam) ? sortOrderParam : 'desc'
+    ) as 'asc' | 'desc';
 
-    // Pagination
     const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
-    // Fetch transactions via AdminService
     const adminService = getAdminService();
 
-    // Filter out undefined values to satisfy exactOptionalPropertyTypes
     const filters = Object.fromEntries(
       Object.entries({
         paymentStatus,
@@ -93,13 +89,29 @@ export async function GET(request: NextRequest) {
       sortOrder,
     });
 
-    // Get total count for pagination metadata
     const transactionRepository = getTransactionRepository();
     const total = await transactionRepository.countAllTransactions(filters);
 
+    const now = Date.now();
+    const transactionsWithEscrowFields = transactions.map((tx) => {
+      const escrowReleaseDate = tx.escrowReleaseDate
+        ? new Date(tx.escrowReleaseDate).getTime()
+        : null;
+      const isHeld = tx.escrowStatus === 'held';
+
+      const escrowTimeRemainingMs =
+        isHeld && escrowReleaseDate !== null
+          ? Math.max(0, escrowReleaseDate - now)
+          : null;
+
+      const isOverdue = isHeld && escrowReleaseDate !== null && escrowReleaseDate < now;
+
+      return { ...tx, escrowTimeRemainingMs, isOverdue };
+    });
+
     return NextResponse.json(
       {
-        transactions,
+        transactions: transactionsWithEscrowFields,
         pagination: {
           total,
           limit,

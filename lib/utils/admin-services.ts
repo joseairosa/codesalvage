@@ -22,9 +22,8 @@ import {
   ProjectRepository,
   TransactionRepository,
 } from '@/lib/repositories';
-import { AdminService, emailService } from '@/lib/services';
+import { AdminService, emailService, stripeService } from '@/lib/services';
 
-// Singleton instances (initialized once, reused across requests)
 let adminServiceInstance: AdminService | null = null;
 let adminRepositoryInstance: AdminRepository | null = null;
 let userRepositoryInstance: UserRepository | null = null;
@@ -93,7 +92,8 @@ export function getAdminService(): AdminService {
       getUserRepository(),
       getProjectRepository(),
       getTransactionRepository(),
-      emailService
+      emailService,
+      stripeService
     );
   }
   return adminServiceInstance;

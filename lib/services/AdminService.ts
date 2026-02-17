@@ -22,6 +22,7 @@
 import type {
   AdminRepository,
   PlatformStats,
+  EscrowAnalytics,
   AuditLogWithAdmin,
   ContentReportWithReporter,
   AdminPaginationOptions,
@@ -29,7 +30,8 @@ import type {
 import type { UserRepository } from '@/lib/repositories/UserRepository';
 import type { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 import type { TransactionRepository } from '@/lib/repositories/TransactionRepository';
-import type { EmailService } from '@/lib/services/EmailService';
+import type { EmailService, RefundEmailData } from '@/lib/services/EmailService';
+import type { StripeService } from '@/lib/services/StripeService';
 import type { User, Project, Transaction } from '@prisma/client';
 
 /**
@@ -61,7 +63,8 @@ export class AdminService {
     private userRepository: UserRepository,
     private projectRepository: ProjectRepository,
     private transactionRepository: TransactionRepository,
-    private emailService: EmailService
+    private emailService: EmailService,
+    private stripeService: StripeService
   ) {
     console.log('[AdminService] Initialized');
   }
@@ -114,28 +117,23 @@ export class AdminService {
   ): Promise<User> {
     console.log('[AdminService] banUser called:', { adminId, userId, reason });
 
-    // Validation: Reason must be meaningful
     if (!reason || reason.trim().length < 10) {
       throw new AdminValidationError('Ban reason must be at least 10 characters');
     }
 
-    // Validation: Cannot ban yourself
     if (adminId === userId) {
       throw new AdminValidationError('Cannot ban yourself');
     }
 
-    // Check if user exists
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new AdminValidationError('User not found');
     }
 
-    // Validation: User is already banned
     if (user.isBanned) {
       throw new AdminValidationError('User is already banned');
     }
 
-    // Validation: Cannot ban admin users (safety measure)
     if (user.isAdmin) {
       throw new AdminAuthorizationError(
         'Cannot ban admin users. Revoke admin status first.'
@@ -143,10 +141,8 @@ export class AdminService {
     }
 
     try {
-      // Ban user
       const bannedUser = await this.userRepository.banUser(userId, adminId, reason);
 
-      // Create audit log
       await this.adminRepository.createAuditLog({
         adminId,
         action: 'user.ban',
@@ -161,7 +157,6 @@ export class AdminService {
         ...(ipAddress ? { ipAddress } : {}),
       });
 
-      // Send email notification
       try {
         await this.emailService.sendUserBannedNotification(
           { email: user.email, name: user.fullName || user.username },
@@ -173,7 +168,6 @@ export class AdminService {
           }
         );
       } catch (emailError) {
-        // Log email error but don't fail the ban operation
         console.error('[AdminService] Failed to send ban email:', emailError);
       }
 
@@ -205,22 +199,18 @@ export class AdminService {
   async unbanUser(adminId: string, userId: string, ipAddress?: string): Promise<User> {
     console.log('[AdminService] unbanUser called:', { adminId, userId });
 
-    // Check if user exists
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new AdminValidationError('User not found');
     }
 
-    // Validation: User is not banned
     if (!user.isBanned) {
       throw new AdminValidationError('User is not currently banned');
     }
 
     try {
-      // Unban user
       const unbannedUser = await this.userRepository.unbanUser(userId);
 
-      // Create audit log
       await this.adminRepository.createAuditLog({
         adminId,
         action: 'user.unban',
@@ -235,7 +225,6 @@ export class AdminService {
         ...(ipAddress ? { ipAddress } : {}),
       });
 
-      // Send email notification
       try {
         await this.emailService.sendUserUnbannedNotification(
           { email: user.email, name: user.fullName || user.username },
@@ -245,7 +234,6 @@ export class AdminService {
           }
         );
       } catch (emailError) {
-        // Log email error but don't fail the unban operation
         console.error('[AdminService] Failed to send unban email:', emailError);
       }
 
@@ -281,25 +269,21 @@ export class AdminService {
   ): Promise<Project> {
     console.log('[AdminService] approveProject called:', { adminId, projectId });
 
-    // Check if project exists
     const project = await this.projectRepository.findById(projectId, true);
     if (!project) {
       throw new AdminValidationError('Project not found');
     }
 
-    // Validation: Project is already active
     if (project.status === 'active') {
       throw new AdminValidationError('Project is already active');
     }
 
     try {
-      // Approve project
       const approvedProject = await this.projectRepository.approveProject(
         projectId,
         adminId
       );
 
-      // Create audit log
       await this.adminRepository.createAuditLog({
         adminId,
         action: 'project.approve',
@@ -347,25 +331,21 @@ export class AdminService {
   ): Promise<Project> {
     console.log('[AdminService] rejectProject called:', { adminId, projectId, reason });
 
-    // Validation: Reason required
     if (!reason || reason.trim().length < 10) {
       throw new AdminValidationError('Rejection reason must be at least 10 characters');
     }
 
-    // Check if project exists
     const project = await this.projectRepository.findById(projectId, true);
     if (!project) {
       throw new AdminValidationError('Project not found');
     }
 
     try {
-      // Reject project
       const rejectedProject = await this.projectRepository.rejectProject(
         projectId,
         reason
       );
 
-      // Create audit log
       await this.adminRepository.createAuditLog({
         adminId,
         action: 'project.reject',
@@ -421,24 +401,20 @@ export class AdminService {
       featuredDays,
     });
 
-    // Check if project exists
     const project = await this.projectRepository.findById(projectId, true);
     if (!project) {
       throw new AdminValidationError('Project not found');
     }
 
-    // Validation: Can only feature active projects
     if (featured && project.status !== 'active') {
       throw new AdminValidationError('Can only feature active projects');
     }
 
-    // Validation: Featured days must be positive
     if (featured && featuredDays <= 0) {
       throw new AdminValidationError('Featured days must be positive');
     }
 
     try {
-      // Toggle featured status
       const updatedProject = await this.projectRepository.toggleFeatured(
         projectId,
         featured,
@@ -446,7 +422,6 @@ export class AdminService {
         featuredDays
       );
 
-      // Create audit log
       await this.adminRepository.createAuditLog({
         adminId,
         action: featured ? 'project.feature' : 'project.unfeature',
@@ -587,20 +562,17 @@ export class AdminService {
       status,
     });
 
-    // Validation: Resolution required
     if (!resolution || resolution.trim().length < 5) {
       throw new AdminValidationError('Resolution must be at least 5 characters');
     }
 
     try {
-      // Update content report
       const updatedReport = await this.adminRepository.updateContentReport(reportId, {
         status,
         reviewedBy: adminId,
         resolution,
       });
 
-      // Create audit log
       await this.adminRepository.createAuditLog({
         adminId,
         action: 'report.resolve',
@@ -653,17 +625,14 @@ export class AdminService {
       reason,
     });
 
-    // Validation: Reason required
     if (!reason || reason.trim().length < 10) {
       throw new AdminValidationError('Release reason must be at least 10 characters');
     }
 
     try {
-      // Release escrow
       const transaction =
         await this.transactionRepository.releaseEscrowManually(transactionId);
 
-      // Create audit log
       await this.adminRepository.createAuditLog({
         adminId,
         action: 'transaction.escrow_release',
@@ -685,5 +654,126 @@ export class AdminService {
       console.error('[AdminService] releaseEscrowManually failed:', error);
       throw error;
     }
+  }
+
+  /**
+   * Refund a transaction (admin-initiated)
+   *
+   * Business rules:
+   * - Reason must be at least 10 characters
+   * - Transaction must exist
+   * - Transaction paymentStatus must be 'succeeded'
+   * - Transaction escrowStatus must be 'held' or 'pending'
+   * - Transaction must have a stripePaymentIntentId
+   * - Calls Stripe refund FIRST, then updates DB atomically
+   * - Creates audit log with action 'transaction.refund'
+   * - Sends buyer email notification (non-blocking)
+   *
+   * @param adminId - Admin user ID performing the refund
+   * @param transactionId - Transaction ID to refund
+   * @param reason - Reason for refund (min 10 chars)
+   * @param ipAddress - Optional IP address of admin
+   * @returns Refunded transaction and optional warning
+   */
+  async refundTransaction(
+    adminId: string,
+    transactionId: string,
+    reason: string,
+    ipAddress?: string
+  ): Promise<{ transaction: Transaction; warning?: string }> {
+    console.log('[AdminService] refundTransaction called:', {
+      adminId,
+      transactionId,
+      reason,
+    });
+
+    if (!reason || reason.trim().length < 10) {
+      throw new AdminValidationError('Refund reason must be at least 10 characters');
+    }
+
+    const transaction = await this.transactionRepository.findById(transactionId);
+    if (!transaction) {
+      throw new AdminValidationError('Transaction not found');
+    }
+
+    if (transaction.paymentStatus !== 'succeeded') {
+      throw new AdminValidationError(
+        'Transaction payment status must be succeeded to refund'
+      );
+    }
+
+    if (transaction.escrowStatus !== 'held' && transaction.escrowStatus !== 'pending') {
+      throw new AdminValidationError('Transaction escrow has already been released');
+    }
+
+    if (!transaction.stripePaymentIntentId) {
+      throw new AdminValidationError('Transaction has no Stripe payment intent ID');
+    }
+
+    const codeAccessWarning =
+      transaction.codeDeliveryStatus === 'accessed' || transaction.githubAccessGrantedAt
+        ? 'Buyer has already received code access'
+        : undefined;
+
+    await this.stripeService.refundPayment(transaction.stripePaymentIntentId, reason);
+
+    const refundedTransaction =
+      await this.transactionRepository.markRefunded(transactionId);
+
+    await this.adminRepository.createAuditLog({
+      adminId,
+      action: 'transaction.refund',
+      targetType: 'transaction',
+      targetId: transactionId,
+      reason,
+      metadata: {
+        amountCents: transaction.amountCents,
+        sellerId: transaction.sellerId,
+        buyerId: transaction.buyerId,
+        projectId: transaction.projectId,
+        stripePaymentIntentId: transaction.stripePaymentIntentId,
+        ...(codeAccessWarning ? { warning: codeAccessWarning } : {}),
+      },
+      ...(ipAddress ? { ipAddress } : {}),
+    });
+
+    try {
+      const buyer = transaction.buyer;
+      if (buyer?.email) {
+        const refundData: RefundEmailData = {
+          buyerName: buyer.fullName || buyer.username || 'Buyer',
+          projectTitle: transaction.project?.title || 'Project',
+          amountCents: transaction.amountCents,
+          refundDate: new Date().toISOString(),
+          transactionId: transaction.id,
+          reason,
+        };
+        await this.emailService.sendRefundNotification(
+          { email: buyer.email, name: refundData.buyerName },
+          refundData
+        );
+      }
+    } catch (emailError) {
+      console.error('[AdminService] Failed to send refund email:', emailError);
+    }
+
+    console.log('[AdminService] Transaction refunded successfully:', transactionId);
+
+    return {
+      transaction: refundedTransaction,
+      ...(codeAccessWarning ? { warning: codeAccessWarning } : {}),
+    };
+  }
+
+  /**
+   * Get escrow analytics
+   *
+   * Returns aggregated escrow metrics for the admin dashboard.
+   *
+   * @returns EscrowAnalytics object with counts and amounts
+   */
+  async getEscrowAnalytics(): Promise<EscrowAnalytics> {
+    console.log('[AdminService] getEscrowAnalytics called');
+    return this.adminRepository.getEscrowAnalytics();
   }
 }

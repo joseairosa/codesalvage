@@ -106,6 +106,19 @@ export interface AdminPaginationOptions {
 }
 
 /**
+ * Escrow analytics data
+ */
+export interface EscrowAnalytics {
+  totalHeldCents: number;
+  totalHeldCount: number;
+  totalReleasedCount: number;
+  totalPendingCount: number;
+  totalDisputedCount: number;
+  overdueCount: number;
+  overdueAmountCents: number;
+}
+
+/**
  * AdminRepository class
  */
 export class AdminRepository {
@@ -133,7 +146,6 @@ export class AdminRepository {
     console.log('[AdminRepository] getPlatformStats called');
 
     try {
-      // Execute all queries in parallel for performance
       const [
         totalUsers,
         totalSellers,
@@ -470,7 +482,6 @@ export class AdminRepository {
       contentType,
     });
 
-    // Build where clause
     const where: any = {};
     if (status) {
       where.status = status;
@@ -606,6 +617,70 @@ export class AdminRepository {
       console.error('[AdminRepository] countAuditLogs failed:', error);
       throw new Error(
         `Failed to count audit logs: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Get escrow analytics
+   *
+   * Returns counts and amounts for transactions in each escrow state,
+   * plus overdue escrow metrics. Uses parallel queries for performance.
+   *
+   * @returns EscrowAnalytics object
+   * @throws Error if query fails
+   */
+  async getEscrowAnalytics(): Promise<EscrowAnalytics> {
+    console.log('[AdminRepository] getEscrowAnalytics called');
+
+    try {
+      const now = new Date();
+
+      const [
+        heldAggregation,
+        totalReleasedCount,
+        totalPendingCount,
+        totalDisputedCount,
+        overdueAggregation,
+      ] = await this.prisma.$transaction([
+        this.prisma.transaction.aggregate({
+          _sum: { amountCents: true },
+          _count: { id: true },
+          where: { escrowStatus: 'held' },
+        }),
+        this.prisma.transaction.count({ where: { escrowStatus: 'released' } }),
+        this.prisma.transaction.count({ where: { escrowStatus: 'pending' } }),
+        this.prisma.transaction.count({ where: { escrowStatus: 'disputed' } }),
+        this.prisma.transaction.aggregate({
+          _sum: { amountCents: true },
+          _count: { id: true },
+          where: {
+            escrowStatus: 'held',
+            escrowReleaseDate: { lt: now },
+          },
+        }),
+      ]);
+
+      const analytics: EscrowAnalytics = {
+        totalHeldCents: heldAggregation._sum.amountCents ?? 0,
+        totalHeldCount: heldAggregation._count.id,
+        totalReleasedCount,
+        totalPendingCount,
+        totalDisputedCount,
+        overdueCount: overdueAggregation._count.id,
+        overdueAmountCents: overdueAggregation._sum.amountCents ?? 0,
+      };
+
+      console.log('[AdminRepository] Escrow analytics retrieved:', {
+        totalHeldCount: analytics.totalHeldCount,
+        overdueCount: analytics.overdueCount,
+      });
+
+      return analytics;
+    } catch (error) {
+      console.error('[AdminRepository] getEscrowAnalytics failed:', error);
+      throw new Error(
+        `Failed to get escrow analytics: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }

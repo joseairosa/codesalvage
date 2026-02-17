@@ -23,9 +23,8 @@ import {
   ProjectRepository,
   TransactionRepository,
 } from '@/lib/repositories';
-import { AdminService, emailService } from '@/lib/services';
+import { AdminService, emailService, stripeService } from '@/lib/services';
 
-// Initialize repositories and services
 const adminRepository = new AdminRepository(prisma);
 const userRepository = new UserRepository(prisma);
 const projectRepository = new ProjectRepository(prisma);
@@ -36,7 +35,8 @@ const adminService = new AdminService(
   userRepository,
   projectRepository,
   transactionRepository,
-  emailService
+  emailService,
+  stripeService
 );
 
 /**
@@ -45,7 +45,6 @@ const adminService = new AdminService(
  * Get platform statistics
  */
 export async function GET(request: Request) {
-  // Verify admin authentication
   const auth = await requireAdminApiAuth(request);
   if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
