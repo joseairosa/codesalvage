@@ -8,6 +8,7 @@
 import Link from 'next/link';
 import { requireAuth } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
+import { stripeService } from '@/lib/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, AlertTriangle, CreditCard } from 'lucide-react';
@@ -15,7 +16,6 @@ import { Plus, AlertTriangle, CreditCard } from 'lucide-react';
 export default async function DashboardPage() {
   const session = await requireAuth();
 
-  // Fetch real stats for the dashboard
   const [projectCount, messageCount, transactionCount, user] = await Promise.all([
     prisma.project.count({ where: { sellerId: session.user.id } }),
     prisma.message.count({
@@ -30,9 +30,28 @@ export default async function DashboardPage() {
     }),
     prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { createdAt: true },
+      select: { createdAt: true, stripeAccountId: true, isVerifiedSeller: true },
     }),
   ]);
+
+  let isVerifiedSeller = session.user.isVerifiedSeller;
+  if (session.user.isSeller && !isVerifiedSeller && user?.stripeAccountId) {
+    try {
+      const isOnboarded = await stripeService.isAccountOnboarded(user.stripeAccountId);
+      if (isOnboarded) {
+        await prisma.user.update({
+          where: { id: session.user.id },
+          data: { isVerifiedSeller: true },
+        });
+        isVerifiedSeller = true;
+        console.log('[Dashboard] Self-healed: updated isVerifiedSeller to true', {
+          userId: session.user.id,
+        });
+      }
+    } catch (err) {
+      console.error('[Dashboard] Failed to check Stripe onboarding status:', err);
+    }
+  }
 
   return (
     <div className="container mx-auto py-10">
@@ -57,7 +76,7 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      {session.user.isSeller && !session.user.isVerifiedSeller && (
+      {session.user.isSeller && !isVerifiedSeller && (
         <Card className="mb-8 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50">
           <CardContent className="flex items-center justify-between py-6">
             <div className="flex items-start gap-3">
@@ -167,7 +186,7 @@ export default async function DashboardPage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="font-medium">Payments:</span>{' '}
-                {session.user.isVerifiedSeller ? (
+                {isVerifiedSeller ? (
                   <span className="text-green-600">Connected</span>
                 ) : (
                   <Link
