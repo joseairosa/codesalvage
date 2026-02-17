@@ -213,7 +213,6 @@ export default function SellerProjectsPage() {
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
 
-  // State
   const [projects, setProjects] = React.useState<SellerProject[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -267,7 +266,6 @@ export default function SellerProjectsPage() {
     }
   }, [sessionStatus, fetchProjects]);
 
-  // Calculate stats
   const stats = React.useMemo(() => {
     const totalProjects = projects.length;
     const activeProjects = projects.filter((p) => p.status === 'active').length;
@@ -284,15 +282,12 @@ export default function SellerProjectsPage() {
     };
   }, [projects]);
 
-  // Filter projects
   const filteredProjects = React.useMemo(() => {
     return projects.filter((project) => {
-      // Status filter
       if (statusFilter !== 'all' && project.status !== statusFilter) {
         return false;
       }
 
-      // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         return (
@@ -346,7 +341,6 @@ export default function SellerProjectsPage() {
 
       console.log(`[${componentName}] Project published successfully`);
 
-      // Refresh projects list to get updated data
       await fetchProjects();
     } catch (error) {
       console.error(`[${componentName}] Publish error:`, error);
@@ -382,7 +376,6 @@ export default function SellerProjectsPage() {
 
       console.log(`[${componentName}] Project deleted successfully`);
 
-      // Refresh projects list
       await fetchProjects();
       setDeleteDialogOpen(false);
       setProjectToDelete(null);
@@ -541,7 +534,7 @@ export default function SellerProjectsPage() {
                 <TableBody>
                   {filteredProjects.map((project) => (
                     <TableRow key={project.id}>
-                      <TableCell className="font-medium">
+                      <TableCell className="text-left font-medium">
                         <button
                           onClick={() => handleViewProject(project.id)}
                           className="hover:underline"
