@@ -134,7 +134,6 @@ export class StripeService {
     try {
       const account = await this.getAccount(accountId);
 
-      // Check if charges are enabled and details submitted
       const isOnboarded = account.charges_enabled && account.details_submitted;
 
       console.log(`[${componentName}] Account onboarded:`, isOnboarded);
@@ -143,6 +142,33 @@ export class StripeService {
     } catch (error) {
       console.error(`[${componentName}] Failed to check onboarding status:`, error);
       return false;
+    }
+  }
+
+  /**
+   * Get granular onboarding status for UI display
+   *
+   * Returns separate flags so the UI can distinguish between:
+   * - Not started (no account)
+   * - In progress (details not yet submitted)
+   * - Pending verification (submitted but charges not yet enabled)
+   * - Fully verified (charges enabled and details submitted)
+   */
+  async getOnboardingStatus(accountId: string): Promise<{
+    detailsSubmitted: boolean;
+    chargesEnabled: boolean;
+    payoutsEnabled: boolean;
+  }> {
+    try {
+      const account = await this.getAccount(accountId);
+      return {
+        detailsSubmitted: account.details_submitted ?? false,
+        chargesEnabled: account.charges_enabled ?? false,
+        payoutsEnabled: account.payouts_enabled ?? false,
+      };
+    } catch (error) {
+      console.error(`[${componentName}] Failed to get onboarding status:`, error);
+      return { detailsSubmitted: false, chargesEnabled: false, payoutsEnabled: false };
     }
   }
 
@@ -206,7 +232,6 @@ export class StripeService {
     });
 
     try {
-      // Calculate seller payout (after platform fee and Stripe fees)
       const sellerPayout = calculateSellerPayout(amountCents);
 
       console.log(`[${componentName}] Seller payout:`, {
