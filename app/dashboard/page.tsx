@@ -11,7 +11,7 @@ import { prisma } from '@/lib/prisma';
 import { stripeService } from '@/lib/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, AlertTriangle, CreditCard } from 'lucide-react';
+import { Plus, AlertTriangle, CreditCard, Clock } from 'lucide-react';
 
 export default async function DashboardPage() {
   const session = await requireAuth();
@@ -35,10 +35,15 @@ export default async function DashboardPage() {
   ]);
 
   let isVerifiedSeller = session.user.isVerifiedSeller;
+  let onboardingStatus: {
+    detailsSubmitted: boolean;
+    chargesEnabled: boolean;
+    payoutsEnabled: boolean;
+  } | null = null;
   if (session.user.isSeller && !isVerifiedSeller && user?.stripeAccountId) {
     try {
-      const isOnboarded = await stripeService.isAccountOnboarded(user.stripeAccountId);
-      if (isOnboarded) {
+      onboardingStatus = await stripeService.getOnboardingStatus(user.stripeAccountId);
+      if (onboardingStatus.chargesEnabled && onboardingStatus.detailsSubmitted) {
         await prisma.user.update({
           where: { id: session.user.id },
           data: { isVerifiedSeller: true },
@@ -76,30 +81,53 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      {session.user.isSeller && !isVerifiedSeller && (
-        <Card className="mb-8 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50">
-          <CardContent className="flex items-center justify-between py-6">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 h-6 w-6 flex-shrink-0 text-amber-600" />
-              <div>
-                <h2 className="text-lg font-semibold text-amber-900">
-                  Complete Your Payment Setup
-                </h2>
-                <p className="mt-1 text-sm text-amber-800">
-                  You need to connect your Stripe account before buyers can purchase your
-                  projects. This only takes a few minutes.
-                </p>
+      {session.user.isSeller &&
+        !isVerifiedSeller &&
+        onboardingStatus?.detailsSubmitted && (
+          <Card className="mb-8 border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <CardContent className="flex items-center justify-between py-6">
+              <div className="flex items-start gap-3">
+                <Clock className="mt-0.5 h-6 w-6 flex-shrink-0 text-blue-600" />
+                <div>
+                  <h2 className="text-lg font-semibold text-blue-900">
+                    Account Under Review
+                  </h2>
+                  <p className="mt-1 text-sm text-blue-800">
+                    Your payment details have been submitted and are being reviewed by
+                    Stripe. This usually takes a few minutes but can take up to 24 hours.
+                  </p>
+                </div>
               </div>
-            </div>
-            <Button asChild className="bg-amber-600 hover:bg-amber-700">
-              <Link href="/seller/onboard">
-                <CreditCard className="mr-2 h-4 w-4" />
-                Set Up Payments
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        )}
+
+      {session.user.isSeller &&
+        !isVerifiedSeller &&
+        !onboardingStatus?.detailsSubmitted && (
+          <Card className="mb-8 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50">
+            <CardContent className="flex items-center justify-between py-6">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="mt-0.5 h-6 w-6 flex-shrink-0 text-amber-600" />
+                <div>
+                  <h2 className="text-lg font-semibold text-amber-900">
+                    Complete Your Payment Setup
+                  </h2>
+                  <p className="mt-1 text-sm text-amber-800">
+                    You need to connect your Stripe account before buyers can purchase
+                    your projects. This only takes a few minutes.
+                  </p>
+                </div>
+              </div>
+              <Button asChild className="bg-amber-600 hover:bg-amber-700">
+                <Link href="/seller/onboard">
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Set Up Payments
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
       {session.user.isSeller && (
         <Card className="mb-8 border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
@@ -188,6 +216,8 @@ export default async function DashboardPage() {
                 <span className="font-medium">Payments:</span>{' '}
                 {isVerifiedSeller ? (
                   <span className="text-green-600">Connected</span>
+                ) : onboardingStatus?.detailsSubmitted ? (
+                  <span className="text-blue-600">Under Review</span>
                 ) : (
                   <Link
                     href="/seller/onboard"
