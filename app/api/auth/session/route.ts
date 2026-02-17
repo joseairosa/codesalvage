@@ -12,15 +12,16 @@
  * - Follows ataglance pattern for consistency
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyFirebaseToken } from '@/lib/firebase-auth';
+import { withAuthRateLimit } from '@/lib/middleware/withRateLimit';
 
 /**
  * POST /api/auth/session
  * Store Firebase ID token in httpOnly cookie
  */
-export async function POST(request: Request) {
+export const POST = withAuthRateLimit(async (request: NextRequest) => {
   try {
     const { idToken } = await request.json();
 
@@ -31,18 +32,16 @@ export async function POST(request: Request) {
 
     console.log('[Session API] Verifying Firebase token');
 
-    // Verify token is valid before storing
     await verifyFirebaseToken(idToken);
 
     console.log('[Session API] Token verified, storing in cookie');
 
-    // Store in httpOnly cookie (7 days)
     const cookieStore = await cookies();
     cookieStore.set('session', idToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
       path: '/',
     });
 
@@ -53,7 +52,6 @@ export async function POST(request: Request) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[Session API] Error creating session:', errorMessage);
 
-    // Determine appropriate status code based on error type
     const isConfigError =
       errorMessage.includes('not configured') ||
       errorMessage.includes('not set') ||
@@ -68,7 +66,7 @@ export async function POST(request: Request) {
       { status: statusCode }
     );
   }
-}
+});
 
 /**
  * DELETE /api/auth/session
