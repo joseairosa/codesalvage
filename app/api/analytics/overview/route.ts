@@ -28,7 +28,6 @@ import { getOrSetCache, CacheKeys, CacheTTL } from '@/lib/utils/cache';
 
 const componentName = 'AnalyticsOverviewAPI';
 
-// Initialize repositories and service
 const analyticsRepository = new AnalyticsRepository(prisma);
 const userRepository = new UserRepository(prisma);
 const analyticsService = new AnalyticsService(analyticsRepository, userRepository);
@@ -61,7 +60,6 @@ export async function GET(request: Request) {
       | 'month'
       | null;
 
-    // Build request object with only defined values
     const requestData: {
       startDate?: string;
       endDate?: string;
@@ -71,17 +69,15 @@ export async function GET(request: Request) {
     if (startDateParam) requestData.startDate = startDateParam;
     if (endDateParam) requestData.endDate = endDateParam;
     if (granularityParam) requestData.granularity = granularityParam;
-    else requestData.granularity = 'day'; // Default
+    else requestData.granularity = 'day';
 
     console.log(`[${componentName}] Fetching analytics overview:`, {
       userId: auth.user.id,
       ...requestData,
     });
 
-    // Create cache key with all query parameters
     const cacheRange = `${startDateParam || 'default'}-${endDateParam || 'default'}-${granularityParam || 'day'}`;
 
-    // Get cached analytics or fetch fresh data
     const analytics = await getOrSetCache(
       CacheKeys.sellerAnalytics(auth.user.id, cacheRange),
       CacheTTL.ANALYTICS,
@@ -96,14 +92,13 @@ export async function GET(request: Request) {
     console.log(`[${componentName}] Analytics overview retrieved:`, {
       totalProjects: analytics.summary.totalProjects,
       totalSold: analytics.summary.totalSold,
-      totalRevenue: analytics.summary.totalRevenue,
+      totalRevenueCents: analytics.summary.totalRevenue,
     });
 
     return NextResponse.json(analytics, { status: 200 });
   } catch (error) {
     console.error(`[${componentName}] Error fetching analytics:`, error);
 
-    // Map service errors to appropriate HTTP status codes
     if (error instanceof AnalyticsValidationError) {
       return NextResponse.json(
         {

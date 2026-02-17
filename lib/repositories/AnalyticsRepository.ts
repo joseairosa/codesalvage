@@ -27,14 +27,16 @@ export interface SellerRevenueSummary {
   totalSold: number;
   totalRevenueCents: number;
   averageProjectPriceCents: number;
-  conversionRate: number; // views to sales ratio
+  totalViews: number;
+  totalFavorites: number;
+  conversionRate: number;
 }
 
 /**
  * Revenue time series data point
  */
 export interface RevenueDataPoint {
-  date: string; // ISO date string (YYYY-MM-DD)
+  date: string;
   revenueCents: number;
   transactionCount: number;
 }
@@ -88,15 +90,12 @@ export class AnalyticsRepository {
     sellerId: string,
     dateRange?: DateRangeFilter
   ): Promise<SellerRevenueSummary> {
-    // Get total projects count (ALL projects, not filtered by date)
-    // Date range only applies to sales/revenue, not to project inventory
     const totalProjects = await this.prisma.project.count({
       where: {
         sellerId,
       },
     });
 
-    // Get sold projects count and revenue (filtered by date range)
     const where: {
       sellerId: string;
       paymentStatus: string;
@@ -133,18 +132,19 @@ export class AnalyticsRepository {
       0
     );
 
-    // Get ALL projects for average price and total views (not filtered by date)
     const projects = await this.prisma.project.findMany({
       where: {
         sellerId,
       },
       select: {
         viewCount: true,
+        favoriteCount: true,
         priceCents: true,
       },
     });
 
     const totalViews = projects.reduce((sum, p) => sum + p.viewCount, 0);
+    const totalFavorites = projects.reduce((sum, p) => sum + p.favoriteCount, 0);
     const averageProjectPriceCents =
       projects.length > 0
         ? Math.round(projects.reduce((sum, p) => sum + p.priceCents, 0) / projects.length)
@@ -158,6 +158,8 @@ export class AnalyticsRepository {
       totalSold,
       totalRevenueCents,
       averageProjectPriceCents,
+      totalViews,
+      totalFavorites,
       conversionRate,
     };
   }
@@ -204,11 +206,9 @@ export class AnalyticsRepository {
       },
     });
 
-    // Group by date
     const revenueByDate = new Map<string, { revenue: number; count: number }>();
 
     for (const transaction of transactions) {
-      // Skip transactions without completedAt date
       if (!transaction.completedAt) continue;
 
       const date = this.formatDateByGranularity(transaction.completedAt, granularity);
@@ -220,7 +220,6 @@ export class AnalyticsRepository {
       });
     }
 
-    // Convert to array
     return Array.from(revenueByDate.entries())
       .map(([date, data]) => ({
         date,
@@ -281,7 +280,6 @@ export class AnalyticsRepository {
       },
     });
 
-    // Calculate metrics for each project
     const projectMetrics: ProjectPerformanceMetrics[] = projects.map((project: any) => {
       const purchaseCount = project.transactions.length;
       const revenueCents = project.transactions.reduce(
@@ -304,7 +302,6 @@ export class AnalyticsRepository {
       };
     });
 
-    // Filter out projects with no revenue, sort by revenue (descending), and take top N
     return projectMetrics
       .filter((project) => project.revenueCents > 0)
       .sort((a, b) => b.revenueCents - a.revenueCents)
@@ -359,7 +356,6 @@ export class AnalyticsRepository {
       case 'day':
         return `${year}-${month}-${day}`;
       case 'week': {
-        // Get ISO week number
         const weekStart = new Date(date);
         weekStart.setDate(weekStart.getDate() - weekStart.getDay());
         const weekMonth = String(weekStart.getMonth() + 1).padStart(2, '0');
