@@ -12,7 +12,7 @@
  * (requires user to connect GitHub via /api/github/connect first).
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { GitHubService, GitHubServiceError } from '@/lib/services/GitHubService';
@@ -22,6 +22,7 @@ import {
 } from '@/lib/services/RepoAnalysisService';
 import { prisma } from '@/lib/prisma';
 import { decrypt } from '@/lib/encryption';
+import { withStrictRateLimit } from '@/lib/middleware/withRateLimit';
 
 const requestSchema = z.object({
   githubUrl: z
@@ -33,44 +34,12 @@ const requestSchema = z.object({
     ),
 });
 
-// Simple in-memory rate limiter (per user, 10 requests/hour)
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT = 10;
-const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
-
-function checkRateLimit(userId: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(userId);
-
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_WINDOW_MS });
-    return true;
-  }
-
-  if (entry.count >= RATE_LIMIT) {
-    return false;
-  }
-
-  entry.count++;
-  return true;
-}
-
-export async function POST(request: Request) {
-  // Authenticate
+export const POST = withStrictRateLimit(async (request: NextRequest) => {
   const auth = await authenticateApiRequest(request);
   if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Rate limit
-  if (!checkRateLimit(auth.user.id)) {
-    return NextResponse.json(
-      { error: 'Rate limit exceeded. Maximum 10 analyses per hour.' },
-      { status: 429 }
-    );
-  }
-
-  // Parse and validate request body
   let body: z.infer<typeof requestSchema>;
   try {
     const raw = await request.json();
@@ -85,7 +54,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  // Get user's GitHub token if they've connected their account
   let githubToken: string | undefined;
   const user = await prisma.user.findUnique({
     where: { id: auth.user.id },
@@ -96,11 +64,9 @@ export async function POST(request: Request) {
       githubToken = decrypt(user.githubAccessToken);
     } catch (err) {
       console.error('[Analyze Repo] Failed to decrypt GitHub token:', err);
-      // Continue without token — will work for public repos
     }
   }
 
-  // Fetch repo data
   const githubService = new GitHubService();
   let repoData;
   try {
@@ -108,7 +74,6 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof GitHubServiceError) {
       if (error.statusCode === 404) {
-        // If no token and 404, might be private
         const hint = githubToken
           ? 'Repository not found.'
           : 'Repository not found or is private. Connect your GitHub account to access private repos.';
@@ -131,7 +96,6 @@ export async function POST(request: Request) {
     );
   }
 
-  // Analyze with AI
   let analysis;
   try {
     const repoAnalysisService = new RepoAnalysisService();
@@ -157,4 +121,4 @@ export async function POST(request: Request) {
       htmlUrl: repoData.metadata.htmlUrl,
     },
   });
-}
+});

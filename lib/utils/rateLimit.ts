@@ -13,7 +13,6 @@
 import { createClient } from 'redis';
 import { type NextRequest, NextResponse } from 'next/server';
 
-// Redis client singleton
 let redisClient: ReturnType<typeof createClient> | null = null;
 let redisConnectionFailed = false;
 let redisErrorLogged = false;
@@ -25,7 +24,6 @@ let redisErrorLogged = false;
  * Logs errors only once to prevent log spam.
  */
 async function getRedisClient(): Promise<ReturnType<typeof createClient> | null> {
-  // Skip if no REDIS_URL configured or previous connection failed
   if (!process.env['REDIS_URL']) {
     if (!redisErrorLogged) {
       console.warn('[RateLimit] REDIS_URL not configured, rate limiting disabled');
@@ -67,6 +65,66 @@ async function getRedisClient(): Promise<ReturnType<typeof createClient> | null>
   }
 
   return redisClient;
+}
+
+/**
+ * In-memory fallback rate limiter
+ *
+ * Activates when Redis is unavailable. Uses a more generous limit
+ * (5x the normal limit) since it's per-instance only and loses state
+ * on restart. Provides basic abuse protection rather than no protection.
+ */
+const fallbackLimitMap = new Map<string, { count: number; resetAt: number }>();
+const FALLBACK_MULTIPLIER = 5;
+
+function checkFallbackRateLimit(config: {
+  maxRequests: number;
+  windowSeconds: number;
+  identifier: string;
+}): RateLimitResult {
+  const now = Date.now();
+  const key = `${config.identifier}`;
+  const entry = fallbackLimitMap.get(key);
+  const fallbackMax = config.maxRequests * FALLBACK_MULTIPLIER;
+  const windowMs = config.windowSeconds * 1000;
+
+  if (Math.random() < 0.01) {
+    fallbackLimitMap.forEach((v, k) => {
+      if (now > v.resetAt) fallbackLimitMap.delete(k);
+    });
+  }
+
+  if (!entry || now > entry.resetAt) {
+    fallbackLimitMap.set(key, { count: 1, resetAt: now + windowMs });
+    return {
+      allowed: true,
+      remaining: fallbackMax - 1,
+      limit: fallbackMax,
+      resetSeconds: config.windowSeconds,
+      currentCount: 1,
+    };
+  }
+
+  if (entry.count >= fallbackMax) {
+    const resetSeconds = Math.ceil((entry.resetAt - now) / 1000);
+    return {
+      allowed: false,
+      remaining: 0,
+      limit: fallbackMax,
+      resetSeconds: resetSeconds > 0 ? resetSeconds : config.windowSeconds,
+      currentCount: entry.count,
+    };
+  }
+
+  entry.count++;
+  const resetSeconds = Math.ceil((entry.resetAt - now) / 1000);
+  return {
+    allowed: true,
+    remaining: fallbackMax - entry.count,
+    limit: fallbackMax,
+    resetSeconds: resetSeconds > 0 ? resetSeconds : config.windowSeconds,
+    currentCount: entry.count,
+  };
 }
 
 /**
@@ -133,7 +191,7 @@ export interface RateLimitResult {
  * @example
  * const result = await checkRateLimit({
  *   maxRequests: 5,
- *   windowSeconds: 900, // 15 minutes
+ *   windowSeconds: 900,
  *   identifier: req.ip,
  *   namespace: 'auth',
  * });
@@ -151,24 +209,15 @@ export async function checkRateLimit(config: RateLimitConfig): Promise<RateLimit
   try {
     const redis = await getRedisClient();
 
-    // If Redis is not available, fail open (allow all requests)
     if (!redis) {
-      return {
-        allowed: true,
-        remaining: maxRequests,
-        limit: maxRequests,
-        resetSeconds: windowSeconds,
-        currentCount: 0,
-      };
+      return checkFallbackRateLimit({ maxRequests, windowSeconds, identifier });
     }
 
     const key = `ratelimit:${namespace}:${identifier}`;
 
-    // Get current count
     const currentCount = await redis.get(key);
     const count = currentCount ? parseInt(currentCount, 10) : 0;
 
-    // Check if limit exceeded
     if (count >= maxRequests) {
       const ttl = await redis.ttl(key);
       return {
@@ -180,13 +229,10 @@ export async function checkRateLimit(config: RateLimitConfig): Promise<RateLimit
       };
     }
 
-    // Increment counter
     const newCount = count + 1;
     if (count === 0) {
-      // First request in window - set with expiration
       await redis.setEx(key, windowSeconds, newCount.toString());
     } else {
-      // Increment existing counter
       await redis.incr(key);
     }
 
@@ -200,17 +246,9 @@ export async function checkRateLimit(config: RateLimitConfig): Promise<RateLimit
       currentCount: newCount,
     };
   } catch (error) {
-    console.error('[RateLimit] Error checking rate limit:', error);
+    console.error('[RateLimit] Error checking rate limit, using fallback:', error);
 
-    // Fail open - allow request if Redis is down
-    // This prevents rate limiting from breaking the app
-    return {
-      allowed: true,
-      remaining: maxRequests,
-      limit: maxRequests,
-      resetSeconds: windowSeconds,
-      currentCount: 0,
-    };
+    return checkFallbackRateLimit({ maxRequests, windowSeconds, identifier });
   }
 }
 
@@ -224,7 +262,7 @@ export const RateLimitPresets = {
    */
   auth: {
     maxRequests: 5,
-    windowSeconds: 900, // 15 minutes
+    windowSeconds: 900,
     namespace: 'auth',
   },
 
@@ -234,7 +272,7 @@ export const RateLimitPresets = {
    */
   api: {
     maxRequests: 100,
-    windowSeconds: 60, // 1 minute
+    windowSeconds: 60,
     namespace: 'api',
   },
 
@@ -244,7 +282,7 @@ export const RateLimitPresets = {
    */
   public: {
     maxRequests: 1000,
-    windowSeconds: 3600, // 1 hour
+    windowSeconds: 3600,
     namespace: 'public',
   },
 
@@ -254,7 +292,7 @@ export const RateLimitPresets = {
    */
   strict: {
     maxRequests: 10,
-    windowSeconds: 3600, // 1 hour
+    windowSeconds: 3600,
     namespace: 'strict',
   },
 };
@@ -266,23 +304,19 @@ export const RateLimitPresets = {
  * @returns IP address or 'unknown'
  */
 export function getClientIP(request: NextRequest): string {
-  // Check X-Forwarded-For (most common proxy header)
   const forwardedFor = request.headers.get('x-forwarded-for');
   if (forwardedFor) {
-    // Return first IP in list (client IP)
     const firstIP = forwardedFor.split(',')[0];
     if (firstIP) {
       return firstIP.trim();
     }
   }
 
-  // Check X-Real-IP (Nginx)
   const realIP = request.headers.get('x-real-ip');
   if (realIP) {
     return realIP;
   }
 
-  // Fallback to 'unknown' (should rarely happen)
   return 'unknown';
 }
 
@@ -295,14 +329,14 @@ export function getClientIP(request: NextRequest): string {
  * @returns Rate limit result or error response
  *
  * @example
- * // In API route
+ *
  * export async function POST(request: NextRequest) {
  *   const rateLimitResult = await applyRateLimit(request, 'auth');
  *   if (rateLimitResult instanceof NextResponse) {
- *     return rateLimitResult; // Rate limit exceeded
+ *     return rateLimitResult;
  *   }
  *
- *   // Continue with request...
+ *
  * }
  */
 export async function applyRateLimit(
@@ -312,7 +346,6 @@ export async function applyRateLimit(
 ): Promise<RateLimitResult | NextResponse> {
   const config = RateLimitPresets[preset];
 
-  // Use custom identifier or default to IP
   const id = identifier || getClientIP(request);
 
   const result = await checkRateLimit({
@@ -345,8 +378,6 @@ export async function applyRateLimit(
     );
   }
 
-  // Add rate limit headers to successful responses
-  // (will be added by caller after processing request)
   return result;
 }
 
