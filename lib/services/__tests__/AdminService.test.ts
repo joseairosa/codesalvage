@@ -553,8 +553,24 @@ describe('AdminService', () => {
     it('should refund transaction with audit log and buyer email', async () => {
       (mockTransactionRepo.findById as any).mockResolvedValue({
         ...mockTransaction,
-        buyer: { id: 'buyer123', email: 'buyer@test.com', username: 'buyeruser', fullName: 'Buyer User', githubUsername: null, avatarUrl: null },
-        project: { id: 'proj456', title: 'Test Project', description: '', priceCents: 50000, status: 'sold', thumbnailImageUrl: null, githubUrl: null, githubRepoName: null },
+        buyer: {
+          id: 'buyer123',
+          email: 'buyer@test.com',
+          username: 'buyeruser',
+          fullName: 'Buyer User',
+          githubUsername: null,
+          avatarUrl: null,
+        },
+        project: {
+          id: 'proj456',
+          title: 'Test Project',
+          description: '',
+          priceCents: 50000,
+          status: 'sold',
+          thumbnailImageUrl: null,
+          githubUrl: null,
+          githubRepoName: null,
+        },
       });
       (mockStripeService.refundPayment as any).mockResolvedValue({ id: 'ref_test_123' });
       (mockTransactionRepo.markRefunded as any).mockResolvedValue({
@@ -565,7 +581,12 @@ describe('AdminService', () => {
       (mockAdminRepo.createAuditLog as any).mockResolvedValue({});
       (mockEmailService.sendRefundNotification as any).mockResolvedValue(undefined);
 
-      const result = await adminService.refundTransaction(adminId, transactionId, reason, ipAddress);
+      const result = await adminService.refundTransaction(
+        adminId,
+        transactionId,
+        reason,
+        ipAddress
+      );
 
       expect(mockTransactionRepo.findById).toHaveBeenCalledWith(transactionId);
       expect(mockStripeService.refundPayment).toHaveBeenCalledWith(
@@ -668,7 +689,12 @@ describe('AdminService', () => {
       (mockAdminRepo.createAuditLog as any).mockResolvedValue({});
       (mockEmailService.sendRefundNotification as any).mockResolvedValue(undefined);
 
-      const result = await adminService.refundTransaction(adminId, transactionId, reason, ipAddress);
+      const result = await adminService.refundTransaction(
+        adminId,
+        transactionId,
+        reason,
+        ipAddress
+      );
 
       expect(result.warning).toBe('Buyer has already received code access');
     });
@@ -686,7 +712,12 @@ describe('AdminService', () => {
         new Error('Email service down')
       );
 
-      const result = await adminService.refundTransaction(adminId, transactionId, reason, ipAddress);
+      const result = await adminService.refundTransaction(
+        adminId,
+        transactionId,
+        reason,
+        ipAddress
+      );
 
       expect(result.transaction.paymentStatus).toBe('refunded');
     });
@@ -731,7 +762,9 @@ describe('AdminService', () => {
         new Error('Database connection failed')
       );
 
-      await expect(adminService.getEscrowAnalytics()).rejects.toThrow('Database connection failed');
+      await expect(adminService.getEscrowAnalytics()).rejects.toThrow(
+        'Database connection failed'
+      );
     });
   });
 });

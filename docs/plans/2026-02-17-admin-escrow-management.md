@@ -267,11 +267,11 @@ Worktree: No
 
 ## Risks and Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-| --- | --- | --- | --- |
-| Stripe refund fails after DB status updated | Low | High | Call Stripe refund FIRST, only update DB status if Stripe succeeds |
-| Transaction has no stripePaymentIntentId | Low | Medium | Validate `stripePaymentIntentId` exists before attempting refund, return clear error |
-| AdminService constructor change breaks existing callers | Low | Medium | Three files directly instantiate AdminService — update all three: `getAdminService()` in `lib/utils/admin-services.ts`, `app/api/admin/stats/route.ts`, and `app/api/admin/users/route.ts` |
+| Risk                                                    | Likelihood | Impact | Mitigation                                                                                                                                                                                 |
+| ------------------------------------------------------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Stripe refund fails after DB status updated             | Low        | High   | Call Stripe refund FIRST, only update DB status if Stripe succeeds                                                                                                                         |
+| Transaction has no stripePaymentIntentId                | Low        | Medium | Validate `stripePaymentIntentId` exists before attempting refund, return clear error                                                                                                       |
+| AdminService constructor change breaks existing callers | Low        | Medium | Three files directly instantiate AdminService — update all three: `getAdminService()` in `lib/utils/admin-services.ts`, `app/api/admin/stats/route.ts`, and `app/api/admin/users/route.ts` |
 
 ## Open Questions
 
