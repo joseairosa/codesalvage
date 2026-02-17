@@ -43,34 +43,21 @@ export function Footer() {
         { label: 'Browse Projects', href: '/projects' },
         { label: 'How It Works', href: '/how-it-works' },
         { label: 'Pricing', href: '/pricing' },
-        { label: 'Featured Projects', href: '/featured' },
       ],
     },
     {
       title: 'For Sellers',
       links: [
-        { label: 'Sell Your Project', href: '/sell' },
-        { label: 'Seller Guidelines', href: '/seller-guidelines' },
-        { label: 'Pricing Calculator', href: '/calculator' },
-        { label: 'Success Stories', href: '/success-stories' },
+        { label: 'Start Selling', href: '/seller/onboard' },
+        { label: 'Seller Dashboard', href: '/seller/dashboard' },
       ],
     },
     {
-      title: 'Resources',
+      title: 'Account',
       links: [
-        { label: 'Documentation', href: '/docs' },
-        { label: 'API', href: '/api-docs' },
-        { label: 'Blog', href: '/blog' },
-        { label: 'Community', href: '/community' },
-      ],
-    },
-    {
-      title: 'Company',
-      links: [
-        { label: 'About Us', href: '/about' },
-        { label: 'Contact', href: '/contact' },
-        { label: 'Careers', href: '/careers' },
-        { label: 'Press Kit', href: '/press' },
+        { label: 'Dashboard', href: '/dashboard' },
+        { label: 'Messages', href: '/messages' },
+        { label: 'Settings', href: '/settings' },
       ],
     },
   ];
@@ -101,9 +88,9 @@ export function Footer() {
     <footer className="border-t bg-gray-50">
       <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
         {/* Main footer content */}
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4">
           {/* Brand column */}
-          <div className="col-span-2 md:col-span-4 lg:col-span-1">
+          <div className="col-span-2 md:col-span-3 lg:col-span-1">
             <Link
               href="/"
               className="flex items-center gap-2"
@@ -174,27 +161,7 @@ export function Footer() {
               © {currentYear} CodeSalvage. All rights reserved.
             </p>
 
-            {/* Legal links */}
-            <div className="flex gap-6">
-              <Link
-                href="/privacy"
-                className="text-sm text-gray-500 transition-colors hover:text-blue-600"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                href="/terms"
-                className="text-sm text-gray-500 transition-colors hover:text-blue-600"
-              >
-                Terms of Service
-              </Link>
-              <Link
-                href="/cookies"
-                className="text-sm text-gray-500 transition-colors hover:text-blue-600"
-              >
-                Cookie Policy
-              </Link>
-            </div>
+            {/* Legal links — add back when pages are created */}
           </div>
         </div>
       </div>
