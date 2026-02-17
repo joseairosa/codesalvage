@@ -32,7 +32,7 @@ export interface PurchaseEmailData {
   projectTitle: string;
   projectId: string;
   transactionId: string;
-  amount: number; // in cents
+  amount: number;
   downloadUrl: string;
   purchaseDate: string;
 }
@@ -40,7 +40,7 @@ export interface PurchaseEmailData {
 export interface EscrowReleaseEmailData {
   sellerName: string;
   projectTitle: string;
-  amount: number; // in cents
+  amount: number;
   releaseDate: string;
   transactionId: string;
 }
@@ -95,6 +95,15 @@ export interface UserUnbannedEmailData {
   unbannedAt: string;
 }
 
+export interface RefundEmailData {
+  buyerName: string;
+  projectTitle: string;
+  amountCents: number;
+  refundDate: string;
+  transactionId: string;
+  reason: string;
+}
+
 export class EmailService {
   private fromEmail: string;
   private fromName: string;
@@ -102,7 +111,6 @@ export class EmailService {
   private isInitialized = false;
 
   constructor() {
-    // Read from process.env directly to support test environment variable injection
     this.fromEmail =
       process.env['POSTMARK_FROM_EMAIL'] ||
       env.POSTMARK_FROM_EMAIL ||
@@ -121,7 +129,6 @@ export class EmailService {
       return;
     }
 
-    // Read from process.env directly to support test environment variable injection
     const apiKey = process.env['POSTMARK_SERVER_TOKEN'] || env.POSTMARK_SERVER_TOKEN;
 
     if (apiKey) {
@@ -304,10 +311,8 @@ export class EmailService {
     html: string,
     text: string
   ): Promise<void> {
-    // Initialize Postmark on first use (lazy initialization for testing)
     this.initializePostmark();
 
-    // Check for API key (read from process.env to support testing)
     const apiKey = process.env['POSTMARK_SERVER_TOKEN'] || env.POSTMARK_SERVER_TOKEN;
 
     if (!apiKey || !this.client) {
@@ -1142,6 +1147,63 @@ ${appUrl}
   }
 
   /**
+   * Send refund notification to buyer
+   */
+  async sendRefundNotification(
+    recipient: EmailRecipient,
+    data: RefundEmailData
+  ): Promise<void> {
+    const subject = `Refund Processed - ${data.projectTitle}`;
+    const appUrl = env.NEXT_PUBLIC_APP_URL;
+    const amountFormatted = `$${(data.amountCents / 100).toFixed(2)}`;
+
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px;">
+    Refund Processed
+  </h1>
+  <p>Hi ${data.buyerName},</p>
+  <p>Your refund for <strong>${data.projectTitle}</strong> has been processed.</p>
+  <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h2 style="margin-top: 0;">Refund Details</h2>
+    <p><strong>Amount:</strong> ${amountFormatted}</p>
+    <p><strong>Date:</strong> ${new Date(data.refundDate).toLocaleString()}</p>
+    <p><strong>Transaction ID:</strong> ${data.transactionId}</p>
+  </div>
+  <p>The refund will appear in your account within 5-10 business days.</p>
+  <p>If you have any questions, please contact us at <a href="${appUrl}">CodeSalvage</a>.</p>
+</body>
+</html>`;
+
+    const text = `
+Refund Processed - ${data.projectTitle}
+
+Hi ${data.buyerName},
+
+Your refund has been processed.
+
+Amount: ${amountFormatted}
+Date: ${new Date(data.refundDate).toLocaleString()}
+Transaction ID: ${data.transactionId}
+
+The refund will appear in your account within 5-10 business days.
+
+CodeSalvage - Marketplace for Incomplete Software Projects
+${appUrl}
+    `.trim();
+
+    await this.sendEmail(recipient, subject, html, text);
+
+    console.log(`[${componentName}] Refund notification sent to buyer:`, recipient.email);
+  }
+
+  /**
    * Send user unbanned notification
    */
   async sendUserUnbannedNotification(
@@ -1631,5 +1693,4 @@ ${appUrl}
   }
 }
 
-// Export singleton instance
 export const emailService = new EmailService();

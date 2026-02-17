@@ -37,6 +37,7 @@ export type {
   FeaturedListingEmailData,
   UserBannedEmailData,
   UserUnbannedEmailData,
+  RefundEmailData,
 } from './EmailService';
 
 export {

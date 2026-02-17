@@ -26,9 +26,8 @@ import {
   ProjectRepository,
   TransactionRepository,
 } from '@/lib/repositories';
-import { AdminService, emailService } from '@/lib/services';
+import { AdminService, emailService, stripeService } from '@/lib/services';
 
-// Initialize repositories and services
 const adminRepository = new AdminRepository(prisma);
 const userRepository = new UserRepository(prisma);
 const projectRepository = new ProjectRepository(prisma);
@@ -39,7 +38,8 @@ const adminService = new AdminService(
   userRepository,
   projectRepository,
   transactionRepository,
-  emailService
+  emailService,
+  stripeService
 );
 
 /**
@@ -48,7 +48,6 @@ const adminService = new AdminService(
  * List users with filters and pagination
  */
 export async function GET(request: NextRequest) {
-  // Verify admin authentication
   const auth = await requireAdminApiAuth(request);
   if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -57,7 +56,6 @@ export async function GET(request: NextRequest) {
   console.log('[API] GET /api/admin/users - Admin:', auth.user.id);
 
   try {
-    // Parse query parameters
     const searchParams = request.nextUrl.searchParams;
     const isBanned =
       searchParams.get('isBanned') === 'true'
@@ -90,9 +88,11 @@ export async function GET(request: NextRequest) {
       | 'lastLogin'
       | 'email'
       | 'username';
-    const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
+    const sortOrderParam = searchParams.get('sortOrder') || 'desc';
+    const sortOrder = (
+      ['asc', 'desc'].includes(sortOrderParam) ? sortOrderParam : 'desc'
+    ) as 'asc' | 'desc';
 
-    // Filter out undefined values to satisfy exactOptionalPropertyTypes
     const filters = Object.fromEntries(
       Object.entries({
         isBanned,
@@ -115,7 +115,6 @@ export async function GET(request: NextRequest) {
       sortOrder,
     });
 
-    // Also get total count for pagination
     const total = await userRepository.countUsers(filters);
 
     return NextResponse.json(

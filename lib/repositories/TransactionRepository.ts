@@ -579,6 +579,34 @@ export class TransactionRepository {
   }
 
   /**
+   * Mark transaction as refunded (atomic update)
+   *
+   * Updates both paymentStatus and escrowStatus in a single Prisma update
+   * to prevent inconsistent state if one update fails.
+   *
+   * @param id - Transaction ID
+   * @returns Updated transaction
+   */
+  async markRefunded(id: string): Promise<Transaction> {
+    try {
+      console.log('[TransactionRepository] Marking transaction as refunded:', id);
+
+      const transaction = await this.prisma.transaction.update({
+        where: { id },
+        data: {
+          paymentStatus: 'refunded',
+          escrowStatus: 'released',
+        },
+      });
+
+      return transaction;
+    } catch (error) {
+      console.error('[TransactionRepository] markRefunded failed:', error);
+      throw new Error('[TransactionRepository] Failed to mark transaction as refunded');
+    }
+  }
+
+  /**
    * Release escrow to seller
    *
    * @param id - Transaction ID
@@ -766,7 +794,6 @@ export class TransactionRepository {
       offset,
     });
 
-    // Build where clause
     const where: any = {};
 
     if (paymentStatus) {
@@ -841,7 +868,7 @@ export class TransactionRepository {
         '[TransactionRepository] Found transactions (admin):',
         transactions.length
       );
-      return transactions as unknown as unknown as TransactionWithRelations[];
+      return transactions as unknown as TransactionWithRelations[];
     } catch (error) {
       console.error('[TransactionRepository] getAllTransactions failed:', error);
       throw new Error('[TransactionRepository] Failed to get all transactions');
@@ -877,7 +904,6 @@ export class TransactionRepository {
       projectId,
     });
 
-    // Build where clause
     const where: any = {};
 
     if (paymentStatus) {
