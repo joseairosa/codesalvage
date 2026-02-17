@@ -435,7 +435,6 @@ describe('AnalyticsService (Integration)', () => {
       expect(analytics.userId).toBe(seller.id);
       expect(analytics.summary).toBeDefined();
       expect(analytics.summary.totalProjects).toBeGreaterThanOrEqual(0);
-
     });
   });
 

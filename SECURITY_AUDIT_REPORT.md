@@ -39,6 +39,7 @@
 
 - **File:** `app/api/projects/analyze-repo/route.ts:37`
 - **Evidence:**
+
   ```typescript
   const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
   const RATE_LIMIT = 10;
@@ -50,6 +51,7 @@
     // ...
   }
   ```
+
 - **Risk:** The AI analysis endpoint (which calls the Anthropic Claude API and incurs per-request costs) uses an in-memory `Map` for rate limiting instead of the Redis-backed rate limiter used elsewhere. In a multi-instance deployment (Railway can run multiple replicas), each instance maintains its own rate limit map, effectively multiplying allowed requests by the number of instances. The map also resets on every server restart or deployment, bypassing limits entirely. This creates cost exposure risk — an attacker could trigger many expensive AI API calls.
 - **Fix:** Replace the in-memory rate limiter with the existing Redis-based `withStrictRateLimit` or `withApiRateLimit` middleware:
   ```typescript
