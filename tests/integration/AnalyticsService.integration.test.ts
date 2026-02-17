@@ -41,23 +41,21 @@ describe('AnalyticsService (Integration)', () => {
 
   describe('getSellerAnalyticsOverview', () => {
     it('should return complete analytics overview for seller', async () => {
-      // Create seller with projects and transactions
       const seller = await createTestUser({
         username: 'analytics-seller',
         isSeller: true,
       });
       const buyer = await createTestUser({ username: 'buyer1' });
 
-      // Create projects
       const project1 = await createTestProject({
         sellerId: seller.id,
         title: 'Project 1',
-        priceCents: 10000, // $100
+        priceCents: 10000,
       });
       const project2 = await createTestProject({
         sellerId: seller.id,
         title: 'Project 2',
-        priceCents: 20000, // $200
+        priceCents: 20000,
       });
       const project3 = await createTestProject({
         sellerId: seller.id,
@@ -65,14 +63,13 @@ describe('AnalyticsService (Integration)', () => {
         priceCents: 15000,
       });
 
-      // Create successful transactions
       await prisma.transaction.create({
         data: {
           projectId: project1.id,
           sellerId: seller.id,
           buyerId: buyer.id,
           amountCents: 10000,
-          commissionCents: 1800, // 18%
+          commissionCents: 1800,
           sellerReceivesCents: 8200,
           paymentStatus: 'succeeded',
           escrowStatus: 'released',
@@ -86,7 +83,7 @@ describe('AnalyticsService (Integration)', () => {
           sellerId: seller.id,
           buyerId: buyer.id,
           amountCents: 20000,
-          commissionCents: 3600, // 18%
+          commissionCents: 3600,
           sellerReceivesCents: 16400,
           paymentStatus: 'succeeded',
           escrowStatus: 'released',
@@ -94,7 +91,6 @@ describe('AnalyticsService (Integration)', () => {
         },
       });
 
-      // Set explicit view counts for all projects (to avoid random faker values)
       await prisma.project.update({
         where: { id: project1.id },
         data: { viewCount: 50 },
@@ -105,35 +101,29 @@ describe('AnalyticsService (Integration)', () => {
       });
       await prisma.project.update({
         where: { id: project3.id },
-        data: { viewCount: 0 }, // Unsold project with no views
+        data: { viewCount: 0 },
       });
 
-      // Get analytics overview
       const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
         startDate: '2025-06-01',
         endDate: '2025-06-30',
         granularity: 'day',
       });
 
-      // Verify summary metrics
       expect(analytics.userId).toBe(seller.id);
       expect(analytics.summary.totalProjects).toBe(3);
       expect(analytics.summary.totalSold).toBe(2);
-      expect(analytics.summary.totalRevenue).toBe('$246.00'); // $82 + $164
-      // Average price is calculated from ALL projects, not just sold ones
-      // ($100 + $200 + $150) / 3 = $150
-      expect(analytics.summary.averageProjectPrice).toBe('$150.00');
-      expect(analytics.summary.conversionRate).toBe('2.50%'); // 2 sold / 80 views
+      expect(analytics.summary.totalRevenue).toBe(24600);
+      expect(analytics.summary.averageRevenue).toBe(15000);
+      expect(analytics.summary.conversionRate).toBe(0.025);
 
       // Note: dateRange not included in response (validated internally in service)
 
-      // Verify revenue chart data exists
-      expect(analytics.revenueChart).toBeDefined();
-      expect(analytics.revenueChart.length).toBeGreaterThan(0);
+      expect(analytics.revenueOverTime).toBeDefined();
+      expect(analytics.revenueOverTime.length).toBeGreaterThan(0);
 
-      // Verify top projects
       expect(analytics.topProjects).toBeDefined();
-      expect(analytics.topProjects.length).toBe(2); // 2 sold projects
+      expect(analytics.topProjects.length).toBe(2);
     });
 
     it('should enforce seller-only permission', async () => {
@@ -150,22 +140,20 @@ describe('AnalyticsService (Integration)', () => {
         isSeller: true,
       });
 
-      // Create project with known price but no transactions
       // @ts-expect-error - Project created for test data setup but not directly used
       const project = await createTestProject({
         sellerId: seller.id,
         title: 'Unsold Project',
-        priceCents: 10000, // $100
+        priceCents: 10000,
       });
 
       const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id);
 
       expect(analytics.summary.totalProjects).toBe(1);
       expect(analytics.summary.totalSold).toBe(0);
-      expect(analytics.summary.totalRevenue).toBe('$0.00');
-      // Average project price should be the price of the listed project, not $0
-      expect(analytics.summary.averageProjectPrice).toBe('$100.00');
-      expect(analytics.summary.conversionRate).toBe('0.00%');
+      expect(analytics.summary.totalRevenue).toBe(0);
+      expect(analytics.summary.averageRevenue).toBe(10000);
+      expect(analytics.summary.conversionRate).toBe(0);
     });
 
     it('should filter analytics by date range', async () => {
@@ -175,7 +163,6 @@ describe('AnalyticsService (Integration)', () => {
       });
       const buyer = await createTestUser({ username: 'buyer2' });
 
-      // Create TWO different projects to sell
       const project1 = await createTestProject({
         sellerId: seller.id,
         title: 'Project June',
@@ -185,7 +172,6 @@ describe('AnalyticsService (Integration)', () => {
         title: 'Project July',
       });
 
-      // Create transaction in June 2025 for project1
       await prisma.transaction.create({
         data: {
           projectId: project1.id,
@@ -200,7 +186,6 @@ describe('AnalyticsService (Integration)', () => {
         },
       });
 
-      // Create transaction in July 2025 for project2
       await prisma.transaction.create({
         data: {
           projectId: project2.id,
@@ -215,35 +200,29 @@ describe('AnalyticsService (Integration)', () => {
         },
       });
 
-      // Query only June data
       const juneAnalytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
         startDate: '2025-06-01',
         endDate: '2025-06-30',
       });
 
-      // Should only include June transaction
       expect(juneAnalytics.summary.totalSold).toBe(1);
-      expect(juneAnalytics.summary.totalRevenue).toBe('$82.00');
+      expect(juneAnalytics.summary.totalRevenue).toBe(8200);
 
-      // Query only July data
       const julyAnalytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
         startDate: '2025-07-01',
         endDate: '2025-07-31',
       });
 
-      // Should only include July transaction
       expect(julyAnalytics.summary.totalSold).toBe(1);
-      expect(julyAnalytics.summary.totalRevenue).toBe('$164.00');
+      expect(julyAnalytics.summary.totalRevenue).toBe(16400);
 
-      // Query entire range
       const allAnalytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
         startDate: '2025-06-01',
         endDate: '2025-07-31',
       });
 
-      // Should include both transactions
       expect(allAnalytics.summary.totalSold).toBe(2);
-      expect(allAnalytics.summary.totalRevenue).toBe('$246.00');
+      expect(allAnalytics.summary.totalRevenue).toBe(24600);
     });
 
     it('should calculate conversion rate correctly', async () => {
@@ -253,7 +232,6 @@ describe('AnalyticsService (Integration)', () => {
       });
       const buyer = await createTestUser({ username: 'buyer3' });
 
-      // Create 3 projects with different view counts
       const project1 = await createTestProject({
         sellerId: seller.id,
         title: 'High Views, Sold',
@@ -280,7 +258,6 @@ describe('AnalyticsService (Integration)', () => {
         data: { viewCount: 50 },
       });
 
-      // Create 2 successful transactions with completedAt
       await prisma.transaction.create({
         data: {
           projectId: project1.id,
@@ -311,8 +288,7 @@ describe('AnalyticsService (Integration)', () => {
 
       const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id);
 
-      // Conversion rate: 2 sales / 200 total views = 1.00%
-      expect(analytics.summary.conversionRate).toBe('1.00%');
+      expect(analytics.summary.conversionRate).toBe(0.01);
       expect(analytics.summary.totalSold).toBe(2);
     });
 
@@ -324,7 +300,6 @@ describe('AnalyticsService (Integration)', () => {
       const buyer = await createTestUser({ username: 'buyer4' });
       const project = await createTestProject({ sellerId: seller.id });
 
-      // Create successful transaction with completedAt
       await prisma.transaction.create({
         data: {
           projectId: project.id,
@@ -339,7 +314,6 @@ describe('AnalyticsService (Integration)', () => {
         },
       });
 
-      // Create failed transaction (should not count)
       await prisma.transaction.create({
         data: {
           projectId: project.id,
@@ -353,7 +327,6 @@ describe('AnalyticsService (Integration)', () => {
         },
       });
 
-      // Create pending transaction (should not count)
       await prisma.transaction.create({
         data: {
           projectId: project.id,
@@ -369,9 +342,8 @@ describe('AnalyticsService (Integration)', () => {
 
       const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id);
 
-      // Should only count the succeeded transaction
       expect(analytics.summary.totalSold).toBe(1);
-      expect(analytics.summary.totalRevenue).toBe('$82.00');
+      expect(analytics.summary.totalRevenue).toBe(8200);
     });
 
     it('should handle different granularities', async () => {
@@ -382,7 +354,6 @@ describe('AnalyticsService (Integration)', () => {
       const buyer = await createTestUser({ username: 'buyer5' });
       const project = await createTestProject({ sellerId: seller.id });
 
-      // Create transaction
       await prisma.transaction.create({
         data: {
           projectId: project.id,
@@ -397,23 +368,20 @@ describe('AnalyticsService (Integration)', () => {
         },
       });
 
-      // Test with 'day' granularity
       const dayAnalytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
         startDate: '2025-06-01',
         endDate: '2025-06-30',
         granularity: 'day',
       });
-      expect(dayAnalytics.revenueChart.length).toBeGreaterThan(0);
+      expect(dayAnalytics.revenueOverTime.length).toBeGreaterThan(0);
 
-      // Test with 'week' granularity
       const weekAnalytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
         startDate: '2025-06-01',
         endDate: '2025-06-30',
         granularity: 'week',
       });
-      expect(weekAnalytics.revenueChart.length).toBeGreaterThan(0);
+      expect(weekAnalytics.revenueOverTime.length).toBeGreaterThan(0);
 
-      // Test with 'month' granularity
       const monthAnalytics = await analyticsService.getSellerAnalyticsOverview(
         seller.id,
         {
@@ -422,7 +390,7 @@ describe('AnalyticsService (Integration)', () => {
           granularity: 'month',
         }
       );
-      expect(monthAnalytics.revenueChart.length).toBeGreaterThan(0);
+      expect(monthAnalytics.revenueOverTime.length).toBeGreaterThan(0);
     });
   });
 
@@ -436,7 +404,7 @@ describe('AnalyticsService (Integration)', () => {
       await expect(
         analyticsService.getSellerAnalyticsOverview(seller.id, {
           startDate: '2025-07-01',
-          endDate: '2025-06-01', // Before start date
+          endDate: '2025-06-01',
         })
       ).rejects.toThrow('Start date must be before end date');
     });
@@ -447,13 +415,11 @@ describe('AnalyticsService (Integration)', () => {
         isSeller: true,
       });
 
-      // Service should not throw error, but cap the start date instead
       const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id, {
-        startDate: '2024-01-01', // Very old date
+        startDate: '2024-01-01',
         endDate: '2025-06-01',
       });
 
-      // Should still return valid analytics (capped to 1 year)
       expect(analytics.userId).toBe(seller.id);
       expect(analytics.summary).toBeDefined();
     });
@@ -466,12 +432,9 @@ describe('AnalyticsService (Integration)', () => {
 
       const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id);
 
-      // Verify analytics returned successfully with defaults
       expect(analytics.userId).toBe(seller.id);
       expect(analytics.summary).toBeDefined();
       expect(analytics.summary.totalProjects).toBeGreaterThanOrEqual(0);
-
-      // Date range is handled internally, not exposed in response
     });
   });
 
@@ -483,7 +446,6 @@ describe('AnalyticsService (Integration)', () => {
       });
       const buyer = await createTestUser({ username: 'buyer6' });
 
-      // Create 3 projects with different revenues
       const highRevProject = await createTestProject({
         sellerId: seller.id,
         title: 'High Revenue Project',
@@ -500,7 +462,6 @@ describe('AnalyticsService (Integration)', () => {
         priceCents: 10000,
       });
 
-      // Create transactions with completedAt
       await prisma.transaction.create({
         data: {
           projectId: highRevProject.id,
@@ -545,14 +506,13 @@ describe('AnalyticsService (Integration)', () => {
 
       const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id);
 
-      // Verify top projects are ranked by revenue
       expect(analytics.topProjects.length).toBe(3);
-      expect(analytics.topProjects[0]!.title).toBe('High Revenue Project');
-      expect(analytics.topProjects[0]!.revenue).toBe('$410.00');
-      expect(analytics.topProjects[1]!.title).toBe('Mid Revenue Project');
-      expect(analytics.topProjects[1]!.revenue).toBe('$246.00');
-      expect(analytics.topProjects[2]!.title).toBe('Low Revenue Project');
-      expect(analytics.topProjects[2]!.revenue).toBe('$82.00');
+      expect(analytics.topProjects[0]!.projectTitle).toBe('High Revenue Project');
+      expect(analytics.topProjects[0]!.revenue).toBe(41000);
+      expect(analytics.topProjects[1]!.projectTitle).toBe('Mid Revenue Project');
+      expect(analytics.topProjects[1]!.revenue).toBe(24600);
+      expect(analytics.topProjects[2]!.projectTitle).toBe('Low Revenue Project');
+      expect(analytics.topProjects[2]!.revenue).toBe(8200);
     });
 
     it('should include view counts in top projects', async () => {
@@ -566,13 +526,11 @@ describe('AnalyticsService (Integration)', () => {
         title: 'Popular Project',
       });
 
-      // Set view count
       await prisma.project.update({
         where: { id: project.id },
         data: { viewCount: 250 },
       });
 
-      // Create transaction with completedAt
       await prisma.transaction.create({
         data: {
           projectId: project.id,
@@ -590,7 +548,7 @@ describe('AnalyticsService (Integration)', () => {
       const analytics = await analyticsService.getSellerAnalyticsOverview(seller.id);
 
       expect(analytics.topProjects[0]!.views).toBe(250);
-      expect(analytics.topProjects[0]!.purchases).toBe(1);
+      expect(analytics.topProjects[0]!.transactionCount).toBe(1);
     });
   });
 
@@ -603,7 +561,6 @@ describe('AnalyticsService (Integration)', () => {
       const buyer = await createTestUser({ username: 'buyer8' });
       const project = await createTestProject({ sellerId: seller.id });
 
-      // Create transactions on different days
       await prisma.transaction.create({
         data: {
           projectId: project.id,
@@ -638,14 +595,12 @@ describe('AnalyticsService (Integration)', () => {
         granularity: 'day',
       });
 
-      // Verify revenue chart has data points
-      expect(analytics.revenueChart.length).toBeGreaterThan(0);
+      expect(analytics.revenueOverTime.length).toBeGreaterThan(0);
 
-      // Verify chart data includes dates and revenue values
-      const firstDataPoint = analytics.revenueChart[0]!;
+      const firstDataPoint = analytics.revenueOverTime[0]!;
       expect(firstDataPoint.date).toBeDefined();
       expect(firstDataPoint.revenue).toBeDefined();
-      expect(typeof firstDataPoint.revenue).toBe('string'); // Formatted as currency
+      expect(typeof firstDataPoint.revenue).toBe('number');
     });
   });
 });

@@ -13,7 +13,6 @@ import {
 import type { AnalyticsRepository } from '../../repositories/AnalyticsRepository';
 import type { UserRepository } from '../../repositories/UserRepository';
 
-// Mock repositories
 const mockAnalyticsRepository = {
   getSellerRevenueSummary: vi.fn(),
   getRevenueOverTime: vi.fn(),
@@ -25,7 +24,6 @@ const mockUserRepository = {
   findById: vi.fn(),
 } as unknown as UserRepository;
 
-// Mock user data
 const createMockUser = (overrides = {}) => ({
   id: 'user123',
   email: 'test@example.com',
@@ -34,13 +32,14 @@ const createMockUser = (overrides = {}) => ({
   ...overrides,
 });
 
-// Mock analytics data
 const mockRevenueSummary = {
   totalProjects: 10,
   totalSold: 5,
-  totalRevenueCents: 50000, // $500
-  averageProjectPriceCents: 10000, // $100
-  conversionRate: 0.05, // 5%
+  totalRevenueCents: 50000,
+  averageProjectPriceCents: 10000,
+  totalViews: 500,
+  totalFavorites: 30,
+  conversionRate: 0.05,
 };
 
 const mockRevenueOverTime = [
@@ -99,41 +98,43 @@ describe('AnalyticsService', () => {
       expect(result.userId).toBe('user123');
       expect(result.summary.totalProjects).toBe(10);
       expect(result.summary.totalSold).toBe(5);
-      expect(result.summary.totalRevenue).toBe('$500.00');
-      expect(result.summary.averageProjectPrice).toBe('$100.00');
-      expect(result.summary.conversionRate).toBe('5.00%');
-      expect(result.revenueChart).toHaveLength(2);
+      expect(result.summary.totalRevenue).toBe(50000);
+      expect(result.summary.averageRevenue).toBe(10000);
+      expect(result.summary.totalViews).toBe(500);
+      expect(result.summary.totalFavorites).toBe(30);
+      expect(result.summary.conversionRate).toBe(0.05);
+      expect(result.revenueOverTime).toHaveLength(2);
       expect(result.topProjects).toHaveLength(2);
     });
 
-    it('should format currency correctly', async () => {
+    it('should pass through revenue as raw cents', async () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue({
         ...mockAnalyticsOverview,
         summary: {
           ...mockRevenueSummary,
-          totalRevenueCents: 123456, // $1,234.56
+          totalRevenueCents: 123456,
         },
       });
 
       const result = await analyticsService.getSellerAnalyticsOverview('user123');
 
-      expect(result.summary.totalRevenue).toBe('$1,234.56');
+      expect(result.summary.totalRevenue).toBe(123456);
     });
 
-    it('should format percentages correctly', async () => {
+    it('should pass through conversion rate as raw decimal', async () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue({
         ...mockAnalyticsOverview,
         summary: {
           ...mockRevenueSummary,
-          conversionRate: 0.1234, // 12.34%
+          conversionRate: 0.1234,
         },
       });
 
       const result = await analyticsService.getSellerAnalyticsOverview('user123');
 
-      expect(result.summary.conversionRate).toBe('12.34%');
+      expect(result.summary.conversionRate).toBe(0.1234);
     });
 
     it('should throw AnalyticsPermissionError if user is not a seller', async () => {
@@ -174,7 +175,6 @@ describe('AnalyticsService', () => {
         })
       );
 
-      // Verify date range is approximately 30 days
       const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock
         .calls[0]!;
       const dateRange = call[1]!;
@@ -241,7 +241,6 @@ describe('AnalyticsService', () => {
         mockAnalyticsOverview
       );
 
-      // Request 2 years ago to now
       const twoYearsAgo = new Date();
       twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
 
@@ -250,14 +249,13 @@ describe('AnalyticsService', () => {
         endDate: new Date().toISOString(),
       });
 
-      // Verify start date was adjusted to 1 year ago
       const call = vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mock
         .calls[0]!;
       const dateRange = call[1]!;
       const yearsDiff =
         (dateRange.endDate!.getTime() - dateRange.startDate!.getTime()) /
         (1000 * 60 * 60 * 24 * 365);
-      expect(yearsDiff).toBeLessThanOrEqual(1.1); // Allow small margin
+      expect(yearsDiff).toBeLessThanOrEqual(1.1);
     });
   });
 
@@ -275,9 +273,11 @@ describe('AnalyticsService', () => {
 
       expect(result.totalProjects).toBe(10);
       expect(result.totalSold).toBe(5);
-      expect(result.totalRevenue).toBe('$500.00');
-      expect(result.averageProjectPrice).toBe('$100.00');
-      expect(result.conversionRate).toBe('5.00%');
+      expect(result.totalRevenue).toBe(50000);
+      expect(result.averageRevenue).toBe(10000);
+      expect(result.totalViews).toBe(500);
+      expect(result.totalFavorites).toBe(30);
+      expect(result.conversionRate).toBe(0.05);
     });
 
     it('should throw AnalyticsPermissionError if user is not a seller', async () => {
@@ -325,12 +325,11 @@ describe('AnalyticsService', () => {
 
       expect(result).toHaveLength(2);
       expect(result[0]!.projectId).toBe('proj1');
-      expect(result[0]!.title).toBe('Project 1');
+      expect(result[0]!.projectTitle).toBe('Project 1');
       expect(result[0]!.views).toBe(100);
       expect(result[0]!.favorites).toBe(10);
-      expect(result[0]!.purchases).toBe(2);
-      expect(result[0]!.revenue).toBe('$200.00');
-      expect(result[0]!.conversionRate).toBe('2.00%');
+      expect(result[0]!.transactionCount).toBe(2);
+      expect(result[0]!.revenue).toBe(20000);
     });
 
     it('should throw AnalyticsPermissionError if user is not a seller', async () => {
@@ -402,7 +401,6 @@ describe('AnalyticsService', () => {
         mockAnalyticsOverview
       );
 
-      // Use dates from mid-2025 (safely in the past and within 1 year)
       await analyticsService.getSellerAnalyticsOverview('user123', {
         startDate: '2025-06-01',
         endDate: '2025-06-30',
@@ -414,8 +412,8 @@ describe('AnalyticsService', () => {
 
       expect(dateRange.startDate!).toBeInstanceOf(Date);
       expect(dateRange.endDate!).toBeInstanceOf(Date);
-      expect(dateRange.startDate!.getMonth()).toBe(5); // June (0-indexed)
-      expect(dateRange.endDate!.getMonth()).toBe(5); // June
+      expect(dateRange.startDate!.getMonth()).toBe(5);
+      expect(dateRange.endDate!.getMonth()).toBe(5);
     });
 
     it('should handle date-only strings (without time)', async () => {
@@ -438,8 +436,8 @@ describe('AnalyticsService', () => {
     });
   });
 
-  describe('Currency Formatting', () => {
-    it('should format zero cents as $0.00', async () => {
+  describe('Raw Value Passthrough', () => {
+    it('should pass through zero revenue as 0', async () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue({
         ...mockAnalyticsOverview,
@@ -451,27 +449,25 @@ describe('AnalyticsService', () => {
 
       const result = await analyticsService.getSellerAnalyticsOverview('user123');
 
-      expect(result.summary.totalRevenue).toBe('$0.00');
+      expect(result.summary.totalRevenue).toBe(0);
     });
 
-    it('should format large amounts with commas', async () => {
+    it('should pass through large revenue amounts as raw cents', async () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue({
         ...mockAnalyticsOverview,
         summary: {
           ...mockRevenueSummary,
-          totalRevenueCents: 123456789, // $1,234,567.89
+          totalRevenueCents: 123456789,
         },
       });
 
       const result = await analyticsService.getSellerAnalyticsOverview('user123');
 
-      expect(result.summary.totalRevenue).toBe('$1,234,567.89');
+      expect(result.summary.totalRevenue).toBe(123456789);
     });
-  });
 
-  describe('Percentage Formatting', () => {
-    it('should format zero as 0.00%', async () => {
+    it('should pass through zero conversion rate as 0', async () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue({
         ...mockAnalyticsOverview,
@@ -483,22 +479,22 @@ describe('AnalyticsService', () => {
 
       const result = await analyticsService.getSellerAnalyticsOverview('user123');
 
-      expect(result.summary.conversionRate).toBe('0.00%');
+      expect(result.summary.conversionRate).toBe(0);
     });
 
-    it('should format very small percentages correctly', async () => {
+    it('should pass through small conversion rates as raw decimals', async () => {
       vi.mocked(mockUserRepository.findById).mockResolvedValue(createMockUser() as any);
       vi.mocked(mockAnalyticsRepository.getSellerAnalyticsOverview).mockResolvedValue({
         ...mockAnalyticsOverview,
         summary: {
           ...mockRevenueSummary,
-          conversionRate: 0.0012, // 0.12%
+          conversionRate: 0.0012,
         },
       });
 
       const result = await analyticsService.getSellerAnalyticsOverview('user123');
 
-      expect(result.summary.conversionRate).toBe('0.12%');
+      expect(result.summary.conversionRate).toBe(0.0012);
     });
   });
 });
