@@ -12,7 +12,6 @@ import type {
   TransactionWithRelations,
 } from '../TransactionRepository';
 
-// Mock Prisma Client
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     transaction: {
@@ -35,7 +34,6 @@ const mockPrismaClient = {
   },
 } as unknown as PrismaClient;
 
-// Helper to create mock transaction with relations
 const createMockTransactionWithRelations = (
   overrides: Partial<TransactionWithRelations> = {}
 ): TransactionWithRelations => ({
@@ -119,6 +117,7 @@ describe('TransactionRepository', () => {
               id: true,
               title: true,
               description: true,
+              completionPercentage: true,
               thumbnailImageUrl: true,
               priceCents: true,
               status: true,
