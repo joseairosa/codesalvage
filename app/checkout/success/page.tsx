@@ -95,6 +95,7 @@ function CheckoutSuccessContent() {
   const [isSubmittingGithub, setIsSubmittingGithub] = React.useState(false);
   const [githubError, setGithubError] = React.useState<string | null>(null);
   const [githubSuccess, setGithubSuccess] = React.useState<string | null>(null);
+  const [collaboratorAccepted, setCollaboratorAccepted] = React.useState(false);
 
   /**
    * Fetch transaction details
@@ -135,6 +136,34 @@ function CheckoutSuccessContent() {
 
     fetchTransaction();
   }, [transactionId, sessionStatus, router]);
+
+  /**
+   * Poll collaborator acceptance status every 30s once invitation is sent
+   */
+  React.useEffect(() => {
+    if (!transactionId || !transaction) return;
+
+    const invitationSentNow =
+      transaction.repositoryTransfer?.status === 'invitation_sent' ||
+      transaction.repositoryTransfer?.status === 'collaborator_added';
+
+    if (!invitationSentNow || collaboratorAccepted) return;
+
+    async function checkAcceptance() {
+      try {
+        const res = await fetch(`/api/transactions/${transactionId}/collaborator-status`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.accepted) {
+          setCollaboratorAccepted(true);
+        }
+      } catch {}
+    }
+
+    checkAcceptance();
+    const interval = setInterval(checkAcceptance, 30_000);
+    return () => clearInterval(interval);
+  }, [transactionId, transaction, collaboratorAccepted]);
 
   /**
    * Sign in with GitHub OAuth and auto-submit username for repository access
@@ -399,20 +428,40 @@ function CheckoutSuccessContent() {
                     </div>
                   )}
 
-                  {/* Invitation sent — waiting for acceptance */}
+                  {/* Invitation sent — polling for acceptance */}
                   {invitationSent && !githubSuccess && (
-                    <div className="flex items-center gap-3 rounded-md bg-blue-50 p-4 text-blue-800 dark:bg-blue-950 dark:text-blue-200">
-                      <Clock className="h-5 w-5 shrink-0" />
-                      <div>
-                        <p className="font-semibold">Invitation sent</p>
-                        <p className="text-sm">
-                          Check your GitHub notifications for a collaborator invitation to{' '}
-                          <strong>
-                            {transaction.repositoryTransfer?.buyerGithubUsername}
-                          </strong>
-                          .
-                        </p>
-                      </div>
+                    <div className="space-y-3">
+                      {collaboratorAccepted ? (
+                        <div className="flex items-center gap-3 rounded-md bg-green-50 p-4 text-green-800 dark:bg-green-950 dark:text-green-200">
+                          <CheckCircle2 className="h-5 w-5 shrink-0" />
+                          <div>
+                            <p className="font-semibold">Collaborator access granted</p>
+                            <p className="text-sm">
+                              @{transaction.repositoryTransfer?.buyerGithubUsername} now
+                              has access to{' '}
+                              {transaction.project.githubRepoName || 'the repository'}.
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3 rounded-md bg-blue-50 p-4 text-blue-800 dark:bg-blue-950 dark:text-blue-200">
+                          <Clock className="h-5 w-5 shrink-0" />
+                          <div className="flex-1">
+                            <p className="font-semibold">
+                              Invitation sent — awaiting acceptance
+                            </p>
+                            <p className="text-sm">
+                              Check your GitHub notifications for a collaborator
+                              invitation to{' '}
+                              <strong>
+                                @{transaction.repositoryTransfer?.buyerGithubUsername}
+                              </strong>
+                              . This page will update automatically once accepted.
+                            </p>
+                          </div>
+                          <Loader2 className="h-4 w-4 shrink-0 animate-spin opacity-50" />
+                        </div>
+                      )}
                     </div>
                   )}
 
