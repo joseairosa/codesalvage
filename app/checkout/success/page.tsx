@@ -7,6 +7,7 @@
  * Features:
  * - Payment confirmation
  * - Order details
+ * - GitHub repository access (if project has a GitHub repo)
  * - Download/access instructions
  * - Link to transaction details
  *
@@ -27,6 +28,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Download,
@@ -35,10 +38,21 @@ import {
   ArrowRight,
   Loader2,
   AlertCircle,
+  Github,
+  CheckCircle2,
+  Clock,
 } from 'lucide-react';
 import Image from 'next/image';
 
 const componentName = 'CheckoutSuccessPage';
+
+interface RepositoryTransfer {
+  id: string;
+  status: string;
+  buyerGithubUsername: string | null;
+  invitationSentAt: Date | null;
+  completedAt: Date | null;
+}
 
 interface Transaction {
   id: string;
@@ -51,12 +65,15 @@ interface Transaction {
     title: string;
     description: string;
     completionPercentage: number;
+    githubUrl: string | null;
+    githubRepoName: string | null;
   };
   seller: {
     id: string;
     username: string | null;
     fullName: string | null;
   };
+  repositoryTransfer: RepositoryTransfer | null;
 }
 
 function CheckoutSuccessContent() {
@@ -69,6 +86,11 @@ function CheckoutSuccessContent() {
   const [transaction, setTransaction] = React.useState<Transaction | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+
+  const [githubUsername, setGithubUsername] = React.useState('');
+  const [isSubmittingGithub, setIsSubmittingGithub] = React.useState(false);
+  const [githubError, setGithubError] = React.useState<string | null>(null);
+  const [githubSuccess, setGithubSuccess] = React.useState<string | null>(null);
 
   /**
    * Fetch transaction details
@@ -98,6 +120,10 @@ function CheckoutSuccessContent() {
         const data = await response.json();
         setTransaction(data.transaction);
 
+        if (data.transaction?.repositoryTransfer?.buyerGithubUsername) {
+          setGithubUsername(data.transaction.repositoryTransfer.buyerGithubUsername);
+        }
+
         console.log(`[${componentName}] Transaction loaded`);
       } catch (err) {
         console.error(`[${componentName}] Fetch error:`, err);
@@ -109,6 +135,54 @@ function CheckoutSuccessContent() {
 
     fetchTransaction();
   }, [transactionId, sessionStatus, router]);
+
+  /**
+   * Submit GitHub username to grant repository access
+   */
+  async function handleGithubSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!transactionId || !githubUsername.trim()) return;
+
+    setIsSubmittingGithub(true);
+    setGithubError(null);
+    setGithubSuccess(null);
+
+    console.log(`[${componentName}] Submitting GitHub username:`, githubUsername.trim());
+
+    try {
+      const response = await fetch(`/api/transactions/${transactionId}/buyer-github`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: githubUsername.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.message || 'Failed to set GitHub username');
+      }
+
+      console.log(`[${componentName}] GitHub username set successfully`);
+
+      const refreshResponse = await fetch(`/api/transactions/${transactionId}`);
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json();
+        setTransaction(refreshData.transaction);
+      }
+
+      setGithubSuccess(
+        'GitHub invitation sent! Check your GitHub notifications to accept repository access.'
+      );
+    } catch (err) {
+      console.error(`[${componentName}] GitHub submit error:`, err);
+      setGithubError(
+        err instanceof Error ? err.message : 'Failed to set GitHub username'
+      );
+    } finally {
+      setIsSubmittingGithub(false);
+    }
+  }
 
   /**
    * Format price in cents to USD
@@ -131,6 +205,23 @@ function CheckoutSuccessContent() {
       year: 'numeric',
     }).format(new Date(date));
   };
+
+  /**
+   * Determine GitHub access status for display
+   */
+  const getGithubAccessStatus = (transfer: RepositoryTransfer | null) => {
+    if (!transfer) return 'none';
+    return transfer.status;
+  };
+
+  const hasGithubRepo = !!(
+    transaction?.project?.githubUrl || transaction?.project?.githubRepoName
+  );
+  const githubStatus = transaction
+    ? getGithubAccessStatus(transaction.repositoryTransfer)
+    : 'none';
+  const transferIsComplete = githubStatus === 'completed' || githubStatus === 'accepted';
+  const invitationSent = githubStatus === 'invitation_sent';
 
   return (
     <div className="container mx-auto max-w-4xl py-10">
@@ -213,6 +304,110 @@ function CheckoutSuccessContent() {
               </CardContent>
             </Card>
 
+            {/* GitHub Repository Access */}
+            {hasGithubRepo && (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Github className="h-5 w-5" />
+                    <CardTitle>GitHub Repository Access</CardTitle>
+                  </div>
+                  <CardDescription>
+                    {transferIsComplete
+                      ? 'You have access to the repository.'
+                      : invitationSent
+                        ? 'A GitHub invitation has been sent to your account.'
+                        : 'Enter your GitHub username to receive an invitation to the private repository.'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {/* Access confirmed */}
+                  {transferIsComplete && (
+                    <div className="flex items-center gap-3 rounded-md bg-green-50 p-4 text-green-800 dark:bg-green-950 dark:text-green-200">
+                      <CheckCircle2 className="h-5 w-5 shrink-0" />
+                      <div>
+                        <p className="font-semibold">Repository access confirmed</p>
+                        <p className="text-sm">
+                          You can now access{' '}
+                          {transaction.project.githubRepoName || 'the repository'} on
+                          GitHub.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Invitation sent — waiting for acceptance */}
+                  {invitationSent && !githubSuccess && (
+                    <div className="flex items-center gap-3 rounded-md bg-blue-50 p-4 text-blue-800 dark:bg-blue-950 dark:text-blue-200">
+                      <Clock className="h-5 w-5 shrink-0" />
+                      <div>
+                        <p className="font-semibold">Invitation sent</p>
+                        <p className="text-sm">
+                          Check your GitHub notifications for a collaborator invitation to{' '}
+                          <strong>
+                            {transaction.repositoryTransfer?.buyerGithubUsername}
+                          </strong>
+                          .
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Success feedback after form submit */}
+                  {githubSuccess && (
+                    <div className="flex items-center gap-3 rounded-md bg-green-50 p-4 text-green-800 dark:bg-green-950 dark:text-green-200">
+                      <CheckCircle2 className="h-5 w-5 shrink-0" />
+                      <p className="text-sm">{githubSuccess}</p>
+                    </div>
+                  )}
+
+                  {/* GitHub username form — show if no transfer yet, or transfer is pending/failed */}
+                  {!transferIsComplete &&
+                    !invitationSent &&
+                    !githubSuccess &&
+                    githubStatus !== 'accepted' && (
+                      <form onSubmit={handleGithubSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="github-username">Your GitHub Username</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="github-username"
+                              type="text"
+                              placeholder="e.g. octocat"
+                              value={githubUsername}
+                              onChange={(e) => setGithubUsername(e.target.value)}
+                              disabled={isSubmittingGithub}
+                              className="max-w-xs"
+                            />
+                            <Button
+                              type="submit"
+                              disabled={isSubmittingGithub || !githubUsername.trim()}
+                            >
+                              {isSubmittingGithub ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                'Grant Access'
+                              )}
+                            </Button>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            You will receive a GitHub collaborator invitation. The seller
+                            will be notified to initiate the transfer.
+                          </p>
+                        </div>
+
+                        {githubError && (
+                          <Alert variant="destructive">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription>{githubError}</AlertDescription>
+                          </Alert>
+                        )}
+                      </form>
+                    )}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Next Steps */}
             <Card>
               <CardHeader>
@@ -226,8 +421,9 @@ function CheckoutSuccessContent() {
                   <div>
                     <h4 className="font-semibold">Code Access</h4>
                     <p className="text-sm text-muted-foreground">
-                      You now have immediate access to download the project code and
-                      repository.
+                      {hasGithubRepo
+                        ? 'Enter your GitHub username above to receive an invitation to the private repository.'
+                        : 'You now have immediate access to download the project code and repository.'}
                     </p>
                   </div>
                 </div>
@@ -240,7 +436,7 @@ function CheckoutSuccessContent() {
                     <h4 className="font-semibold">7-Day Review Period</h4>
                     <p className="text-sm text-muted-foreground">
                       Your payment is held in escrow until{' '}
-                      {formatDate(transaction.escrowReleaseDate)}. If you're not
+                      {formatDate(transaction.escrowReleaseDate)}. If you&apos;re not
                       satisfied, request a refund within this period.
                     </p>
                   </div>
