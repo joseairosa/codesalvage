@@ -1,0 +1,9 @@
+metadata-version = "1.0"
+
+[asset]
+  name = "stripe-webhooks"
+  version = "1"
+  type = "skill"
+
+[skill]
+  prompt-file = "SKILL.md"
