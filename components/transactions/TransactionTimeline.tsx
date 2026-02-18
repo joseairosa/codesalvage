@@ -267,7 +267,7 @@ export function TransactionTimeline({
                   stage.status === 'upcoming' && 'opacity-50'
                 )}
               >
-                <CardHeader className="pb-2">
+                <CardHeader className={cn(stage.actions.length > 0 && 'pb-2')}>
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className={cn('text-base', isSkipped && 'line-through')}>
                       {stage.name}
