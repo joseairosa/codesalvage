@@ -18,7 +18,9 @@ describe('GitHubAccessCard', () => {
   describe('connect state', () => {
     it('renders sign in with GitHub button when no session username', () => {
       render(<GitHubAccessCard {...baseProps} githubAccessState="connect" />);
-      expect(screen.getByRole('button', { name: /sign in with github/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /sign in with github/i })
+      ).toBeInTheDocument();
     });
 
     it('renders grant repository access button when session username present', () => {
@@ -35,13 +37,25 @@ describe('GitHubAccessCard', () => {
     });
 
     it('disables button and shows spinner while connecting', () => {
-      render(<GitHubAccessCard {...baseProps} githubAccessState="connect" isConnecting={true} />);
+      render(
+        <GitHubAccessCard
+          {...baseProps}
+          githubAccessState="connect"
+          isConnecting={true}
+        />
+      );
       expect(screen.getByRole('button')).toBeDisabled();
     });
 
     it('calls onConnect when button clicked', async () => {
       const onConnect = vi.fn();
-      render(<GitHubAccessCard {...baseProps} githubAccessState="connect" onConnect={onConnect} />);
+      render(
+        <GitHubAccessCard
+          {...baseProps}
+          githubAccessState="connect"
+          onConnect={onConnect}
+        />
+      );
       await userEvent.click(screen.getByRole('button'));
       expect(onConnect).toHaveBeenCalledOnce();
     });
@@ -73,7 +87,9 @@ describe('GitHubAccessCard', () => {
   describe('pending state', () => {
     it('renders awaiting acceptance message', () => {
       render(<GitHubAccessCard {...baseProps} githubAccessState="pending" />);
-      expect(screen.getByText(/invitation sent — awaiting acceptance/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/invitation sent — awaiting acceptance/i)
+      ).toBeInTheDocument();
     });
 
     it('shows buyer github username in message', () => {

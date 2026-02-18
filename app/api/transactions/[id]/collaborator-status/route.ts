@@ -12,6 +12,7 @@ import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import { githubService } from '@/lib/services/GitHubService';
+import { decrypt } from '@/lib/encryption';
 
 const componentName = 'CollaboratorStatusAPI';
 
@@ -87,6 +88,8 @@ async function getCollaboratorStatus(
       );
     }
 
+    const decryptedToken = decrypt(sellerToken);
+
     console.log(`[${componentName}] Checking collaborator status`, {
       transactionId: id,
       owner: parsed.owner,
@@ -98,7 +101,7 @@ async function getCollaboratorStatus(
       parsed.owner,
       parsed.repo,
       buyerUsername,
-      sellerToken
+      decryptedToken
     );
 
     console.log(`[${componentName}] Collaborator status:`, { buyerUsername, accepted });
