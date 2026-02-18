@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { setupHoneybadger } from '@honeybadger-io/nextjs';
 
 /**
  * Build-time validation for critical client-side environment variables.
@@ -12,7 +13,6 @@ import type { NextConfig } from 'next';
  * shipping a broken app that crashes at runtime.
  */
 function validateBuildEnv() {
-  // Only enforce in production builds (Railway sets NODE_ENV=production)
   if (process.env.NODE_ENV !== 'production') {
     return;
   }
@@ -37,8 +37,6 @@ function validateBuildEnv() {
     process.exit(1);
   }
 
-  // Warn about server-side vars (these are runtime-only, so don't fail the build,
-  // but missing them at build time often means they're also missing at runtime)
   const requiredServerVars = ['FIREBASE_PROJECT_ID', 'FIREBASE_SERVICE_ACCOUNT_BASE64'];
 
   const missingServer = requiredServerVars.filter((key) => !process.env[key]);
@@ -96,13 +94,11 @@ const nextConfig: NextConfig = {
 
   /* TypeScript */
   typescript: {
-    // Fail build on type errors in production
     ignoreBuildErrors: false,
   },
 
   /* ESLint */
   eslint: {
-    // Allow build to succeed with lint warnings (fix later)
     ignoreDuringBuilds: true,
   },
 
@@ -111,7 +107,6 @@ const nextConfig: NextConfig = {
 
   /* Experimental features for Next.js 15 */
   experimental: {
-    // Server Actions
     serverActions: {
       bodySizeLimit: '10mb',
       allowedOrigins: [
@@ -167,4 +162,9 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default setupHoneybadger(nextConfig, {
+  webpackPluginOptions: {
+    apiKey: process.env['HONEYBADGER_API_KEY'] || '',
+    assetsUrl: process.env['NEXT_PUBLIC_APP_URL'] || 'https://codesalvage.com',
+  },
+});
