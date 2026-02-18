@@ -152,7 +152,9 @@ describe('POST /api/transactions/[id]/transfer-ownership', () => {
 
   it('should return 404 when service throws NotFoundError', async () => {
     mockAuthenticateApiRequest.mockResolvedValue({ user: { id: 'seller-123' } });
-    mockTransferOwnership.mockRejectedValue(new MockNotFoundError('Transaction not found'));
+    mockTransferOwnership.mockRejectedValue(
+      new MockNotFoundError('Transaction not found')
+    );
 
     const response = await POST(makeRequest('txn-123'), makeParams('txn-123'));
     const body = await response.json();

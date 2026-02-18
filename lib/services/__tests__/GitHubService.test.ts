@@ -21,7 +21,6 @@ describe('GitHubService', () => {
     vi.unstubAllGlobals();
   });
 
-
   describe('parseGitHubUrl', () => {
     it('should parse standard GitHub URL', () => {
       const result = service.parseGitHubUrl('https://github.com/owner/repo');
@@ -69,7 +68,6 @@ describe('GitHubService', () => {
       expect(() => service.parseGitHubUrl('')).toThrow(GitHubServiceError);
     });
   });
-
 
   describe('fetchRepoData', () => {
     const mockRepoResponse = {
@@ -215,7 +213,6 @@ describe('GitHubService', () => {
       expect(result.metadata.isPrivate).toBe(false);
     });
   });
-
 
   describe('addCollaborator', () => {
     it('should send invitation and return invitationId on 201 response', async () => {
@@ -364,7 +361,6 @@ describe('GitHubService', () => {
       ).rejects.toThrow(/forbidden/i);
     });
   });
-
 
   describe('transferOwnership', () => {
     it('should return success on 202 response (transfer queued)', async () => {

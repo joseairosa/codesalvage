@@ -22,7 +22,6 @@ vi.mock('@/lib/encryption', () => ({
   decrypt: vi.fn().mockReturnValue('decrypted-token'),
 }));
 
-
 const mockRepositoryTransferRepository = {
   create: vi.fn(),
   findById: vi.fn(),
@@ -51,7 +50,6 @@ const mockGitHubService = {
 const mockNotificationService = {
   createNotification: vi.fn().mockResolvedValue({}),
 } as unknown as NotificationService;
-
 
 const createMockTransaction = (overrides = {}) => ({
   id: 'txn-123',
@@ -131,7 +129,6 @@ const createMockTransfer = (overrides = {}) => ({
   ...overrides,
 });
 
-
 let service: RepositoryTransferService;
 
 beforeEach(() => {
@@ -145,7 +142,6 @@ beforeEach(() => {
 });
 
 describe('RepositoryTransferService', () => {
-
   describe('initiateTransfer', () => {
     it('should initiate transfer when buyer has github username (invitation_sent)', async () => {
       const transaction = createMockTransaction();
@@ -338,7 +334,6 @@ describe('RepositoryTransferService', () => {
     });
   });
 
-
   describe('setBuyerGithubUsername', () => {
     it('should set buyer github username', async () => {
       const transaction = createMockTransaction();
@@ -460,7 +455,9 @@ describe('RepositoryTransferService', () => {
         mockRepositoryTransferRepository.create as ReturnType<typeof vi.fn>
       ).mockResolvedValue(createdTransfer);
       (
-        mockRepositoryTransferRepository.setBuyerGithubUsername as ReturnType<typeof vi.fn>
+        mockRepositoryTransferRepository.setBuyerGithubUsername as ReturnType<
+          typeof vi.fn
+        >
       ).mockResolvedValue(withUsername);
       (
         mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>
@@ -510,7 +507,9 @@ describe('RepositoryTransferService', () => {
         mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
       ).mockResolvedValue(transfer);
       (
-        mockRepositoryTransferRepository.setBuyerGithubUsername as ReturnType<typeof vi.fn>
+        mockRepositoryTransferRepository.setBuyerGithubUsername as ReturnType<
+          typeof vi.fn
+        >
       ).mockResolvedValue(updatedTransfer);
 
       const result = await service.setBuyerGithubUsername(
@@ -539,7 +538,9 @@ describe('RepositoryTransferService', () => {
         mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
       ).mockResolvedValue(transfer);
       (
-        mockRepositoryTransferRepository.setBuyerGithubUsername as ReturnType<typeof vi.fn>
+        mockRepositoryTransferRepository.setBuyerGithubUsername as ReturnType<
+          typeof vi.fn
+        >
       ).mockResolvedValue(withUsername);
       (mockGitHubService.addCollaborator as ReturnType<typeof vi.fn>).mockRejectedValue(
         new Error('GitHub API error')
@@ -549,10 +550,9 @@ describe('RepositoryTransferService', () => {
         service.setBuyerGithubUsername('buyer-123', 'txn-123', 'new-buyer-gh')
       ).rejects.toThrow('GitHub API error');
 
-      expect(mockRepositoryTransferRepository.setBuyerGithubUsername).toHaveBeenCalledWith(
-        'transfer-123',
-        'new-buyer-gh'
-      );
+      expect(
+        mockRepositoryTransferRepository.setBuyerGithubUsername
+      ).toHaveBeenCalledWith('transfer-123', 'new-buyer-gh');
     });
 
     it('should throw ValidationError when payment not succeeded', async () => {
@@ -620,7 +620,6 @@ describe('RepositoryTransferService', () => {
     });
   });
 
-
   describe('confirmTransfer', () => {
     it('should confirm transfer and notify seller', async () => {
       const transaction = createMockTransaction();
@@ -682,7 +681,6 @@ describe('RepositoryTransferService', () => {
       );
     });
   });
-
 
   describe('getTimelineData', () => {
     it('should return 5 stages for completed transaction', async () => {
@@ -932,10 +930,11 @@ describe('RepositoryTransferService', () => {
       );
     });
 
-
     it('should name stage 3 "Collaborator Access" not "Repository Transfer"', async () => {
       const transaction = createMockTransaction({ repositoryTransfer: null });
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
 
       const stages = await service.getTimelineData('txn-123', 'buyer-123');
 
@@ -962,7 +961,9 @@ describe('RepositoryTransferService', () => {
           createdAt: new Date(),
         },
       });
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
 
       const stages = await service.getTimelineData('txn-123', 'buyer-123');
 
@@ -977,7 +978,9 @@ describe('RepositoryTransferService', () => {
         escrowReleaseDate: futureDate,
         repositoryTransfer: null,
       });
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
 
       const stages = await service.getTimelineData('txn-123', 'buyer-123');
 
@@ -987,7 +990,9 @@ describe('RepositoryTransferService', () => {
 
     it('should name stage 5 "Ownership Transfer" not "Escrow Released"', async () => {
       const transaction = createMockTransaction();
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
 
       const stages = await service.getTimelineData('txn-123', 'buyer-123');
 
@@ -1016,7 +1021,9 @@ describe('RepositoryTransferService', () => {
           createdAt: new Date(),
         },
       });
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
 
       const stages = await service.getTimelineData('txn-123', 'seller-123');
 
@@ -1053,7 +1060,9 @@ describe('RepositoryTransferService', () => {
           createdAt: new Date(),
         },
       });
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
 
       const stages = await service.getTimelineData('txn-123', 'seller-123');
 
@@ -1087,7 +1096,9 @@ describe('RepositoryTransferService', () => {
           createdAt: new Date(),
         },
       });
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
 
       const stages = await service.getTimelineData('txn-123', 'buyer-123');
 
@@ -1098,28 +1109,48 @@ describe('RepositoryTransferService', () => {
     });
   });
 
-
   describe('transferOwnership', () => {
     it('should call GitHub transfer API and release escrow when review period has passed', async () => {
       const pastDate = new Date('2026-02-01T00:00:00Z');
       const transaction = createMockTransaction({ escrowReleaseDate: pastDate });
-      const transfer = createMockTransfer({ status: 'invitation_sent', buyerGithubUsername: 'buyer-gh' });
-      const updatedTransfer = createMockTransfer({ status: 'transfer_initiated', transferInitiatedAt: new Date() });
+      const transfer = createMockTransfer({
+        status: 'invitation_sent',
+        buyerGithubUsername: 'buyer-gh',
+      });
+      const updatedTransfer = createMockTransfer({
+        status: 'transfer_initiated',
+        transferInitiatedAt: new Date(),
+      });
 
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
-      (mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>).mockResolvedValue(transfer);
-      (mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>).mockResolvedValue(1);
-      (mockGitHubService.transferOwnership as ReturnType<typeof vi.fn>).mockResolvedValue({ success: true });
-      (mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(updatedTransfer);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
+      (
+        mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(transfer);
+      (
+        mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(1);
+      (mockGitHubService.transferOwnership as ReturnType<typeof vi.fn>).mockResolvedValue(
+        { success: true }
+      );
+      (
+        mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(updatedTransfer);
 
       const result = await service.transferOwnership('txn-123');
 
       expect(result.success).toBe(true);
       expect(mockGitHubService.transferOwnership).toHaveBeenCalledWith(
-        'test-owner', 'test-repo', 'buyer-gh', 'decrypted-token'
+        'test-owner',
+        'test-repo',
+        'buyer-gh',
+        'decrypted-token'
       );
       expect(mockRepositoryTransferRepository.updateStatus).toHaveBeenCalledWith(
-        'transfer-123', 'transfer_initiated', { transferInitiatedAt: expect.any(Date) }
+        'transfer-123',
+        'transfer_initiated',
+        { transferInitiatedAt: expect.any(Date) }
       );
       expect(mockTransactionRepository.releaseEscrow).toHaveBeenCalledWith('txn-123');
     });
@@ -1127,15 +1158,26 @@ describe('RepositoryTransferService', () => {
     it('should accept invitation_sent status (not just completed)', async () => {
       const pastDate = new Date('2026-02-01T00:00:00Z');
       const transaction = createMockTransaction({ escrowReleaseDate: pastDate });
-      const transfer = createMockTransfer({ status: 'invitation_sent', buyerGithubUsername: 'buyer-gh' });
+      const transfer = createMockTransfer({
+        status: 'invitation_sent',
+        buyerGithubUsername: 'buyer-gh',
+      });
 
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
-      (mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>).mockResolvedValue(transfer);
-      (mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>).mockResolvedValue(1);
-      (mockGitHubService.transferOwnership as ReturnType<typeof vi.fn>).mockResolvedValue({ success: true });
-      (mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(
-        createMockTransfer({ status: 'transfer_initiated' })
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
       );
+      (
+        mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(transfer);
+      (
+        mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(1);
+      (mockGitHubService.transferOwnership as ReturnType<typeof vi.fn>).mockResolvedValue(
+        { success: true }
+      );
+      (
+        mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(createMockTransfer({ status: 'transfer_initiated' }));
 
       const result = await service.transferOwnership('txn-123');
 
@@ -1146,8 +1188,12 @@ describe('RepositoryTransferService', () => {
     it('should skip when no RepositoryTransfer record exists', async () => {
       const transaction = createMockTransaction();
 
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
-      (mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
+      (
+        mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(null);
 
       const result = await service.transferOwnership('txn-123');
 
@@ -1158,10 +1204,17 @@ describe('RepositoryTransferService', () => {
 
     it('should skip when transfer is in pending status without incrementing retry count', async () => {
       const transaction = createMockTransaction();
-      const transfer = createMockTransfer({ status: 'pending', buyerGithubUsername: null });
+      const transfer = createMockTransfer({
+        status: 'pending',
+        buyerGithubUsername: null,
+      });
 
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
-      (mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>).mockResolvedValue(transfer);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
+      (
+        mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(transfer);
 
       const result = await service.transferOwnership('txn-123');
 
@@ -1173,10 +1226,17 @@ describe('RepositoryTransferService', () => {
 
     it('should skip when buyer GitHub username is not set', async () => {
       const transaction = createMockTransaction();
-      const transfer = createMockTransfer({ status: 'completed', buyerGithubUsername: null });
+      const transfer = createMockTransfer({
+        status: 'completed',
+        buyerGithubUsername: null,
+      });
 
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
-      (mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>).mockResolvedValue(transfer);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
+      (
+        mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(transfer);
 
       const result = await service.transferOwnership('txn-123');
 
@@ -1187,10 +1247,18 @@ describe('RepositoryTransferService', () => {
 
     it('should skip when retry count exceeds 3 without calling GitHub API', async () => {
       const transaction = createMockTransaction();
-      const transfer = createMockTransfer({ status: 'failed', buyerGithubUsername: 'buyer-gh', retryCount: 4 });
+      const transfer = createMockTransfer({
+        status: 'failed',
+        buyerGithubUsername: 'buyer-gh',
+        retryCount: 4,
+      });
 
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
-      (mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>).mockResolvedValue(transfer);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
+      (
+        mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(transfer);
 
       const result = await service.transferOwnership('txn-123');
 
@@ -1202,11 +1270,20 @@ describe('RepositoryTransferService', () => {
 
     it('should skip when concurrency guard fails (already claimed by another worker)', async () => {
       const transaction = createMockTransaction();
-      const transfer = createMockTransfer({ status: 'completed', buyerGithubUsername: 'buyer-gh' });
+      const transfer = createMockTransfer({
+        status: 'completed',
+        buyerGithubUsername: 'buyer-gh',
+      });
 
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
-      (mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>).mockResolvedValue(transfer);
-      (mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>).mockResolvedValue(0);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
+      (
+        mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(transfer);
+      (
+        mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(0);
 
       const result = await service.transferOwnership('txn-123');
 
@@ -1219,66 +1296,108 @@ describe('RepositoryTransferService', () => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 5);
       const transaction = createMockTransaction({ escrowReleaseDate: futureDate });
-      const transfer = createMockTransfer({ status: 'completed', buyerGithubUsername: 'buyer-gh' });
+      const transfer = createMockTransfer({
+        status: 'completed',
+        buyerGithubUsername: 'buyer-gh',
+      });
 
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
-      (mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>).mockResolvedValue(transfer);
-      (mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>).mockResolvedValue(1);
-      (mockGitHubService.transferOwnership as ReturnType<typeof vi.fn>).mockResolvedValue({ success: true });
-      (mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(
-        createMockTransfer({ status: 'transfer_initiated' })
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
       );
+      (
+        mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(transfer);
+      (
+        mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(1);
+      (mockGitHubService.transferOwnership as ReturnType<typeof vi.fn>).mockResolvedValue(
+        { success: true }
+      );
+      (
+        mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(createMockTransfer({ status: 'transfer_initiated' }));
 
       const result = await service.transferOwnership('txn-123');
 
       expect(result.success).toBe(true);
       expect(mockGitHubService.transferOwnership).toHaveBeenCalled();
       expect(mockTransactionRepository.releaseEscrow).not.toHaveBeenCalled();
-      expect(mockTransactionRepository.updateEscrowStatus).toHaveBeenCalledWith('txn-123', 'held');
+      expect(mockTransactionRepository.updateEscrowStatus).toHaveBeenCalledWith(
+        'txn-123',
+        'held'
+      );
     });
 
     it('should increment retry count on retryable GitHub API failure', async () => {
       const pastDate = new Date('2026-02-01T00:00:00Z');
       const transaction = createMockTransaction({ escrowReleaseDate: pastDate });
-      const transfer = createMockTransfer({ status: 'completed', buyerGithubUsername: 'buyer-gh' });
+      const transfer = createMockTransfer({
+        status: 'completed',
+        buyerGithubUsername: 'buyer-gh',
+      });
 
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
-      (mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>).mockResolvedValue(transfer);
-      (mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>).mockResolvedValue(1);
-      (mockGitHubService.transferOwnership as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('GitHub API error'));
-      (mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(
-        createMockTransfer({ status: 'failed' })
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
       );
-      (mockRepositoryTransferRepository.incrementRetryCount as ReturnType<typeof vi.fn>).mockResolvedValue(
-        createMockTransfer({ retryCount: 1 })
+      (
+        mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(transfer);
+      (
+        mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(1);
+      (mockGitHubService.transferOwnership as ReturnType<typeof vi.fn>).mockRejectedValue(
+        new Error('GitHub API error')
       );
+      (
+        mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(createMockTransfer({ status: 'failed' }));
+      (
+        mockRepositoryTransferRepository.incrementRetryCount as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(createMockTransfer({ retryCount: 1 }));
 
       const result = await service.transferOwnership('txn-123');
 
       expect(result.success).toBe(false);
-      expect(mockRepositoryTransferRepository.incrementRetryCount).toHaveBeenCalledWith('transfer-123');
+      expect(mockRepositoryTransferRepository.incrementRetryCount).toHaveBeenCalledWith(
+        'transfer-123'
+      );
       expect(mockRepositoryTransferRepository.updateStatus).toHaveBeenCalledWith(
         'transfer-123',
         'failed',
-        expect.objectContaining({ errorMessage: 'GitHub API error', failedAt: expect.any(Date) })
+        expect.objectContaining({
+          errorMessage: 'GitHub API error',
+          failedAt: expect.any(Date),
+        })
       );
-      expect(mockTransactionRepository.updateEscrowStatus).toHaveBeenCalledWith('txn-123', 'held');
+      expect(mockTransactionRepository.updateEscrowStatus).toHaveBeenCalledWith(
+        'txn-123',
+        'held'
+      );
     });
 
     it('should not increment retry count on 401 (token expired, non-retryable) and flag admin', async () => {
       const pastDate = new Date('2026-02-01T00:00:00Z');
       const transaction = createMockTransaction({ escrowReleaseDate: pastDate });
-      const transfer = createMockTransfer({ status: 'completed', buyerGithubUsername: 'buyer-gh' });
+      const transfer = createMockTransfer({
+        status: 'completed',
+        buyerGithubUsername: 'buyer-gh',
+      });
 
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
-      (mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>).mockResolvedValue(transfer);
-      (mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>).mockResolvedValue(1);
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
+      (
+        mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(transfer);
+      (
+        mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(1);
       (mockGitHubService.transferOwnership as ReturnType<typeof vi.fn>).mockRejectedValue(
         new GitHubServiceError('Token expired or revoked', 401)
       );
-      (mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(
-        createMockTransfer({ status: 'failed' })
-      );
+      (
+        mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(createMockTransfer({ status: 'failed' }));
 
       const consoleErrorSpy = vi.spyOn(console, 'error');
 
@@ -1292,17 +1411,24 @@ describe('RepositoryTransferService', () => {
       expect(mockRepositoryTransferRepository.updateStatus).toHaveBeenCalledWith(
         'transfer-123',
         'failed',
-        expect.objectContaining({ errorMessage: expect.stringContaining('Token expired') })
+        expect.objectContaining({
+          errorMessage: expect.stringContaining('Token expired'),
+        })
       );
-      expect(mockTransactionRepository.updateEscrowStatus).toHaveBeenCalledWith('txn-123', 'held');
+      expect(mockTransactionRepository.updateEscrowStatus).toHaveBeenCalledWith(
+        'txn-123',
+        'held'
+      );
 
       consoleErrorSpy.mockRestore();
     });
   });
 
-
   describe('processAutoTransfers', () => {
-    const buildEligibleTxn = (transferOverrides: Record<string, unknown> = {}, txnOverrides: Record<string, unknown> = {}) => ({
+    const buildEligibleTxn = (
+      transferOverrides: Record<string, unknown> = {},
+      txnOverrides: Record<string, unknown> = {}
+    ) => ({
       id: 'txn-123',
       createdAt: new Date('2026-01-01T00:00:00Z'),
       escrowReleaseDate: new Date('2026-02-01T00:00:00Z'),
@@ -1317,31 +1443,48 @@ describe('RepositoryTransferService', () => {
     });
 
     it('should call findTransactionsForAutoTransfer with current date', async () => {
-      (mockTransactionRepository.findTransactionsForAutoTransfer as ReturnType<typeof vi.fn>)
-        .mockResolvedValue([]);
+      (
+        mockTransactionRepository.findTransactionsForAutoTransfer as ReturnType<
+          typeof vi.fn
+        >
+      ).mockResolvedValue([]);
 
       await service.processAutoTransfers();
 
-      expect(mockTransactionRepository.findTransactionsForAutoTransfer).toHaveBeenCalledWith(
-        expect.any(Date)
-      );
+      expect(
+        mockTransactionRepository.findTransactionsForAutoTransfer
+      ).toHaveBeenCalledWith(expect.any(Date));
     });
 
     it('should process eligible transactions and return processed count', async () => {
-      (mockTransactionRepository.findTransactionsForAutoTransfer as ReturnType<typeof vi.fn>)
-        .mockResolvedValue([buildEligibleTxn()]);
+      (
+        mockTransactionRepository.findTransactionsForAutoTransfer as ReturnType<
+          typeof vi.fn
+        >
+      ).mockResolvedValue([buildEligibleTxn()]);
 
       const pastDate = new Date('2026-02-01T00:00:00Z');
       const transaction = createMockTransaction({ escrowReleaseDate: pastDate });
-      const transfer = createMockTransfer({ status: 'invitation_sent', buyerGithubUsername: 'buyer-gh' });
+      const transfer = createMockTransfer({
+        status: 'invitation_sent',
+        buyerGithubUsername: 'buyer-gh',
+      });
 
-      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(transaction);
-      (mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>).mockResolvedValue(transfer);
-      (mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>).mockResolvedValue(1);
-      (mockGitHubService.transferOwnership as ReturnType<typeof vi.fn>).mockResolvedValue({ success: true });
-      (mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(
-        createMockTransfer({ status: 'transfer_initiated' })
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
       );
+      (
+        mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(transfer);
+      (
+        mockTransactionRepository.claimForTransferProcessing as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(1);
+      (mockGitHubService.transferOwnership as ReturnType<typeof vi.fn>).mockResolvedValue(
+        { success: true }
+      );
+      (
+        mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(createMockTransfer({ status: 'transfer_initiated' }));
 
       const result = await service.processAutoTransfers();
 
@@ -1350,8 +1493,13 @@ describe('RepositoryTransferService', () => {
     });
 
     it('should skip pending transfers without incrementing retry count', async () => {
-      (mockTransactionRepository.findTransactionsForAutoTransfer as ReturnType<typeof vi.fn>)
-        .mockResolvedValue([buildEligibleTxn({ status: 'pending', buyerGithubUsername: null })]);
+      (
+        mockTransactionRepository.findTransactionsForAutoTransfer as ReturnType<
+          typeof vi.fn
+        >
+      ).mockResolvedValue([
+        buildEligibleTxn({ status: 'pending', buyerGithubUsername: null }),
+      ]);
 
       const result = await service.processAutoTransfers();
 
@@ -1364,8 +1512,13 @@ describe('RepositoryTransferService', () => {
       const veryOldDate = new Date();
       veryOldDate.setDate(veryOldDate.getDate() - 15);
 
-      (mockTransactionRepository.findTransactionsForAutoTransfer as ReturnType<typeof vi.fn>)
-        .mockResolvedValue([buildEligibleTxn({ status: 'failed', retryCount: 4 }, { createdAt: veryOldDate })]);
+      (
+        mockTransactionRepository.findTransactionsForAutoTransfer as ReturnType<
+          typeof vi.fn
+        >
+      ).mockResolvedValue([
+        buildEligibleTxn({ status: 'failed', retryCount: 4 }, { createdAt: veryOldDate }),
+      ]);
 
       const result = await service.processAutoTransfers();
 
@@ -1378,8 +1531,13 @@ describe('RepositoryTransferService', () => {
       const recentDate = new Date();
       recentDate.setDate(recentDate.getDate() - 5);
 
-      (mockTransactionRepository.findTransactionsForAutoTransfer as ReturnType<typeof vi.fn>)
-        .mockResolvedValue([buildEligibleTxn({ status: 'failed', retryCount: 4 }, { createdAt: recentDate })]);
+      (
+        mockTransactionRepository.findTransactionsForAutoTransfer as ReturnType<
+          typeof vi.fn
+        >
+      ).mockResolvedValue([
+        buildEligibleTxn({ status: 'failed', retryCount: 4 }, { createdAt: recentDate }),
+      ]);
 
       const result = await service.processAutoTransfers();
 
