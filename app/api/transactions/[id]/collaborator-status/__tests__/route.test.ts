@@ -5,12 +5,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
-const { mockAuthenticateApiRequest, mockFindUnique, mockCheckCollaboratorAccess } =
-  vi.hoisted(() => ({
-    mockAuthenticateApiRequest: vi.fn(),
-    mockFindUnique: vi.fn(),
-    mockCheckCollaboratorAccess: vi.fn(),
-  }));
+const {
+  mockAuthenticateApiRequest,
+  mockFindUnique,
+  mockCheckCollaboratorAccess,
+  mockDecrypt,
+} = vi.hoisted(() => ({
+  mockAuthenticateApiRequest: vi.fn(),
+  mockFindUnique: vi.fn(),
+  mockCheckCollaboratorAccess: vi.fn(),
+  mockDecrypt: vi.fn((token: string) => `decrypted_${token}`),
+}));
 
 vi.mock('@/lib/api-auth', () => ({
   authenticateApiRequest: mockAuthenticateApiRequest,
@@ -32,6 +37,10 @@ vi.mock('@/lib/services/GitHubService', () => ({
 
 vi.mock('@/lib/middleware/withRateLimit', () => ({
   withApiRateLimit: (handler: any) => handler,
+}));
+
+vi.mock('@/lib/encryption', () => ({
+  decrypt: mockDecrypt,
 }));
 
 import { GET } from '../route';
@@ -165,11 +174,12 @@ describe('GET /api/transactions/[id]/collaborator-status', () => {
     expect(body.accepted).toBe(true);
     expect(body.username).toBe('buyeruser');
     expect(body.reason).toBe('accepted');
+    expect(mockDecrypt).toHaveBeenCalledWith('gha_token_abc');
     expect(mockCheckCollaboratorAccess).toHaveBeenCalledWith(
       'seller',
       'my-repo',
       'buyeruser',
-      'gha_token_abc'
+      'decrypted_gha_token_abc'
     );
   });
 
