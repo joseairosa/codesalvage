@@ -28,8 +28,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Download,
@@ -43,6 +41,12 @@ import {
   Clock,
 } from 'lucide-react';
 import Image from 'next/image';
+import {
+  GithubAuthProvider,
+  signInWithPopup,
+  getAdditionalUserInfo,
+} from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 const componentName = 'CheckoutSuccessPage';
 
@@ -87,7 +91,6 @@ function CheckoutSuccessContent() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  const [githubUsername, setGithubUsername] = React.useState('');
   const [isSubmittingGithub, setIsSubmittingGithub] = React.useState(false);
   const [githubError, setGithubError] = React.useState<string | null>(null);
   const [githubSuccess, setGithubSuccess] = React.useState<string | null>(null);
@@ -120,10 +123,6 @@ function CheckoutSuccessContent() {
         const data = await response.json();
         setTransaction(data.transaction);
 
-        if (data.transaction?.repositoryTransfer?.buyerGithubUsername) {
-          setGithubUsername(data.transaction.repositoryTransfer.buyerGithubUsername);
-        }
-
         console.log(`[${componentName}] Transaction loaded`);
       } catch (err) {
         console.error(`[${componentName}] Fetch error:`, err);
@@ -137,24 +136,39 @@ function CheckoutSuccessContent() {
   }, [transactionId, sessionStatus, router]);
 
   /**
-   * Submit GitHub username to grant repository access
+   * Sign in with GitHub OAuth and auto-submit username for repository access
    */
-  async function handleGithubSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (!transactionId || !githubUsername.trim()) return;
+  async function handleGithubOAuth() {
+    if (!transactionId || !auth) return;
 
     setIsSubmittingGithub(true);
     setGithubError(null);
     setGithubSuccess(null);
 
-    console.log(`[${componentName}] Submitting GitHub username:`, githubUsername.trim());
-
     try {
+      const provider = new GithubAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+
+      const idToken = await userCredential.user.getIdToken();
+      await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+
+      const additionalInfo = getAdditionalUserInfo(userCredential);
+      const username = (additionalInfo?.profile as { login?: string } | null)?.login;
+
+      if (!username) {
+        throw new Error('Could not retrieve GitHub username from your account');
+      }
+
+      console.log(`[${componentName}] Submitting GitHub username from OAuth:`, username);
+
       const response = await fetch(`/api/transactions/${transactionId}/buyer-github`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: githubUsername.trim() }),
+        body: JSON.stringify({ username }),
       });
 
       const data = await response.json();
@@ -174,11 +188,12 @@ function CheckoutSuccessContent() {
       setGithubSuccess(
         'GitHub invitation sent! Check your GitHub notifications to accept repository access.'
       );
-    } catch (err) {
-      console.error(`[${componentName}] GitHub submit error:`, err);
-      setGithubError(
-        err instanceof Error ? err.message : 'Failed to set GitHub username'
-      );
+    } catch (err: any) {
+      if (err.code === 'auth/popup-closed-by-user') {
+      } else {
+        console.error(`[${componentName}] GitHub OAuth error:`, err);
+        setGithubError(err instanceof Error ? err.message : 'Failed to connect GitHub');
+      }
     } finally {
       setIsSubmittingGithub(false);
     }
@@ -361,40 +376,28 @@ function CheckoutSuccessContent() {
                     </div>
                   )}
 
-                  {/* GitHub username form — show if no transfer yet, or transfer is pending/failed */}
+                  {/* Sign in with GitHub — show if no transfer yet, or transfer is pending/failed */}
                   {!transferIsComplete &&
                     !invitationSent &&
                     !githubSuccess &&
                     githubStatus !== 'accepted' && (
-                      <form onSubmit={handleGithubSubmit} className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="github-username">Your GitHub Username</Label>
-                          <div className="flex gap-2">
-                            <Input
-                              id="github-username"
-                              type="text"
-                              placeholder="e.g. octocat"
-                              value={githubUsername}
-                              onChange={(e) => setGithubUsername(e.target.value)}
-                              disabled={isSubmittingGithub}
-                              className="max-w-xs"
-                            />
-                            <Button
-                              type="submit"
-                              disabled={isSubmittingGithub || !githubUsername.trim()}
-                            >
-                              {isSubmittingGithub ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                'Grant Access'
-                              )}
-                            </Button>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            You will be automatically added as a collaborator so you can
-                            review the code during the 7-day review period.
-                          </p>
-                        </div>
+                      <div className="space-y-4">
+                        <p className="text-sm text-muted-foreground">
+                          Sign in with GitHub to be automatically added as a collaborator
+                          so you can review the code during the 7-day review period.
+                        </p>
+                        <Button
+                          onClick={handleGithubOAuth}
+                          disabled={isSubmittingGithub}
+                          className="gap-2"
+                        >
+                          {isSubmittingGithub ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Github className="h-4 w-4" />
+                          )}
+                          Sign in with GitHub
+                        </Button>
 
                         {githubError && (
                           <Alert variant="destructive">
@@ -402,7 +405,7 @@ function CheckoutSuccessContent() {
                             <AlertDescription>{githubError}</AlertDescription>
                           </Alert>
                         )}
-                      </form>
+                      </div>
                     )}
                 </CardContent>
               </Card>
