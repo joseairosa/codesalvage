@@ -836,6 +836,52 @@ describe('RepositoryTransferService', () => {
       );
     });
 
+    it('should show connect github action for buyer when no transfer record', async () => {
+      const transaction = createMockTransaction({ repositoryTransfer: null });
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
+
+      const stages = await service.getTimelineData('txn-123', 'buyer-123');
+
+      expect(stages[2]!.status).toBe('active');
+      expect(stages[2]!.actions).toHaveLength(1);
+      expect(stages[2]!.actions[0]!.label).toBe('Connect GitHub Account');
+      expect(stages[2]!.actions[0]!.url).toBe('/checkout/success?transactionId=txn-123');
+    });
+
+    it('should show connect github action for buyer when transfer is pending', async () => {
+      const transaction = createMockTransaction({
+        repositoryTransfer: {
+          id: 'transfer-123',
+          githubRepoFullName: 'test-owner/test-repo',
+          method: 'github_collaborator',
+          status: 'pending',
+          githubInvitationId: null,
+          sellerGithubUsername: 'seller-gh',
+          buyerGithubUsername: null,
+          initiatedAt: null,
+          invitationSentAt: null,
+          acceptedAt: null,
+          completedAt: null,
+          failedAt: null,
+          errorMessage: null,
+          retryCount: 0,
+          createdAt: new Date(),
+        },
+      });
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
+
+      const stages = await service.getTimelineData('txn-123', 'buyer-123');
+
+      expect(stages[2]!.status).toBe('active');
+      expect(stages[2]!.actions).toHaveLength(1);
+      expect(stages[2]!.actions[0]!.label).toBe('Connect GitHub Account');
+      expect(stages[2]!.actions[0]!.url).toBe('/checkout/success?transactionId=txn-123');
+    });
+
     it('should show active review period with days remaining', async () => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 5);

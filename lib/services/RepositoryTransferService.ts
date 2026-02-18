@@ -443,8 +443,8 @@ export class RepositoryTransferService {
 
   private buildRepositoryTransferStage(
     transaction: TransactionWithRelations,
-    _role: string,
-    _transactionId: string
+    role: string,
+    transactionId: string
   ): TimelineStage {
     if (!transaction.project.githubUrl) {
       return {
@@ -457,6 +457,11 @@ export class RepositoryTransferService {
     }
 
     const transferRecord = transaction.repositoryTransfer;
+    const connectGithubAction: TimelineAction = {
+      label: 'Connect GitHub Account',
+      type: 'primary',
+      url: `/checkout/success?transactionId=${transactionId}`,
+    };
 
     if (transferRecord) {
       let status: TimelineStageStatus;
@@ -493,7 +498,7 @@ export class RepositoryTransferService {
             ? (transferRecord.invitationSentAt ?? transferRecord.completedAt)
             : null,
         description,
-        actions: [],
+        actions: status === 'active' && role === 'buyer' ? [connectGithubAction] : [],
       };
     }
 
@@ -514,7 +519,7 @@ export class RepositoryTransferService {
       status: 'active',
       completedAt: null,
       description: 'Awaiting buyer GitHub username',
-      actions: [],
+      actions: role === 'buyer' ? [connectGithubAction] : [],
     };
   }
 
