@@ -55,16 +55,12 @@ import type {
 
 const componentName = 'TransactionTimeline';
 
-// ---------- Props ----------
-
 export interface TransactionTimelineProps {
   stages: TimelineStage[];
   userRole: 'buyer' | 'seller';
   transactionId: string;
   onActionComplete?: () => void;
 }
-
-// ---------- Helpers ----------
 
 /**
  * Map a stage name to its lucide-react icon component.
@@ -73,9 +69,9 @@ function getStageIcon(stageName: string): React.ElementType {
   const iconMap: Record<string, React.ElementType> = {
     'Offer Accepted': Handshake,
     'Payment Received': CreditCard,
-    'Repository Transfer': GitBranch,
+    'Collaborator Access': GitBranch,
     'Review Period': Shield,
-    'Escrow Released': DollarSign,
+    'Ownership Transfer': DollarSign,
   };
   return iconMap[stageName] ?? Circle;
 }
@@ -146,8 +142,6 @@ function actionVariant(type: TimelineAction['type']): 'default' | 'outline' | 'l
   }
 }
 
-// ---------- Sub-components ----------
-
 /**
  * Status icon rendered inside the timeline node circle.
  */
@@ -174,8 +168,6 @@ function StageStatusIcon({
       return <Circle className="h-5 w-5" />;
   }
 }
-
-// ---------- Main component ----------
 
 export function TransactionTimeline({
   stages,
@@ -204,13 +196,11 @@ export function TransactionTimeline({
         url: action.url,
       });
 
-      // URL navigation
       if (action.url) {
         router.push(action.url);
         return;
       }
 
-      // API call
       if (action.apiEndpoint) {
         const actionKey = `${action.apiEndpoint}-${action.apiMethod}`;
         setLoadingAction(actionKey);

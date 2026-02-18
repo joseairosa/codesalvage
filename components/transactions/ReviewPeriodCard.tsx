@@ -37,19 +37,13 @@ import type { TimelineStage } from '@/lib/services/RepositoryTransferService';
 
 const componentName = 'ReviewPeriodCard';
 
-// ---------- Props ----------
-
 export interface ReviewPeriodCardProps {
   stage: TimelineStage;
   userRole: 'buyer' | 'seller';
   transactionId: string;
 }
 
-// ---------- Constants ----------
-
 const REVIEW_PERIOD_DAYS = 7;
-
-// ---------- Helpers ----------
 
 /**
  * Format a date into a human-readable string like "Feb 18, 2026 at 3:45 PM".
@@ -67,8 +61,6 @@ function formatDate(date: Date | string | null | undefined): string | null {
     hour12: true,
   }).format(d);
 }
-
-// ---------- Component ----------
 
 export function ReviewPeriodCard({
   stage,
@@ -157,11 +149,16 @@ export function ReviewPeriodCard({
         )}
 
         {/* Seller: informational message */}
-        {userRole === 'seller' && isActive && formattedReleaseDate && (
+        {userRole === 'seller' && isActive && (
           <p className="text-sm text-muted-foreground">
-            Funds will be released on{' '}
-            <span className="font-semibold">{formattedReleaseDate}</span>. The buyer has
-            until then to review the project and request a refund if necessary.
+            The buyer has until{' '}
+            {formattedReleaseDate ? (
+              <span className="font-semibold">{formattedReleaseDate}</span>
+            ) : (
+              'the end of the review period'
+            )}{' '}
+            to review the project and raise any disputes. After the review period,
+            ownership transfer will be initiated automatically.
           </p>
         )}
 

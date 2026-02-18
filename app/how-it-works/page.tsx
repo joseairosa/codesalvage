@@ -2,12 +2,12 @@
  * How It Works Page
  *
  * Explains the CodeSalvage marketplace for both buyers and sellers.
- * Shows the complete process from listing to purchase to completion.
+ * Shows the complete process from listing to purchase to ownership transfer.
  *
  * Sections:
  * - Hero introduction
- * - For Buyers: Browse → Purchase → Download → Build
- * - For Sellers: List → Set Price → Earn Money
+ * - For Buyers: 5-step flow — Browse → Purchase → Review → Transfer → Funds
+ * - For Sellers: List → Set Price → Await Purchase → Get Paid
  * - Trust & Safety features
  * - CTA sections
  */
@@ -26,8 +26,7 @@ import {
 import {
   Search,
   ShoppingCart,
-  Download,
-  Code,
+  GitBranch,
   DollarSign,
   Upload,
   Shield,
@@ -70,27 +69,36 @@ export default function HowItWorksPage() {
       image: '/images/step-secure.png',
       imageAlt: 'Secure payment with escrow',
       title: '2. Purchase Securely',
-      description: 'Buy with confidence using our secure checkout',
+      description: 'Buy with confidence — your payment is protected',
       details:
-        'All payments processed through Stripe. Your payment is held in escrow for 7 days to ensure project quality and seller responsiveness.',
+        'Your payment is held in escrow and you are immediately added as a GitHub collaborator, so you can start reviewing the code right away.',
     },
     {
-      icon: Download,
-      image: '/images/step-download.png',
-      imageAlt: 'Download code package',
-      title: '3. Download Code',
-      description: 'Get immediate access to the complete codebase',
+      icon: Clock,
+      image: '/images/step-review.png',
+      imageAlt: '7-day code review period',
+      title: '3. 7-Day Review',
+      description: 'Review the code as a collaborator before committing',
       details:
-        'Download a ZIP file with all source code, documentation, and assets. Access granted instantly after successful payment.',
+        "You have 7 days from purchase to review the repository. If something doesn't match the description, raise a concern within this window.",
     },
     {
-      icon: Code,
-      image: '/images/step-complete.png',
-      imageAlt: 'Launch your completed project',
-      title: '4. Complete & Launch',
-      description: 'Finish development and ship your product',
+      icon: GitBranch,
+      image: '/images/step-transfer.png',
+      imageAlt: 'Repository ownership transferred to buyer',
+      title: '4. Ownership Transfer',
+      description: 'Full GitHub ownership transferred to your account',
       details:
-        'Use the existing foundation to save months of development time. Add your features, polish the UI, and launch to production.',
+        'After the review period, full repository ownership is automatically transferred to your GitHub account. You become the new owner.',
+    },
+    {
+      icon: DollarSign,
+      image: '/images/step-earn.png',
+      imageAlt: 'Escrow funds released to seller',
+      title: '5. Funds Released',
+      description: 'Escrow is released once ownership is confirmed',
+      details:
+        'Once ownership transfer is complete, the escrowed funds are released to the seller. The deal is done — the project is yours.',
     },
   ];
 
@@ -116,29 +124,29 @@ export default function HowItWorksPage() {
     {
       icon: CheckCircle,
       image: '/images/step-connect.png',
-      imageAlt: 'Connect with potential buyers',
-      title: '3. Await Purchase',
-      description: 'Your project is now live in the marketplace',
+      imageAlt: 'Buyer gets automatic collaborator access',
+      title: '3. Buyer Gets Access',
+      description: 'Collaborator access is granted automatically',
       details:
-        'Respond to buyer questions promptly. Provide support during the 7-day escrow period to ensure buyer satisfaction.',
+        "When a buyer submits their GitHub username, they're automatically added as a collaborator. No manual action needed from you — the platform handles it.",
     },
     {
       icon: Lock,
       image: '/images/step-earn.png',
-      imageAlt: 'Earn money from your project',
+      imageAlt: 'Earn money after ownership transfer',
       title: '4. Get Paid',
-      description: 'Receive payment after escrow release',
+      description: 'Receive payment after ownership transfer',
       details:
-        'Funds held in escrow for 7 days to protect buyers. After that period, payment is automatically transferred to your account.',
+        'After the 7-day review period, repository ownership transfers to the buyer automatically. Once the transfer is confirmed, funds are released to your account.',
     },
   ];
 
   const trustFeatures = [
     {
       icon: Shield,
-      title: '7-Day Escrow Protection',
+      title: '7-Day Review Window',
       description:
-        "All payments held in escrow for 7 days. Buyers can request refunds if project doesn't match description.",
+        'All payments held in escrow while you review the code as a collaborator. Raise any concerns within 7 days of purchase.',
     },
     {
       icon: Star,
@@ -147,10 +155,10 @@ export default function HowItWorksPage() {
         'Rate sellers on code quality, documentation, responsiveness, and accuracy. Build reputation over time.',
     },
     {
-      icon: Clock,
-      title: 'Instant Code Access',
+      icon: GitBranch,
+      title: 'Collaborator Access on Purchase',
       description:
-        'Download code immediately after purchase. No waiting, no manual delivery. Direct download from secure cloud storage.',
+        'Added as a GitHub collaborator immediately after purchase. Review the real repository — not just a download — before ownership transfers.',
     },
     {
       icon: Users,
@@ -191,7 +199,7 @@ export default function HowItWorksPage() {
               </p>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-2">
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {buyerSteps.map((step, index) => {
                 const Icon = step.icon;
                 return (
@@ -373,9 +381,10 @@ export default function HowItWorksPage() {
                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
                       <Shield className="h-5 w-5 text-white" />
                     </div>
-                    <p className="font-semibold text-white">7-Day Escrow</p>
+                    <p className="font-semibold text-white">7-Day Review + Transfer</p>
                     <p className="mt-1 text-sm text-blue-100">
-                      Payments held to protect buyers. Automatic release if no disputes.
+                      Escrow held during review. Released after ownership transfer — not
+                      just a timer.
                     </p>
                   </div>
                 </div>

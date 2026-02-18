@@ -21,9 +21,6 @@ describe('GitHubService', () => {
     vi.unstubAllGlobals();
   });
 
-  // ============================================
-  // URL PARSING
-  // ============================================
 
   describe('parseGitHubUrl', () => {
     it('should parse standard GitHub URL', () => {
@@ -73,9 +70,6 @@ describe('GitHubService', () => {
     });
   });
 
-  // ============================================
-  // FETCH REPO DATA
-  // ============================================
 
   describe('fetchRepoData', () => {
     const mockRepoResponse = {
@@ -126,19 +120,17 @@ describe('GitHubService', () => {
     }
 
     it('should pass access token in Authorization header', async () => {
-      // Use mockImplementation to return appropriate responses based on URL
       mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
         const url = typeof input === 'string' ? input : input.toString();
         if (url.includes('/readme')) return mockJsonResponse(mockReadmeResponse);
         if (url.includes('/languages')) return mockJsonResponse(mockLanguagesResponse);
-        if (url.includes('/contents/')) return mock404Response(); // no dep file
+        if (url.includes('/contents/')) return mock404Response();
         if (url.includes('/git/trees/')) return mockJsonResponse(mockTreeResponse);
-        return mockJsonResponse(mockRepoResponse); // default: repo metadata
+        return mockJsonResponse(mockRepoResponse);
       });
 
       await service.fetchRepoData('https://github.com/owner/test-repo', 'test-token');
 
-      // Check that Authorization header was included
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('/repos/owner/test-repo'),
         expect.objectContaining({
@@ -150,7 +142,6 @@ describe('GitHubService', () => {
     });
 
     it('should throw GitHubServiceError when repo not found', async () => {
-      // ALL GitHub API calls return 404
       mockFetch.mockImplementation(async () => mock404Response());
 
       await expect(
@@ -225,9 +216,6 @@ describe('GitHubService', () => {
     });
   });
 
-  // ============================================
-  // COLLABORATOR MANAGEMENT
-  // ============================================
 
   describe('addCollaborator', () => {
     it('should send invitation and return invitationId on 201 response', async () => {
@@ -374,6 +362,112 @@ describe('GitHubService', () => {
       await expect(
         service.removeCollaborator('owner', 'repo', 'user', 'test-token')
       ).rejects.toThrow(/forbidden/i);
+    });
+  });
+
+
+  describe('transferOwnership', () => {
+    it('should return success on 202 response (transfer queued)', async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ id: 1, name: 'repo' }), {
+          status: 202,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      );
+
+      const result = await service.transferOwnership(
+        'owner',
+        'repo',
+        'new-owner',
+        'test-token'
+      );
+
+      expect(result).toEqual({ success: true });
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/repos/owner/repo/transfer'),
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ new_owner: 'new-owner' }),
+        })
+      );
+    });
+
+    it('should throw GitHubServiceError with 401 status on expired token', async () => {
+      mockFetch.mockResolvedValue(
+        new Response('Unauthorized', { status: 401, statusText: 'Unauthorized' })
+      );
+
+      await expect(
+        service.transferOwnership('owner', 'repo', 'new-owner', 'bad-token')
+      ).rejects.toThrow(GitHubServiceError);
+
+      await expect(
+        service.transferOwnership('owner', 'repo', 'new-owner', 'bad-token')
+      ).rejects.toThrow(/token expired|unauthorized/i);
+
+      try {
+        await service.transferOwnership('owner', 'repo', 'new-owner', 'bad-token');
+      } catch (err) {
+        expect(err instanceof GitHubServiceError && err.statusCode).toBe(401);
+      }
+    });
+
+    it('should throw GitHubServiceError on 403 response (insufficient permissions)', async () => {
+      mockFetch.mockResolvedValue(
+        new Response('Forbidden', { status: 403, statusText: 'Forbidden' })
+      );
+
+      await expect(
+        service.transferOwnership('owner', 'repo', 'new-owner', 'test-token')
+      ).rejects.toThrow(GitHubServiceError);
+
+      await expect(
+        service.transferOwnership('owner', 'repo', 'new-owner', 'test-token')
+      ).rejects.toThrow(/forbidden|permission/i);
+    });
+
+    it('should throw GitHubServiceError on 404 response (repo not found)', async () => {
+      mockFetch.mockResolvedValue(
+        new Response('Not Found', { status: 404, statusText: 'Not Found' })
+      );
+
+      await expect(
+        service.transferOwnership('owner', 'nonexistent', 'new-owner', 'test-token')
+      ).rejects.toThrow(GitHubServiceError);
+
+      await expect(
+        service.transferOwnership('owner', 'nonexistent', 'new-owner', 'test-token')
+      ).rejects.toThrow(/not found/i);
+    });
+
+    it('should throw GitHubServiceError on 422 response (validation failed)', async () => {
+      mockFetch.mockResolvedValue(
+        new Response('Unprocessable Entity', {
+          status: 422,
+          statusText: 'Unprocessable Entity',
+        })
+      );
+
+      await expect(
+        service.transferOwnership('owner', 'repo', 'invalid-owner', 'test-token')
+      ).rejects.toThrow(GitHubServiceError);
+
+      await expect(
+        service.transferOwnership('owner', 'repo', 'invalid-owner', 'test-token')
+      ).rejects.toThrow(/validation failed/i);
+    });
+
+    it('should throw on unexpected status codes', async () => {
+      mockFetch.mockResolvedValue(
+        new Response('Internal Server Error', {
+          status: 500,
+          statusText: 'Internal Server Error',
+        })
+      );
+
+      await expect(
+        service.transferOwnership('owner', 'repo', 'new-owner', 'test-token')
+      ).rejects.toThrow(GitHubServiceError);
     });
   });
 });

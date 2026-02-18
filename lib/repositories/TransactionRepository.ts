@@ -92,7 +92,25 @@ export interface TransactionWithRelations extends Transaction {
     failedAt: Date | null;
     errorMessage: string | null;
     retryCount: number;
+    transferInitiatedAt: Date | null;
+    ownershipTransferredAt: Date | null;
     createdAt: Date;
+  } | null;
+}
+
+/**
+ * Lightweight transaction shape returned by findTransactionsForAutoTransfer.
+ * Used to drive the auto-transfer cron without loading full relations.
+ */
+export interface AutoTransferEligibleTransaction {
+  id: string;
+  createdAt: Date;
+  escrowReleaseDate: Date | null;
+  repositoryTransfer: {
+    id: string;
+    status: string;
+    buyerGithubUsername: string | null;
+    retryCount: number;
   } | null;
 }
 
@@ -935,6 +953,98 @@ export class TransactionRepository {
     } catch (error) {
       console.error('[TransactionRepository] countAllTransactions failed:', error);
       throw new Error('[TransactionRepository] Failed to count transactions');
+    }
+  }
+
+  /**
+   * Find transactions eligible for automatic ownership transfer processing.
+   *
+   * Returns GitHub-linked transactions whose escrow is 'held', payment succeeded,
+   * review period has ended (escrowReleaseDate <= now), and which have a
+   * RepositoryTransfer record. Used by the auto-transfer cron.
+   *
+   * @param now - Current timestamp for filtering by review period expiry
+   * @returns Lightweight transaction list with repositoryTransfer info
+   */
+  async findTransactionsForAutoTransfer(
+    now: Date
+  ): Promise<AutoTransferEligibleTransaction[]> {
+    try {
+      console.log('[TransactionRepository] findTransactionsForAutoTransfer called');
+
+      const transactions = await this.prisma.transaction.findMany({
+        where: {
+          escrowStatus: 'held',
+          paymentStatus: 'succeeded',
+          escrowReleaseDate: { lte: now },
+          project: {
+            githubUrl: { not: null },
+          },
+          repositoryTransfer: {
+            isNot: null,
+          },
+        },
+        select: {
+          id: true,
+          createdAt: true,
+          escrowReleaseDate: true,
+          repositoryTransfer: {
+            select: {
+              id: true,
+              status: true,
+              buyerGithubUsername: true,
+              retryCount: true,
+            },
+          },
+        },
+        take: 100,
+      });
+
+      return transactions as AutoTransferEligibleTransaction[];
+    } catch (error) {
+      console.error(
+        '[TransactionRepository] findTransactionsForAutoTransfer failed:',
+        error
+      );
+      throw new Error(
+        '[TransactionRepository] Failed to find transactions for auto-transfer'
+      );
+    }
+  }
+
+  /**
+   * Atomically claim a transaction for transfer processing.
+   *
+   * Uses an updateMany with a conditional WHERE clause to implement a compare-and-swap.
+   * Returns 1 if the claim succeeded (this worker owns it), 0 if another worker already
+   * claimed it (escrowStatus was not 'held').
+   *
+   * @param transactionId - Transaction ID to claim
+   * @returns 1 if claimed successfully, 0 if already claimed by another worker
+   */
+  async claimForTransferProcessing(transactionId: string): Promise<number> {
+    try {
+      console.log(
+        '[TransactionRepository] claimForTransferProcessing called:',
+        transactionId
+      );
+
+      const result = await this.prisma.transaction.updateMany({
+        where: {
+          id: transactionId,
+          escrowStatus: 'held',
+        },
+        data: {
+          escrowStatus: 'transfer_processing',
+        },
+      });
+
+      return result.count;
+    } catch (error) {
+      console.error('[TransactionRepository] claimForTransferProcessing failed:', error);
+      throw new Error(
+        '[TransactionRepository] Failed to claim transaction for transfer processing'
+      );
     }
   }
 

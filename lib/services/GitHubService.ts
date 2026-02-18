@@ -161,7 +161,6 @@ export class GitHubService {
 
     if (data.encoding === 'base64' && data.content) {
       const content = Buffer.from(data.content, 'base64').toString('utf-8');
-      // Truncate very long READMEs to keep token usage reasonable
       return content.length > 10000
         ? content.slice(0, 10000) + '\n\n[...truncated]'
         : content;
@@ -183,7 +182,6 @@ export class GitHubService {
     repo: string,
     token?: string
   ): Promise<{ deps: Record<string, string>; file: string }> {
-    // Try common dependency files in priority order
     const depFiles = [
       { path: 'package.json', parser: this.parsePackageJson },
       { path: 'requirements.txt', parser: this.parseRequirementsTxt },
@@ -205,7 +203,6 @@ export class GitHubService {
           return { deps: parser(content), file: path };
         }
       } catch {
-        // File not found, try next
         continue;
       }
     }
@@ -218,7 +215,6 @@ export class GitHubService {
     repo: string,
     token?: string
   ): Promise<RepoFileEntry[]> {
-    // First get default branch from metadata
     const repoData = await this.githubFetch(`/repos/${owner}/${repo}`, token);
     const branch = repoData.default_branch;
 
@@ -270,10 +266,6 @@ export class GitHubService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return response.json() as Promise<any>;
   }
-
-  // ============================================
-  // COLLABORATOR MANAGEMENT
-  // ============================================
 
   /**
    * Add a collaborator to a GitHub repository.
@@ -447,6 +439,83 @@ export class GitHubService {
   }
 
   /**
+   * Transfer ownership of a GitHub repository to a new owner.
+   *
+   * Calls GitHub's Transfer API: POST /repos/{owner}/{repo}/transfer
+   * Returns 202 Accepted (async) — the new owner must accept via email invitation.
+   *
+   * Error handling:
+   * - 401: Seller's OAuth token is expired or revoked (non-retryable — seller must reconnect)
+   * - 403: Token is valid but lacks admin permission on the repo
+   * - 404: Repository not found
+   * - 422: Validation failed (e.g., new owner does not exist)
+   *
+   * @param owner - Current repository owner
+   * @param repo - Repository name
+   * @param newOwner - GitHub username of the new owner
+   * @param token - Seller's OAuth access token
+   * @returns { success: true } when transfer is queued (202 response)
+   */
+  async transferOwnership(
+    owner: string,
+    repo: string,
+    newOwner: string,
+    token: string
+  ): Promise<{ success: boolean }> {
+    console.log('[GitHubService] Initiating ownership transfer', {
+      owner,
+      repo,
+      newOwner,
+    });
+
+    const response = await this.githubRequest(
+      `/repos/${owner}/${repo}/transfer`,
+      'POST',
+      token,
+      { new_owner: newOwner }
+    );
+
+    if (response.status === 202) {
+      console.log('[GitHubService] Ownership transfer queued successfully', {
+        owner,
+        repo,
+        newOwner,
+      });
+      return { success: true };
+    }
+
+    if (response.status === 401) {
+      throw new GitHubServiceError(
+        `Token expired or revoked — seller must reconnect GitHub account`,
+        401
+      );
+    }
+
+    if (response.status === 403) {
+      throw new GitHubServiceError(
+        `Forbidden: insufficient permissions to transfer ${owner}/${repo}`,
+        403
+      );
+    }
+
+    if (response.status === 404) {
+      throw new GitHubServiceError(`Repository ${owner}/${repo} not found`, 404);
+    }
+
+    if (response.status === 422) {
+      throw new GitHubServiceError(
+        `Validation failed: unable to transfer ${owner}/${repo} to ${newOwner}`,
+        422
+      );
+    }
+
+    throw new GitHubServiceError(
+      `GitHub API error: ${response.status} ${response.statusText}`,
+      response.status
+    );
+  }
+
+  /**
    * Generic GitHub API request helper that supports different HTTP methods.
    *
    * Unlike `githubFetch` (GET-only with auto-JSON parsing), this returns
@@ -479,8 +548,6 @@ export class GitHubService {
 
     return fetch(`${GITHUB_API_BASE}${path}`, options);
   }
-
-  // --- Dependency file parsers ---
 
   private parsePackageJson(content: string): Record<string, string> {
     try {

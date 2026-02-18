@@ -21,14 +21,14 @@
 import type { RepositoryTransfer } from '@prisma/client';
 import type { RepositoryTransferRepository } from '../repositories/RepositoryTransferRepository';
 import type {
+  AutoTransferEligibleTransaction,
   TransactionRepository,
   TransactionWithRelations,
 } from '../repositories/TransactionRepository';
+import { GitHubServiceError } from './GitHubService';
 import type { GitHubService } from './GitHubService';
 import type { NotificationService } from './NotificationService';
 import { decrypt } from '@/lib/encryption';
-
-// ---------- Error classes ----------
 
 export class RepositoryTransferValidationError extends Error {
   constructor(message: string) {
@@ -50,8 +50,6 @@ export class RepositoryTransferNotFoundError extends Error {
     this.name = 'RepositoryTransferNotFoundError';
   }
 }
-
-// ---------- Timeline types ----------
 
 export type TimelineStageStatus =
   | 'completed'
@@ -76,8 +74,6 @@ export interface TimelineStage {
   actions: TimelineAction[];
   metadata?: Record<string, unknown>;
 }
-
-// ---------- Service ----------
 
 export class RepositoryTransferService {
   constructor(
@@ -109,7 +105,6 @@ export class RepositoryTransferService {
       transactionId,
     });
 
-    // Fetch and validate transaction
     const transaction = await this.transactionRepository.findById(transactionId);
     if (!transaction) {
       throw new RepositoryTransferNotFoundError('Transaction not found');
@@ -129,14 +124,12 @@ export class RepositoryTransferService {
       throw new RepositoryTransferValidationError('Project has no GitHub repository');
     }
 
-    // Check no existing transfer
     const existingTransfer =
       await this.repositoryTransferRepository.findByTransactionId(transactionId);
     if (existingTransfer) {
       throw new RepositoryTransferValidationError('Transfer already initiated');
     }
 
-    // Validate seller GitHub connectivity
     const sellerGithubUsername = transaction.seller.githubUsername;
     const sellerGithubAccessToken = transaction.seller.githubAccessToken;
 
@@ -154,7 +147,6 @@ export class RepositoryTransferService {
     let transfer: RepositoryTransfer;
 
     if (buyerUsername) {
-      // Buyer has GitHub username — send invitation immediately
       await this.gitHubService.addCollaborator(owner, repo, buyerUsername, token);
 
       transfer = await this.repositoryTransferRepository.create({
@@ -167,7 +159,6 @@ export class RepositoryTransferService {
         invitationSentAt: new Date(),
       });
     } else {
-      // Buyer has no GitHub username — create pending transfer
       transfer = await this.repositoryTransferRepository.create({
         transactionId,
         githubRepoFullName: owner + '/' + repo,
@@ -179,7 +170,6 @@ export class RepositoryTransferService {
 
     console.log('[RepositoryTransferService] Transfer created:', transfer.id);
 
-    // Notify buyer (fire-and-forget)
     this.notificationService
       .createNotification({
         userId: transaction.buyerId,
@@ -203,10 +193,16 @@ export class RepositoryTransferService {
   }
 
   /**
-   * Set the buyer's GitHub username on a transfer.
+   * Set the buyer's GitHub username on a transfer and immediately grant collaborator access.
    *
-   * If the transfer was already initiated by the seller (status 'pending'),
-   * the invitation is sent automatically after setting the username.
+   * In the new purchase flow, sellers no longer manually initiate transfers.
+   * When the buyer submits their GitHub username after payment, this method:
+   * 1. Auto-creates a RepositoryTransfer record if none exists
+   * 2. Saves the buyer's GitHub username
+   * 3. Calls addCollaborator() to grant immediate access (unless already granted)
+   *
+   * The username is always saved, even if addCollaborator() fails, so the
+   * buyer can retry without losing their input.
    *
    * @param buyerId - Buyer user ID (must match transaction.buyerId)
    * @param transactionId - Transaction ID
@@ -224,7 +220,6 @@ export class RepositoryTransferService {
       username,
     });
 
-    // Fetch and validate transaction
     const transaction = await this.transactionRepository.findById(transactionId);
     if (!transaction) {
       throw new RepositoryTransferNotFoundError('Transaction not found');
@@ -236,26 +231,46 @@ export class RepositoryTransferService {
       );
     }
 
-    // Find existing transfer
-    const transfer =
-      await this.repositoryTransferRepository.findByTransactionId(transactionId);
-    if (!transfer) {
-      throw new RepositoryTransferNotFoundError('Repository transfer not found');
+    if (transaction.paymentStatus !== 'succeeded') {
+      throw new RepositoryTransferValidationError(
+        'Payment must be completed to access repository'
+      );
     }
 
-    // Update the username
+    if (!transaction.project.githubUrl) {
+      throw new RepositoryTransferValidationError('Project has no GitHub repository');
+    }
+
+    if (!transaction.seller.githubAccessToken) {
+      throw new RepositoryTransferValidationError(
+        'Seller GitHub account not connected — cannot grant collaborator access'
+      );
+    }
+
+    const { owner, repo } = this.gitHubService.parseGitHubUrl(
+      transaction.project.githubUrl
+    );
+    const token = decrypt(transaction.seller.githubAccessToken);
+
+    let transfer =
+      await this.repositoryTransferRepository.findByTransactionId(transactionId);
+    if (!transfer) {
+      transfer = await this.repositoryTransferRepository.create({
+        transactionId,
+        githubRepoFullName: owner + '/' + repo,
+        sellerGithubUsername: transaction.seller.githubUsername ?? '',
+        status: 'pending',
+        initiatedAt: new Date(),
+      });
+    }
+
     let updated = await this.repositoryTransferRepository.setBuyerGithubUsername(
       transfer.id,
       username
     );
 
-    // Auto-send invitation if transfer is pending and seller already initiated
-    if (transfer.status === 'pending' && transfer.initiatedAt) {
-      const token = decrypt(transaction.seller.githubAccessToken!);
-      const { owner, repo } = this.gitHubService.parseGitHubUrl(
-        transaction.project.githubUrl!
-      );
-
+    const needsCollaboratorAccess = ['pending', 'failed'].includes(transfer.status);
+    if (needsCollaboratorAccess) {
       await this.gitHubService.addCollaborator(owner, repo, username, token);
 
       updated = await this.repositoryTransferRepository.updateStatus(
@@ -285,7 +300,6 @@ export class RepositoryTransferService {
       transactionId,
     });
 
-    // Fetch and validate transaction
     const transaction = await this.transactionRepository.findById(transactionId);
     if (!transaction) {
       throw new RepositoryTransferNotFoundError('Transaction not found');
@@ -297,14 +311,12 @@ export class RepositoryTransferService {
       );
     }
 
-    // Find existing transfer
     const transfer =
       await this.repositoryTransferRepository.findByTransactionId(transactionId);
     if (!transfer) {
       throw new RepositoryTransferNotFoundError('Repository transfer not found');
     }
 
-    // Mark as completed
     const updated = await this.repositoryTransferRepository.updateStatus(
       transfer.id,
       'completed',
@@ -313,7 +325,6 @@ export class RepositoryTransferService {
 
     console.log('[RepositoryTransferService] Transfer confirmed:', updated.id);
 
-    // Notify seller (fire-and-forget)
     this.notificationService
       .createNotification({
         userId: transaction.sellerId,
@@ -350,7 +361,6 @@ export class RepositoryTransferService {
       userId,
     });
 
-    // Fetch and validate transaction
     const transaction = await this.transactionRepository.findById(transactionId);
     if (!transaction) {
       throw new RepositoryTransferNotFoundError('Transaction not found');
@@ -364,25 +374,23 @@ export class RepositoryTransferService {
 
     const role = userId === transaction.buyerId ? 'buyer' : 'seller';
 
-    // Stage 1 — Offer Accepted
     const stage1 = this.buildOfferAcceptedStage(transaction);
 
-    // Stage 2 — Payment Received
     const stage2 = this.buildPaymentReceivedStage(transaction);
 
-    // Stage 3 — Repository Transfer
     const stage3 = this.buildRepositoryTransferStage(transaction, role, transactionId);
 
-    // Stage 4 — Review Period
     const stage4 = this.buildReviewPeriodStage(transaction, stage3, role, transactionId);
 
-    // Stage 5 — Escrow Released
-    const stage5 = this.buildEscrowReleasedStage(transaction, stage4);
+    const stage5 = this.buildOwnershipTransferStage(
+      transaction,
+      stage4,
+      role,
+      transactionId
+    );
 
     return [stage1, stage2, stage3, stage4, stage5];
   }
-
-  // ---------- Private stage builders ----------
 
   private buildOfferAcceptedStage(transaction: TransactionWithRelations): TimelineStage {
     if (transaction.offer) {
@@ -395,7 +403,6 @@ export class RepositoryTransferService {
       };
     }
 
-    // Direct purchase (no offer)
     return {
       name: 'Offer Accepted',
       status: 'completed',
@@ -436,19 +443,16 @@ export class RepositoryTransferService {
 
   private buildRepositoryTransferStage(
     transaction: TransactionWithRelations,
-    role: string,
-    transactionId: string
+    _role: string,
+    _transactionId: string
   ): TimelineStage {
-    const actions: TimelineAction[] = [];
-
-    // No GitHub URL — skip stage
     if (!transaction.project.githubUrl) {
       return {
-        name: 'Repository Transfer',
+        name: 'Collaborator Access',
         status: 'skipped',
         completedAt: null,
         description: 'No GitHub repository linked to this project',
-        actions,
+        actions: [],
       };
     }
 
@@ -460,111 +464,88 @@ export class RepositoryTransferService {
 
       switch (transferRecord.status) {
         case 'completed':
-          status = 'completed';
-          description = 'Repository access has been transferred';
-          break;
         case 'invitation_sent':
         case 'accepted':
-          status = 'active';
+        case 'transfer_initiated':
+        case 'ownership_transferred':
+          status = 'completed';
           description =
-            transferRecord.status === 'invitation_sent'
-              ? 'GitHub invitation sent — waiting for buyer to accept'
-              : 'Invitation accepted — waiting for buyer to confirm access';
+            'Collaborator access granted — buyer has been added to the repository';
           break;
         case 'failed':
           status = 'failed';
           description =
-            'Repository transfer failed: ' +
+            'Collaborator access failed: ' +
             (transferRecord.errorMessage || 'Unknown error');
           break;
         case 'pending':
         default:
           status = 'active';
-          description = 'Transfer initiated — waiting for buyer GitHub username';
+          description = 'Awaiting buyer GitHub username';
           break;
       }
 
-      // Actions for buyer when invitation is sent
-      if (
-        role === 'buyer' &&
-        status === 'active' &&
-        transferRecord.status === 'invitation_sent'
-      ) {
-        actions.push({
-          label: 'Confirm Access',
-          type: 'primary',
-          apiEndpoint: '/api/transactions/' + transactionId + '/confirm-transfer',
-          apiMethod: 'POST',
-        });
-      }
-
       return {
-        name: 'Repository Transfer',
+        name: 'Collaborator Access',
         status,
-        completedAt: transferRecord.completedAt,
+        completedAt:
+          status === 'completed'
+            ? (transferRecord.invitationSentAt ?? transferRecord.completedAt)
+            : null,
         description,
-        actions,
+        actions: [],
       };
     }
 
-    // No transfer record yet
     const paymentSucceeded = transaction.paymentStatus === 'succeeded';
 
     if (!paymentSucceeded) {
       return {
-        name: 'Repository Transfer',
+        name: 'Collaborator Access',
         status: 'upcoming',
         completedAt: null,
         description: 'Will begin after payment is confirmed',
-        actions,
+        actions: [],
       };
     }
 
-    // Payment succeeded but no transfer initiated
-    if (role === 'seller') {
-      actions.push({
-        label: 'Transfer Repository',
-        type: 'primary',
-        apiEndpoint: '/api/transactions/' + transactionId + '/repository-transfer',
-        apiMethod: 'POST',
-      });
-    }
-
     return {
-      name: 'Repository Transfer',
+      name: 'Collaborator Access',
       status: 'active',
       completedAt: null,
-      description: 'Waiting for seller to initiate repository transfer',
-      actions,
+      description: 'Awaiting buyer GitHub username',
+      actions: [],
     };
   }
 
   private buildReviewPeriodStage(
     transaction: TransactionWithRelations,
-    stage3: TimelineStage,
+    _stage3: TimelineStage,
     role: string,
     transactionId: string
   ): TimelineStage {
     const actions: TimelineAction[] = [];
-    const transferDoneOrSkipped =
-      stage3.status === 'completed' || stage3.status === 'skipped';
     const paymentDone = transaction.paymentStatus === 'succeeded';
+    const escrowReleaseDate = transaction.escrowReleaseDate;
+    const now = new Date();
+
+    const daysRemaining = escrowReleaseDate
+      ? Math.max(0, Math.ceil((escrowReleaseDate.getTime() - now.getTime()) / 86400000))
+      : null;
 
     let status: TimelineStageStatus;
     let description: string;
 
-    const escrowReleaseDate = transaction.escrowReleaseDate;
-    const now = new Date();
-
     if (!paymentDone) {
       status = 'upcoming';
       description = 'Review period begins after payment';
-    } else if (paymentDone && escrowReleaseDate && now >= escrowReleaseDate) {
+    } else if (escrowReleaseDate && now >= escrowReleaseDate) {
       status = 'completed';
       description = 'Review period has ended';
-    } else if (paymentDone && transferDoneOrSkipped) {
+    } else {
       status = 'active';
-      description = 'Review period is active';
+      const days = daysRemaining ?? 7;
+      description = `${days} day${days !== 1 ? 's' : ''} remaining to review and raise any disputes`;
 
       if (role === 'buyer') {
         actions.push({
@@ -573,14 +554,7 @@ export class RepositoryTransferService {
           url: '/transactions/' + transactionId + '/review',
         });
       }
-    } else {
-      status = 'upcoming';
-      description = 'Review period begins after repository transfer';
     }
-
-    const daysRemaining = escrowReleaseDate
-      ? Math.max(0, Math.ceil((escrowReleaseDate.getTime() - now.getTime()) / 86400000))
-      : null;
 
     return {
       name: 'Review Period',
@@ -595,30 +569,251 @@ export class RepositoryTransferService {
     };
   }
 
-  private buildEscrowReleasedStage(
+  /**
+   * Perform the final GitHub ownership transfer for a transaction.
+   *
+   * Implements the full transfer pipeline:
+   * - Guard against duplicate processing (concurrency-safe via atomic escrow claim)
+   * - Call GitHub transfer API with seller's decrypted token
+   * - Release escrow if review period has ended; otherwise reset to 'held'
+   * - On retryable failure: increment retry count, update status to 'failed'
+   * - On 401 (token expired): do NOT increment retry count, update status to 'failed'
+   *
+   * @param transactionId - Transaction ID to transfer ownership for
+   * @returns `{ success: true }` on success, or `{ success: false, skipped, reason }` on skip
+   */
+  async transferOwnership(
+    transactionId: string,
+    callerSellerId?: string
+  ): Promise<{ success: boolean; skipped?: boolean; reason?: string }> {
+    console.log('[RepositoryTransferService] transferOwnership called:', transactionId);
+
+    const transaction = await this.transactionRepository.findById(transactionId);
+    if (!transaction) {
+      throw new RepositoryTransferNotFoundError('Transaction not found');
+    }
+
+    if (callerSellerId && transaction.sellerId !== callerSellerId) {
+      throw new RepositoryTransferPermissionError(
+        'Only the seller can initiate an ownership transfer'
+      );
+    }
+
+    const transfer =
+      await this.repositoryTransferRepository.findByTransactionId(transactionId);
+    if (!transfer) {
+      return { success: false, skipped: true, reason: 'No repository transfer record' };
+    }
+
+    if (transfer.status === 'pending') {
+      return {
+        success: false,
+        skipped: true,
+        reason: 'Transfer pending buyer GitHub username',
+      };
+    }
+
+    if (!transfer.buyerGithubUsername) {
+      return { success: false, skipped: true, reason: 'Buyer GitHub username not set' };
+    }
+
+    if (transfer.retryCount > 3) {
+      return { success: false, skipped: true, reason: 'Max retries exceeded' };
+    }
+
+    if (!transaction.project.githubUrl) {
+      return { success: false, skipped: true, reason: 'Project has no GitHub URL' };
+    }
+    if (!transaction.seller.githubAccessToken) {
+      return {
+        success: false,
+        skipped: true,
+        reason: 'Seller GitHub token not available',
+      };
+    }
+
+    const claimed =
+      await this.transactionRepository.claimForTransferProcessing(transactionId);
+    if (claimed === 0) {
+      return {
+        success: false,
+        skipped: true,
+        reason: 'Already being processed by another worker',
+      };
+    }
+
+    const { owner, repo } = this.gitHubService.parseGitHubUrl(
+      transaction.project.githubUrl
+    );
+    const token = decrypt(transaction.seller.githubAccessToken);
+
+    try {
+      await this.gitHubService.transferOwnership(
+        owner,
+        repo,
+        transfer.buyerGithubUsername,
+        token
+      );
+
+      await this.repositoryTransferRepository.updateStatus(
+        transfer.id,
+        'transfer_initiated',
+        {
+          transferInitiatedAt: new Date(),
+        }
+      );
+
+      const now = new Date();
+      const reviewEnded =
+        transaction.escrowReleaseDate != null && now >= transaction.escrowReleaseDate;
+
+      if (reviewEnded) {
+        await this.transactionRepository.releaseEscrow(transactionId);
+      } else {
+        await this.transactionRepository.updateEscrowStatus(transactionId, 'held');
+      }
+
+      return { success: true };
+    } catch (error) {
+      const isNonRetryable =
+        error instanceof GitHubServiceError && error.statusCode === 401;
+
+      if (isNonRetryable) {
+        console.error(
+          `[RepositoryTransferService] [ADMIN_ACTION_REQUIRED] Seller OAuth token expired/revoked for transaction ${transactionId}. ` +
+            `Seller must reconnect their GitHub account. Transfer ID: ${transfer.id}`
+        );
+      } else {
+        await this.repositoryTransferRepository.incrementRetryCount(transfer.id);
+      }
+
+      await this.repositoryTransferRepository.updateStatus(transfer.id, 'failed', {
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        failedAt: new Date(),
+      });
+
+      await this.transactionRepository.updateEscrowStatus(transactionId, 'held');
+
+      return { success: false };
+    }
+  }
+
+  /**
+   * Process all pending automatic ownership transfers (called by cron).
+   *
+   * Finds all GitHub-linked transactions with held escrow and attempts transfers.
+   * Skips pending transfers (buyer has not submitted username) without retry.
+   * Applies 14-day absolute fallback: if retries exhausted AND transaction is 14+ days old,
+   * releases escrow directly without a GitHub transfer.
+   *
+   * @returns `{ processed }` — count of transactions successfully handled
+   */
+  async processAutoTransfers(): Promise<{ processed: number }> {
+    console.log('[RepositoryTransferService] processAutoTransfers called');
+
+    const now = new Date();
+    const transactions =
+      await this.transactionRepository.findTransactionsForAutoTransfer(now);
+
+    let processed = 0;
+
+    for (const txn of transactions as AutoTransferEligibleTransaction[]) {
+      const rt = txn.repositoryTransfer;
+      if (!rt) continue;
+
+      if (rt.status === 'pending') {
+        continue;
+      }
+
+      if (rt.retryCount > 3) {
+        const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+        if (txn.createdAt <= fourteenDaysAgo) {
+          await this.transactionRepository.releaseEscrow(txn.id);
+          processed++;
+        }
+        continue;
+      }
+
+      try {
+        const result = await this.transferOwnership(txn.id);
+        if (result.success) {
+          processed++;
+        }
+      } catch (err) {
+        console.error(
+          '[RepositoryTransferService] Unexpected error processing transfer:',
+          txn.id,
+          err
+        );
+      }
+    }
+
+    return { processed };
+  }
+
+  private buildOwnershipTransferStage(
     transaction: TransactionWithRelations,
-    stage4: TimelineStage
+    stage4: TimelineStage,
+    role: string,
+    transactionId: string
   ): TimelineStage {
+    const actions: TimelineAction[] = [];
+    const transferRecord = transaction.repositoryTransfer;
+    const transferStatus = transferRecord?.status;
+    const escrowReleaseDate = transaction.escrowReleaseDate;
+    const now = new Date();
+    const reviewEnded = escrowReleaseDate != null && now >= escrowReleaseDate;
+
     let status: TimelineStageStatus;
     let description: string;
 
     if (transaction.escrowStatus === 'released') {
       status = 'completed';
-      description = 'Funds have been released to the seller';
-    } else if (stage4.status === 'completed') {
+      description = 'Ownership transferred — funds have been released to the seller';
+    } else if (
+      transferStatus === 'transfer_initiated' ||
+      transferStatus === 'ownership_transferred'
+    ) {
       status = 'active';
-      description = 'Escrow is ready to be released';
+      description =
+        'Ownership transfer in progress — buyer must accept the GitHub invitation';
+    } else if (stage4.status === 'completed' || reviewEnded) {
+      status = 'active';
+      description = 'Review period complete — awaiting ownership transfer';
+
+      if (role === 'seller' && transaction.project.githubUrl) {
+        actions.push({
+          label: 'Transfer Now',
+          type: 'primary',
+          apiEndpoint: '/api/transactions/' + transactionId + '/transfer-ownership',
+          apiMethod: 'POST',
+        });
+      }
     } else {
       status = 'upcoming';
-      description = 'Funds will be released after the review period';
+      description = 'Ownership transfer will happen after the review period';
+
+      if (
+        role === 'seller' &&
+        transaction.project.githubUrl &&
+        transferStatus &&
+        ['invitation_sent', 'accepted', 'completed'].includes(transferStatus)
+      ) {
+        actions.push({
+          label: 'Transfer Early',
+          type: 'secondary',
+          apiEndpoint: '/api/transactions/' + transactionId + '/transfer-ownership',
+          apiMethod: 'POST',
+        });
+      }
     }
 
     return {
-      name: 'Escrow Released',
+      name: 'Ownership Transfer',
       status,
       completedAt: transaction.releasedToSellerAt ?? null,
       description,
-      actions: [],
+      actions,
     };
   }
 }

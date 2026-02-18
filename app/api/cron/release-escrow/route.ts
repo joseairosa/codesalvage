@@ -26,7 +26,6 @@ import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
 
 const componentName = 'EscrowReleaseCron';
 
-// Initialize repositories and service
 const transactionRepository = new TransactionRepository(prisma);
 const userRepository = new UserRepository(prisma);
 const projectRepository = new ProjectRepository(prisma);
@@ -43,7 +42,6 @@ const transactionService = new TransactionService(
  */
 export async function GET() {
   try {
-    // Verify cron secret (security)
     const headersList = await headers();
     const authHeader = headersList.get('authorization');
     const expectedAuth = `Bearer ${env.CRON_SECRET}`;
@@ -57,14 +55,16 @@ export async function GET() {
 
     const now = new Date();
 
-    // Find transactions ready for escrow release
     const transactions = await prisma.transaction.findMany({
       where: {
         escrowStatus: 'held',
         escrowReleaseDate: {
-          lte: now, // Release date is in the past
+          lte: now,
         },
         paymentStatus: 'succeeded',
+        project: {
+          githubUrl: null,
+        },
       },
       include: {
         seller: {
@@ -83,7 +83,7 @@ export async function GET() {
           },
         },
       },
-      take: 50, // Process max 50 at a time
+      take: 50,
     });
 
     console.log(
@@ -93,12 +93,10 @@ export async function GET() {
     let successCount = 0;
     let errorCount = 0;
 
-    // Process each transaction
     for (const transaction of transactions) {
       try {
         console.log(`[${componentName}] Processing transaction:`, transaction.id);
 
-        // Check if seller has Stripe account
         if (!transaction.seller.stripeAccountId) {
           console.error(
             `[${componentName}] Seller has no Stripe account:`,
@@ -108,15 +106,13 @@ export async function GET() {
           continue;
         }
 
-        // Release escrow via TransactionService (handles validation and updates)
         await transactionService.releaseEscrow(transaction.id);
 
         console.log(`[${componentName}] Escrow released via service:`, transaction.id);
 
-        // Transfer funds to seller via Stripe Connect
         const transfer = await stripeService.transferToSeller(
           transaction.seller.stripeAccountId,
-          transaction.sellerReceivesCents, // Use seller amount after commission
+          transaction.sellerReceivesCents,
           transaction.id
         );
 
@@ -124,7 +120,6 @@ export async function GET() {
 
         successCount++;
 
-        // Send escrow release notification to seller
         try {
           await emailService.sendEscrowReleaseNotification(
             {
@@ -143,7 +138,6 @@ export async function GET() {
           console.log(`[${componentName}] Escrow release notification sent to seller`);
         } catch (emailError) {
           console.error(`[${componentName}] Failed to send email:`, emailError);
-          // Don't fail escrow release if email fails
         }
       } catch (error) {
         console.error(`[${componentName}] Failed to release escrow:`, {
@@ -151,9 +145,6 @@ export async function GET() {
           error: error instanceof Error ? error.message : 'Unknown error',
         });
         errorCount++;
-
-        // Mark transaction as having an error (optional)
-        // Could add an `escrowReleaseError` field to track failures
       }
     }
 

@@ -616,7 +616,7 @@ model RepositoryTransfer {
   method String @default("github_collaborator") @map("method") // 'github_collaborator', 'manual'
 
   // Status
-  status String @default("pending") @map("status") // 'pending', 'invitation_sent', 'accepted', 'completed', 'failed'
+  status String @default("pending") @map("status") // 'pending', 'invitation_sent', 'accepted', 'completed', 'transfer_initiated', 'ownership_transferred', 'failed'
 
   // GitHub invitation
   githubInvitationId String? @map("github_invitation_id")
@@ -629,8 +629,10 @@ model RepositoryTransfer {
   initiatedAt    DateTime? @map("initiated_at")
   invitationSentAt DateTime? @map("invitation_sent_at")
   acceptedAt     DateTime? @map("accepted_at")
-  completedAt    DateTime? @map("completed_at")
-  failedAt       DateTime? @map("failed_at")
+  completedAt          DateTime? @map("completed_at")
+  transferInitiatedAt  DateTime? @map("transfer_initiated_at")
+  ownershipTransferredAt DateTime? @map("ownership_transferred_at")
+  failedAt             DateTime? @map("failed_at")
 
   // Error tracking
   errorMessage String? @map("error_message") @db.Text

@@ -72,59 +72,69 @@ export default function HomePage() {
       {/* How It Works Section */}
       <section className="border-t bg-gray-50 py-20">
         <div className="container mx-auto">
-          <h2 className="mb-12 text-center text-3xl font-bold">How It Works</h2>
+          <h2 className="mb-4 text-center text-3xl font-bold">How It Works</h2>
+          <p className="mx-auto mb-12 max-w-2xl text-center text-gray-600">
+            Like a test drive — buyers get real collaborator access to review the code
+            before full ownership transfers.
+          </p>
 
           <div className="grid gap-8 md:grid-cols-3">
             <div className="flex flex-col items-center text-center">
               <div className="mb-4 h-32 w-32 overflow-hidden rounded-2xl">
                 <Image
-                  src="/images/step-list.png"
-                  alt="List your project"
-                  width={128}
-                  height={128}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <h3 className="mb-2 text-xl font-semibold">List Your Project</h3>
-              <p className="text-gray-600">
-                Upload your incomplete project with details about completion status, tech
-                stack, and known issues.
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4 h-32 w-32 overflow-hidden rounded-2xl">
-                <Image
-                  src="/images/step-connect.png"
-                  alt="Connect with buyers"
-                  width={128}
-                  height={128}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <h3 className="mb-2 text-xl font-semibold">Connect with Buyers</h3>
-              <p className="text-gray-600">
-                Buyers browse projects, message sellers with questions, and make purchase
-                decisions.
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4 h-32 w-32 overflow-hidden rounded-2xl">
-                <Image
                   src="/images/step-secure.png"
-                  alt="Secure transaction"
+                  alt="Purchase and get collaborator access"
                   width={128}
                   height={128}
                   className="h-full w-full object-cover"
                 />
               </div>
-              <h3 className="mb-2 text-xl font-semibold">Secure Transaction</h3>
+              <h3 className="mb-2 text-xl font-semibold">Buy &amp; Get Access</h3>
               <p className="text-gray-600">
-                Payments are processed securely with 7-day escrow protection for buyer
-                confidence.
+                Purchase a project and you&apos;re immediately added as a GitHub
+                collaborator — review the real code before committing to ownership.
               </p>
             </div>
+
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-4 h-32 w-32 overflow-hidden rounded-2xl">
+                <Image
+                  src="/images/step-review.png"
+                  alt="7-day review period"
+                  width={128}
+                  height={128}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <h3 className="mb-2 text-xl font-semibold">7-Day Test Drive</h3>
+              <p className="text-gray-600">
+                You have 7 days to review the codebase as a collaborator. Raise any
+                concerns within this window — your payment stays in escrow until then.
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-4 h-32 w-32 overflow-hidden rounded-2xl">
+                <Image
+                  src="/images/step-transfer.png"
+                  alt="Ownership transfer"
+                  width={128}
+                  height={128}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <h3 className="mb-2 text-xl font-semibold">Ownership Transfers</h3>
+              <p className="text-gray-600">
+                After the review period, full repository ownership is automatically
+                transferred to your GitHub account and funds are released to the seller.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <Button asChild variant="outline" size="lg">
+              <Link href="/how-it-works">Learn More</Link>
+            </Button>
           </div>
         </div>
       </section>

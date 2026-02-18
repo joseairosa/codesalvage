@@ -391,8 +391,8 @@ function CheckoutSuccessContent() {
                             </Button>
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            You will receive a GitHub collaborator invitation. The seller
-                            will be notified to initiate the transfer.
+                            You will be automatically added as a collaborator so you can
+                            review the code during the 7-day review period.
                           </p>
                         </div>
 
@@ -415,42 +415,58 @@ function CheckoutSuccessContent() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex gap-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
                     1
                   </div>
                   <div>
-                    <h4 className="font-semibold">Code Access</h4>
+                    <h4 className="font-semibold">Collaborator Access</h4>
                     <p className="text-sm text-muted-foreground">
                       {hasGithubRepo
-                        ? 'Enter your GitHub username above to receive an invitation to the private repository.'
-                        : 'You now have immediate access to download the project code and repository.'}
+                        ? "Enter your GitHub username above. You'll be immediately added as a collaborator so you can review the real repository."
+                        : 'You now have immediate access to download the project code and assets.'}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
                     2
                   </div>
                   <div>
                     <h4 className="font-semibold">7-Day Review Period</h4>
                     <p className="text-sm text-muted-foreground">
-                      Your payment is held in escrow until{' '}
-                      {formatDate(transaction.escrowReleaseDate)}. If you&apos;re not
-                      satisfied, request a refund within this period.
+                      Your payment is held in escrow while you review the code. You have
+                      until{' '}
+                      <span className="font-medium">
+                        {formatDate(transaction.escrowReleaseDate)}
+                      </span>{' '}
+                      to raise any concerns.
                     </p>
                   </div>
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
                     3
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">Ownership Transfer</h4>
+                    <p className="text-sm text-muted-foreground">
+                      After the review period, full repository ownership is automatically
+                      transferred to your GitHub account.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    4
                   </div>
                   <div>
                     <h4 className="font-semibold">Funds Released</h4>
                     <p className="text-sm text-muted-foreground">
-                      After the review period, funds are automatically released to the
-                      seller.
+                      Once the ownership transfer is confirmed, escrowed funds are
+                      released to the seller. The deal is complete.
                     </p>
                   </div>
                 </div>
