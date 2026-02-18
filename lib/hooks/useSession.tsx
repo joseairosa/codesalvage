@@ -34,6 +34,7 @@ interface SessionUser {
   email: string;
   name?: string;
   username: string;
+  githubUsername: string | null;
   isSeller: boolean;
   isVerifiedSeller: boolean;
   isAdmin: boolean;
@@ -92,17 +93,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     console.log('[AuthProvider] Setting up auth state listener');
 
-    // Guard against null firebaseAuth (Firebase not configured)
     if (!firebaseAuth) {
       console.warn('[AuthProvider] Firebase not configured, skipping auth listener');
       setStatus('unauthenticated');
       return;
     }
 
-    // Use onIdTokenChanged instead of onAuthStateChanged so the session
-    // cookie stays fresh. Firebase ID tokens expire after 1 hour — this
-    // listener fires on sign-in, sign-out, AND automatic token refreshes
-    // (~every 55 minutes), keeping the httpOnly cookie up to date.
     const unsubscribe = onIdTokenChanged(
       firebaseAuth,
       async (firebaseUser: FirebaseUser | null) => {
@@ -112,7 +108,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         );
 
         if (firebaseUser) {
-          // Store fresh ID token in httpOnly cookie
           try {
             const idToken = await firebaseUser.getIdToken();
 
@@ -122,8 +117,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               body: JSON.stringify({ idToken }),
             });
 
-            // Only fetch user data if we don't have a session yet
-            // (avoid re-fetching on every token refresh)
             if (!sessionRef.current) {
               const userData = await fetchUserData();
 
@@ -137,7 +130,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setStatus('authenticated');
                 console.log('[AuthProvider] Authenticated:', userData.id);
               } else {
-                // User exists in Firebase but not in database yet
                 updateSession(null);
                 setStatus('unauthenticated');
                 console.log('[AuthProvider] Firebase user exists but no database user');
@@ -151,12 +143,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setStatus('unauthenticated');
           }
         } else {
-          // Clear session
           try {
             await fetch('/api/auth/session', { method: 'DELETE' });
-          } catch {
-            // Ignore cleanup errors
-          }
+          } catch {}
           updateSession(null);
           setStatus('unauthenticated');
           console.log('[AuthProvider] Unauthenticated');

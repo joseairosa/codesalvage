@@ -44,6 +44,7 @@ import Image from 'next/image';
 import {
   GithubAuthProvider,
   signInWithPopup,
+  linkWithPopup,
   getAdditionalUserInfo,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -83,7 +84,7 @@ interface Transaction {
 function CheckoutSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: _session, status: sessionStatus } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
 
   const transactionId = searchParams.get('transactionId');
 
@@ -146,8 +147,29 @@ function CheckoutSuccessContent() {
     setGithubSuccess(null);
 
     try {
+      const existingGithubUsername = session?.user?.githubUsername;
+      if (existingGithubUsername) {
+        const response = await fetch(`/api/transactions/${transactionId}/buyer-github`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: existingGithubUsername }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Failed to set GitHub username');
+        const refreshResponse = await fetch(`/api/transactions/${transactionId}`);
+        if (refreshResponse.ok)
+          setTransaction((await refreshResponse.json()).transaction);
+        setGithubSuccess(
+          'GitHub invitation sent! Check your GitHub notifications to accept repository access.'
+        );
+        return;
+      }
+
       const provider = new GithubAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
+      const currentUser = auth.currentUser;
+      const userCredential = currentUser
+        ? await linkWithPopup(currentUser, provider)
+        : await signInWithPopup(auth, provider);
 
       const idToken = await userCredential.user.getIdToken();
       await fetch('/api/auth/session', {
@@ -190,6 +212,32 @@ function CheckoutSuccessContent() {
       );
     } catch (err: any) {
       if (err.code === 'auth/popup-closed-by-user') {
+      } else if (err.code === 'auth/provider-already-linked' && transactionId) {
+        const username = (
+          getAdditionalUserInfo(err.credential)?.profile as { login?: string } | null
+        )?.login;
+        if (username) {
+          const response = await fetch(
+            `/api/transactions/${transactionId}/buyer-github`,
+            {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username }),
+            }
+          );
+          if (response.ok) {
+            const refreshResponse = await fetch(`/api/transactions/${transactionId}`);
+            if (refreshResponse.ok) {
+              setTransaction((await refreshResponse.json()).transaction);
+            }
+            setGithubSuccess(
+              'GitHub invitation sent! Check your GitHub notifications to accept repository access.'
+            );
+          } else {
+            const data = await response.json();
+            setGithubError(data.error || 'Failed to set GitHub username');
+          }
+        }
       } else {
         console.error(`[${componentName}] GitHub OAuth error:`, err);
         setGithubError(err instanceof Error ? err.message : 'Failed to connect GitHub');
@@ -383,8 +431,9 @@ function CheckoutSuccessContent() {
                     githubStatus !== 'accepted' && (
                       <div className="space-y-4">
                         <p className="text-sm text-muted-foreground">
-                          Sign in with GitHub to be automatically added as a collaborator
-                          so you can review the code during the 7-day review period.
+                          {session?.user?.githubUsername
+                            ? `Connect your GitHub account (@${session.user.githubUsername}) to be added as a collaborator.`
+                            : 'Sign in with GitHub to be automatically added as a collaborator so you can review the code during the 7-day review period.'}
                         </p>
                         <Button
                           onClick={handleGithubOAuth}
@@ -396,7 +445,9 @@ function CheckoutSuccessContent() {
                           ) : (
                             <Github className="h-4 w-4" />
                           )}
-                          Sign in with GitHub
+                          {session?.user?.githubUsername
+                            ? 'Grant Repository Access'
+                            : 'Sign in with GitHub'}
                         </Button>
 
                         {githubError && (

@@ -27,6 +27,7 @@ export async function GET() {
         id: auth.user.id,
         email: auth.user.email,
         username: auth.user.username,
+        githubUsername: auth.user.githubUsername ?? null,
         isSeller: auth.user.isSeller,
         isVerifiedSeller: auth.user.isVerifiedSeller,
         isAdmin: auth.user.isAdmin,

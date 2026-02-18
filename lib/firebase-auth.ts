@@ -22,6 +22,7 @@ export interface AuthResult {
     id: string;
     email: string;
     username: string;
+    githubUsername: string | null;
     isAdmin: boolean;
     isSeller: boolean;
     isVerifiedSeller: boolean;
@@ -47,7 +48,6 @@ export class AuthenticationError extends Error {
  * 3. Database failure (Prisma errors, user creation issues)
  */
 export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
-  // Step 1: Get Firebase Auth instance (may fail if Admin SDK not configured)
   let authInstance: ReturnType<typeof getAuth>;
   try {
     authInstance = getAuth();
@@ -57,7 +57,6 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
     throw new AuthenticationError(`Firebase Admin SDK not configured: ${msg}`);
   }
 
-  // Step 2: Verify the ID token
   let decodedToken;
   try {
     decodedToken = await authInstance.verifyIdToken(token);
@@ -75,17 +74,11 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
   const firebaseUid = decodedToken.uid;
   console.log('[Firebase Auth] Token verified for UID:', firebaseUid);
 
-  // Step 3: Find or create user in database
-  //
-  // Migration strategy for Auth.js → Firebase:
-  // 1. Look up by firebaseUid (returning Firebase users)
-  // 2. If not found, look up by email (existing Auth.js users)
-  //    → Link their account by setting firebaseUid
-  // 3. If neither found, create a new user
   const userSelect = {
     id: true,
     email: true,
     username: true,
+    githubUsername: true,
     isAdmin: true,
     isSeller: true,
     isVerifiedSeller: true,
@@ -98,8 +91,6 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
       select: userSelect,
     });
 
-    // Not found by firebaseUid — check if an existing user has this email
-    // (Auth.js users who haven't been linked to Firebase yet)
     if (!user && decodedToken.email) {
       const existingUser = await prisma.user.findUnique({
         where: { email: decodedToken.email },
@@ -107,7 +98,6 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
       });
 
       if (existingUser && !existingUser.firebaseUid) {
-        // Link existing Auth.js user to their Firebase account
         console.log(
           '[Firebase Auth] Linking existing user to Firebase:',
           existingUser.id,
@@ -126,7 +116,6 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
 
         console.log('[Firebase Auth] Successfully linked user:', user.id);
       } else if (!existingUser) {
-        // No user exists at all — create a new one
         console.log('[Firebase Auth] Creating new user for:', decodedToken.email);
 
         const email = decodedToken.email;
@@ -142,7 +131,6 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
 
         console.log('[Firebase Auth] Created new user:', user.id);
       } else {
-        // User exists but already linked to a different Firebase UID
         console.warn(
           '[Firebase Auth] Email already linked to different Firebase UID:',
           existingUser.id
@@ -178,7 +166,6 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
  * Verify API key (sk-xxx format) and return user
  */
 export async function verifyApiKey(key: string): Promise<AuthResult> {
-  // Hash the API key (we store SHA-256 hash, never plaintext)
   const keyHash = crypto.createHash('sha256').update(key).digest('hex');
 
   const apiKey = await prisma.apiKey.findUnique({
@@ -189,6 +176,7 @@ export async function verifyApiKey(key: string): Promise<AuthResult> {
           id: true,
           email: true,
           username: true,
+          githubUsername: true,
           isAdmin: true,
           isSeller: true,
           isVerifiedSeller: true,
@@ -220,7 +208,6 @@ export async function verifyApiKey(key: string): Promise<AuthResult> {
 
   console.log('[API Key] Valid key used:', apiKey.prefix);
 
-  // Update usage tracking (fire and forget)
   prisma.apiKey
     .update({
       where: { id: apiKey.id },
@@ -248,13 +235,11 @@ export async function verifyAuth(authHeader: string | null): Promise<AuthResult>
 
   const token = authHeader.replace('Bearer ', '');
 
-  // API Key authentication (sk-xxx format)
   if (token.startsWith('sk-')) {
     console.log('[Auth] API key authentication attempt');
     return await verifyApiKey(token);
   }
 
-  // Firebase token authentication
   console.log('[Auth] Firebase token authentication attempt');
   return await verifyFirebaseToken(token);
 }
