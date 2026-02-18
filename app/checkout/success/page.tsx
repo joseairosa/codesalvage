@@ -51,11 +51,11 @@ interface Transaction {
     title: string;
     description: string;
     completionPercentage: number;
-    seller: {
-      id: string;
-      username: string | null;
-      fullName: string | null;
-    };
+  };
+  seller: {
+    id: string;
+    username: string | null;
+    fullName: string | null;
   };
 }
 
@@ -96,7 +96,7 @@ function CheckoutSuccessContent() {
         }
 
         const data = await response.json();
-        setTransaction(data);
+        setTransaction(data.transaction);
 
         console.log(`[${componentName}] Transaction loaded`);
       } catch (err) {

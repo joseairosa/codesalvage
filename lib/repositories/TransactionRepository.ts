@@ -145,6 +145,7 @@ export class TransactionRepository {
               id: true,
               title: true,
               description: true,
+              completionPercentage: true,
               thumbnailImageUrl: true,
               priceCents: true,
               status: true,
