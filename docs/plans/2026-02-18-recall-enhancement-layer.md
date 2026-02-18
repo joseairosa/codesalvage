@@ -29,6 +29,7 @@ Worktree: No
 ### In Scope
 
 **Phase 1 — Methodology Serving (6 tasks)**
+
 - `MethodologyTemplate` schema and storage keys in `src/types.ts`
 - `MethodologyStore` persistence layer for CRUD + search + versioning
 - `MethodologyService` business logic (create, get, list, fork, version)
@@ -38,6 +39,7 @@ Worktree: No
 - Tests for service + tools
 
 **Phase 2 — Plan Management (6 tasks)**
+
 - `Plan` and `PlanTask` schemas and storage keys in `src/types.ts`
 - `PlanStore` persistence layer for plans and tasks
 - `PlanService` business logic (create, get, update task status, link to workflow)
@@ -47,6 +49,7 @@ Worktree: No
 - Tests for service + tools
 
 **Phase 3 — Review Audit Trail (5 tasks)**
+
 - `ReviewFinding` and `QualityGate` schemas and storage keys in `src/types.ts`
 - `ReviewStore` persistence layer
 - `ReviewService` business logic (store review, get history, configure gates)
@@ -54,6 +57,7 @@ Worktree: No
 - Tests for service + tools
 
 **Phase 4 — Integration & Intelligence (3 tasks)**
+
 - Enhance `auto_session_start` to detect task type and recommend methodologies
 - MCP prompt for the enhancement layer overview
 - REST API endpoints for dashboard visibility (methodology list, plan status, review history)
@@ -93,18 +97,18 @@ Worktree: No
 
 ### Key Files
 
-| File | Purpose | Relevant Lines |
-|------|---------|---------------|
-| `src/types.ts` | All Zod schemas, types, storage keys | `StorageKeys` at L278, `WorkflowStorageKeys` at L741 |
-| `src/tools/index.ts` | Tool registry, `setMemoryStore()` wiring | `setMemoryStore` function, `tools` export |
-| `src/tools/workflow-tools.ts` | Reference pattern for new tool modules | Full file — thin handlers + service delegation |
-| `src/services/workflow.service.ts` | Reference pattern for new services | Full file — constructor DI, async methods |
-| `src/persistence/workflow-store.ts` | Reference pattern for new stores | Full file — Redis hash + sorted set operations |
-| `src/persistence/memory-store.ts` | MemoryStore constructor and workspace scoping | Constructor at L42, `createMemory` pattern |
-| `src/prompts/index.ts` | MCP prompt definitions | `prompts` object, `listPrompts`, `getPrompt` |
-| `src/http/types.ts` | `PLAN_LIMITS` constant, `TenantContext` | `PLAN_LIMITS` at L50 |
-| `src/http/server.ts` | REST API endpoint definitions | Workspace endpoints pattern at L1977+ |
-| `src/http/mcp-handler.ts` | MCP session handler, per-tenant store injection | `setMemoryStore` call pattern |
+| File                                | Purpose                                         | Relevant Lines                                       |
+| ----------------------------------- | ----------------------------------------------- | ---------------------------------------------------- |
+| `src/types.ts`                      | All Zod schemas, types, storage keys            | `StorageKeys` at L278, `WorkflowStorageKeys` at L741 |
+| `src/tools/index.ts`                | Tool registry, `setMemoryStore()` wiring        | `setMemoryStore` function, `tools` export            |
+| `src/tools/workflow-tools.ts`       | Reference pattern for new tool modules          | Full file — thin handlers + service delegation       |
+| `src/services/workflow.service.ts`  | Reference pattern for new services              | Full file — constructor DI, async methods            |
+| `src/persistence/workflow-store.ts` | Reference pattern for new stores                | Full file — Redis hash + sorted set operations       |
+| `src/persistence/memory-store.ts`   | MemoryStore constructor and workspace scoping   | Constructor at L42, `createMemory` pattern           |
+| `src/prompts/index.ts`              | MCP prompt definitions                          | `prompts` object, `listPrompts`, `getPrompt`         |
+| `src/http/types.ts`                 | `PLAN_LIMITS` constant, `TenantContext`         | `PLAN_LIMITS` at L50                                 |
+| `src/http/server.ts`                | REST API endpoint definitions                   | Workspace endpoints pattern at L1977+                |
+| `src/http/mcp-handler.ts`           | MCP session handler, per-tenant store injection | `setMemoryStore` call pattern                        |
 
 ### Gotchas
 
@@ -158,9 +162,11 @@ ws:{wsId}:quality-gates                 → hash (QualityGateConfig)
 Done: 0 | Left: 6
 
 #### Task 1: Define Methodology Schemas and Storage Keys
+
 - [ ] Complete
 
 **Files:**
+
 - Modify: `src/types.ts` (add schemas at end of file, before closing)
 
 **What to implement:**
@@ -187,8 +193,14 @@ export const MethodologyTemplateSchema = z.object({
   display_name: z.string().describe('Human-readable name'),
   description: z.string().describe('What this methodology does and when to use it'),
   version: z.number().min(1).default(1).describe('Version number (auto-incremented)'),
-  phases: z.array(MethodologyPhaseSchema).min(1).describe('Ordered phases of the methodology'),
-  triggers: z.array(z.string()).default([]).describe('Keywords/patterns that suggest this methodology'),
+  phases: z
+    .array(MethodologyPhaseSchema)
+    .min(1)
+    .describe('Ordered phases of the methodology'),
+  triggers: z
+    .array(z.string())
+    .default([])
+    .describe('Keywords/patterns that suggest this methodology'),
   tags: z.array(z.string()).default([]).describe('Categorization tags'),
   is_builtin: z.boolean().default(false).describe('True for system-provided defaults'),
   forked_from: z.string().optional().describe('ID of methodology this was forked from'),
@@ -201,7 +213,11 @@ export type MethodologyTemplate = z.infer<typeof MethodologyTemplateSchema>;
 export const CreateMethodologySchema = z.object({
   name: z.string().min(1).max(100).describe('Short slug name (lowercase, hyphens)'),
   display_name: z.string().min(1).max(200).describe('Human-readable name'),
-  description: z.string().min(1).max(2000).describe('Description and when-to-use guidance'),
+  description: z
+    .string()
+    .min(1)
+    .max(2000)
+    .describe('Description and when-to-use guidance'),
   phases: z.array(MethodologyPhaseSchema).min(1).max(20).describe('Methodology phases'),
   triggers: z.array(z.string()).default([]).describe('Auto-detection trigger keywords'),
   tags: z.array(z.string()).default([]).describe('Tags for categorization'),
@@ -209,7 +225,10 @@ export const CreateMethodologySchema = z.object({
 export type CreateMethodology = z.infer<typeof CreateMethodologySchema>;
 
 export const GetMethodologySchema = z.object({
-  name: z.string().optional().describe('Get by name (checks workspace first, then built-in)'),
+  name: z
+    .string()
+    .optional()
+    .describe('Get by name (checks workspace first, then built-in)'),
   id: z.string().optional().describe('Get by ID directly'),
 });
 export type GetMethodology = z.infer<typeof GetMethodologySchema>;
@@ -223,24 +242,33 @@ export type ListMethodologies = z.infer<typeof ListMethodologiesSchema>;
 export const ForkMethodologySchema = z.object({
   source_id: z.string().describe('ID of methodology to fork (can be built-in)'),
   name: z.string().optional().describe('New name (defaults to original name)'),
-  customizations: z.object({
-    phases: z.array(MethodologyPhaseSchema).optional(),
-    description: z.string().optional(),
-    triggers: z.array(z.string()).optional(),
-  }).optional().describe('Override specific fields'),
+  customizations: z
+    .object({
+      phases: z.array(MethodologyPhaseSchema).optional(),
+      description: z.string().optional(),
+      triggers: z.array(z.string()).optional(),
+    })
+    .optional()
+    .describe('Override specific fields'),
 });
 export type ForkMethodology = z.infer<typeof ForkMethodologySchema>;
 
 export const RecommendMethodologySchema = z.object({
-  task_description: z.string().describe('Description of the task to get methodology recommendation for'),
-  context: z.string().optional().describe('Additional context about the project or constraints'),
+  task_description: z
+    .string()
+    .describe('Description of the task to get methodology recommendation for'),
+  context: z
+    .string()
+    .optional()
+    .describe('Additional context about the project or constraints'),
 });
 export type RecommendMethodology = z.infer<typeof RecommendMethodologySchema>;
 
 export const MethodologyStorageKeys = {
   methodology: (workspace: string, id: string) => `ws:${workspace}:methodology:${id}`,
   methodologies: (workspace: string) => `ws:${workspace}:methodologies:all`,
-  methodologyByName: (workspace: string, name: string) => `ws:${workspace}:methodology:name:${name}`,
+  methodologyByName: (workspace: string, name: string) =>
+    `ws:${workspace}:methodology:name:${name}`,
   builtinMethodology: (id: string) => `builtin:methodology:${id}`,
   builtinMethodologies: () => `builtin:methodologies:all`,
   builtinMethodologyByName: (name: string) => `builtin:methodology:name:${name}`,
@@ -252,9 +280,11 @@ export const MethodologyStorageKeys = {
 ---
 
 #### Task 2: Implement MethodologyService
+
 - [ ] Complete
 
 **Files:**
+
 - Create: `src/services/methodology.service.ts`
 - Create: `src/services/methodology.service.test.ts`
 
@@ -267,25 +297,25 @@ export class MethodologyService {
   constructor(private readonly store: MemoryStore) {}
 
   /** Create a new workspace-scoped methodology */
-  async createMethodology(input: CreateMethodology): Promise<MethodologyTemplate>
+  async createMethodology(input: CreateMethodology): Promise<MethodologyTemplate>;
 
   /** Get by name (workspace first, then built-in) or by ID */
-  async getMethodology(opts: GetMethodology): Promise<MethodologyTemplate | null>
+  async getMethodology(opts: GetMethodology): Promise<MethodologyTemplate | null>;
 
   /** List all methodologies (workspace + optionally built-in) */
-  async listMethodologies(opts: ListMethodologies): Promise<MethodologyTemplate[]>
+  async listMethodologies(opts: ListMethodologies): Promise<MethodologyTemplate[]>;
 
   /** Fork a methodology (built-in or workspace) into workspace scope */
-  async forkMethodology(input: ForkMethodology): Promise<MethodologyTemplate>
+  async forkMethodology(input: ForkMethodology): Promise<MethodologyTemplate>;
 
   /** Recommend a methodology based on task description (keyword matching against triggers) */
   async recommendMethodology(input: RecommendMethodology): Promise<{
     recommended: MethodologyTemplate | null;
     alternatives: Array<{ methodology: MethodologyTemplate; match_score: number }>;
-  }>
+  }>;
 
   /** Seed built-in methodologies (called on server startup) */
-  async seedBuiltins(): Promise<void>
+  async seedBuiltins(): Promise<void>;
 }
 ```
 
@@ -300,9 +330,11 @@ The service needs direct Redis access via `MemoryStore`'s underlying `StorageCli
 ---
 
 #### Task 3: Define Built-in Methodology Content
+
 - [ ] Complete
 
 **Files:**
+
 - Create: `src/services/methodology-builtins.ts`
 
 **What to implement:**
@@ -310,6 +342,7 @@ The service needs direct Redis access via `MemoryStore`'s underlying `StorageCli
 Define the content for 5 built-in methodologies as TypeScript constants. Each is a `CreateMethodology` object with full phase prompts. These are the "Superpowers-equivalent" methodologies served remotely:
 
 **1. `brainstorming`** — Socratic design refinement before coding
+
 - Phase 1: "Understand the Problem" — Ask clarifying questions, identify stakeholders, define success criteria
 - Phase 2: "Explore Alternatives" — Generate 2-3 approaches, evaluate trade-offs
 - Phase 3: "Design Validation" — Present design in digestible chunks, get sign-off
@@ -317,6 +350,7 @@ Define the content for 5 built-in methodologies as TypeScript constants. Each is
 - Triggers: `["new feature", "design", "architecture", "how should we", "build", "implement"]`
 
 **2. `systematic-debugging`** — 4-phase root cause analysis
+
 - Phase 1: "Reproduce & Observe" — Reproduce consistently, read errors completely, check recent changes
 - Phase 2: "Trace & Isolate" — Find working examples, compare against references, identify differences
 - Phase 3: "Hypothesize & Test" — Form specific falsifiable hypothesis, test with minimal change
@@ -324,6 +358,7 @@ Define the content for 5 built-in methodologies as TypeScript constants. Each is
 - Triggers: `["bug", "error", "broken", "not working", "crash", "fail", "debug"]`
 
 **3. `test-driven-development`** — RED-GREEN-REFACTOR enforcement
+
 - Phase 1: "Write Failing Test" — One minimal test for desired behavior, verify it fails correctly
 - Phase 2: "Implement Minimum" — Simplest code that passes, no extras
 - Phase 3: "Refactor" — Improve quality while tests stay green
@@ -331,12 +366,14 @@ Define the content for 5 built-in methodologies as TypeScript constants. Each is
 - Triggers: `["tdd", "test first", "red green", "new function", "new endpoint"]`
 
 **4. `code-review`** — Two-stage review (spec compliance + quality)
+
 - Phase 1: "Spec Compliance" — Verify all requirements met, nothing extra, nothing missing
 - Phase 2: "Code Quality" — Check naming, patterns, error handling, performance, security
 - Phase 3: "Report Findings" — Categorize as must_fix / should_fix / suggestion
 - Triggers: `["review", "check code", "quality", "ready to merge"]`
 
 **5. `plan-writing`** — Granular implementation planning
+
 - Phase 1: "Analyze Requirements" — Break down feature into components, identify dependencies
 - Phase 2: "Design Tasks" — Create bite-sized tasks with exact file paths and code
 - Phase 3: "Define Verification" — Add test commands and expected output per task
@@ -350,9 +387,11 @@ Each phase's `prompt_template` should be a comprehensive prompt (200-500 words) 
 ---
 
 #### Task 4: Implement Methodology MCP Tools
+
 - [ ] Complete
 
 **Files:**
+
 - Create: `src/tools/methodology-tools.ts`
 - Modify: `src/tools/index.ts` (wire up new tools)
 
@@ -363,47 +402,63 @@ Each phase's `prompt_template` should be a comprehensive prompt (200-500 words) 
 ```typescript
 export const methodologyTools = {
   get_methodology: {
-    description: 'Get a development methodology by name or ID. ' +
+    description:
+      'Get a development methodology by name or ID. ' +
       'Returns structured phases with prompt templates for the AI agent to follow. ' +
       'Checks workspace-specific methodologies first, then falls back to built-in defaults. ' +
       'Built-in methodologies: brainstorming, systematic-debugging, test-driven-development, code-review, plan-writing.',
     inputSchema: zodToJsonSchema(GetMethodologySchema),
-    handler: async (args) => { /* delegate to service.getMethodology() */ },
+    handler: async (args) => {
+      /* delegate to service.getMethodology() */
+    },
   },
 
   list_methodologies: {
-    description: 'List all available development methodologies (workspace-specific and built-in). ' +
+    description:
+      'List all available development methodologies (workspace-specific and built-in). ' +
       'Use this to discover what methodologies are available before starting a task.',
     inputSchema: zodToJsonSchema(ListMethodologiesSchema),
-    handler: async (args) => { /* delegate to service.listMethodologies() */ },
+    handler: async (args) => {
+      /* delegate to service.listMethodologies() */
+    },
   },
 
   create_methodology: {
-    description: 'Create a custom development methodology for this workspace. ' +
+    description:
+      'Create a custom development methodology for this workspace. ' +
       'Define phases with prompt templates that AI agents will follow. ' +
       'For customizing a built-in methodology, use fork_methodology instead.',
     inputSchema: zodToJsonSchema(CreateMethodologySchema),
-    handler: async (args) => { /* delegate to service.createMethodology() */ },
+    handler: async (args) => {
+      /* delegate to service.createMethodology() */
+    },
   },
 
   fork_methodology: {
-    description: 'Fork a built-in or existing methodology into your workspace for customization. ' +
+    description:
+      'Fork a built-in or existing methodology into your workspace for customization. ' +
       'Creates an independent copy that you can modify without affecting the original.',
     inputSchema: zodToJsonSchema(ForkMethodologySchema),
-    handler: async (args) => { /* delegate to service.forkMethodology() */ },
+    handler: async (args) => {
+      /* delegate to service.forkMethodology() */
+    },
   },
 
   recommend_methodology: {
-    description: 'Get a methodology recommendation based on your current task description. ' +
+    description:
+      'Get a methodology recommendation based on your current task description. ' +
       'Analyzes the task against methodology triggers and returns the best match. ' +
       'Call this at the start of a task to get structured guidance.',
     inputSchema: zodToJsonSchema(RecommendMethodologySchema),
-    handler: async (args) => { /* delegate to service.recommendMethodology() */ },
+    handler: async (args) => {
+      /* delegate to service.recommendMethodology() */
+    },
   },
 };
 ```
 
 In `src/tools/index.ts`:
+
 - Import `methodologyTools` and `setMethodologyMemoryStore`
 - Add `setMethodologyMemoryStore(store)` to the `setMemoryStore()` function
 - Spread `...methodologyTools` into the `tools` export
@@ -413,9 +468,11 @@ In `src/tools/index.ts`:
 ---
 
 #### Task 5: Extend Plan Limits for Methodologies
+
 - [ ] Complete
 
 **Files:**
+
 - Modify: `src/http/types.ts` (extend `PLAN_LIMITS`)
 
 **What to implement:**
@@ -428,9 +485,9 @@ export const PLAN_LIMITS = {
     maxMemories: 500,
     maxWorkspaces: 1,
     maxTeamMembers: 1,
-    maxMethodologies: 3,     // Can create 3 custom (built-ins always available)
-    maxPlans: 5,             // 5 active plans
-    maxReviewsPerPlan: 20,   // 20 review entries per plan
+    maxMethodologies: 3, // Can create 3 custom (built-ins always available)
+    maxPlans: 5, // 5 active plans
+    maxReviewsPerPlan: 20, // 20 review entries per plan
   },
   pro: {
     maxMemories: 5000,
@@ -444,7 +501,7 @@ export const PLAN_LIMITS = {
     maxMemories: 25000,
     maxWorkspaces: -1,
     maxTeamMembers: 10,
-    maxMethodologies: -1,    // unlimited
+    maxMethodologies: -1, // unlimited
     maxPlans: -1,
     maxReviewsPerPlan: -1,
   },
@@ -464,15 +521,18 @@ export const PLAN_LIMITS = {
 ---
 
 #### Task 6: Write Methodology Tests
+
 - [ ] Complete
 
 **Files:**
+
 - Create: `src/services/methodology.service.test.ts`
 - Create: `src/tools/methodology-tools.test.ts` (optional — service tests are primary)
 
 **What to test:**
 
 Service tests:
+
 - `createMethodology` — creates with correct fields, returns ULID, stores in sorted set
 - `getMethodology` — finds by name (workspace-first, then builtin fallback), finds by ID
 - `getMethodology` — returns null for nonexistent
@@ -492,9 +552,11 @@ Service tests:
 Done: 0 | Left: 6
 
 #### Task 7: Define Plan Schemas and Storage Keys
+
 - [ ] Complete
 
 **Files:**
+
 - Modify: `src/types.ts`
 
 **What to implement:**
@@ -504,10 +566,23 @@ Done: 0 | Left: 6
 // Plan Management Types (Enhancement Layer v1)
 // ============================================================================
 
-export const PlanTaskStatus = z.enum(['pending', 'in_progress', 'completed', 'skipped', 'blocked']);
+export const PlanTaskStatus = z.enum([
+  'pending',
+  'in_progress',
+  'completed',
+  'skipped',
+  'blocked',
+]);
 export type PlanTaskStatus = z.infer<typeof PlanTaskStatus>;
 
-export const PlanStatus = z.enum(['draft', 'approved', 'in_progress', 'completed', 'verified', 'abandoned']);
+export const PlanStatus = z.enum([
+  'draft',
+  'approved',
+  'in_progress',
+  'completed',
+  'verified',
+  'abandoned',
+]);
 export type PlanStatus = z.infer<typeof PlanStatus>;
 
 export const PlanTaskSchema = z.object({
@@ -519,7 +594,10 @@ export const PlanTaskSchema = z.object({
   status: PlanTaskStatus.default('pending'),
   files: z.array(z.string()).default([]).describe('Files this task touches'),
   depends_on: z.array(z.string()).default([]).describe('Task IDs this depends on'),
-  methodology_phase: z.string().optional().describe('Which methodology phase this maps to'),
+  methodology_phase: z
+    .string()
+    .optional()
+    .describe('Which methodology phase this maps to'),
   review_status: z.enum(['none', 'passed', 'failed']).default('none'),
   started_at: z.number().optional(),
   completed_at: z.number().optional(),
@@ -550,12 +628,21 @@ export const CreatePlanSchema = z.object({
   architecture: z.string().max(2000).optional().describe('Architecture summary'),
   methodology_id: z.string().optional().describe('Methodology to associate'),
   workflow_id: z.string().optional().describe('Workflow to link to'),
-  tasks: z.array(z.object({
-    title: z.string().min(1),
-    description: z.string().min(1),
-    files: z.array(z.string()).default([]),
-    depends_on_indices: z.array(z.number()).default([]).describe('Indices of tasks this depends on (resolved to IDs after creation)'),
-  })).min(1).max(50).describe('Plan tasks in order'),
+  tasks: z
+    .array(
+      z.object({
+        title: z.string().min(1),
+        description: z.string().min(1),
+        files: z.array(z.string()).default([]),
+        depends_on_indices: z
+          .array(z.number())
+          .default([])
+          .describe('Indices of tasks this depends on (resolved to IDs after creation)'),
+      })
+    )
+    .min(1)
+    .max(50)
+    .describe('Plan tasks in order'),
 });
 export type CreatePlan = z.infer<typeof CreatePlanSchema>;
 
@@ -568,7 +655,10 @@ export const UpdatePlanTaskSchema = z.object({
 export type UpdatePlanTask = z.infer<typeof UpdatePlanTaskSchema>;
 
 export const GetPlanSchema = z.object({
-  plan_id: z.string().optional().describe('Plan ID (if omitted, returns active plan for workspace)'),
+  plan_id: z
+    .string()
+    .optional()
+    .describe('Plan ID (if omitted, returns active plan for workspace)'),
   name: z.string().optional().describe('Plan name to search for'),
   include_tasks: z.boolean().default(true).describe('Include full task list'),
 });
@@ -595,8 +685,10 @@ export const PlanStorageKeys = {
   plan: (workspace: string, id: string) => `ws:${workspace}:plan:${id}`,
   plans: (workspace: string) => `ws:${workspace}:plans:all`,
   planByName: (workspace: string, name: string) => `ws:${workspace}:plan:name:${name}`,
-  planTasks: (workspace: string, planId: string) => `ws:${workspace}:plan:${planId}:tasks`,
-  planTask: (workspace: string, planId: string, taskId: string) => `ws:${workspace}:plan:${planId}:task:${taskId}`,
+  planTasks: (workspace: string, planId: string) =>
+    `ws:${workspace}:plan:${planId}:tasks`,
+  planTask: (workspace: string, planId: string, taskId: string) =>
+    `ws:${workspace}:plan:${planId}:task:${taskId}`,
   activePlan: (workspace: string) => `ws:${workspace}:plan:active`,
 } as const;
 ```
@@ -606,9 +698,11 @@ export const PlanStorageKeys = {
 ---
 
 #### Task 8: Implement PlanService
+
 - [ ] Complete
 
 **Files:**
+
 - Create: `src/services/plan.service.ts`
 
 **What to implement:**
@@ -618,19 +712,19 @@ export class PlanService {
   constructor(private readonly store: MemoryStore) {}
 
   /** Create a plan with tasks. Resolves depends_on_indices to task IDs. Sets as active plan. */
-  async createPlan(input: CreatePlan): Promise<Plan & { tasks: PlanTask[] }>
+  async createPlan(input: CreatePlan): Promise<Plan & { tasks: PlanTask[] }>;
 
   /** Get plan by ID or name. Optionally includes tasks. Falls back to active plan. */
-  async getPlan(opts: GetPlan): Promise<(Plan & { tasks?: PlanTask[] }) | null>
+  async getPlan(opts: GetPlan): Promise<(Plan & { tasks?: PlanTask[] }) | null>;
 
   /** List plans filtered by status */
-  async listPlans(opts: ListPlans): Promise<Plan[]>
+  async listPlans(opts: ListPlans): Promise<Plan[]>;
 
   /** Update a specific task's status and/or review status. Auto-updates plan counters. */
-  async updatePlanTask(input: UpdatePlanTask): Promise<PlanTask>
+  async updatePlanTask(input: UpdatePlanTask): Promise<PlanTask>;
 
   /** Update plan-level status (draft -> approved -> in_progress -> completed -> verified) */
-  async updatePlanStatus(input: UpdatePlanStatus): Promise<Plan>
+  async updatePlanStatus(input: UpdatePlanStatus): Promise<Plan>;
 
   /** Get plan progress summary (task counts by status, percentage, blocked tasks) */
   async getPlanProgress(input: GetPlanProgress): Promise<{
@@ -645,17 +739,18 @@ export class PlanService {
     blocked: number;
     percentage: number;
     next_task: PlanTask | null;
-  }>
+  }>;
 
   /** Set the active plan for this workspace */
-  async setActivePlan(planId: string): Promise<void>
+  async setActivePlan(planId: string): Promise<void>;
 
   /** Clear the active plan */
-  async clearActivePlan(): Promise<void>
+  async clearActivePlan(): Promise<void>;
 }
 ```
 
 **Key behavior:**
+
 - `createPlan` creates all tasks in a pipeline, resolves `depends_on_indices` to the generated task ULIDs, and sets the plan as active for the workspace.
 - `updatePlanTask` to `completed` auto-increments `tasks_completed` on the plan. If all tasks complete, auto-sets plan status to `completed`.
 - `getPlanProgress` computes `next_task` by finding the first `pending` task whose `depends_on` are all `completed`.
@@ -666,9 +761,11 @@ export class PlanService {
 ---
 
 #### Task 9: Implement Plan MCP Tools
+
 - [ ] Complete
 
 **Files:**
+
 - Create: `src/tools/plan-tools.ts`
 - Modify: `src/tools/index.ts`
 
@@ -685,7 +782,9 @@ export const planTools = {
       'Each task has a title, description, files list, and dependency tracking. ' +
       'The plan becomes the active plan for the workspace.',
     inputSchema: zodToJsonSchema(CreatePlanSchema),
-    handler: async (args) => { /* delegate to service.createPlan() */ },
+    handler: async (args) => {
+      /* delegate to service.createPlan() */
+    },
   },
 
   get_plan: {
@@ -694,7 +793,9 @@ export const planTools = {
       'Returns plan header and optionally all tasks with their current status. ' +
       'Use this at session start to resume work on an existing plan.',
     inputSchema: zodToJsonSchema(GetPlanSchema),
-    handler: async (args) => { /* delegate to service.getPlan() */ },
+    handler: async (args) => {
+      /* delegate to service.getPlan() */
+    },
   },
 
   list_plans: {
@@ -702,16 +803,20 @@ export const planTools = {
       'List all plans in this workspace, optionally filtered by status. ' +
       'Returns plan headers without task details for quick scanning.',
     inputSchema: zodToJsonSchema(ListPlansSchema),
-    handler: async (args) => { /* delegate to service.listPlans() */ },
+    handler: async (args) => {
+      /* delegate to service.listPlans() */
+    },
   },
 
   update_plan_task: {
     description:
-      'Update a task\'s status within a plan. Status: pending, in_progress, completed, skipped, blocked. ' +
+      "Update a task's status within a plan. Status: pending, in_progress, completed, skipped, blocked. " +
       'Also accepts review_status: none, passed, failed. ' +
       'Automatically updates plan progress counters and auto-completes the plan when all tasks finish.',
     inputSchema: zodToJsonSchema(UpdatePlanTaskSchema),
-    handler: async (args) => { /* delegate to service.updatePlanTask() */ },
+    handler: async (args) => {
+      /* delegate to service.updatePlanTask() */
+    },
   },
 
   update_plan_status: {
@@ -719,7 +824,9 @@ export const planTools = {
       'Update the overall plan status. Lifecycle: draft -> approved -> in_progress -> completed -> verified. ' +
       'Use "abandoned" to archive a plan that\'s no longer needed.',
     inputSchema: zodToJsonSchema(UpdatePlanStatusSchema),
-    handler: async (args) => { /* delegate to service.updatePlanStatus() */ },
+    handler: async (args) => {
+      /* delegate to service.updatePlanStatus() */
+    },
   },
 
   get_plan_progress: {
@@ -728,7 +835,9 @@ export const planTools = {
       'Returns task counts by status, completion percentage, and the next unblocked task to work on. ' +
       'Call this to determine what to work on next.',
     inputSchema: zodToJsonSchema(GetPlanProgressSchema),
-    handler: async (args) => { /* delegate to service.getPlanProgress() */ },
+    handler: async (args) => {
+      /* delegate to service.getPlanProgress() */
+    },
   },
 
   set_active_plan: {
@@ -736,7 +845,9 @@ export const planTools = {
       'Set which plan is the active/current plan for this workspace. ' +
       'The active plan is returned by get_plan when no ID is specified.',
     inputSchema: z.object({ plan_id: z.string() }),
-    handler: async (args) => { /* delegate to service.setActivePlan() */ },
+    handler: async (args) => {
+      /* delegate to service.setActivePlan() */
+    },
   },
 };
 ```
@@ -748,9 +859,11 @@ Wire into `src/tools/index.ts` following the same pattern as methodology tools.
 ---
 
 #### Task 10: Write Plan Service Tests
+
 - [ ] Complete
 
 **Files:**
+
 - Create: `src/services/plan.service.test.ts`
 
 **What to test:**
@@ -774,9 +887,11 @@ Wire into `src/tools/index.ts` following the same pattern as methodology tools.
 ---
 
 #### Task 11: Add Plan Workflow MCP Prompt
+
 - [ ] Complete
 
 **Files:**
+
 - Modify: `src/prompts/index.ts`
 
 **What to implement:**
@@ -831,9 +946,11 @@ Add to the `prompts` object and update `listPrompts`.
 ---
 
 #### Task 12: Add Plan REST API Endpoints
+
 - [ ] Complete
 
 **Files:**
+
 - Modify: `src/http/server.ts`
 
 **What to implement:**
@@ -857,9 +974,11 @@ Follow the existing authenticated endpoint pattern with `req.tenant` context. Th
 Done: 0 | Left: 5
 
 #### Task 13: Define Review Schemas and Storage Keys
+
 - [ ] Complete
 
 **Files:**
+
 - Modify: `src/types.ts`
 
 **What to implement:**
@@ -872,7 +991,13 @@ Done: 0 | Left: 5
 export const ReviewSeverity = z.enum(['must_fix', 'should_fix', 'suggestion', 'note']);
 export type ReviewSeverity = z.infer<typeof ReviewSeverity>;
 
-export const ReviewType = z.enum(['spec_compliance', 'code_quality', 'security', 'performance', 'general']);
+export const ReviewType = z.enum([
+  'spec_compliance',
+  'code_quality',
+  'security',
+  'performance',
+  'general',
+]);
 export type ReviewType = z.infer<typeof ReviewType>;
 
 export const ReviewFindingSchema = z.object({
@@ -893,7 +1018,10 @@ export const ReviewEntrySchema = z.object({
   approved: z.boolean().describe('Whether the review passed overall'),
   findings: z.array(ReviewFindingSchema).default([]),
   summary: z.string().optional().describe('Review summary'),
-  reviewer: z.string().default('ai').describe('Who performed the review (ai, human name)'),
+  reviewer: z
+    .string()
+    .default('ai')
+    .describe('Who performed the review (ai, human name)'),
   workspace_id: z.string(),
   created_at: z.number(),
 });
@@ -920,10 +1048,18 @@ export const GetReviewHistorySchema = z.object({
 export type GetReviewHistory = z.infer<typeof GetReviewHistorySchema>;
 
 export const QualityGateConfigSchema = z.object({
-  coverage_threshold: z.number().min(0).max(100).default(70).describe('Minimum test coverage percentage'),
+  coverage_threshold: z
+    .number()
+    .min(0)
+    .max(100)
+    .default(70)
+    .describe('Minimum test coverage percentage'),
   required_review_types: z.array(ReviewType).default(['spec_compliance', 'code_quality']),
   blocking_severities: z.array(ReviewSeverity).default(['must_fix']),
-  auto_approve_suggestions: z.boolean().default(true).describe('Auto-pass reviews with only suggestions/notes'),
+  auto_approve_suggestions: z
+    .boolean()
+    .default(true)
+    .describe('Auto-pass reviews with only suggestions/notes'),
 });
 export type QualityGateConfig = z.infer<typeof QualityGateConfigSchema>;
 
@@ -940,8 +1076,10 @@ export type CheckQualityGates = z.infer<typeof CheckQualityGatesSchema>;
 export const ReviewStorageKeys = {
   review: (workspace: string, id: string) => `ws:${workspace}:review:${id}`,
   reviews: (workspace: string) => `ws:${workspace}:reviews:all`,
-  planReviews: (workspace: string, planId: string) => `ws:${workspace}:plan:${planId}:reviews`,
-  workflowReviews: (workspace: string, workflowId: string) => `ws:${workspace}:workflow:${workflowId}:reviews`,
+  planReviews: (workspace: string, planId: string) =>
+    `ws:${workspace}:plan:${planId}:reviews`,
+  workflowReviews: (workspace: string, workflowId: string) =>
+    `ws:${workspace}:workflow:${workflowId}:reviews`,
   qualityGates: (workspace: string) => `ws:${workspace}:quality-gates`,
 } as const;
 ```
@@ -951,9 +1089,11 @@ export const ReviewStorageKeys = {
 ---
 
 #### Task 14: Implement ReviewService
+
 - [ ] Complete
 
 **Files:**
+
 - Create: `src/services/review.service.ts`
 
 **What to implement:**
@@ -963,16 +1103,16 @@ export class ReviewService {
   constructor(private readonly store: MemoryStore) {}
 
   /** Store a review entry, linking to plan/task/workflow as specified */
-  async storeReview(input: StoreReview): Promise<ReviewEntry>
+  async storeReview(input: StoreReview): Promise<ReviewEntry>;
 
   /** Get review history with optional filters */
-  async getReviewHistory(opts: GetReviewHistory): Promise<ReviewEntry[]>
+  async getReviewHistory(opts: GetReviewHistory): Promise<ReviewEntry[]>;
 
   /** Set quality gate configuration for this workspace */
-  async setQualityGates(input: SetQualityGates): Promise<QualityGateConfig>
+  async setQualityGates(input: SetQualityGates): Promise<QualityGateConfig>;
 
   /** Get quality gate configuration (returns defaults if none set) */
-  async getQualityGates(): Promise<QualityGateConfig>
+  async getQualityGates(): Promise<QualityGateConfig>;
 
   /** Check if all quality gates pass for a plan (all required review types passed, no blocking findings) */
   async checkQualityGates(input: CheckQualityGates): Promise<{
@@ -984,11 +1124,12 @@ export class ReviewService {
       blocking_findings: number;
     }>;
     summary: string;
-  }>
+  }>;
 }
 ```
 
 **Key behavior:**
+
 - `storeReview` creates the review entry and adds to all relevant sorted sets (global, plan-specific, workflow-specific). Also updates `review_status` on the linked plan task if `plan_task_id` is provided.
 - `checkQualityGates` looks at the most recent review per required type for the plan. If any required type has no review or a failed review, or if there are unresolved `must_fix` findings, the gate fails.
 - `getQualityGates` returns workspace config or sensible defaults if none configured.
@@ -998,9 +1139,11 @@ export class ReviewService {
 ---
 
 #### Task 15: Implement Review MCP Tools
+
 - [ ] Complete
 
 **Files:**
+
 - Create: `src/tools/review-tools.ts`
 - Modify: `src/tools/index.ts`
 
@@ -1017,7 +1160,9 @@ export const reviewTools = {
       'Findings are categorized by severity: must_fix, should_fix, suggestion, note. ' +
       'Call this after completing a spec compliance or code quality review.',
     inputSchema: zodToJsonSchema(StoreReviewSchema),
-    handler: async (args) => { /* delegate to service.storeReview() */ },
+    handler: async (args) => {
+      /* delegate to service.storeReview() */
+    },
   },
 
   get_review_history: {
@@ -1026,7 +1171,9 @@ export const reviewTools = {
       'Returns review entries with findings, sorted by most recent. ' +
       'Use this to check what reviews have been done and their outcomes.',
     inputSchema: zodToJsonSchema(GetReviewHistorySchema),
-    handler: async (args) => { /* delegate to service.getReviewHistory() */ },
+    handler: async (args) => {
+      /* delegate to service.getReviewHistory() */
+    },
   },
 
   set_quality_gates: {
@@ -1035,7 +1182,9 @@ export const reviewTools = {
       'Define required review types, blocking severity levels, and coverage thresholds. ' +
       'These gates are checked before a plan can be marked as verified.',
     inputSchema: zodToJsonSchema(SetQualityGatesSchema),
-    handler: async (args) => { /* delegate to service.setQualityGates() */ },
+    handler: async (args) => {
+      /* delegate to service.setQualityGates() */
+    },
   },
 
   get_quality_gates: {
@@ -1043,7 +1192,9 @@ export const reviewTools = {
       'Get the current quality gate configuration for this workspace. ' +
       'Returns the configured thresholds and requirements.',
     inputSchema: z.object({}),
-    handler: async () => { /* delegate to service.getQualityGates() */ },
+    handler: async () => {
+      /* delegate to service.getQualityGates() */
+    },
   },
 
   check_quality_gates: {
@@ -1052,7 +1203,9 @@ export const reviewTools = {
       'Evaluates required reviews, blocking findings, and coverage. ' +
       'Call this before marking a plan as verified to ensure all standards are met.',
     inputSchema: zodToJsonSchema(CheckQualityGatesSchema),
-    handler: async (args) => { /* delegate to service.checkQualityGates() */ },
+    handler: async (args) => {
+      /* delegate to service.checkQualityGates() */
+    },
   },
 };
 ```
@@ -1064,9 +1217,11 @@ Wire into `src/tools/index.ts`.
 ---
 
 #### Task 16: Write Review Service Tests
+
 - [ ] Complete
 
 **Files:**
+
 - Create: `src/services/review.service.test.ts`
 
 **What to test:**
@@ -1086,9 +1241,11 @@ Wire into `src/tools/index.ts`.
 ---
 
 #### Task 17: Add Review REST API Endpoints
+
 - [ ] Complete
 
 **Files:**
+
 - Modify: `src/http/server.ts`
 
 **What to implement:**
@@ -1109,9 +1266,11 @@ GET  /api/plans/:planId/gates       → Check quality gates for a plan
 Done: 0 | Left: 3
 
 #### Task 18: Enhance auto_session_start with Methodology Recommendations
+
 - [ ] Complete
 
 **Files:**
+
 - Modify: `src/tools/context-tools.ts` (enhance `auto_session_start` handler)
 
 **What to implement:**
@@ -1154,9 +1313,11 @@ This requires importing and using `PlanService`, `MethodologyService`, and `Revi
 ---
 
 #### Task 19: Add Enhancement Layer Overview MCP Prompt
+
 - [ ] Complete
 
 **Files:**
+
 - Modify: `src/prompts/index.ts`
 
 **What to implement:**
@@ -1218,9 +1379,11 @@ Tools: store_review, get_review_history, set_quality_gates, check_quality_gates
 ---
 
 #### Task 20: Methodology Seed on Server Startup
+
 - [ ] Complete
 
 **Files:**
+
 - Modify: `src/http/mcp-handler.ts` or `src/tools/index.ts` (wherever initialization happens)
 
 **What to implement:**
@@ -1248,13 +1411,13 @@ Find the appropriate initialization point — likely in `initializeDefaultMemory
 
 ## Risks and Mitigations
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Tool count bloat (40 existing + 17 new = 57) | Higher context cost per MCP session | Group tools logically; consider tool-level feature flags by plan tier |
-| Redis memory growth from plans/reviews | Storage costs | Add TTL for abandoned plans (30 days); review entries capped per plan |
-| Methodology prompt templates are large | Token cost when served | Return phase list by default; full prompt only for requested phase |
-| Conflict between remote plans and local plan files (Pilot) | Confusion about source of truth | Document clearly: Recall is the source of truth; local files are for reference only |
-| Built-in methodology content quality | Agent follows bad instructions | Start with battle-tested content (adapted from Superpowers); iterate based on usage |
+| Risk                                                       | Impact                              | Mitigation                                                                          |
+| ---------------------------------------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------- |
+| Tool count bloat (40 existing + 17 new = 57)               | Higher context cost per MCP session | Group tools logically; consider tool-level feature flags by plan tier               |
+| Redis memory growth from plans/reviews                     | Storage costs                       | Add TTL for abandoned plans (30 days); review entries capped per plan               |
+| Methodology prompt templates are large                     | Token cost when served              | Return phase list by default; full prompt only for requested phase                  |
+| Conflict between remote plans and local plan files (Pilot) | Confusion about source of truth     | Document clearly: Recall is the source of truth; local files are for reference only |
+| Built-in methodology content quality                       | Agent follows bad instructions      | Start with battle-tested content (adapted from Superpowers); iterate based on usage |
 
 ## Future Work (Not in Scope)
 

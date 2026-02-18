@@ -18,6 +18,7 @@ Deploying to Railway requires coordinating multiple steps: environment variables
 ## Trigger Conditions
 
 Use this skill when:
+
 - User asks to "deploy to production" or "deploy to Railway"
 - Completing a feature and ready for production release
 - Initial production launch setup
@@ -55,20 +56,21 @@ git log -5
 
 **Critical environment variables to set in Railway dashboard:**
 
-| Variable | Source | Example |
-|----------|--------|---------|
-| `DATABASE_URL` | Auto-set by Railway Postgres | - |
-| `REDIS_URL` | Auto-set by Railway Redis | - |
-| `AUTH_SECRET` | `openssl rand -base64 32` | - |
-| `STRIPE_SECRET_KEY` | Stripe Dashboard (live mode) | `sk_live_...` |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe Dashboard | `pk_live_...` |
-| `STRIPE_WEBHOOK_SECRET` | Stripe webhook config | `whsec_...` |
-| `CRON_SECRET` | Generate random | - |
-| `HONEYBADGER_API_KEY` | Honeybadger dashboard | - |
+| Variable                             | Source                       | Example       |
+| ------------------------------------ | ---------------------------- | ------------- |
+| `DATABASE_URL`                       | Auto-set by Railway Postgres | -             |
+| `REDIS_URL`                          | Auto-set by Railway Redis    | -             |
+| `AUTH_SECRET`                        | `openssl rand -base64 32`    | -             |
+| `STRIPE_SECRET_KEY`                  | Stripe Dashboard (live mode) | `sk_live_...` |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe Dashboard             | `pk_live_...` |
+| `STRIPE_WEBHOOK_SECRET`              | Stripe webhook config        | `whsec_...`   |
+| `CRON_SECRET`                        | Generate random              | -             |
+| `HONEYBADGER_API_KEY`                | Honeybadger dashboard        | -             |
 
 **See PRODUCTION_DEPLOYMENT.md for full list (30+ variables).**
 
 **External service updates:**
+
 - Stripe: Configure webhook `https://codesalvage.com/api/webhooks/stripe`
 - GitHub OAuth: Update callback URL to production domain
 - Configure custom domain in Railway → Settings → Domains
@@ -113,6 +115,7 @@ curl -H "Authorization: Bearer YOUR_CRON_SECRET" \
 ### Phase 6: Monitoring (First 24-48 Hours)
 
 **Check every 2 hours:**
+
 - Honeybadger (no critical errors)
 - Railway metrics (CPU, memory normal)
 - Stripe Dashboard (webhooks delivering)
@@ -121,6 +124,7 @@ curl -H "Authorization: Bearer YOUR_CRON_SECRET" \
 ## Success Criteria
 
 Deployment successful when:
+
 - ✅ All health checks pass
 - ✅ No errors in Honeybadger
 - ✅ Railway metrics normal
@@ -141,13 +145,13 @@ Then investigate with `railway logs` and Honeybadger.
 
 ## Common Issues
 
-| Symptom | Fix |
-|---------|-----|
-| Database connection errors | Check `DATABASE_URL`, verify Postgres running |
-| Redis connection errors | Check `REDIS_URL`, verify Redis running |
-| Stripe webhook failures | Verify webhook URL and signing secret in Stripe Dashboard |
-| Email not sending | Check SendGrid API key, verify domain authentication |
-| GitHub OAuth fails | Verify callback URL: `https://codesalvage.com/api/auth/callback/github` |
+| Symptom                    | Fix                                                                     |
+| -------------------------- | ----------------------------------------------------------------------- |
+| Database connection errors | Check `DATABASE_URL`, verify Postgres running                           |
+| Redis connection errors    | Check `REDIS_URL`, verify Redis running                                 |
+| Stripe webhook failures    | Verify webhook URL and signing secret in Stripe Dashboard               |
+| Email not sending          | Check SendGrid API key, verify domain authentication                    |
+| GitHub OAuth fails         | Verify callback URL: `https://codesalvage.com/api/auth/callback/github` |
 
 ## References
 
