@@ -250,3 +250,26 @@ Use **normal mode** for:
 - **Batch clarifying questions**: ask all unknowns in one AskUserQuestion call rather than asking one at a time.
 - **Recall MCP checkpoints**: after completing a feature or significant fix, store the decision and context in Recall so future sessions don't re-investigate.
 - **Test DB lifecycle**: if running integration tests multiple times in a session, start the test DB once (`npm run test:db:setup`) and leave it running — only tear down when done.
+
+## Honeybadger Error Monitoring
+
+Credentials are in `.env.local` (gitignored). Use the read API to investigate production errors:
+
+```bash
+source .env.local
+
+# List unresolved faults (most frequent first)
+curl -s -u "$HONEYBADGER_PERSONAL_TOKEN:" \
+  "https://app.honeybadger.io/v2/projects/$HONEYBADGER_PROJECT_ID/faults?q=is:unresolved&order=frequent" \
+  | jq '.results[] | {id, klass, message, notices_count: .notices_count, last_notice_at}'
+
+# Get full detail on a specific fault
+curl -s -u "$HONEYBADGER_PERSONAL_TOKEN:" \
+  "https://app.honeybadger.io/v2/projects/$HONEYBADGER_PROJECT_ID/faults/$FAULT_ID" | jq .
+
+# List recent notices for a fault (stack traces, request data)
+curl -s -u "$HONEYBADGER_PERSONAL_TOKEN:" \
+  "https://app.honeybadger.io/v2/projects/$HONEYBADGER_PROJECT_ID/faults/$FAULT_ID/notices" | jq .
+```
+
+Project ID: `137096`
