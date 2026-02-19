@@ -320,10 +320,8 @@ export class ProjectRepository {
 
     const skip = (page - 1) * limit;
 
-    // Build where clause
     const where: Prisma.ProjectWhereInput = {};
 
-    // Text search (title, description)
     if (filters.query) {
       where.OR = [
         { title: { contains: filters.query, mode: 'insensitive' } },
@@ -331,24 +329,20 @@ export class ProjectRepository {
       ];
     }
 
-    // Category filter
     if (filters.category) {
       where.category = filters.category;
     }
 
-    // Tech stack filter (contains any)
     if (filters.techStack && filters.techStack.length > 0) {
       where.techStack = {
         hasSome: filters.techStack,
       };
     }
 
-    // Primary language filter
     if (filters.primaryLanguage) {
       where.primaryLanguage = filters.primaryLanguage;
     }
 
-    // Completion percentage range
     if (filters.minCompletion !== undefined || filters.maxCompletion !== undefined) {
       where.completionPercentage = {};
       if (filters.minCompletion !== undefined) {
@@ -359,7 +353,6 @@ export class ProjectRepository {
       }
     }
 
-    // Price range
     if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
       where.priceCents = {};
       if (filters.minPrice !== undefined) {
@@ -370,37 +363,29 @@ export class ProjectRepository {
       }
     }
 
-    // Status filter (defaults to 'active' if not specified)
     if (filters.status) {
       if (Array.isArray(filters.status)) {
         where.status = { in: filters.status };
       } else {
         where.status = filters.status;
       }
-    } else {
-      // Default to only showing active projects
+    } else if (!filters.sellerId) {
       where.status = 'active';
     }
 
-    // Seller filter
     if (filters.sellerId) {
       where.sellerId = filters.sellerId;
     }
 
-    // Featured filter
     if (filters.featured !== undefined) {
       if (filters.featured) {
-        // Show featured projects that haven't expired (or have no expiration)
         if (!where.AND) {
           where.AND = [];
         }
         if (Array.isArray(where.AND)) {
           where.AND.push({
             isFeatured: true,
-            OR: [
-              { featuredUntil: null }, // No expiration
-              { featuredUntil: { gte: new Date() } }, // Not yet expired
-            ],
+            OR: [{ featuredUntil: null }, { featuredUntil: { gte: new Date() } }],
           });
         }
       } else {
@@ -409,7 +394,6 @@ export class ProjectRepository {
     }
 
     try {
-      // Execute query with count
       const [projects, total] = await this.prisma.$transaction([
         this.prisma.project.findMany({
           where,
@@ -576,10 +560,7 @@ export class ProjectRepository {
         where: {
           isFeatured: true,
           status: 'active',
-          OR: [
-            { featuredUntil: null }, // No expiration
-            { featuredUntil: { gte: new Date() } }, // Not yet expired
-          ],
+          OR: [{ featuredUntil: null }, { featuredUntil: { gte: new Date() } }],
         },
         take: limit,
         orderBy: { createdAt: 'desc' },
@@ -714,7 +695,6 @@ export class ProjectRepository {
           approvedBy: null,
           approvedAt: null,
           // Note: rejectionReason field doesn't exist in schema
-          // If needed, add to schema or use a different approach
         },
       });
 
@@ -758,7 +738,6 @@ export class ProjectRepository {
     });
 
     try {
-      // Calculate expiry date if featuring
       const featuredUntil = featured
         ? new Date(Date.now() + featuredDays * 24 * 60 * 60 * 1000)
         : null;
@@ -824,7 +803,6 @@ export class ProjectRepository {
       offset,
     });
 
-    // Build where clause
     const where: Prisma.ProjectWhereInput = {};
 
     if (status) {

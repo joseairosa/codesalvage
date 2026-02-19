@@ -9,7 +9,6 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ProjectRepository } from '../ProjectRepository';
 import type { PrismaClient } from '@prisma/client';
 
-// Mock Prisma Client
 const mockPrismaClient = {
   project: {
     create: vi.fn(),
@@ -27,16 +26,10 @@ describe('ProjectRepository', () => {
   let projectRepository: ProjectRepository;
 
   beforeEach(() => {
-    // Reset all mocks before each test
     vi.clearAllMocks();
 
-    // Create fresh instance
     projectRepository = new ProjectRepository(mockPrismaClient);
   });
-
-  // ============================================
-  // CREATE TESTS
-  // ============================================
 
   describe('create', () => {
     it('should create a new project', async () => {
@@ -79,10 +72,6 @@ describe('ProjectRepository', () => {
       });
     });
   });
-
-  // ============================================
-  // FIND BY ID TESTS
-  // ============================================
 
   describe('findById', () => {
     it('should find project by id', async () => {
@@ -143,10 +132,6 @@ describe('ProjectRepository', () => {
     });
   });
 
-  // ============================================
-  // UPDATE TESTS
-  // ============================================
-
   describe('update', () => {
     it('should update project', async () => {
       const updateData = {
@@ -174,10 +159,6 @@ describe('ProjectRepository', () => {
     });
   });
 
-  // ============================================
-  // DELETE TESTS
-  // ============================================
-
   describe('delete', () => {
     it('should delete project', async () => {
       const mockDeletedProject = {
@@ -197,10 +178,6 @@ describe('ProjectRepository', () => {
       });
     });
   });
-
-  // ============================================
-  // SEARCH TESTS
-  // ============================================
 
   describe('search', () => {
     it('should search projects with default pagination', async () => {
@@ -294,11 +271,30 @@ describe('ProjectRepository', () => {
 
       expect(mockPrismaClient.$transaction).toHaveBeenCalled();
     });
-  });
 
-  // ============================================
-  // FIND BY SELLER ID TESTS
-  // ============================================
+    it('should default to status=active when no sellerId is provided', async () => {
+      vi.mocked(mockPrismaClient.$transaction).mockResolvedValue([[], 0] as any);
+
+      await projectRepository.search({});
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const findManyArgs = vi.mocked(mockPrismaClient.project.findMany).mock
+        .calls[0]![0]!;
+      expect(findManyArgs.where).toMatchObject({ status: 'active' });
+    });
+
+    it('should NOT apply default status filter when sellerId is provided', async () => {
+      vi.mocked(mockPrismaClient.$transaction).mockResolvedValue([[], 0] as any);
+
+      await projectRepository.search({ sellerId: 'seller-123' });
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const findManyArgs = vi.mocked(mockPrismaClient.project.findMany).mock
+        .calls[0]![0]!;
+      expect(findManyArgs.where).not.toHaveProperty('status');
+      expect(findManyArgs.where).toMatchObject({ sellerId: 'seller-123' });
+    });
+  });
 
   describe('findBySellerId', () => {
     it('should find all projects for a seller', async () => {
@@ -318,10 +314,6 @@ describe('ProjectRepository', () => {
       });
     });
   });
-
-  // ============================================
-  // INCREMENT VIEW COUNT TESTS
-  // ============================================
 
   describe('incrementViewCount', () => {
     it('should increment view count', async () => {
@@ -345,10 +337,6 @@ describe('ProjectRepository', () => {
       });
     });
   });
-
-  // ============================================
-  // GET FEATURED TESTS
-  // ============================================
 
   describe('getFeatured', () => {
     it('should get featured projects', async () => {
@@ -387,17 +375,13 @@ describe('ProjectRepository', () => {
     });
   });
 
-  // ============================================
-  // GET STATISTICS TESTS
-  // ============================================
-
   describe('getStatistics', () => {
     it('should get platform statistics', async () => {
       vi.mocked(mockPrismaClient.$transaction).mockResolvedValue([
-        100, // total
-        80, // active
-        15, // sold
-        5, // draft
+        100,
+        80,
+        15,
+        5,
         {
           _avg: {
             completionPercentage: 75,
@@ -418,10 +402,10 @@ describe('ProjectRepository', () => {
 
     it('should handle null aggregate values', async () => {
       vi.mocked(mockPrismaClient.$transaction).mockResolvedValue([
-        0, // total
-        0, // active
-        0, // sold
-        0, // draft
+        0,
+        0,
+        0,
+        0,
         {
           _avg: {
             completionPercentage: null,
