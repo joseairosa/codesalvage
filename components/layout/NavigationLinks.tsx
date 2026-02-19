@@ -42,7 +42,6 @@ export function NavigationLinks({
 }: NavigationLinksProps) {
   const pathname = usePathname();
 
-  // Define navigation links based on auth state
   const links: NavLink[] = [
     { href: '/projects', label: 'Browse Projects' },
     { href: '/how-it-works', label: 'How It Works' },
@@ -58,6 +57,7 @@ export function NavigationLinks({
                   label: 'Offers Received',
                   requiresSeller: true,
                 },
+                { href: '/seller/sales', label: 'My Sales', requiresSeller: true },
                 { href: '/projects/new', label: 'List Project', requiresSeller: true },
               ]
             : []),
