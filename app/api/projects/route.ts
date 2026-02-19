@@ -108,13 +108,11 @@ const createProjectSchema = z.object({
  */
 async function createProject(request: NextRequest) {
   try {
-    // Check authentication (supports both cookie and Authorization header)
     const auth = await authenticateApiRequest(request);
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user is a seller
     if (!auth.user.isSeller) {
       return NextResponse.json(
         { error: 'Only sellers can create projects' },
@@ -122,7 +120,6 @@ async function createProject(request: NextRequest) {
       );
     }
 
-    // Parse and validate request body
     const body = await request.json();
     const validatedData = createProjectSchema.safeParse(body);
 
@@ -141,17 +138,14 @@ async function createProject(request: NextRequest) {
       title: validatedData.data.title,
     });
 
-    // Filter out undefined values for exactOptionalPropertyTypes
     const createData = Object.fromEntries(
       Object.entries(validatedData.data).filter(([_, value]) => value !== undefined)
     );
 
-    // Create project
     const project = await projectService.createProject(auth.user.id, createData as any);
 
     console.log('[Projects API] Project created successfully:', project.id);
 
-    // Invalidate search cache (new project should appear in search)
     await invalidateCache.search();
     await invalidateCache.seller(auth.user.id);
 
@@ -193,7 +187,6 @@ async function searchProjects(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
-    // Parse filters
     const filters = {
       query: searchParams.get('query') || undefined,
       category: searchParams.get('category') || undefined,
@@ -211,12 +204,13 @@ async function searchProjects(request: NextRequest) {
       maxPrice: searchParams.get('maxPrice')
         ? parseInt(searchParams.get('maxPrice')!)
         : undefined,
-      status: searchParams.get('status') || 'active', // Default to active projects
+      status:
+        searchParams.get('status') ||
+        (searchParams.get('sellerId') ? undefined : 'active'),
       sellerId: searchParams.get('sellerId') || undefined,
       featured: searchParams.get('featured') === 'true' ? true : undefined,
     };
 
-    // Parse pagination
     const pagination = {
       page: searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1,
       limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20,
@@ -226,18 +220,15 @@ async function searchProjects(request: NextRequest) {
 
     console.log('[Projects API] Searching projects:', { filters, pagination });
 
-    // Filter out undefined values for exactOptionalPropertyTypes
     const cleanFilters = Object.fromEntries(
       Object.entries(filters).filter(([_, value]) => value !== undefined)
     );
 
-    // Create cache key from search parameters
     const cacheKey = CacheKeys.searchResults(
       filters.query || 'all',
       JSON.stringify({ ...cleanFilters, ...pagination })
     );
 
-    // Get cached results or fetch from database
     const results = await getOrSetCache(cacheKey, CacheTTL.SEARCH_RESULTS, async () => {
       return await projectService.searchProjects(cleanFilters as any, pagination);
     });
