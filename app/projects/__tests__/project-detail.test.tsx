@@ -16,18 +16,15 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ProjectDetailPage from '../[id]/page';
 
-// Mock react-markdown to avoid ESM issues in test environment
 vi.mock('react-markdown', () => ({
   default: ({ children }: { children: string }) =>
     React.createElement('div', { 'data-testid': 'markdown' }, children),
 }));
 
-// Mock ProBadge
 vi.mock('@/components/seller/ProBadge', () => ({
   ProBadge: () => null,
 }));
 
-// Mock Next.js navigation
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -38,7 +35,6 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-// Sample project data matching API response shape
 const mockProject = {
   id: 'proj-123',
   title: 'Test Project',
@@ -86,7 +82,6 @@ describe('ProjectDetailPage', () => {
 
   describe('loading state', () => {
     it('should show loading spinner while fetching project', () => {
-      // Mock fetch that never resolves
       global.fetch = vi.fn(() => new Promise(() => {})) as unknown as typeof fetch;
 
       render(<ProjectDetailPage params={{ id: 'proj-123' }} />);
@@ -166,7 +161,6 @@ describe('ProjectDetailPage', () => {
       await waitFor(() => {
         expect(screen.getByText('Tech Stack')).toBeDefined();
         expect(screen.getByText('Primary Language')).toBeDefined();
-        // TypeScript appears multiple times (primary language + all technologies)
         expect(screen.getAllByText('TypeScript').length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText('React')).toBeDefined();
         expect(screen.getByText('Node.js')).toBeDefined();
@@ -189,12 +183,10 @@ describe('ProjectDetailPage', () => {
         expect(screen.getByText('$120')).toBeDefined();
       });
 
-      // Find the sticky purchase card - it contains the price
       const stickyCard = container.querySelector('.sticky');
       expect(stickyCard).not.toBeNull();
       expect(stickyCard!.classList.contains('top-20')).toBe(true);
       expect(stickyCard!.classList.contains('z-30')).toBe(true);
-      // Ensure it does NOT use top-4 (old value that caused overlap)
       expect(stickyCard!.classList.contains('top-4')).toBe(false);
     });
   });
@@ -230,7 +222,6 @@ describe('ProjectDetailPage', () => {
 
       await user.click(screen.getByText('Contact Seller'));
 
-      // Verify the old broken pattern is not used
       const calledUrl = mockPush.mock.calls[0]?.[0] as string;
       expect(calledUrl).not.toContain('/messages/new');
       expect(calledUrl).not.toContain('?seller=');
@@ -256,6 +247,63 @@ describe('ProjectDetailPage', () => {
       await user.click(screen.getByText('Buy Now'));
 
       expect(mockPush).toHaveBeenCalledWith('/checkout/proj-123');
+    });
+  });
+
+  describe('sold project state', () => {
+    const soldProject = { ...mockProject, status: 'sold' };
+
+    beforeEach(() => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(soldProject),
+      }) as unknown as typeof fetch;
+    });
+
+    it('should show "Project Sold" indicator instead of Buy Now when status is sold', async () => {
+      render(<ProjectDetailPage params={{ id: 'proj-123' }} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Project Sold')).toBeDefined();
+      });
+
+      expect(screen.queryByText('Buy Now')).toBeNull();
+    });
+
+    it('should hide Make an Offer button when status is sold', async () => {
+      render(<ProjectDetailPage params={{ id: 'proj-123' }} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Project Sold')).toBeDefined();
+      });
+
+      expect(screen.queryByText('Make an Offer')).toBeNull();
+    });
+
+    it('should still show Contact Seller button when status is sold', async () => {
+      render(<ProjectDetailPage params={{ id: 'proj-123' }} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Project Sold')).toBeDefined();
+      });
+
+      expect(screen.getByText('Contact Seller')).toBeDefined();
+    });
+
+    it('should show Buy Now and Make an Offer when status is active', async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ ...mockProject, status: 'active' }),
+      }) as unknown as typeof fetch;
+
+      render(<ProjectDetailPage params={{ id: 'proj-123' }} />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Buy Now')).toBeDefined();
+      });
+
+      expect(screen.getByText('Make an Offer')).toBeDefined();
+      expect(screen.queryByText('Project Sold')).toBeNull();
     });
   });
 });

@@ -177,21 +177,19 @@ function formatDate(date: Date | string): string {
 }
 
 /**
- * Get status badge variant
+ * Get status badge className for distinct per-status colors
  */
-function getStatusVariant(
-  status: ProjectStatus
-): 'default' | 'secondary' | 'outline' | 'destructive' {
-  const variants: Record<
-    ProjectStatus,
-    'default' | 'secondary' | 'outline' | 'destructive'
-  > = {
-    draft: 'secondary',
-    active: 'default',
-    sold: 'outline',
-    delisted: 'destructive',
+function getStatusClassName(status: ProjectStatus): string {
+  const classNames: Record<ProjectStatus, string> = {
+    draft:
+      'border-transparent bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
+    active:
+      'border-transparent bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
+    sold: 'border-transparent bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
+    delisted:
+      'border-transparent bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
   };
-  return variants[status];
+  return classNames[status];
 }
 
 /**
@@ -543,7 +541,7 @@ export default function SellerProjectsPage() {
                         </button>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getStatusVariant(project.status)}>
+                        <Badge className={getStatusClassName(project.status)}>
                           {getStatusLabel(project.status)}
                         </Badge>
                       </TableCell>
