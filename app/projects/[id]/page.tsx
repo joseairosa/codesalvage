@@ -527,19 +527,28 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
               {/* Action Buttons */}
               <div className="space-y-2">
-                <Button onClick={handleBuyNow} size="lg" className="w-full">
-                  <DollarSign className="mr-2 h-4 w-4" />
-                  Buy Now
-                </Button>
-                <Button
-                  onClick={() => setOfferDialogOpen(true)}
-                  variant="outline"
-                  size="lg"
-                  className="w-full"
-                >
-                  <Tag className="mr-2 h-4 w-4" />
-                  Make an Offer
-                </Button>
+                {project.status === 'sold' ? (
+                  <div className="flex w-full items-center justify-center gap-2 rounded-lg border border-green-200 bg-green-50 py-4 text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-400">
+                    <CheckCircle2 className="h-5 w-5" />
+                    <span className="font-semibold">Project Sold</span>
+                  </div>
+                ) : (
+                  <>
+                    <Button onClick={handleBuyNow} size="lg" className="w-full">
+                      <DollarSign className="mr-2 h-4 w-4" />
+                      Buy Now
+                    </Button>
+                    <Button
+                      onClick={() => setOfferDialogOpen(true)}
+                      variant="outline"
+                      size="lg"
+                      className="w-full"
+                    >
+                      <Tag className="mr-2 h-4 w-4" />
+                      Make an Offer
+                    </Button>
+                  </>
+                )}
                 <Button
                   onClick={handleContactSeller}
                   variant="outline"
