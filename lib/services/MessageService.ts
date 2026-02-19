@@ -109,8 +109,8 @@ export class MessageService {
     private messageRepository: MessageRepository,
     private userRepository: UserRepository,
     private projectRepository: ProjectRepository,
-    private emailService?: any, // EmailService type (optional for now)
-    private notificationService?: any // NotificationService (optional)
+    private emailService?: any,
+    private notificationService?: any
   ) {
     console.log('[MessageService] Initialized');
   }
@@ -138,10 +138,8 @@ export class MessageService {
   ): Promise<MessageWithRelations> {
     console.log('[MessageService] Sending message from:', senderId);
 
-    // Validate input
     await this.validateMessageData(senderId, data);
 
-    // Convert request to repository input
     const createInput: CreateMessageInput = {
       senderId,
       recipientId: data.recipientId,
@@ -150,17 +148,14 @@ export class MessageService {
       transactionId: data.transactionId || null,
     };
 
-    // Create message
     const message = await this.messageRepository.create(createInput);
 
-    // Send email notification (async, don't wait)
     if (this.emailService) {
       this.emailService.sendNewMessageNotification(message).catch((err: Error) => {
         console.error('[MessageService] Failed to send email notification:', err);
       });
     }
 
-    // Create in-app notification (async, don't wait)
     if (this.notificationService) {
       const senderName = message.sender.fullName || message.sender.username;
       this.notificationService
@@ -208,7 +203,6 @@ export class MessageService {
       projectId,
     });
 
-    // Validate users exist
     const currentUser = await this.userRepository.findById(currentUserId);
     if (!currentUser) {
       throw new MessagePermissionError('Current user not found');
@@ -219,20 +213,17 @@ export class MessageService {
       throw new MessagePermissionError('Other user not found');
     }
 
-    // Get messages
     const messages = await this.messageRepository.getConversation(
       currentUserId,
       otherUserId,
       projectId
     );
 
-    // Get project if specified
     let project = null;
     if (projectId) {
       project = await this.projectRepository.findById(projectId);
     }
 
-    // Auto-mark messages from other user as read
     const unreadMessageIds = messages
       .filter((msg) => msg.senderId === otherUserId && !msg.isRead)
       .map((msg) => msg.id);
@@ -343,7 +334,6 @@ export class MessageService {
     senderId: string,
     data: SendMessageRequest
   ): Promise<void> {
-    // Content validation
     if (!data.content || data.content.trim().length === 0) {
       throw new MessageValidationError('Message content is required', 'content');
     }
@@ -363,12 +353,10 @@ export class MessageService {
       );
     }
 
-    // Recipient validation
     if (!data.recipientId || data.recipientId.trim().length === 0) {
       throw new MessageValidationError('Recipient is required', 'recipientId');
     }
 
-    // Can't message yourself
     if (data.recipientId === senderId) {
       throw new MessageValidationError(
         'You cannot send messages to yourself',
@@ -376,37 +364,31 @@ export class MessageService {
       );
     }
 
-    // Verify recipient exists
     const recipient = await this.userRepository.findById(data.recipientId);
     if (!recipient) {
       throw new MessagePermissionError('Recipient user not found');
     }
 
-    // Verify sender exists
     const sender = await this.userRepository.findById(senderId);
     if (!sender) {
       throw new MessagePermissionError('Sender user not found');
     }
 
-    // Project validation (if provided)
     if (data.projectId) {
       const project = await this.projectRepository.findById(data.projectId);
       if (!project) {
         throw new MessageValidationError('Project not found', 'projectId');
       }
 
-      // Verify project is active
-      if (project.status !== 'active') {
+      if (project.status !== 'active' && project.status !== 'sold') {
         throw new MessageValidationError(
-          'Can only message about active projects',
+          'Can only message about active or sold projects',
           'projectId'
         );
       }
     }
 
-    // Transaction validation (if provided)
     // Note: TransactionRepository doesn't exist yet, skip for now
-    // Will be added when TransactionService is implemented
     if (data.transactionId) {
       console.warn(
         '[MessageService] Transaction validation not yet implemented - skipping'
