@@ -13,7 +13,6 @@
 
 import { createClient } from 'redis';
 
-// Redis client singleton
 let cacheClient: ReturnType<typeof createClient> | null = null;
 let cacheConnectionFailed = false;
 let cacheErrorLogged = false;
@@ -25,7 +24,6 @@ let cacheErrorLogged = false;
  * Logs errors only once to prevent log spam.
  */
 export async function getCacheClient(): Promise<ReturnType<typeof createClient> | null> {
-  // Skip if no REDIS_URL configured or previous connection failed
   if (!process.env['REDIS_URL']) {
     if (!cacheErrorLogged) {
       console.warn('[Cache] REDIS_URL not configured, caching disabled');
@@ -120,6 +118,12 @@ export const CacheTTL = {
    * Use for rarely changing data
    */
   LONG: 3600,
+
+  /**
+   * Repo analysis: 24 hours
+   * GitHub repo AI analysis — expensive, changes only when repo is pushed to
+   */
+  REPO_ANALYSIS: 86400,
 } as const;
 
 /**
@@ -149,7 +153,7 @@ export async function getCache(key: string): Promise<string | null> {
     return value;
   } catch (error) {
     console.error('[Cache] Error getting cache:', error);
-    return null; // Fail gracefully
+    return null;
   }
 }
 
@@ -175,7 +179,6 @@ export async function setCache(
     console.log(`[Cache] SET: ${key} (TTL: ${ttlSeconds}s)`);
   } catch (error) {
     console.error('[Cache] Error setting cache:', error);
-    // Fail gracefully - don't throw
   }
 }
 
@@ -185,8 +188,8 @@ export async function setCache(
  * @param pattern - Cache key or pattern (e.g., 'user:123:*')
  *
  * @example
- * await deleteCache('user:123:profile'); // Delete specific key
- * await deleteCache('user:123:*'); // Delete all keys matching pattern
+ * await deleteCache('user:123:profile');
+ * await deleteCache('user:123:*');
  */
 export async function deleteCache(pattern: string): Promise<void> {
   try {
@@ -194,14 +197,12 @@ export async function deleteCache(pattern: string): Promise<void> {
     if (!redis) return;
 
     if (pattern.includes('*')) {
-      // Delete multiple keys matching pattern
       const keys = await redis.keys(pattern);
       if (keys.length > 0) {
         await redis.del(keys);
         console.log(`[Cache] DELETE: ${pattern} (${keys.length} keys)`);
       }
     } else {
-      // Delete single key
       await redis.del(pattern);
       console.log(`[Cache] DELETE: ${pattern}`);
     }
@@ -232,16 +233,13 @@ export async function getOrSetCache<T>(
   ttlSeconds: number,
   generator: () => Promise<T>
 ): Promise<T> {
-  // Try to get from cache
   const cached = await getCache(key);
   if (cached) {
     return JSON.parse(cached) as T;
   }
 
-  // Generate value
   const value = await generator();
 
-  // Cache for next time
   await setCache(key, JSON.stringify(value), ttlSeconds);
 
   return value;
@@ -322,6 +320,13 @@ export const CacheKeys = {
    * All featured cache (for invalidation)
    */
   featuredAll: () => 'featured:*',
+
+  /**
+   * GitHub repo AI analysis — keyed by fullName + pushedAt so any new push
+   * invalidates the cache automatically without manual TTL juggling.
+   */
+  repoAnalysis: (fullName: string, pushedAt: string) =>
+    `repo-analysis:${fullName}:${pushedAt}`,
 } as const;
 
 /**
@@ -340,8 +345,8 @@ export const invalidateCache = {
    */
   project: async (projectId: string) => {
     await deleteCache(CacheKeys.projectAll(projectId));
-    await deleteCache(CacheKeys.featuredAll()); // Featured list might include this project
-    await deleteCache(CacheKeys.searchAll()); // Search results might include this project
+    await deleteCache(CacheKeys.featuredAll());
+    await deleteCache(CacheKeys.searchAll());
   },
 
   /**
@@ -393,7 +398,7 @@ export const invalidateCache = {
  *   }
  * );
  *
- * // Use it
+ *
  * const projects = await getCachedFeaturedProjects();
  */
 export function withCache<T>(
@@ -424,12 +429,6 @@ export async function closeCacheConnection(): Promise<void> {
  */
 export async function warmupCache(): Promise<void> {
   console.log('[Cache] Warming up cache...');
-
-  // Add warmup logic here
-  // Example:
-  // - Load featured projects
-  // - Load popular search results
-  // - Load top sellers
 
   console.log('[Cache] Cache warmup complete');
 }
