@@ -11,13 +11,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
-
-const { mockAnalyzeRepo, mockFetchRepoData, mockGetOrSetCache } =
-  vi.hoisted(() => ({
-    mockAnalyzeRepo: vi.fn(),
-    mockFetchRepoData: vi.fn(),
-    mockGetOrSetCache: vi.fn(),
-  }));
+const { mockAnalyzeRepo, mockFetchRepoData, mockGetOrSetCache } = vi.hoisted(() => ({
+  mockAnalyzeRepo: vi.fn(),
+  mockFetchRepoData: vi.fn(),
+  mockGetOrSetCache: vi.fn(),
+}));
 
 vi.mock('@/lib/services/RepoAnalysisService', () => ({
   RepoAnalysisService: vi.fn().mockImplementation(() => ({
@@ -53,7 +51,9 @@ vi.mock('@/lib/middleware/withRateLimit', () => ({
   withRateLimit: (handler: unknown) => handler,
 }));
 
-vi.mock('@/lib/prisma', () => ({ prisma: { user: { findUnique: vi.fn().mockResolvedValue(null) } } }));
+vi.mock('@/lib/prisma', () => ({
+  prisma: { user: { findUnique: vi.fn().mockResolvedValue(null) } },
+}));
 vi.mock('@/lib/encryption', () => ({ decrypt: vi.fn() }));
 
 vi.mock('@/lib/api-auth', () => ({
@@ -66,7 +66,6 @@ vi.mock('@/lib/utils/rateLimit', () => ({
 
 import { POST } from '../route';
 import { authenticateApiRequest } from '@/lib/api-auth';
-
 
 const mockRepoData = {
   metadata: {
@@ -112,7 +111,6 @@ function makeRequest(body: object) {
   });
 }
 
-
 describe('POST /api/projects/analyze-repo', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -132,12 +130,14 @@ describe('POST /api/projects/analyze-repo', () => {
   });
 
   it('calls Claude and returns analysis on cache miss', async () => {
-    mockGetOrSetCache.mockImplementation(async (_key: string, _ttl: number, generator: () => Promise<unknown>) =>
-      generator()
+    mockGetOrSetCache.mockImplementation(
+      async (_key: string, _ttl: number, generator: () => Promise<unknown>) => generator()
     );
     mockAnalyzeRepo.mockResolvedValue(mockAnalysis);
 
-    const res = await POST(makeRequest({ githubUrl: 'https://github.com/owner/my-repo' }));
+    const res = await POST(
+      makeRequest({ githubUrl: 'https://github.com/owner/my-repo' })
+    );
     const body = await res.json();
 
     expect(res.status).toBe(200);
@@ -148,7 +148,9 @@ describe('POST /api/projects/analyze-repo', () => {
   it('does NOT call Claude when result is cached (cache hit)', async () => {
     mockGetOrSetCache.mockResolvedValue(mockAnalysis);
 
-    const res = await POST(makeRequest({ githubUrl: 'https://github.com/owner/my-repo' }));
+    const res = await POST(
+      makeRequest({ githubUrl: 'https://github.com/owner/my-repo' })
+    );
     const body = await res.json();
 
     expect(res.status).toBe(200);
