@@ -798,12 +798,7 @@ export class RepositoryTransferService {
       status = 'upcoming';
       description = 'Ownership transfer will happen after the review period';
 
-      if (
-        role === 'seller' &&
-        transaction.project.githubUrl &&
-        transferStatus &&
-        ['invitation_sent', 'accepted', 'completed'].includes(transferStatus)
-      ) {
+      if (role === 'seller' && transaction.project.githubUrl) {
         actions.push({
           label: 'Transfer Early',
           type: 'secondary',
