@@ -75,7 +75,9 @@ describe('NavigationLinks', () => {
     it('does not show My Purchases when unauthenticated', () => {
       mockPathname = '/';
       render(<NavigationLinks isAuthenticated={false} isSeller={false} />);
-      expect(screen.queryByRole('link', { name: 'My Purchases' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: 'My Purchases' })
+      ).not.toBeInTheDocument();
     });
 
     it('marks My Purchases active on /buyer/purchases', () => {
