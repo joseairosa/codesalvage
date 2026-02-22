@@ -35,6 +35,7 @@ import {
   Star,
   LogOut,
   ShieldCheck,
+  ShoppingBag,
 } from 'lucide-react';
 
 interface UserMenuProps {
@@ -61,7 +62,6 @@ export function UserMenu({ user }: UserMenuProps) {
     await signOut();
   };
 
-  // Get user initials for avatar fallback
   const initials = user.name
     ? user.name
         .split(' ')
@@ -125,6 +125,17 @@ export function UserMenu({ user }: UserMenuProps) {
             </Link>
           </DropdownMenuItem>
         )}
+
+        {/* My Purchases — visible to all authenticated users */}
+        <DropdownMenuItem asChild>
+          <Link
+            href="/buyer/purchases"
+            className="flex cursor-pointer items-center gap-2"
+          >
+            <ShoppingBag className="h-4 w-4" aria-hidden="true" />
+            <span>My Purchases</span>
+          </Link>
+        </DropdownMenuItem>
 
         {/* Seller-specific links */}
         {user.isSeller && (
