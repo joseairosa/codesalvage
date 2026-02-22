@@ -126,11 +126,7 @@ describe('ReviewPeriodCard', () => {
   describe('completed stage', () => {
     it('shows "Review period complete"', () => {
       render(
-        <ReviewPeriodCard
-          stage={completedStage}
-          userRole="buyer"
-          transactionId="txn-1"
-        />
+        <ReviewPeriodCard stage={completedStage} userRole="buyer" transactionId="txn-1" />
       );
       expect(screen.getByText('Review period complete')).toBeInTheDocument();
     });
@@ -152,11 +148,7 @@ describe('ReviewPeriodCard', () => {
   describe('upcoming stage', () => {
     it('does not show Transfer Ownership button', () => {
       render(
-        <ReviewPeriodCard
-          stage={upcomingStage}
-          userRole="seller"
-          transactionId="txn-1"
-        />
+        <ReviewPeriodCard stage={upcomingStage} userRole="seller" transactionId="txn-1" />
       );
       expect(
         screen.queryByRole('button', { name: /transfer ownership/i })
