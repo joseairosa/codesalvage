@@ -174,8 +174,18 @@ export function TransactionChat({
     }
   };
 
+  React.useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    const LINE_HEIGHT = 24;
+    const PADDING = 16;
+    const maxHeight = LINE_HEIGHT * 5 + PADDING;
+    el.style.height = Math.min(el.scrollHeight, maxHeight) + 'px';
+  }, [draft]);
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend(e as unknown as React.FormEvent);
     }
@@ -256,22 +266,24 @@ export function TransactionChat({
         </div>
 
         {/* Compose */}
-        <form onSubmit={handleSend} className="space-y-2">
-          <Textarea
-            ref={textareaRef}
-            placeholder="Type a message… (Cmd+Enter to send)"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={handleKeyDown}
-            rows={2}
-            disabled={isSending}
-            className="resize-none"
-          />
-
-          {sendError && <p className="text-xs text-destructive">{sendError}</p>}
-
-          <div className="flex justify-end">
-            <Button type="submit" size="sm" disabled={!draft.trim() || isSending}>
+        <form onSubmit={handleSend} className="space-y-1">
+          <div className="flex items-end gap-2">
+            <Textarea
+              ref={textareaRef}
+              placeholder="Type a message…"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={handleKeyDown}
+              rows={1}
+              disabled={isSending}
+              className="min-h-9 flex-1 resize-none overflow-hidden py-2"
+            />
+            <Button
+              type="submit"
+              size="sm"
+              disabled={!draft.trim() || isSending}
+              className="shrink-0"
+            >
               {isSending ? (
                 <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
               ) : (
@@ -280,6 +292,10 @@ export function TransactionChat({
               Send
             </Button>
           </div>
+          <p className="text-xs text-muted-foreground">
+            Press Enter to send · Shift+Enter for new line
+          </p>
+          {sendError && <p className="text-xs text-destructive">{sendError}</p>}
         </form>
       </CardContent>
     </Card>

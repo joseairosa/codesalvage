@@ -37,10 +37,16 @@ import type { TimelineStage } from '@/lib/services/RepositoryTransferService';
 
 const componentName = 'ReviewPeriodCard';
 
+export interface ExistingReview {
+  id: string;
+  overallRating: number;
+}
+
 export interface ReviewPeriodCardProps {
   stage: TimelineStage;
   userRole: 'buyer' | 'seller';
   transactionId: string;
+  existingReview?: ExistingReview | null;
 }
 
 const REVIEW_PERIOD_DAYS = 7;
@@ -66,6 +72,7 @@ export function ReviewPeriodCard({
   stage,
   userRole,
   transactionId,
+  existingReview,
 }: ReviewPeriodCardProps) {
   const daysRemaining = (stage.metadata?.['daysRemaining'] as number) ?? 0;
   const escrowReleaseDate = stage.metadata?.['escrowReleaseDate']
@@ -138,14 +145,33 @@ export function ReviewPeriodCard({
           </div>
         )}
 
-        {/* Buyer: leave a review */}
+        {/* Buyer: leave or edit a review */}
         {userRole === 'buyer' && isActive && (
-          <Button variant="outline" size="sm" asChild>
-            <a href={`/transactions/${transactionId}/review`}>
-              <Star className="mr-2 h-4 w-4" />
-              Leave a Review
-            </a>
-          </Button>
+          <div className="space-y-2">
+            {existingReview && (
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-4 w-4 ${
+                      i < existingReview.overallRating
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'text-muted-foreground'
+                    }`}
+                  />
+                ))}
+                <span className="ml-1 text-sm text-muted-foreground">
+                  Your rating: {existingReview.overallRating}/5
+                </span>
+              </div>
+            )}
+            <Button variant="outline" size="sm" asChild>
+              <a href={`/transactions/${transactionId}/review`}>
+                <Star className="mr-2 h-4 w-4" />
+                {existingReview ? 'Edit Review' : 'Leave a Review'}
+              </a>
+            </Button>
+          </div>
         )}
 
         {/* Seller: informational message */}

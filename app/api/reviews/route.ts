@@ -27,7 +27,6 @@ import { z } from 'zod';
 
 const componentName = 'ReviewsAPI';
 
-// Initialize repositories and service
 const reviewRepository = new ReviewRepository(prisma);
 const userRepository = new UserRepository(prisma);
 const transactionRepository = new TransactionRepository(prisma);
@@ -35,7 +34,7 @@ const reviewService = new ReviewService(
   reviewRepository,
   userRepository,
   transactionRepository,
-  undefined // emailService - service will handle
+  undefined
 );
 
 const createReviewSchema = z.object({
@@ -57,6 +56,20 @@ const createReviewSchema = z.object({
 async function listReviews(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+
+    const transactionId = searchParams.get('transactionId');
+    if (transactionId) {
+      const auth = await authenticateApiRequest(request);
+      if (!auth) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      const review = await prisma.review.findUnique({
+        where: { transactionId },
+        select: { id: true, overallRating: true, comment: true, createdAt: true },
+      });
+      return NextResponse.json({ review }, { status: 200 });
+    }
+
     const sellerId = searchParams.get('sellerId');
     const limit = parseInt(searchParams.get('limit') || '20', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
@@ -70,16 +83,13 @@ async function listReviews(request: NextRequest) {
 
     console.log(`[${componentName}] Fetching reviews for seller:`, sellerId);
 
-    // Convert offset to page number
     const page = Math.floor(offset / limit) + 1;
 
-    // Use ReviewService to get reviews
     const result = await reviewService.getSellerReviews(sellerId, {
       page,
       limit,
     });
 
-    // Anonymize buyer info if requested
     const sanitizedReviews = result.reviews.map((review) => ({
       ...review,
       buyer: review.isAnonymous
@@ -154,7 +164,6 @@ async function createReview(request: NextRequest) {
 
     console.log(`[${componentName}] Creating review for transaction:`, transactionId);
 
-    // Filter out undefined values for exactOptionalPropertyTypes
     const reviewData: any = {
       transactionId,
       overallRating,
@@ -168,7 +177,6 @@ async function createReview(request: NextRequest) {
     if (accuracyRating !== undefined) reviewData.accuracyRating = accuracyRating;
     if (isAnonymous !== undefined) reviewData.isAnonymous = isAnonymous;
 
-    // Use ReviewService to create review
     const review = await reviewService.createReview(auth.user.id, reviewData);
 
     console.log(`[${componentName}] Review created:`, review.id);
@@ -177,7 +185,6 @@ async function createReview(request: NextRequest) {
   } catch (error) {
     console.error(`[${componentName}] Error creating review:`, error);
 
-    // Map service errors to appropriate HTTP status codes
     if (error instanceof ReviewValidationError) {
       return NextResponse.json(
         {
