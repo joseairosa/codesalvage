@@ -78,6 +78,10 @@ function TransactionDetailContent() {
   const [timeline, setTimeline] = React.useState<TimelineStage[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [existingReview, setExistingReview] = React.useState<{
+    id: string;
+    overallRating: number;
+  } | null>(null);
 
   const userRole: 'buyer' | 'seller' =
     session?.user?.id === transaction?.buyerId ? 'buyer' : 'seller';
@@ -99,9 +103,10 @@ function TransactionDetailContent() {
     console.log(`[${componentName}] Fetching transaction data:`, transactionId);
 
     try {
-      const [txnResponse, timelineResponse] = await Promise.all([
+      const [txnResponse, timelineResponse, reviewResponse] = await Promise.all([
         fetch(`/api/transactions/${transactionId}`),
         fetch(`/api/transactions/${transactionId}/timeline`),
+        fetch(`/api/reviews?transactionId=${transactionId}`),
       ]);
 
       if (!txnResponse.ok) {
@@ -117,6 +122,11 @@ function TransactionDetailContent() {
       if (timelineResponse.ok) {
         const timelineData = await timelineResponse.json();
         setTimeline(timelineData);
+      }
+
+      if (reviewResponse.ok) {
+        const reviewData = await reviewResponse.json();
+        setExistingReview(reviewData.review ?? null);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load transaction');
@@ -270,6 +280,7 @@ function TransactionDetailContent() {
                 stage={reviewPeriodStage}
                 userRole={userRole}
                 transactionId={transaction.id}
+                existingReview={existingReview}
               />
             )}
 
