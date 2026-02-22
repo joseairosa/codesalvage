@@ -1061,6 +1061,18 @@ export class TransactionRepository {
    * @example
    * const releasedTx = await transactionRepo.releaseEscrowManually('tx123');
    */
+  async setEscrowReleaseDate(id: string, date: Date): Promise<Transaction> {
+    try {
+      return await this.prisma.transaction.update({
+        where: { id },
+        data: { escrowReleaseDate: date },
+      });
+    } catch (error) {
+      console.error('[TransactionRepository] setEscrowReleaseDate failed:', error);
+      throw new Error('[TransactionRepository] Failed to set escrow release date');
+    }
+  }
+
   async releaseEscrowManually(transactionId: string): Promise<Transaction> {
     console.log('[TransactionRepository] releaseEscrowManually called:', transactionId);
 

@@ -36,6 +36,7 @@ import {
   CreditCard,
   GitBranch,
   Shield,
+  Star,
   DollarSign,
 } from 'lucide-react';
 import {
@@ -70,7 +71,8 @@ function getStageIcon(stageName: string): React.ElementType {
     'Offer Accepted': Handshake,
     'Payment Received': CreditCard,
     'Collaborator Access': GitBranch,
-    'Review Period': Shield,
+    'Project Review': Shield,
+    'Trade Review': Star,
     'Ownership Transfer': DollarSign,
   };
   return iconMap[stageName] ?? Circle;
