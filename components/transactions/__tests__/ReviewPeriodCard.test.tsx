@@ -34,22 +34,14 @@ describe('ReviewPeriodCard', () => {
   describe('buyer — active stage — no existing review', () => {
     it('shows Leave a Review link', () => {
       render(
-        <ReviewPeriodCard
-          stage={activeStage}
-          userRole="buyer"
-          transactionId="txn-1"
-        />
+        <ReviewPeriodCard stage={activeStage} userRole="buyer" transactionId="txn-1" />
       );
       expect(screen.getByRole('link', { name: /leave a review/i })).toBeInTheDocument();
     });
 
     it('links to the review page', () => {
       render(
-        <ReviewPeriodCard
-          stage={activeStage}
-          userRole="buyer"
-          transactionId="txn-1"
-        />
+        <ReviewPeriodCard stage={activeStage} userRole="buyer" transactionId="txn-1" />
       );
       expect(screen.getByRole('link', { name: /leave a review/i })).toHaveAttribute(
         'href',
@@ -59,22 +51,16 @@ describe('ReviewPeriodCard', () => {
 
     it('does not show Edit Review', () => {
       render(
-        <ReviewPeriodCard
-          stage={activeStage}
-          userRole="buyer"
-          transactionId="txn-1"
-        />
+        <ReviewPeriodCard stage={activeStage} userRole="buyer" transactionId="txn-1" />
       );
-      expect(screen.queryByRole('link', { name: /edit review/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: /edit review/i })
+      ).not.toBeInTheDocument();
     });
 
     it('does not show star rating', () => {
       render(
-        <ReviewPeriodCard
-          stage={activeStage}
-          userRole="buyer"
-          transactionId="txn-1"
-        />
+        <ReviewPeriodCard stage={activeStage} userRole="buyer" transactionId="txn-1" />
       );
       expect(screen.queryByText(/your rating/i)).not.toBeInTheDocument();
     });
@@ -93,7 +79,9 @@ describe('ReviewPeriodCard', () => {
         />
       );
       expect(screen.getByRole('link', { name: /edit review/i })).toBeInTheDocument();
-      expect(screen.queryByRole('link', { name: /leave a review/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: /leave a review/i })
+      ).not.toBeInTheDocument();
     });
 
     it('displays the rating text', () => {
@@ -127,22 +115,14 @@ describe('ReviewPeriodCard', () => {
   describe('seller — active stage', () => {
     it('does not show a review link', () => {
       render(
-        <ReviewPeriodCard
-          stage={activeStage}
-          userRole="seller"
-          transactionId="txn-1"
-        />
+        <ReviewPeriodCard stage={activeStage} userRole="seller" transactionId="txn-1" />
       );
       expect(screen.queryByRole('link', { name: /review/i })).not.toBeInTheDocument();
     });
 
     it('shows informational escrow message', () => {
       render(
-        <ReviewPeriodCard
-          stage={activeStage}
-          userRole="seller"
-          transactionId="txn-1"
-        />
+        <ReviewPeriodCard stage={activeStage} userRole="seller" transactionId="txn-1" />
       );
       expect(screen.getByText(/the buyer has until/i)).toBeInTheDocument();
     });
@@ -151,11 +131,7 @@ describe('ReviewPeriodCard', () => {
   describe('upcoming stage', () => {
     it('does not show a review link', () => {
       render(
-        <ReviewPeriodCard
-          stage={upcomingStage}
-          userRole="buyer"
-          transactionId="txn-1"
-        />
+        <ReviewPeriodCard stage={upcomingStage} userRole="buyer" transactionId="txn-1" />
       );
       expect(screen.queryByRole('link', { name: /review/i })).not.toBeInTheDocument();
     });
@@ -164,22 +140,14 @@ describe('ReviewPeriodCard', () => {
   describe('completed stage', () => {
     it('shows "Review period complete" text', () => {
       render(
-        <ReviewPeriodCard
-          stage={completedStage}
-          userRole="buyer"
-          transactionId="txn-1"
-        />
+        <ReviewPeriodCard stage={completedStage} userRole="buyer" transactionId="txn-1" />
       );
       expect(screen.getByText('Review period complete')).toBeInTheDocument();
     });
 
     it('does not show a review link when completed', () => {
       render(
-        <ReviewPeriodCard
-          stage={completedStage}
-          userRole="buyer"
-          transactionId="txn-1"
-        />
+        <ReviewPeriodCard stage={completedStage} userRole="buyer" transactionId="txn-1" />
       );
       expect(screen.queryByRole('link', { name: /review/i })).not.toBeInTheDocument();
     });
