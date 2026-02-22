@@ -10,8 +10,15 @@ vi.mock('next/navigation', () => ({
 }));
 
 vi.mock('next/link', () => ({
-  default: ({ href, children, ...props }: { href: string; children: React.ReactNode; [key: string]: unknown }) =>
-    React.createElement('a', { href, ...props }, children),
+  default: ({
+    href,
+    children,
+    ...props
+  }: {
+    href: string;
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }) => React.createElement('a', { href, ...props }, children),
 }));
 
 describe('NavigationLinks', () => {

@@ -58,12 +58,16 @@ describe('BuyerOfferCard', () => {
   describe('accepted offer — no transaction (not yet purchased)', () => {
     it('shows Proceed to Checkout button', () => {
       render(<BuyerOfferCard {...baseProps} />);
-      expect(screen.getByRole('button', { name: /proceed to checkout/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /proceed to checkout/i })
+      ).toBeInTheDocument();
     });
 
     it('does not show View Purchase button', () => {
       render(<BuyerOfferCard {...baseProps} />);
-      expect(screen.queryByRole('button', { name: /view purchase/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /view purchase/i })
+      ).not.toBeInTheDocument();
     });
 
     it('navigates to checkout on click', async () => {
@@ -105,13 +109,17 @@ describe('BuyerOfferCard', () => {
 
     it('calls onWithdraw with offer id', async () => {
       const onWithdraw = vi.fn();
-      render(<BuyerOfferCard {...baseProps} offer={pendingOffer} onWithdraw={onWithdraw} />);
+      render(
+        <BuyerOfferCard {...baseProps} offer={pendingOffer} onWithdraw={onWithdraw} />
+      );
       await userEvent.click(screen.getByRole('button', { name: /withdraw/i }));
       expect(onWithdraw).toHaveBeenCalledWith('offer-1');
     });
 
     it('disables Withdraw while action is loading', () => {
-      render(<BuyerOfferCard {...baseProps} offer={pendingOffer} isActionLoading={true} />);
+      render(
+        <BuyerOfferCard {...baseProps} offer={pendingOffer} isActionLoading={true} />
+      );
       expect(screen.getByRole('button', { name: /withdraw/i })).toBeDisabled();
     });
   });
@@ -139,7 +147,11 @@ describe('BuyerOfferCard', () => {
     it('calls onAcceptCounter with counter offer id', async () => {
       const onAcceptCounter = vi.fn();
       render(
-        <BuyerOfferCard {...baseProps} offer={counteredOffer} onAcceptCounter={onAcceptCounter} />
+        <BuyerOfferCard
+          {...baseProps}
+          offer={counteredOffer}
+          onAcceptCounter={onAcceptCounter}
+        />
       );
       await userEvent.click(screen.getByRole('button', { name: /accept/i }));
       expect(onAcceptCounter).toHaveBeenCalledWith('counter-1');
@@ -148,7 +160,11 @@ describe('BuyerOfferCard', () => {
     it('calls onRejectCounter with counter offer id', async () => {
       const onRejectCounter = vi.fn();
       render(
-        <BuyerOfferCard {...baseProps} offer={counteredOffer} onRejectCounter={onRejectCounter} />
+        <BuyerOfferCard
+          {...baseProps}
+          offer={counteredOffer}
+          onRejectCounter={onRejectCounter}
+        />
       );
       await userEvent.click(screen.getByRole('button', { name: /reject/i }));
       expect(onRejectCounter).toHaveBeenCalledWith('counter-1');
