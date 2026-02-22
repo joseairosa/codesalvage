@@ -348,8 +348,8 @@ export class RepositoryTransferService {
   /**
    * Build timeline data for a transaction's progress.
    *
-   * Returns 5 stages: Offer Accepted, Payment Received, Repository Transfer,
-   * Review Period, and Escrow Released.
+   * Returns 6 stages: Offer Accepted, Payment Received, Repository Transfer,
+   * Project Review, Trade Review, and Ownership Transfer.
    *
    * @param transactionId - Transaction ID
    * @param userId - Current user ID (must be buyer or seller)
@@ -380,16 +380,18 @@ export class RepositoryTransferService {
 
     const stage3 = this.buildRepositoryTransferStage(transaction, role, transactionId);
 
-    const stage4 = this.buildReviewPeriodStage(transaction, stage3, role, transactionId);
+    const stage4 = this.buildProjectReviewStage(transaction, stage3, role, transactionId);
 
-    const stage5 = this.buildOwnershipTransferStage(
+    const stage5 = this.buildTradeReviewStage(transaction, role, transactionId);
+
+    const stage6 = this.buildOwnershipTransferStage(
       transaction,
       stage4,
       role,
       transactionId
     );
 
-    return [stage1, stage2, stage3, stage4, stage5];
+    return [stage1, stage2, stage3, stage4, stage5, stage6];
   }
 
   private buildOfferAcceptedStage(transaction: TransactionWithRelations): TimelineStage {
@@ -523,13 +525,14 @@ export class RepositoryTransferService {
     };
   }
 
-  private buildReviewPeriodStage(
+  private buildProjectReviewStage(
     transaction: TransactionWithRelations,
     _stage3: TimelineStage,
     role: string,
     transactionId: string
   ): TimelineStage {
-    const actions: TimelineAction[] = [];
+    void role;
+    void transactionId;
     const paymentDone = transaction.paymentStatus === 'succeeded';
     const escrowReleaseDate = transaction.escrowReleaseDate;
     const now = new Date();
@@ -543,14 +546,47 @@ export class RepositoryTransferService {
 
     if (!paymentDone) {
       status = 'upcoming';
-      description = 'Review period begins after payment';
+      description = 'Project review begins after payment';
     } else if (escrowReleaseDate && now >= escrowReleaseDate) {
       status = 'completed';
-      description = 'Review period has ended';
+      description = 'Project review period has ended';
     } else {
       status = 'active';
       const days = daysRemaining ?? 7;
       description = `${days} day${days !== 1 ? 's' : ''} remaining to review and raise any disputes`;
+    }
+
+    return {
+      name: 'Project Review',
+      status,
+      completedAt: status === 'completed' && escrowReleaseDate ? escrowReleaseDate : null,
+      description,
+      actions: [],
+      metadata: {
+        escrowReleaseDate: escrowReleaseDate ?? null,
+        daysRemaining: daysRemaining ?? 0,
+      },
+    };
+  }
+
+  private buildTradeReviewStage(
+    transaction: TransactionWithRelations,
+    role: string,
+    transactionId: string
+  ): TimelineStage {
+    const paymentDone = transaction.paymentStatus === 'succeeded';
+    const review = transaction.review;
+
+    let status: TimelineStageStatus;
+    let description: string;
+    const actions: TimelineAction[] = [];
+
+    if (review) {
+      status = 'completed';
+      description = `Review submitted — ${review.overallRating}/5 stars`;
+    } else if (paymentDone) {
+      status = 'active';
+      description = 'Rate your experience with the seller';
 
       if (role === 'buyer') {
         actions.push({
@@ -559,18 +595,17 @@ export class RepositoryTransferService {
           url: '/transactions/' + transactionId + '/review',
         });
       }
+    } else {
+      status = 'upcoming';
+      description = 'Leave a review for the seller after purchase';
     }
 
     return {
-      name: 'Review Period',
+      name: 'Trade Review',
       status,
-      completedAt: status === 'completed' && escrowReleaseDate ? escrowReleaseDate : null,
+      completedAt: review ? review.createdAt : null,
       description,
       actions,
-      metadata: {
-        escrowReleaseDate: escrowReleaseDate ?? null,
-        daysRemaining: daysRemaining ?? 0,
-      },
     };
   }
 
@@ -756,6 +791,58 @@ export class RepositoryTransferService {
     return { processed };
   }
 
+  /**
+   * Seller-initiated early release of the review period.
+   *
+   * Sets escrowReleaseDate to now so all downstream logic treats the review
+   * period as ended, then triggers a full ownership transfer (GitHub + escrow).
+   * If there is no GitHub repository the escrow is released directly.
+   *
+   * @param transactionId - Transaction to release
+   * @param sellerId      - Must match transaction.sellerId
+   */
+  async sellerEarlyRelease(
+    transactionId: string,
+    sellerId: string
+  ): Promise<{ success: boolean; reason?: string }> {
+    console.log('[RepositoryTransferService] sellerEarlyRelease called:', transactionId);
+
+    const transaction = await this.transactionRepository.findById(transactionId);
+    if (!transaction) {
+      throw new RepositoryTransferNotFoundError('Transaction not found');
+    }
+
+    if (transaction.sellerId !== sellerId) {
+      throw new RepositoryTransferPermissionError(
+        'Only the seller can initiate an early release'
+      );
+    }
+
+    if (transaction.escrowStatus === 'released') {
+      throw new RepositoryTransferValidationError('Escrow has already been released');
+    }
+
+    if (transaction.paymentStatus !== 'succeeded') {
+      throw new RepositoryTransferValidationError('Payment has not been received yet');
+    }
+
+    await this.transactionRepository.setEscrowReleaseDate(transactionId, new Date());
+
+    if (!transaction.project.githubUrl) {
+      await this.transactionRepository.releaseEscrow(transactionId);
+      return { success: true };
+    }
+
+    const result = await this.transferOwnership(transactionId, sellerId);
+    if (result.skipped) {
+      await this.transactionRepository.releaseEscrow(transactionId);
+      const reason = result.reason;
+      return reason !== undefined ? { success: true, reason } : { success: true };
+    }
+
+    return result;
+  }
+
   private buildOwnershipTransferStage(
     transaction: TransactionWithRelations,
     stage4: TimelineStage,
@@ -797,15 +884,6 @@ export class RepositoryTransferService {
     } else {
       status = 'upcoming';
       description = 'Ownership transfer will happen after the review period';
-
-      if (role === 'seller' && transaction.project.githubUrl) {
-        actions.push({
-          label: 'Transfer Early',
-          type: 'secondary',
-          apiEndpoint: '/api/transactions/' + transactionId + '/transfer-ownership',
-          apiMethod: 'POST',
-        });
-      }
     }
 
     return {

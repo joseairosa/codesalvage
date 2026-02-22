@@ -37,6 +37,7 @@ const mockTransactionRepository = {
   updateEscrowStatus: vi.fn().mockResolvedValue({}),
   findTransactionsForAutoTransfer: vi.fn().mockResolvedValue([]),
   claimForTransferProcessing: vi.fn().mockResolvedValue(1),
+  setEscrowReleaseDate: vi.fn().mockResolvedValue({}),
 } as unknown as TransactionRepository;
 
 const mockGitHubService = {
@@ -683,7 +684,7 @@ describe('RepositoryTransferService', () => {
   });
 
   describe('getTimelineData', () => {
-    it('should return 5 stages for completed transaction', async () => {
+    it('should return 6 stages for completed transaction', async () => {
       const transaction = createMockTransaction({
         escrowStatus: 'released',
         releasedToSellerAt: new Date('2026-02-18T12:00:00Z'),
@@ -713,16 +714,17 @@ describe('RepositoryTransferService', () => {
 
       const stages = await service.getTimelineData('txn-123', 'buyer-123');
 
-      expect(stages).toHaveLength(5);
+      expect(stages).toHaveLength(6);
       expect(stages[0]!.name).toBe('Offer Accepted');
       expect(stages[0]!.status).toBe('completed');
       expect(stages[1]!.name).toBe('Payment Received');
       expect(stages[1]!.status).toBe('completed');
       expect(stages[2]!.name).toBe('Collaborator Access');
       expect(stages[2]!.status).toBe('completed');
-      expect(stages[3]!.name).toBe('Review Period');
-      expect(stages[4]!.name).toBe('Ownership Transfer');
-      expect(stages[4]!.status).toBe('completed');
+      expect(stages[3]!.name).toBe('Project Review');
+      expect(stages[4]!.name).toBe('Trade Review');
+      expect(stages[5]!.name).toBe('Ownership Transfer');
+      expect(stages[5]!.status).toBe('completed');
     });
 
     it('should show offer accepted for direct purchase (no offer)', async () => {
@@ -913,13 +915,16 @@ describe('RepositoryTransferService', () => {
 
       const stages = await service.getTimelineData('txn-123', 'buyer-123');
 
-      expect(stages[3]!.name).toBe('Review Period');
+      expect(stages[3]!.name).toBe('Project Review');
       expect(stages[3]!.status).toBe('active');
       expect(stages[3]!.description).toMatch(/\d+ days? remaining to review/);
       expect(stages[3]!.metadata).toBeDefined();
       expect(stages[3]!.metadata!['daysRemaining']).toBeGreaterThan(0);
-      expect(stages[3]!.actions).toHaveLength(1);
-      expect(stages[3]!.actions[0]).toEqual({
+      expect(stages[3]!.actions).toHaveLength(0);
+      expect(stages[4]!.name).toBe('Trade Review');
+      expect(stages[4]!.status).toBe('active');
+      expect(stages[4]!.actions).toHaveLength(1);
+      expect(stages[4]!.actions[0]).toEqual({
         label: 'Leave Review',
         type: 'link',
         url: '/transactions/txn-123/review',
@@ -957,10 +962,10 @@ describe('RepositoryTransferService', () => {
 
       const stages = await service.getTimelineData('txn-123', 'seller-123');
 
-      expect(stages[4]!.name).toBe('Ownership Transfer');
-      expect(stages[4]!.status).toBe('completed');
-      expect(stages[4]!.completedAt).toEqual(new Date('2026-01-08T00:00:00Z'));
-      expect(stages[4]!.description).toBe(
+      expect(stages[5]!.name).toBe('Ownership Transfer');
+      expect(stages[5]!.status).toBe('completed');
+      expect(stages[5]!.completedAt).toEqual(new Date('2026-01-08T00:00:00Z'));
+      expect(stages[5]!.description).toBe(
         'Ownership transferred — funds have been released to the seller'
       );
     });
@@ -1030,11 +1035,11 @@ describe('RepositoryTransferService', () => {
 
       const stages = await service.getTimelineData('txn-123', 'buyer-123');
 
-      expect(stages[3]!.name).toBe('Review Period');
+      expect(stages[3]!.name).toBe('Project Review');
       expect(stages[3]!.status).toBe('active');
     });
 
-    it('should name stage 5 "Ownership Transfer" not "Escrow Released"', async () => {
+    it('should name stage 6 "Ownership Transfer" not "Escrow Released"', async () => {
       const transaction = createMockTransaction();
       (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
         transaction
@@ -1042,7 +1047,7 @@ describe('RepositoryTransferService', () => {
 
       const stages = await service.getTimelineData('txn-123', 'buyer-123');
 
-      expect(stages[4]!.name).toBe('Ownership Transfer');
+      expect(stages[5]!.name).toBe('Ownership Transfer');
     });
 
     it('should show "Transfer Now" button for seller when review period has passed', async () => {
@@ -1073,7 +1078,7 @@ describe('RepositoryTransferService', () => {
 
       const stages = await service.getTimelineData('txn-123', 'seller-123');
 
-      const ownershipStage = stages[4]!;
+      const ownershipStage = stages[5]!;
       expect(ownershipStage.name).toBe('Ownership Transfer');
       expect(ownershipStage.actions).toHaveLength(1);
       expect(ownershipStage.actions[0]!.label).toBe('Transfer Now');
@@ -1083,7 +1088,7 @@ describe('RepositoryTransferService', () => {
       expect(ownershipStage.actions[0]!.apiMethod).toBe('POST');
     });
 
-    it('should show "Transfer Early" button for seller during review period', async () => {
+    it('should show no actions for ownership transfer during review period', async () => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 5);
       const transaction = createMockTransaction({
@@ -1112,13 +1117,10 @@ describe('RepositoryTransferService', () => {
 
       const stages = await service.getTimelineData('txn-123', 'seller-123');
 
-      const ownershipStage = stages[4]!;
+      const ownershipStage = stages[5]!;
       expect(ownershipStage.name).toBe('Ownership Transfer');
-      expect(ownershipStage.actions).toHaveLength(1);
-      expect(ownershipStage.actions[0]!.label).toBe('Transfer Early');
-      expect(ownershipStage.actions[0]!.apiEndpoint).toBe(
-        '/api/transactions/txn-123/transfer-ownership'
-      );
+      expect(ownershipStage.status).toBe('upcoming');
+      expect(ownershipStage.actions).toHaveLength(0);
     });
 
     it('should show transfer in progress description when transfer_initiated in stage 5', async () => {
@@ -1148,7 +1150,7 @@ describe('RepositoryTransferService', () => {
 
       const stages = await service.getTimelineData('txn-123', 'buyer-123');
 
-      const ownershipStage = stages[4]!;
+      const ownershipStage = stages[5]!;
       expect(ownershipStage.name).toBe('Ownership Transfer');
       expect(ownershipStage.status).toBe('active');
       expect(ownershipStage.description).toContain('progress');

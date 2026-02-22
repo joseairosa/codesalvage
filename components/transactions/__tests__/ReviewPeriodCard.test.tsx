@@ -1,13 +1,14 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { ReviewPeriodCard } from '../ReviewPeriodCard';
 import type { TimelineStage } from '@/lib/services/RepositoryTransferService';
 
 const activeStage: TimelineStage = {
-  name: 'Review Period',
+  name: 'Project Review',
   status: 'active',
-  description: 'Buyer has 7 days to review the project.',
+  description: '5 days remaining to review and raise any disputes',
   actions: [],
   metadata: {
     daysRemaining: 5,
@@ -16,140 +17,142 @@ const activeStage: TimelineStage = {
 };
 
 const completedStage: TimelineStage = {
-  name: 'Review Period',
+  name: 'Project Review',
   status: 'completed',
-  description: 'Review period complete.',
+  description: 'Project review period has ended',
   actions: [],
   metadata: { daysRemaining: 0 },
 };
 
 const upcomingStage: TimelineStage = {
-  name: 'Review Period',
+  name: 'Project Review',
   status: 'upcoming',
-  description: 'Review period has not started yet.',
+  description: 'Project review begins after payment',
   actions: [],
 };
 
 describe('ReviewPeriodCard', () => {
-  describe('buyer — active stage — no existing review', () => {
-    it('shows Leave a Review link', () => {
+  describe('card title', () => {
+    it('shows "Project Review" as the heading', () => {
       render(
         <ReviewPeriodCard stage={activeStage} userRole="buyer" transactionId="txn-1" />
       );
-      expect(screen.getByRole('link', { name: /leave a review/i })).toBeInTheDocument();
-    });
-
-    it('links to the review page', () => {
-      render(
-        <ReviewPeriodCard stage={activeStage} userRole="buyer" transactionId="txn-1" />
-      );
-      expect(screen.getByRole('link', { name: /leave a review/i })).toHaveAttribute(
-        'href',
-        '/transactions/txn-1/review'
-      );
-    });
-
-    it('does not show Edit Review', () => {
-      render(
-        <ReviewPeriodCard stage={activeStage} userRole="buyer" transactionId="txn-1" />
-      );
-      expect(
-        screen.queryByRole('link', { name: /edit review/i })
-      ).not.toBeInTheDocument();
-    });
-
-    it('does not show star rating', () => {
-      render(
-        <ReviewPeriodCard stage={activeStage} userRole="buyer" transactionId="txn-1" />
-      );
-      expect(screen.queryByText(/your rating/i)).not.toBeInTheDocument();
-    });
-  });
-
-  describe('buyer — active stage — with existing review', () => {
-    const existingReview = { id: 'rev-1', overallRating: 4 };
-
-    it('shows Edit Review link instead of Leave a Review', () => {
-      render(
-        <ReviewPeriodCard
-          stage={activeStage}
-          userRole="buyer"
-          transactionId="txn-1"
-          existingReview={existingReview}
-        />
-      );
-      expect(screen.getByRole('link', { name: /edit review/i })).toBeInTheDocument();
-      expect(
-        screen.queryByRole('link', { name: /leave a review/i })
-      ).not.toBeInTheDocument();
-    });
-
-    it('displays the rating text', () => {
-      render(
-        <ReviewPeriodCard
-          stage={activeStage}
-          userRole="buyer"
-          transactionId="txn-1"
-          existingReview={existingReview}
-        />
-      );
-      expect(screen.getByText(/your rating: 4\/5/i)).toBeInTheDocument();
-    });
-
-    it('links to the review page', () => {
-      render(
-        <ReviewPeriodCard
-          stage={activeStage}
-          userRole="buyer"
-          transactionId="txn-1"
-          existingReview={existingReview}
-        />
-      );
-      expect(screen.getByRole('link', { name: /edit review/i })).toHaveAttribute(
-        'href',
-        '/transactions/txn-1/review'
-      );
+      expect(screen.getByText('Project Review')).toBeInTheDocument();
     });
   });
 
   describe('seller — active stage', () => {
-    it('does not show a review link', () => {
+    it('shows Transfer Ownership Now button', () => {
       render(
         <ReviewPeriodCard stage={activeStage} userRole="seller" transactionId="txn-1" />
       );
-      expect(screen.queryByRole('link', { name: /review/i })).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /transfer ownership now/i })
+      ).toBeInTheDocument();
     });
 
-    it('shows informational escrow message', () => {
+    it('shows informational text about the dispute window', () => {
       render(
         <ReviewPeriodCard stage={activeStage} userRole="seller" transactionId="txn-1" />
       );
       expect(screen.getByText(/the buyer has until/i)).toBeInTheDocument();
     });
+
+    it('opens confirmation dialog when button is clicked', async () => {
+      render(
+        <ReviewPeriodCard stage={activeStage} userRole="seller" transactionId="txn-1" />
+      );
+      await userEvent.click(
+        screen.getByRole('button', { name: /transfer ownership now/i })
+      );
+      expect(screen.getByText(/transfer ownership now\?/i)).toBeInTheDocument();
+    });
+
+    it('shows irreversible warning in the dialog', async () => {
+      render(
+        <ReviewPeriodCard stage={activeStage} userRole="seller" transactionId="txn-1" />
+      );
+      await userEvent.click(
+        screen.getByRole('button', { name: /transfer ownership now/i })
+      );
+      expect(screen.getByText(/this action cannot be undone/i)).toBeInTheDocument();
+    });
+
+    it('calls early-release API and onActionComplete on confirm', async () => {
+      const onActionComplete = vi.fn();
+      global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
+
+      render(
+        <ReviewPeriodCard
+          stage={activeStage}
+          userRole="seller"
+          transactionId="txn-1"
+          onActionComplete={onActionComplete}
+        />
+      );
+      await userEvent.click(
+        screen.getByRole('button', { name: /transfer ownership now/i })
+      );
+      await userEvent.click(
+        screen.getByRole('button', { name: /yes, transfer ownership/i })
+      );
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/transactions/txn-1/early-release',
+        expect.objectContaining({ method: 'POST' })
+      );
+      expect(onActionComplete).toHaveBeenCalled();
+    });
   });
 
-  describe('upcoming stage', () => {
-    it('does not show a review link', () => {
+  describe('buyer — active stage', () => {
+    it('does not show Transfer Ownership button', () => {
       render(
-        <ReviewPeriodCard stage={upcomingStage} userRole="buyer" transactionId="txn-1" />
+        <ReviewPeriodCard stage={activeStage} userRole="buyer" transactionId="txn-1" />
       );
-      expect(screen.queryByRole('link', { name: /review/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /transfer ownership/i })
+      ).not.toBeInTheDocument();
+    });
+
+    it('does not show the dispute informational text', () => {
+      render(
+        <ReviewPeriodCard stage={activeStage} userRole="buyer" transactionId="txn-1" />
+      );
+      expect(screen.queryByText(/the buyer has until/i)).not.toBeInTheDocument();
     });
   });
 
   describe('completed stage', () => {
-    it('shows "Review period complete" text', () => {
+    it('shows "Review period complete"', () => {
       render(
         <ReviewPeriodCard stage={completedStage} userRole="buyer" transactionId="txn-1" />
       );
       expect(screen.getByText('Review period complete')).toBeInTheDocument();
     });
 
-    it('does not show a review link when completed', () => {
+    it('does not show Transfer Ownership button when completed', () => {
       render(
-        <ReviewPeriodCard stage={completedStage} userRole="buyer" transactionId="txn-1" />
+        <ReviewPeriodCard
+          stage={completedStage}
+          userRole="seller"
+          transactionId="txn-1"
+        />
       );
-      expect(screen.queryByRole('link', { name: /review/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /transfer ownership/i })
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('upcoming stage', () => {
+    it('does not show Transfer Ownership button', () => {
+      render(
+        <ReviewPeriodCard stage={upcomingStage} userRole="seller" transactionId="txn-1" />
+      );
+      expect(
+        screen.queryByRole('button', { name: /transfer ownership/i })
+      ).not.toBeInTheDocument();
     });
   });
 });
