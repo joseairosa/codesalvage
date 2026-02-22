@@ -50,6 +50,7 @@ export function NavigationLinks({
       ? [
           { href: '/dashboard', label: 'Dashboard', requiresAuth: true, exact: true },
           { href: '/dashboard/offers', label: 'My Offers', requiresAuth: true },
+          { href: '/buyer/purchases', label: 'My Purchases', requiresAuth: true },
           ...(isSeller
             ? [
                 { href: '/seller/projects', label: 'My Projects', requiresSeller: true },

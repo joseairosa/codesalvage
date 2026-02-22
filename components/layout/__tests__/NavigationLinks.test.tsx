@@ -58,4 +58,33 @@ describe('NavigationLinks', () => {
       expect(link).toHaveAttribute('aria-current', 'page');
     });
   });
+
+  describe('link visibility', () => {
+    it('shows My Purchases for authenticated users', () => {
+      mockPathname = '/';
+      render(<NavigationLinks isAuthenticated={true} isSeller={false} />);
+      expect(screen.getByRole('link', { name: 'My Purchases' })).toBeInTheDocument();
+    });
+
+    it('shows My Purchases for authenticated sellers too', () => {
+      mockPathname = '/';
+      render(<NavigationLinks isAuthenticated={true} isSeller={true} />);
+      expect(screen.getByRole('link', { name: 'My Purchases' })).toBeInTheDocument();
+    });
+
+    it('does not show My Purchases when unauthenticated', () => {
+      mockPathname = '/';
+      render(<NavigationLinks isAuthenticated={false} isSeller={false} />);
+      expect(screen.queryByRole('link', { name: 'My Purchases' })).not.toBeInTheDocument();
+    });
+
+    it('marks My Purchases active on /buyer/purchases', () => {
+      mockPathname = '/buyer/purchases';
+      render(<NavigationLinks isAuthenticated={true} isSeller={false} />);
+      expect(screen.getByRole('link', { name: 'My Purchases' })).toHaveAttribute(
+        'aria-current',
+        'page'
+      );
+    });
+  });
 });
