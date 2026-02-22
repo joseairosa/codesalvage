@@ -30,6 +30,7 @@ interface NavLink {
   label: string;
   requiresAuth?: boolean;
   requiresSeller?: boolean;
+  exact?: boolean;
 }
 
 /**
@@ -47,7 +48,7 @@ export function NavigationLinks({
     { href: '/how-it-works', label: 'How It Works' },
     ...(isAuthenticated
       ? [
-          { href: '/dashboard', label: 'Dashboard', requiresAuth: true },
+          { href: '/dashboard', label: 'Dashboard', requiresAuth: true, exact: true },
           { href: '/dashboard/offers', label: 'My Offers', requiresAuth: true },
           ...(isSeller
             ? [
@@ -68,7 +69,9 @@ export function NavigationLinks({
   return (
     <div className={cn('flex items-center gap-6', className)}>
       {links.map((link) => {
-        const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+        const isActive = link.exact
+          ? pathname === link.href
+          : pathname === link.href || pathname.startsWith(`${link.href}/`);
 
         return (
           <Link
