@@ -391,7 +391,7 @@ export class RepositoryTransferService {
       transactionId
     );
 
-    return [stage1, stage2, stage3, stage4, stage5, stage6];
+    return [stage1, stage2, stage3, stage5, stage4, stage6];
   }
 
   private buildOfferAcceptedStage(transaction: TransactionWithRelations): TimelineStage {

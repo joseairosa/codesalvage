@@ -721,8 +721,8 @@ describe('RepositoryTransferService', () => {
       expect(stages[1]!.status).toBe('completed');
       expect(stages[2]!.name).toBe('Collaborator Access');
       expect(stages[2]!.status).toBe('completed');
-      expect(stages[3]!.name).toBe('Project Review');
-      expect(stages[4]!.name).toBe('Trade Review');
+      expect(stages[3]!.name).toBe('Trade Review');
+      expect(stages[4]!.name).toBe('Project Review');
       expect(stages[5]!.name).toBe('Ownership Transfer');
       expect(stages[5]!.status).toBe('completed');
     });
@@ -915,20 +915,20 @@ describe('RepositoryTransferService', () => {
 
       const stages = await service.getTimelineData('txn-123', 'buyer-123');
 
-      expect(stages[3]!.name).toBe('Project Review');
+      expect(stages[3]!.name).toBe('Trade Review');
       expect(stages[3]!.status).toBe('active');
-      expect(stages[3]!.description).toMatch(/\d+ days? remaining to review/);
-      expect(stages[3]!.metadata).toBeDefined();
-      expect(stages[3]!.metadata!['daysRemaining']).toBeGreaterThan(0);
-      expect(stages[3]!.actions).toHaveLength(0);
-      expect(stages[4]!.name).toBe('Trade Review');
-      expect(stages[4]!.status).toBe('active');
-      expect(stages[4]!.actions).toHaveLength(1);
-      expect(stages[4]!.actions[0]).toEqual({
+      expect(stages[3]!.actions).toHaveLength(1);
+      expect(stages[3]!.actions[0]).toEqual({
         label: 'Leave Review',
         type: 'link',
         url: '/transactions/txn-123/review',
       });
+      expect(stages[4]!.name).toBe('Project Review');
+      expect(stages[4]!.status).toBe('active');
+      expect(stages[4]!.description).toMatch(/\d+ days? remaining to review/);
+      expect(stages[4]!.metadata).toBeDefined();
+      expect(stages[4]!.metadata!['daysRemaining']).toBeGreaterThan(0);
+      expect(stages[4]!.actions).toHaveLength(0);
     });
 
     it('should show completed escrow', async () => {
@@ -1035,8 +1035,8 @@ describe('RepositoryTransferService', () => {
 
       const stages = await service.getTimelineData('txn-123', 'buyer-123');
 
-      expect(stages[3]!.name).toBe('Project Review');
-      expect(stages[3]!.status).toBe('active');
+      expect(stages[4]!.name).toBe('Project Review');
+      expect(stages[4]!.status).toBe('active');
     });
 
     it('should name stage 6 "Ownership Transfer" not "Escrow Released"', async () => {
