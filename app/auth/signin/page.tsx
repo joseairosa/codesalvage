@@ -21,9 +21,9 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   sendSignInLinkToEmail,
-  onAuthStateChanged,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { useSession } from '@/lib/hooks/useSession';
 import { SignInCard } from './SignInCard';
 
 export default function SignInPage() {
@@ -39,6 +39,7 @@ function SignInContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';
   const urlError = searchParams.get('error');
+  const { status } = useSession();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -47,14 +48,10 @@ function SignInContent() {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
 
   useEffect(() => {
-    if (!auth) return;
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        router.replace(callbackUrl);
-      }
-    });
-    return () => unsubscribe();
-  }, [router, callbackUrl]);
+    if (status === 'authenticated') {
+      router.replace(callbackUrl);
+    }
+  }, [status, router, callbackUrl]);
 
   useEffect(() => {
     if (urlError) {
