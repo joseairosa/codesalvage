@@ -15,13 +15,17 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyFirebaseToken } from '@/lib/firebase-auth';
-import { withAuthRateLimit } from '@/lib/middleware/withRateLimit';
 
 /**
  * POST /api/auth/session
  * Store Firebase ID token in httpOnly cookie
+ *
+ * No rate limiting needed here: Firebase Admin SDK cryptographically
+ * validates every token (invalid tokens return 401 immediately).
+ * Rate limiting by IP was causing 429s for normal users since AuthProvider
+ * calls this endpoint on every page load (5 req/15min was too tight).
  */
-export const POST = withAuthRateLimit(async (request: NextRequest) => {
+export async function POST(request: NextRequest) {
   try {
     const { idToken } = await request.json();
 
@@ -66,7 +70,7 @@ export const POST = withAuthRateLimit(async (request: NextRequest) => {
       { status: statusCode }
     );
   }
-});
+}
 
 /**
  * DELETE /api/auth/session
