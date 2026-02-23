@@ -243,7 +243,7 @@ export function TransactionChat({
 
                     <div className="space-y-0.5">
                       <div
-                        className={`rounded-lg px-3 py-2 text-sm ${
+                        className={`w-full rounded-lg px-3 py-2 text-sm ${
                           isOwn
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-background text-foreground shadow-sm'
