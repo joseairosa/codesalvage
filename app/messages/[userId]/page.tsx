@@ -134,11 +134,9 @@ function ConversationContent({ params }: { params: { userId: string } }) {
       const data = await response.json();
       console.log(`[${componentName}] Message sent:`, data.message.id);
 
-      // Add new message to list
       setMessages((prev) => [...prev, data.message]);
       setNewMessage('');
 
-      // Scroll to bottom
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
@@ -176,7 +174,7 @@ function ConversationContent({ params }: { params: { userId: string } }) {
 
     const interval = setInterval(() => {
       fetchMessages();
-    }, 10000); // 10 seconds
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [sessionStatus, fetchMessages]);
@@ -297,7 +295,7 @@ function ConversationContent({ params }: { params: { userId: string } }) {
                         {/* Message Bubble */}
                         <div className="space-y-1">
                           <div
-                            className={`rounded-lg px-4 py-3 ${
+                            className={`w-full rounded-lg px-4 py-3 ${
                               isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'
                             }`}
                           >
