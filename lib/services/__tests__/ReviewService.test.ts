@@ -104,7 +104,6 @@ describe('ReviewService', () => {
     );
   });
 
-
   describe('createReview', () => {
     const buyerId = 'buyer123';
 
@@ -375,7 +374,6 @@ describe('ReviewService', () => {
     });
   });
 
-
   describe('getSellerReviews', () => {
     it('should get seller reviews', async () => {
       const sellerId = 'seller123';
@@ -430,7 +428,6 @@ describe('ReviewService', () => {
     });
   });
 
-
   describe('getSellerRatingStats', () => {
     it('should get seller rating stats', async () => {
       const sellerId = 'seller123';
@@ -459,7 +456,6 @@ describe('ReviewService', () => {
       );
     });
   });
-
 
   describe('getBuyerReviews', () => {
     it('should get buyer reviews', async () => {
@@ -498,7 +494,6 @@ describe('ReviewService', () => {
       );
     });
   });
-
 
   describe('isTransactionReviewed', () => {
     it('should return true if transaction is reviewed', async () => {

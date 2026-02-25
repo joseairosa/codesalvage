@@ -288,9 +288,7 @@ describe('MessageRepository', () => {
         .mockResolvedValueOnce(latestMessage1)
         .mockResolvedValueOnce(latestMessage2);
 
-      mockPrismaClient.message.count
-        .mockResolvedValueOnce(2)
-        .mockResolvedValueOnce(5);
+      mockPrismaClient.message.count.mockResolvedValueOnce(2).mockResolvedValueOnce(5);
 
       const result = await messageRepository.getConversations(userId);
 

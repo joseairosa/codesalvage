@@ -21,7 +21,9 @@ process.env['RESEND_API_KEY'] = 'test-resend-key';
 process.env['NEXT_PUBLIC_APP_URL'] = 'https://app.codesalvage.com';
 delete process.env['EMAIL_TEST_OVERRIDE'];
 
-const mockEmailsSend = vi.fn().mockResolvedValue({ data: { id: 'test-id' }, error: null });
+const mockEmailsSend = vi
+  .fn()
+  .mockResolvedValue({ data: { id: 'test-id' }, error: null });
 
 vi.mock('resend', () => ({
   Resend: vi.fn().mockImplementation(() => ({
@@ -33,7 +35,8 @@ vi.mock('@/config/env', () => ({
   get env() {
     return {
       RESEND_API_KEY: process.env['RESEND_API_KEY'],
-      NEXT_PUBLIC_APP_URL: process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://app.codesalvage.com',
+      NEXT_PUBLIC_APP_URL:
+        process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://app.codesalvage.com',
       EMAIL_TEST_OVERRIDE: process.env['EMAIL_TEST_OVERRIDE'],
     };
   },
@@ -51,7 +54,6 @@ import type {
 import type { MessageWithRelations } from '@/lib/repositories/MessageRepository';
 import type { ReviewWithRelations } from '@/lib/repositories/ReviewRepository';
 
-
 function makeMessage(
   recipientEmail: string,
   content = 'Hi, I have a question about your project...'
@@ -66,7 +68,12 @@ function makeMessage(
     readAt: null,
     projectId: 'project_1',
     transactionId: null,
-    sender: { id: 'sender_1', username: 'johndoe', fullName: 'John Doe', avatarUrl: null },
+    sender: {
+      id: 'sender_1',
+      username: 'johndoe',
+      fullName: 'John Doe',
+      avatarUrl: null,
+    },
     recipient: {
       id: 'recipient_1',
       username: 'janesmith',
@@ -74,7 +81,11 @@ function makeMessage(
       avatarUrl: null,
       email: recipientEmail,
     } as MessageWithRelations['recipient'],
-    project: { id: 'project_1', title: 'React Dashboard Template', thumbnailImageUrl: null },
+    project: {
+      id: 'project_1',
+      title: 'React Dashboard Template',
+      thumbnailImageUrl: null,
+    },
     transaction: null,
   };
 }
@@ -103,7 +114,6 @@ function makeReview(overallRating = 5, comment?: string): ReviewWithRelations {
   } as ReviewWithRelations;
 }
 
-
 describe('EmailService', () => {
   let emailService: EmailService;
 
@@ -112,7 +122,6 @@ describe('EmailService', () => {
     mockEmailsSend.mockResolvedValue({ data: { id: 'test-id' }, error: null });
     emailService = new EmailService();
   });
-
 
   describe('sendBuyerPurchaseConfirmation', () => {
     const recipient: EmailRecipient = { email: 'buyer@example.com', name: 'John Doe' };
@@ -149,19 +158,21 @@ describe('EmailService', () => {
 
     it('should throw when Resend returns error', async () => {
       mockEmailsSend.mockResolvedValueOnce({ error: { message: 'invalid_api_key' } });
-      await expect(emailService.sendBuyerPurchaseConfirmation(recipient, data)).rejects.toThrow(
-        'Failed to send email'
-      );
+      await expect(
+        emailService.sendBuyerPurchaseConfirmation(recipient, data)
+      ).rejects.toThrow('Failed to send email');
     });
 
     it('should handle recipient without name', async () => {
-      await emailService.sendBuyerPurchaseConfirmation({ email: 'buyer@example.com' }, data);
+      await emailService.sendBuyerPurchaseConfirmation(
+        { email: 'buyer@example.com' },
+        data
+      );
       expect(mockEmailsSend).toHaveBeenCalledWith(
         expect.objectContaining({ to: 'buyer@example.com' })
       );
     });
   });
-
 
   describe('sendSellerPurchaseNotification', () => {
     const recipient: EmailRecipient = { email: 'seller@example.com', name: 'Jane Smith' };
@@ -191,7 +202,6 @@ describe('EmailService', () => {
     });
   });
 
-
   describe('sendEscrowReleaseNotification', () => {
     const recipient: EmailRecipient = { email: 'seller@example.com', name: 'Jane Smith' };
     const data: EscrowReleaseEmailData = {
@@ -205,7 +215,9 @@ describe('EmailService', () => {
     it('should send with correct subject', async () => {
       await emailService.sendEscrowReleaseNotification(recipient, data);
       expect(mockEmailsSend).toHaveBeenCalledWith(
-        expect.objectContaining({ subject: 'Payment Released – React Dashboard Template' })
+        expect.objectContaining({
+          subject: 'Payment Released – React Dashboard Template',
+        })
       );
     });
 
@@ -215,7 +227,6 @@ describe('EmailService', () => {
       expect(html).toContain('$820.70');
     });
   });
-
 
   describe('sendNewMessageNotification', () => {
     it('should send to recipient email from message object', async () => {
@@ -232,7 +243,10 @@ describe('EmailService', () => {
     });
 
     it('should include message preview in html', async () => {
-      const message = makeMessage('jane@example.com', 'Hi, I have a question about your project...');
+      const message = makeMessage(
+        'jane@example.com',
+        'Hi, I have a question about your project...'
+      );
       await emailService.sendNewMessageNotification(message);
       const { html } = mockEmailsSend.mock.calls[0]![0]!;
       expect(html).toContain('Hi, I have a question');
@@ -253,9 +267,12 @@ describe('EmailService', () => {
     });
   });
 
-
   describe('sendNewReviewNotification', () => {
-    const seller = { email: 'seller@example.com', fullName: 'Jane Smith', username: 'janesmith' };
+    const seller = {
+      email: 'seller@example.com',
+      fullName: 'Jane Smith',
+      username: 'janesmith',
+    };
 
     it('should send to seller email', async () => {
       const review = makeReview(5, 'Great project!');
@@ -293,7 +310,6 @@ describe('EmailService', () => {
     });
   });
 
-
   describe('sendReviewReminder', () => {
     const recipient: EmailRecipient = { email: 'buyer@example.com', name: 'John Doe' };
     const data: ReviewEmailData = {
@@ -320,7 +336,6 @@ describe('EmailService', () => {
     });
   });
 
-
   describe('sendOfferAcceptedNotification', () => {
     const recipient: EmailRecipient = { email: 'buyer@example.com', name: 'John Doe' };
     const data: OfferEmailData = {
@@ -340,7 +355,6 @@ describe('EmailService', () => {
       expect(html).toContain('/checkout/project123');
     });
   });
-
 
   describe('sendFeaturedListingConfirmation', () => {
     const recipient: EmailRecipient = { email: 'seller@example.com', name: 'Jane Smith' };
@@ -371,7 +385,6 @@ describe('EmailService', () => {
     });
   });
 
-
   describe('price formatting', () => {
     const recipient: EmailRecipient = { email: 'test@example.com', name: 'Test' };
 
@@ -399,7 +412,6 @@ describe('EmailService', () => {
     });
   });
 
-
   describe('error handling', () => {
     it('should throw when Resend returns an error object', async () => {
       mockEmailsSend.mockResolvedValueOnce({ error: { message: 'rate_limit_exceeded' } });
@@ -420,7 +432,6 @@ describe('EmailService', () => {
       ).rejects.toThrow('Failed to send email');
     });
   });
-
 
   describe('EMAIL_TEST_OVERRIDE', () => {
     it('should redirect all emails to override address', async () => {
