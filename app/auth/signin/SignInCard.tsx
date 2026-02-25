@@ -89,7 +89,7 @@ export function SignInCard({
             <CardHeader className="space-y-2 text-center">
               <div className="mx-auto mb-4">
                 <Image
-                  src="/images/logo.png"
+                  src="/images/branding/codesalvage_logo_square.png"
                   alt="CodeSalvage"
                   width={64}
                   height={64}

@@ -39,7 +39,6 @@ prisma/schema.prisma     → PostgreSQL models (CUID IDs)
 ```
 
 **Key Principles:**
-
 - Dependency injection (services receive repos via constructor)
 - Single responsibility (each layer has one job)
 - Services instantiated as singletons in `lib/services/index.ts`
@@ -76,7 +75,6 @@ config/
 ## Development Commands
 
 **Docker (Primary):**
-
 ```bash
 npm run docker:dev       # Start app:3011, postgres:5444, redis:6390
 npm run docker:down      # Stop containers
@@ -84,7 +82,6 @@ npm run docker:logs      # Tail logs
 ```
 
 **Database:**
-
 ```bash
 npm run db:migrate       # Apply migrations (dev)
 npm run db:seed          # Seed database
@@ -93,7 +90,6 @@ npm run db:generate      # Regenerate Prisma client
 ```
 
 **Testing:**
-
 ```bash
 npm run test:ci          # Unit tests (single run)
 npm run test:with-db     # Full suite: setup test DB → test → teardown
@@ -102,7 +98,6 @@ npm run test:e2e         # Playwright E2E
 ```
 
 **Quality:**
-
 ```bash
 npm run lint             # ESLint check
 npm run lint:fix         # Auto-fix
@@ -111,7 +106,6 @@ npm run type-check       # TypeScript strict check
 ```
 
 **Build:**
-
 ```bash
 npm run build            # prisma generate && next build
 npm run start            # Production server (port 3000)
@@ -120,7 +114,6 @@ npm run start            # Production server (port 3000)
 ## Key Patterns
 
 ### API Routes
-
 ```typescript
 // app/api/*/route.ts
 import { NextResponse } from 'next/server';
@@ -133,7 +126,6 @@ return NextResponse.json({ error: 'Message' }, { status: 400 });
 ```
 
 ### Services
-
 ```typescript
 // lib/services/ExampleService.ts
 export class ExampleService {
@@ -156,7 +148,6 @@ export class ExampleService {
 ```
 
 ### Repositories
-
 ```typescript
 // lib/repositories/ExampleRepository.ts
 export class ExampleRepository {
@@ -169,7 +160,6 @@ export class ExampleRepository {
 ```
 
 ### Testing
-
 ```typescript
 // Mock repositories with vi.fn()
 const mockRepo: ExampleRepository = {
@@ -190,14 +180,12 @@ describe('ExampleService', () => {
 ## Authentication
 
 **Firebase (Primary):**
-
 - Client: `lib/firebase.ts` (browser auth)
 - Server: `lib/firebase-admin.ts` (token verification)
 - Middleware: `middleware.ts` checks `session` cookie
 - Helpers: `requireAuth()` / `requireAdmin()` in `lib/auth-helpers.ts`
 
 **Auth.js (Secondary):**
-
 - GitHub OAuth provider
 - Being phased out
 
@@ -212,21 +200,20 @@ describe('ExampleService', () => {
 
 ## External Integrations
 
-| Service     | Purpose                       | Config                                     |
-| ----------- | ----------------------------- | ------------------------------------------ |
-| Stripe      | Connect + Payments, 7d escrow | `lib/services/StripeService.ts`            |
-| Postmark    | Transactional emails          | `lib/services/EmailService.ts`             |
-| R2          | File uploads                  | `lib/services/R2Service.ts`                |
-| Claude AI   | Repo analysis                 | `lib/services/RepoAnalysisService.ts`      |
-| Firebase    | Auth                          | `lib/firebase.ts`, `lib/firebase-admin.ts` |
-| Honeybadger | Error monitoring              | `next.config.ts`                           |
+| Service   | Purpose                     | Config                                       |
+| --------- | --------------------------- | -------------------------------------------- |
+| Stripe    | Connect + Payments, 7d escrow | `lib/services/StripeService.ts`              |
+| Postmark  | Transactional emails        | `lib/services/EmailService.ts`               |
+| R2        | File uploads                | `lib/services/R2Service.ts`                  |
+| Claude AI | Repo analysis               | `lib/services/RepoAnalysisService.ts`        |
+| Firebase  | Auth                        | `lib/firebase.ts`, `lib/firebase-admin.ts`   |
+| Honeybadger | Error monitoring          | `next.config.ts`                             |
 
 ## Environment Variables
 
 Defined in `config/env.ts` with Zod validation.
 
 **Critical:**
-
 - `DATABASE_URL` - PostgreSQL connection
 - `REDIS_URL` - Redis connection
 - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
@@ -237,7 +224,6 @@ Defined in `config/env.ts` with Zod validation.
 ## CI/CD
 
 GitHub Actions pipeline:
-
 1. Lint → Type-check → Unit tests → E2E tests → Build
 2. All must pass before merge
 3. Auto-deploy to Railway on merge to `main`
