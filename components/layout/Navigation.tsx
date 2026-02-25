@@ -33,7 +33,7 @@ export function Navigation() {
           aria-label="CodeSalvage home"
         >
           <Image
-            src="/images/logo.png"
+            src="/images/branding/codesalvage_logo_square.png"
             alt="CodeSalvage logo"
             width={48}
             height={48}

@@ -71,13 +71,11 @@ function SignUpContent() {
     e.preventDefault();
     setError(null);
 
-    // Validate passwords match
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
-    // Validate password strength
     if (password.length < 8) {
       setError('Password must be at least 8 characters');
       return;
@@ -109,7 +107,6 @@ function SignUpContent() {
     } catch (err: any) {
       console.error('[SignUp] Email/Password sign-up error:', err);
 
-      // Provide user-friendly error messages
       if (err.code === 'auth/email-already-in-use') {
         setError('This email is already registered. Try signing in instead.');
       } else if (err.code === 'auth/weak-password') {
@@ -229,7 +226,7 @@ function SignUpContent() {
               {/* Logo/Branding */}
               <div className="mx-auto mb-4">
                 <Image
-                  src="/images/logo.png"
+                  src="/images/branding/codesalvage_logo_square.png"
                   alt="CodeSalvage"
                   width={64}
                   height={64}
