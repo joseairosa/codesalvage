@@ -10,7 +10,7 @@
     "restartPolicyMaxRetries": 10
   },
   "healthcheck": {
-    "path": "/api/health",
-    "timeout": 300
+    "path": "/api/ping",
+    "timeout": 60
   }
 }

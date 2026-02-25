@@ -9,6 +9,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
+export const dynamic = 'force-static';
+
 export default function HomePage() {
   return (
     <div className="flex flex-col">
