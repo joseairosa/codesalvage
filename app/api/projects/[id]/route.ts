@@ -28,6 +28,7 @@ import {
   ProjectValidationError,
   ProjectPermissionError,
 } from '@/lib/services';
+import { getOrSetCache, CacheKeys, CacheTTL, invalidateCache } from '@/lib/utils/cache';
 import { z } from 'zod';
 
 /**
@@ -98,8 +99,11 @@ export async function GET(
 
     console.log('[Project API] Getting project:', id);
 
-    // Get project (increment view count for active projects)
-    const project = await projectService.getProject(id, { incrementView: true });
+    const project = await getOrSetCache(
+      CacheKeys.projectDetail(id),
+      CacheTTL.PROJECT_DETAIL,
+      () => projectService.getProject(id, { incrementView: true })
+    );
 
     if (!project) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
@@ -135,7 +139,6 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check authentication
     const auth = await authenticateApiRequest(request);
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -143,7 +146,6 @@ export async function PUT(
 
     const { id } = await params;
 
-    // Parse and validate request body
     const body = await request.json();
     const validatedData = updateProjectSchema.safeParse(body);
 
@@ -159,17 +161,17 @@ export async function PUT(
 
     console.log('[Project API] Updating project:', { id, userId: auth.user.id });
 
-    // Filter out undefined values for exactOptionalPropertyTypes
     const updateData = Object.fromEntries(
       Object.entries(validatedData.data).filter(([_, value]) => value !== undefined)
     );
 
-    // Update project
     const project = await projectService.updateProject(
       id,
       auth.user.id,
       updateData as any
     );
+
+    await invalidateCache.project(id);
 
     console.log('[Project API] Project updated successfully');
 
@@ -220,7 +222,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check authentication
     const auth = await authenticateApiRequest(request);
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -230,8 +231,9 @@ export async function DELETE(
 
     console.log('[Project API] Deleting project:', { id, userId: auth.user.id });
 
-    // Delete project
     await projectService.deleteProject(id, auth.user.id);
+
+    await invalidateCache.project(id);
 
     console.log('[Project API] Project deleted successfully');
 

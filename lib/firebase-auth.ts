@@ -15,6 +15,7 @@
 
 import { getAuth } from './firebase-admin';
 import { prisma } from './prisma';
+import { emailService } from './services';
 import crypto from 'crypto';
 
 export interface AuthResult {
@@ -130,6 +131,15 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
         });
 
         console.log('[Firebase Auth] Created new user:', user.id);
+
+        emailService
+          .sendWelcomeEmail(
+            { email: user.email!, name: user.username },
+            { username: user.username }
+          )
+          .catch((err: Error) =>
+            console.error('[Firebase Auth] Failed to send welcome email:', err)
+          );
       } else {
         console.warn(
           '[Firebase Auth] Email already linked to different Firebase UID:',

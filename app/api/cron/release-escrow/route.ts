@@ -76,6 +76,14 @@ export async function GET() {
             username: true,
           },
         },
+        buyer: {
+          select: {
+            id: true,
+            email: true,
+            fullName: true,
+            username: true,
+          },
+        },
         project: {
           select: {
             id: true,
@@ -136,6 +144,30 @@ export async function GET() {
           );
 
           console.log(`[${componentName}] Escrow release notification sent to seller`);
+
+          if (transaction.buyer.email) {
+            emailService
+              .sendEscrowReleasedBuyerCopy(
+                {
+                  email: transaction.buyer.email,
+                  name: transaction.buyer.fullName || transaction.buyer.username,
+                },
+                {
+                  sellerName: transaction.seller.fullName || transaction.seller.username,
+                  projectTitle: transaction.project.title,
+                  amount: transaction.sellerReceivesCents,
+                  releaseDate: now.toISOString(),
+                  transactionId: transaction.id,
+                  buyerName: transaction.buyer.fullName || transaction.buyer.username,
+                }
+              )
+              .catch((err: Error) =>
+                console.error(
+                  `[${componentName}] Failed to send escrow released buyer copy:`,
+                  err
+                )
+              );
+          }
         } catch (emailError) {
           console.error(`[${componentName}] Failed to send email:`, emailError);
         }

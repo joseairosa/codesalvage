@@ -22,11 +22,11 @@ import {
 } from '@/lib/services/SubscriptionService';
 import { SubscriptionRepository } from '@/lib/repositories/SubscriptionRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
+import { getOrSetCache, CacheKeys, CacheTTL, invalidateCache } from '@/lib/utils/cache';
 import { z } from 'zod';
 
 const componentName = 'SubscriptionsAPI';
 
-// Initialize repositories and service
 const subscriptionRepository = new SubscriptionRepository(prisma);
 const userRepository = new UserRepository(prisma);
 const subscriptionService = new SubscriptionService(
@@ -53,7 +53,11 @@ export async function GET(request: Request) {
 
     console.log(`[${componentName}] Fetching subscription status:`, auth.user.id);
 
-    const status = await subscriptionService.getSubscriptionStatus(auth.user.id);
+    const status = await getOrSetCache(
+      CacheKeys.userSubscription(auth.user.id),
+      CacheTTL.SUBSCRIPTION,
+      () => subscriptionService.getSubscriptionStatus(auth.user.id)
+    );
 
     console.log(`[${componentName}] Subscription status:`, {
       plan: status.plan,
@@ -111,7 +115,6 @@ export async function POST(request: Request) {
       plan,
     });
 
-    // Build subscription request, filtering undefined values
     const subscriptionRequest: any = { plan };
     if (paymentMethodId !== undefined) {
       subscriptionRequest.paymentMethodId = paymentMethodId;
@@ -121,6 +124,8 @@ export async function POST(request: Request) {
       auth.user.id,
       subscriptionRequest
     );
+
+    await invalidateCache.user(auth.user.id);
 
     console.log(`[${componentName}] Subscription created:`, result.subscriptionId);
 
@@ -133,7 +138,6 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error(`[${componentName}] Error creating subscription:`, error);
 
-    // Map service errors to appropriate HTTP status codes
     if (error instanceof SubscriptionValidationError) {
       return NextResponse.json(
         {
@@ -188,6 +192,8 @@ export async function DELETE(request: Request) {
 
     const result = await subscriptionService.cancelSubscription(auth.user.id);
 
+    await invalidateCache.user(auth.user.id);
+
     console.log(`[${componentName}] Subscription canceled:`, result.subscriptionId);
 
     return NextResponse.json(
@@ -200,7 +206,6 @@ export async function DELETE(request: Request) {
   } catch (error) {
     console.error(`[${componentName}] Error canceling subscription:`, error);
 
-    // Map service errors to appropriate HTTP status codes
     if (error instanceof SubscriptionNotFoundError) {
       return NextResponse.json(
         {

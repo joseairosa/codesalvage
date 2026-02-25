@@ -11,6 +11,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
+import { getOrSetCache, deleteCache, CacheTTL } from '@/lib/utils/cache';
 import {
   NotificationService,
   NotificationValidationError,
@@ -20,7 +21,6 @@ import { z } from 'zod';
 
 const componentName = 'NotificationsAPI';
 
-// Initialize repository and service
 const notificationRepository = new NotificationRepository(prisma);
 const notificationService = new NotificationService(notificationRepository);
 
@@ -46,17 +46,16 @@ async function getNotifications(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '20', 10);
-    const offset = parseInt(searchParams.get('offset') || '0', 10);
+    const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10), 50);
+    const offset = Math.max(parseInt(searchParams.get('offset') || '0', 10), 0);
     const unreadOnly = searchParams.get('unreadOnly') === 'true';
 
     console.log(`[${componentName}] Fetching notifications for:`, auth.user.id);
 
-    const result = await notificationService.getNotifications(auth.user.id, {
-      limit: Math.min(limit, 50),
-      offset: Math.max(offset, 0),
-      unreadOnly,
-    });
+    const cacheKey = `notification:${auth.user.id}:list:${limit}:${offset}:${unreadOnly}`;
+    const result = await getOrSetCache(cacheKey, CacheTTL.SHORT, () =>
+      notificationService.getNotifications(auth.user.id, { limit, offset, unreadOnly })
+    );
 
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
@@ -109,6 +108,8 @@ async function markNotificationsRead(request: NextRequest) {
         validatedData.data.notificationIds
       );
     }
+
+    await deleteCache(`notification:${auth.user.id}:*`);
 
     return NextResponse.json({ updated }, { status: 200 });
   } catch (error) {
