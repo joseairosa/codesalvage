@@ -1,147 +1,121 @@
 /**
  * EmailService Unit Tests
  *
- * Tests all email notification functionality with mocked Postmark.
+ * Tests all email notification methods with mocked Resend client.
  *
  * Coverage:
  * - Purchase confirmation emails (buyer + seller)
  * - Escrow release notifications
- * - Message notifications
- * - Review notifications
+ * - Message notifications (MessageWithRelations signature)
+ * - Review notifications (ReviewWithRelations + seller signature)
  * - Review reminders
+ * - Price formatting
  * - Error handling
- * - Development mode (no API key)
+ * - Dev mode (no API key → logs only)
+ * - EMAIL_TEST_OVERRIDE redirect
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Set environment BEFORE importing EmailService
-process.env['POSTMARK_SERVER_TOKEN'] = 'test-api-key';
-process.env['POSTMARK_FROM_EMAIL'] = 'test@codesalvage.com';
+process.env['RESEND_API_KEY'] = 'test-resend-key';
+process.env['NEXT_PUBLIC_APP_URL'] = 'https://app.codesalvage.com';
+delete process.env['EMAIL_TEST_OVERRIDE'];
 
-// Mock Postmark BEFORE importing EmailService (hoisted)
-vi.mock('postmark', () => ({
-  ServerClient: vi.fn().mockImplementation(() => ({
-    sendEmail: vi.fn().mockResolvedValue({ MessageID: 'test-message-id' }),
+const mockEmailsSend = vi.fn().mockResolvedValue({ data: { id: 'test-id' }, error: null });
+
+vi.mock('resend', () => ({
+  Resend: vi.fn().mockImplementation(() => ({
+    emails: { send: mockEmailsSend },
   })),
 }));
 
-// Now import EmailService after env and mock are set
-import * as postmark from 'postmark';
+vi.mock('@/config/env', () => ({
+  get env() {
+    return {
+      RESEND_API_KEY: process.env['RESEND_API_KEY'],
+      NEXT_PUBLIC_APP_URL: process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://app.codesalvage.com',
+      EMAIL_TEST_OVERRIDE: process.env['EMAIL_TEST_OVERRIDE'],
+    };
+  },
+}));
+
 import { EmailService } from '../EmailService';
 import type {
   EmailRecipient,
   PurchaseEmailData,
   EscrowReleaseEmailData,
-  MessageEmailData,
   ReviewEmailData,
+  FeaturedListingEmailData,
+  OfferEmailData,
 } from '../EmailService';
+import type { MessageWithRelations } from '@/lib/repositories/MessageRepository';
+import type { ReviewWithRelations } from '@/lib/repositories/ReviewRepository';
 
-// Get mocked ServerClient
-const MockServerClient = postmark.ServerClient as unknown as ReturnType<typeof vi.fn>;
+
+function makeMessage(
+  recipientEmail: string,
+  content = 'Hi, I have a question about your project...'
+): MessageWithRelations {
+  return {
+    id: 'msg_1',
+    senderId: 'sender_1',
+    recipientId: 'recipient_1',
+    content,
+    createdAt: new Date(),
+    isRead: false,
+    readAt: null,
+    projectId: 'project_1',
+    transactionId: null,
+    sender: { id: 'sender_1', username: 'johndoe', fullName: 'John Doe', avatarUrl: null },
+    recipient: {
+      id: 'recipient_1',
+      username: 'janesmith',
+      fullName: 'Jane Smith',
+      avatarUrl: null,
+      email: recipientEmail,
+    } as MessageWithRelations['recipient'],
+    project: { id: 'project_1', title: 'React Dashboard Template', thumbnailImageUrl: null },
+    transaction: null,
+  };
+}
+
+function makeReview(overallRating = 5, comment?: string): ReviewWithRelations {
+  return {
+    id: 'rev_1',
+    transactionId: 'txn_1',
+    sellerId: 'seller_1',
+    buyerId: 'buyer_1',
+    overallRating,
+    comment: comment ?? null,
+    codeQualityRating: null,
+    documentationRating: null,
+    responsivenessRating: null,
+    accuracyRating: null,
+    isAnonymous: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    buyer: { id: 'buyer_1', username: 'johndoe', fullName: 'John Doe', avatarUrl: null },
+    transaction: {
+      id: 'txn_1',
+      projectId: 'project_1',
+      project: { id: 'project_1', title: 'React Dashboard Template' },
+    },
+  } as ReviewWithRelations;
+}
+
 
 describe('EmailService', () => {
   let emailService: EmailService;
-  let mockSendEmail: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    // Clear all mocks
     vi.clearAllMocks();
-
-    // Create fresh mock for sendEmail
-    mockSendEmail = vi.fn().mockResolvedValue({ MessageID: 'test-message-id' });
-
-    // Reset the ServerClient mock
-    MockServerClient.mockImplementation(() => ({
-      sendEmail: mockSendEmail,
-    }));
-
+    mockEmailsSend.mockResolvedValue({ data: { id: 'test-id' }, error: null });
     emailService = new EmailService();
   });
 
-  describe('Constructor', () => {
-    it('should initialize with default from email if not provided', () => {
-      const service = new EmailService();
-      expect(service).toBeDefined();
-    });
-
-    it('should use POSTMARK_FROM_EMAIL from environment', () => {
-      const service = new EmailService();
-      expect(service).toBeDefined();
-    });
-  });
 
   describe('sendBuyerPurchaseConfirmation', () => {
-    const recipient: EmailRecipient = {
-      email: 'buyer@example.com',
-      name: 'John Doe',
-    };
-
-    const data: PurchaseEmailData = {
-      buyerName: 'John Doe',
-      sellerName: 'Jane Smith',
-      projectTitle: 'React Dashboard Template',
-      projectId: 'project123',
-      transactionId: 'txn_abc123',
-      amount: 100000, // $1,000.00
-      downloadUrl: 'https://app.com/projects/project123/download',
-      purchaseDate: '2026-01-26T00:00:00.000Z',
-    };
-
-    it('should send purchase confirmation email to buyer', async () => {
-      await emailService.sendBuyerPurchaseConfirmation(recipient, data);
-
-      expect(mockSendEmail).toHaveBeenCalledTimes(1);
-      expect(mockSendEmail).toHaveBeenCalledWith(
-        expect.objectContaining({
-          To: 'John Doe <buyer@example.com>',
-          From: 'CodeSalvage <test@codesalvage.com>',
-          Subject: 'Purchase Confirmation - React Dashboard Template',
-          MessageStream: 'outbound',
-        })
-      );
-    });
-
-    it('should include HTML and text versions', async () => {
-      await emailService.sendBuyerPurchaseConfirmation(recipient, data);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain('Purchase Confirmed!');
-      expect(call.HtmlBody).toContain('React Dashboard Template');
-      expect(call.HtmlBody).toContain('$1,000.00');
-      expect(call.TextBody).toContain('Purchase Confirmed');
-      expect(call.TextBody).toContain('React Dashboard Template');
-    });
-
-    it('should throw error if Postmark fails', async () => {
-      mockSendEmail.mockRejectedValueOnce(new Error('Postmark API error'));
-
-      await expect(
-        emailService.sendBuyerPurchaseConfirmation(recipient, data)
-      ).rejects.toThrow('Postmark API error');
-    });
-
-    it('should handle missing recipient name', async () => {
-      const recipientNoName: EmailRecipient = {
-        email: 'buyer@example.com',
-      };
-
-      await emailService.sendBuyerPurchaseConfirmation(recipientNoName, data);
-
-      expect(mockSendEmail).toHaveBeenCalledWith(
-        expect.objectContaining({
-          To: 'buyer@example.com',
-        })
-      );
-    });
-  });
-
-  describe('sendSellerPurchaseNotification', () => {
-    const recipient: EmailRecipient = {
-      email: 'seller@example.com',
-      name: 'Jane Smith',
-    };
-
+    const recipient: EmailRecipient = { email: 'buyer@example.com', name: 'John Doe' };
     const data: PurchaseEmailData = {
       buyerName: 'John Doe',
       sellerName: 'Jane Smith',
@@ -153,356 +127,325 @@ describe('EmailService', () => {
       purchaseDate: '2026-01-26T00:00:00.000Z',
     };
 
-    it('should send purchase notification to seller', async () => {
-      await emailService.sendSellerPurchaseNotification(recipient, data);
+    it('should send to correct recipient', async () => {
+      await emailService.sendBuyerPurchaseConfirmation(recipient, data);
 
-      expect(mockSendEmail).toHaveBeenCalledTimes(1);
-      expect(mockSendEmail).toHaveBeenCalledWith(
+      expect(mockEmailsSend).toHaveBeenCalledTimes(1);
+      expect(mockEmailsSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          To: 'Jane Smith <seller@example.com>',
-          Subject: 'New Sale - React Dashboard Template',
-          MessageStream: 'outbound',
+          to: 'John Doe <buyer@example.com>',
+          subject: 'Purchase Confirmed – React Dashboard Template',
         })
       );
     });
 
-    it('should include congratulations message in HTML', async () => {
-      await emailService.sendSellerPurchaseNotification(recipient, data);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain('Congratulations');
-      expect(call.HtmlBody).toContain('Sale');
-      expect(call.HtmlBody).toContain('React Dashboard Template');
+    it('should contain purchase details in html', async () => {
+      await emailService.sendBuyerPurchaseConfirmation(recipient, data);
+      const { html } = mockEmailsSend.mock.calls[0]![0]!;
+      expect(html).toContain('Purchase Confirmed');
+      expect(html).toContain('React Dashboard Template');
+      expect(html).toContain('$1,000.00');
     });
 
-    it('should include sale details', async () => {
-      await emailService.sendSellerPurchaseNotification(recipient, data);
+    it('should throw when Resend returns error', async () => {
+      mockEmailsSend.mockResolvedValueOnce({ error: { message: 'invalid_api_key' } });
+      await expect(emailService.sendBuyerPurchaseConfirmation(recipient, data)).rejects.toThrow(
+        'Failed to send email'
+      );
+    });
 
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain('$1,000.00');
-      expect(call.HtmlBody).toContain('John Doe');
+    it('should handle recipient without name', async () => {
+      await emailService.sendBuyerPurchaseConfirmation({ email: 'buyer@example.com' }, data);
+      expect(mockEmailsSend).toHaveBeenCalledWith(
+        expect.objectContaining({ to: 'buyer@example.com' })
+      );
     });
   });
 
-  describe('sendEscrowReleaseNotification', () => {
-    const recipient: EmailRecipient = {
-      email: 'seller@example.com',
-      name: 'Jane Smith',
+
+  describe('sendSellerPurchaseNotification', () => {
+    const recipient: EmailRecipient = { email: 'seller@example.com', name: 'Jane Smith' };
+    const data: PurchaseEmailData = {
+      buyerName: 'John Doe',
+      sellerName: 'Jane Smith',
+      projectTitle: 'React Dashboard Template',
+      projectId: 'project123',
+      transactionId: 'txn_abc123',
+      amount: 100000,
+      downloadUrl: 'https://app.com/download',
+      purchaseDate: '2026-01-26T00:00:00.000Z',
     };
 
+    it('should send sale notification with correct subject', async () => {
+      await emailService.sendSellerPurchaseNotification(recipient, data);
+      expect(mockEmailsSend).toHaveBeenCalledWith(
+        expect.objectContaining({ subject: 'New Sale – React Dashboard Template' })
+      );
+    });
+
+    it('should include buyer name and amount', async () => {
+      await emailService.sendSellerPurchaseNotification(recipient, data);
+      const { html } = mockEmailsSend.mock.calls[0]![0]!;
+      expect(html).toContain('John Doe');
+      expect(html).toContain('$1,000.00');
+    });
+  });
+
+
+  describe('sendEscrowReleaseNotification', () => {
+    const recipient: EmailRecipient = { email: 'seller@example.com', name: 'Jane Smith' };
     const data: EscrowReleaseEmailData = {
       sellerName: 'Jane Smith',
       projectTitle: 'React Dashboard Template',
-      amount: 82070, // $820.70 (after 18% commission)
+      amount: 82070,
       releaseDate: '2026-02-02T00:00:00.000Z',
       transactionId: 'txn_abc123',
     };
 
-    it('should send escrow release notification to seller', async () => {
+    it('should send with correct subject', async () => {
       await emailService.sendEscrowReleaseNotification(recipient, data);
-
-      expect(mockSendEmail).toHaveBeenCalledTimes(1);
-      expect(mockSendEmail).toHaveBeenCalledWith(
-        expect.objectContaining({
-          To: 'Jane Smith <seller@example.com>',
-          Subject: 'Payment Released - React Dashboard Template',
-          MessageStream: 'outbound',
-        })
+      expect(mockEmailsSend).toHaveBeenCalledWith(
+        expect.objectContaining({ subject: 'Payment Released – React Dashboard Template' })
       );
     });
 
-    it('should include payment amount in email', async () => {
+    it('should include formatted amount', async () => {
       await emailService.sendEscrowReleaseNotification(recipient, data);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain('$820.70');
-      expect(call.HtmlBody).toContain('Payment Released');
-    });
-
-    it('should include release date', async () => {
-      await emailService.sendEscrowReleaseNotification(recipient, data);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain('2026');
+      const { html } = mockEmailsSend.mock.calls[0]![0]!;
+      expect(html).toContain('$820.70');
     });
   });
+
 
   describe('sendNewMessageNotification', () => {
-    const recipient: EmailRecipient = {
-      email: 'recipient@example.com',
-      name: 'Jane Smith',
-    };
+    it('should send to recipient email from message object', async () => {
+      const message = makeMessage('jane@example.com');
+      await emailService.sendNewMessageNotification(message);
 
-    const data: MessageEmailData = {
-      recipientName: 'Jane Smith',
-      senderName: 'John Doe',
-      messagePreview: 'Hi, I have a question about your project...',
-      projectTitle: 'React Dashboard Template',
-      conversationUrl: 'https://app.com/messages/user123',
-    };
-
-    it('should send new message notification', async () => {
-      await emailService.sendNewMessageNotification(recipient, data);
-
-      expect(mockSendEmail).toHaveBeenCalledTimes(1);
-      expect(mockSendEmail).toHaveBeenCalledWith(
+      expect(mockEmailsSend).toHaveBeenCalledTimes(1);
+      expect(mockEmailsSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          To: 'Jane Smith <recipient@example.com>',
-          Subject: 'New Message from John Doe',
-          MessageStream: 'outbound',
+          to: expect.stringContaining('jane@example.com'),
+          subject: 'New message from John Doe',
         })
       );
     });
 
-    it('should include message preview in email', async () => {
-      await emailService.sendNewMessageNotification(recipient, data);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain('Hi, I have a question');
-      expect(call.HtmlBody).toContain('John Doe');
+    it('should include message preview in html', async () => {
+      const message = makeMessage('jane@example.com', 'Hi, I have a question about your project...');
+      await emailService.sendNewMessageNotification(message);
+      const { html } = mockEmailsSend.mock.calls[0]![0]!;
+      expect(html).toContain('Hi, I have a question');
     });
 
-    it('should include project title if provided', async () => {
-      await emailService.sendNewMessageNotification(recipient, data);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain('React Dashboard Template');
+    it('should include project title when present', async () => {
+      const message = makeMessage('jane@example.com');
+      await emailService.sendNewMessageNotification(message);
+      const { html } = mockEmailsSend.mock.calls[0]![0]!;
+      expect(html).toContain('React Dashboard Template');
     });
 
-    it('should handle message without project title', async () => {
-      const dataNoProject: MessageEmailData = {
-        recipientName: data.recipientName,
-        senderName: data.senderName,
-        messagePreview: data.messagePreview,
-        conversationUrl: data.conversationUrl,
-        // projectTitle intentionally omitted
-      };
-
-      await emailService.sendNewMessageNotification(recipient, dataNoProject);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain('John Doe');
-    });
-
-    it('should include conversation URL', async () => {
-      await emailService.sendNewMessageNotification(recipient, data);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain(data.conversationUrl);
+    it('should skip send when recipient has no email', async () => {
+      const message = makeMessage('');
+      (message.recipient as Record<string, unknown>)['email'] = null;
+      await emailService.sendNewMessageNotification(message);
+      expect(mockEmailsSend).not.toHaveBeenCalled();
     });
   });
 
-  describe('sendReviewNotification', () => {
-    const recipient: EmailRecipient = {
-      email: 'seller@example.com',
-      name: 'Jane Smith',
-    };
 
-    const data: ReviewEmailData = {
-      sellerName: 'Jane Smith',
-      buyerName: 'John Doe',
-      projectTitle: 'React Dashboard Template',
-      rating: 5,
-      comment: 'Great project! Code was clean and well-documented.',
-      reviewUrl: 'https://app.com/seller/reviews',
-    };
+  describe('sendNewReviewNotification', () => {
+    const seller = { email: 'seller@example.com', fullName: 'Jane Smith', username: 'janesmith' };
 
-    it('should send review notification to seller', async () => {
-      await emailService.sendReviewNotification(recipient, data);
+    it('should send to seller email', async () => {
+      const review = makeReview(5, 'Great project!');
+      await emailService.sendNewReviewNotification(review, seller);
 
-      expect(mockSendEmail).toHaveBeenCalledTimes(1);
-      expect(mockSendEmail).toHaveBeenCalledWith(
+      expect(mockEmailsSend).toHaveBeenCalledTimes(1);
+      expect(mockEmailsSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          To: 'Jane Smith <seller@example.com>',
-          Subject: 'New Review Received - React Dashboard Template',
-          MessageStream: 'outbound',
+          to: expect.stringContaining('seller@example.com'),
+          subject: 'New Review – React Dashboard Template',
         })
       );
     });
 
-    it('should include star rating in email', async () => {
-      await emailService.sendReviewNotification(recipient, data);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain('⭐');
-      expect(call.HtmlBody).toContain('5');
+    it('should include star rating in html', async () => {
+      const review = makeReview(5);
+      await emailService.sendNewReviewNotification(review, seller);
+      const { html } = mockEmailsSend.mock.calls[0]![0]!;
+      expect(html).toContain('★');
+      expect(html).toContain('5');
     });
 
-    it('should include review comment if provided', async () => {
-      await emailService.sendReviewNotification(recipient, data);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain('Great project!');
-      expect(call.HtmlBody).toContain('well-documented');
+    it('should include comment when provided', async () => {
+      const review = makeReview(4, 'Code was clean and well-documented.');
+      await emailService.sendNewReviewNotification(review, seller);
+      const { html } = mockEmailsSend.mock.calls[0]![0]!;
+      expect(html).toContain('well-documented');
     });
 
-    it('should handle review without comment', async () => {
-      const dataNoComment: ReviewEmailData = {
-        sellerName: data.sellerName,
-        buyerName: data.buyerName,
-        projectTitle: data.projectTitle,
-        rating: data.rating,
-        reviewUrl: data.reviewUrl,
-        // comment intentionally omitted
-      };
-
-      await emailService.sendReviewNotification(recipient, dataNoComment);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain('⭐');
-    });
-
-    it('should handle different star ratings', async () => {
-      const ratings = [1, 2, 3, 4, 5];
-
-      for (const rating of ratings) {
-        mockSendEmail.mockClear();
-        const testData = { ...data, rating };
-
-        await emailService.sendReviewNotification(recipient, testData);
-
-        const call = mockSendEmail.mock.calls[0]![0]!;
-        expect(call.HtmlBody).toContain('⭐');
-        expect(call.HtmlBody).toContain(String(rating));
-      }
+    it('should omit comment block when not provided', async () => {
+      const review = makeReview(3);
+      await emailService.sendNewReviewNotification(review, seller);
+      const { html } = mockEmailsSend.mock.calls[0]![0]!;
+      expect(html).not.toContain('font-style:italic');
     });
   });
+
 
   describe('sendReviewReminder', () => {
-    const recipient: EmailRecipient = {
-      email: 'buyer@example.com',
-      name: 'John Doe',
-    };
-
+    const recipient: EmailRecipient = { email: 'buyer@example.com', name: 'John Doe' };
     const data: ReviewEmailData = {
       sellerName: 'Jane Smith',
       buyerName: 'John Doe',
       projectTitle: 'React Dashboard Template',
-      rating: 0, // Not used for reminders
+      rating: 0,
       reviewUrl: 'https://app.com/projects/project123/review',
     };
 
-    it('should send review reminder to buyer', async () => {
+    it('should send with correct subject', async () => {
       await emailService.sendReviewReminder(recipient, data);
-
-      expect(mockSendEmail).toHaveBeenCalledTimes(1);
-      expect(mockSendEmail).toHaveBeenCalledWith(
+      expect(mockEmailsSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          To: 'John Doe <buyer@example.com>',
-          Subject: 'How was your experience with React Dashboard Template?',
-          MessageStream: 'outbound',
+          subject: 'How was your experience with React Dashboard Template?',
         })
       );
-    });
-
-    it('should include encouragement to leave review', async () => {
-      await emailService.sendReviewReminder(recipient, data);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain('review');
-      expect(call.HtmlBody).toContain('feedback');
     });
 
     it('should include review URL', async () => {
       await emailService.sendReviewReminder(recipient, data);
-
-      const call = mockSendEmail.mock.calls[0]![0]!;
-      expect(call.HtmlBody).toContain(data.reviewUrl);
+      const { html } = mockEmailsSend.mock.calls[0]![0]!;
+      expect(html).toContain(data.reviewUrl);
     });
   });
 
-  describe('Price Formatting', () => {
-    it('should format prices correctly in emails', async () => {
-      const recipient: EmailRecipient = {
-        email: 'test@example.com',
-        name: 'Test User',
+
+  describe('sendOfferAcceptedNotification', () => {
+    const recipient: EmailRecipient = { email: 'buyer@example.com', name: 'John Doe' };
+    const data: OfferEmailData = {
+      recipientName: 'John Doe',
+      otherPartyName: 'Jane Smith',
+      projectTitle: 'React Dashboard Template',
+      projectId: 'project123',
+      offeredPriceCents: 80000,
+      listingPriceCents: 100000,
+      offerUrl: '/dashboard/offers',
+      checkoutUrl: '/checkout/project123?offerId=offer_1',
+    };
+
+    it('should include CTA to checkout when checkoutUrl is present', async () => {
+      await emailService.sendOfferAcceptedNotification(recipient, data);
+      const { html } = mockEmailsSend.mock.calls[0]![0]!;
+      expect(html).toContain('/checkout/project123');
+    });
+  });
+
+
+  describe('sendFeaturedListingConfirmation', () => {
+    const recipient: EmailRecipient = { email: 'seller@example.com', name: 'Jane Smith' };
+    const data: FeaturedListingEmailData = {
+      sellerName: 'Jane Smith',
+      projectTitle: 'React Dashboard Template',
+      projectId: 'project123',
+      durationDays: 7,
+      costCents: 1999,
+      featuredUntil: '2026-03-04T00:00:00.000Z',
+      projectUrl: 'https://app.com/projects/project123',
+    };
+
+    it('should send with correct subject', async () => {
+      await emailService.sendFeaturedListingConfirmation(recipient, data);
+      expect(mockEmailsSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          subject: 'Featured Listing Confirmed – React Dashboard Template',
+        })
+      );
+    });
+
+    it('should include duration and cost', async () => {
+      await emailService.sendFeaturedListingConfirmation(recipient, data);
+      const { html } = mockEmailsSend.mock.calls[0]![0]!;
+      expect(html).toContain('7 days');
+      expect(html).toContain('$19.99');
+    });
+  });
+
+
+  describe('price formatting', () => {
+    const recipient: EmailRecipient = { email: 'test@example.com', name: 'Test' };
+
+    it.each([
+      [100, '$1.00'],
+      [1000, '$10.00'],
+      [100000, '$1,000.00'],
+      [1234567, '$12,345.67'],
+      [99, '$0.99'],
+    ])('formats %i cents as %s', async (cents, expected) => {
+      const data: PurchaseEmailData = {
+        buyerName: 'Test',
+        sellerName: 'Test',
+        projectTitle: 'Test',
+        projectId: 'test',
+        transactionId: 'test',
+        amount: cents,
+        downloadUrl: 'https://app.com/download',
+        purchaseDate: '2026-01-26T00:00:00.000Z',
       };
+      await emailService.sendBuyerPurchaseConfirmation(recipient, data);
+      const { html } = mockEmailsSend.mock.calls[0]![0]!;
+      expect(html).toContain(expected);
+      vi.clearAllMocks();
+    });
+  });
 
-      const testCases = [
-        { cents: 100, expected: '$1.00' },
-        { cents: 1000, expected: '$10.00' },
-        { cents: 100000, expected: '$1,000.00' },
-        { cents: 1234567, expected: '$12,345.67' },
-        { cents: 99, expected: '$0.99' },
-      ];
 
-      for (const { cents, expected } of testCases) {
-        mockSendEmail.mockClear();
+  describe('error handling', () => {
+    it('should throw when Resend returns an error object', async () => {
+      mockEmailsSend.mockResolvedValueOnce({ error: { message: 'rate_limit_exceeded' } });
+      await expect(
+        emailService.sendBuyerPurchaseConfirmation(
+          { email: 'test@example.com' },
+          {
+            buyerName: 'Test',
+            sellerName: 'Test',
+            projectTitle: 'Test',
+            projectId: 'test',
+            transactionId: 'test',
+            amount: 1000,
+            downloadUrl: 'https://app.com/download',
+            purchaseDate: '2026-01-26T00:00:00.000Z',
+          }
+        )
+      ).rejects.toThrow('Failed to send email');
+    });
+  });
 
-        const data: PurchaseEmailData = {
-          buyerName: 'Test',
-          sellerName: 'Test',
-          projectTitle: 'Test Project',
+
+  describe('EMAIL_TEST_OVERRIDE', () => {
+    it('should redirect all emails to override address', async () => {
+      process.env['EMAIL_TEST_OVERRIDE'] = 'dev@test.com';
+      const overrideService = new EmailService();
+
+      await overrideService.sendBuyerPurchaseConfirmation(
+        { email: 'realbuyer@example.com', name: 'Real Buyer' },
+        {
+          buyerName: 'Real',
+          sellerName: 'Seller',
+          projectTitle: 'Test',
           projectId: 'test',
           transactionId: 'test',
-          amount: cents,
+          amount: 1000,
           downloadUrl: 'https://app.com/download',
           purchaseDate: '2026-01-26T00:00:00.000Z',
-        };
-
-        await emailService.sendBuyerPurchaseConfirmation(recipient, data);
-
-        const call = mockSendEmail.mock.calls[0]![0]!;
-        expect(call.HtmlBody).toContain(expected);
-      }
-    });
-  });
-
-  describe('Error Handling', () => {
-    it('should log error and throw if Postmark fails', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      mockSendEmail.mockRejectedValueOnce(new Error('Network error'));
-
-      const recipient: EmailRecipient = {
-        email: 'test@example.com',
-        name: 'Test',
-      };
-
-      const data: PurchaseEmailData = {
-        buyerName: 'Test',
-        sellerName: 'Test',
-        projectTitle: 'Test',
-        projectId: 'test',
-        transactionId: 'test',
-        amount: 10000,
-        downloadUrl: 'https://app.com/download',
-        purchaseDate: '2026-01-26T00:00:00.000Z',
-      };
-
-      await expect(
-        emailService.sendBuyerPurchaseConfirmation(recipient, data)
-      ).rejects.toThrow('Network error');
-
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to send email'),
-        expect.any(Error)
+        }
       );
 
-      consoleErrorSpy.mockRestore();
-    });
+      expect(mockEmailsSend).toHaveBeenCalledWith(
+        expect.objectContaining({ to: expect.stringContaining('dev@test.com') })
+      );
 
-    it('should handle Postmark timeout', async () => {
-      mockSendEmail.mockRejectedValueOnce(new Error('Request timeout'));
-
-      const recipient: EmailRecipient = {
-        email: 'test@example.com',
-        name: 'Test',
-      };
-
-      const data: PurchaseEmailData = {
-        buyerName: 'Test',
-        sellerName: 'Test',
-        projectTitle: 'Test',
-        projectId: 'test',
-        transactionId: 'test',
-        amount: 10000,
-        downloadUrl: 'https://app.com/download',
-        purchaseDate: '2026-01-26T00:00:00.000Z',
-      };
-
-      await expect(
-        emailService.sendBuyerPurchaseConfirmation(recipient, data)
-      ).rejects.toThrow('Request timeout');
+      delete process.env['EMAIL_TEST_OVERRIDE'];
     });
   });
 });

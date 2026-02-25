@@ -20,12 +20,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MessageRepository } from '../MessageRepository';
 import type { PrismaClient } from '@prisma/client';
 
-// Mock Prisma Client
 vi.mock('@prisma/client', () => ({
   PrismaClient: vi.fn(),
 }));
 
-// Mock data helpers
 const createMockMessage = (overrides = {}) => ({
   id: 'msg123',
   senderId: 'sender123',
@@ -52,6 +50,7 @@ const createMockMessageWithRelations = (overrides = {}) => ({
     username: 'recipient',
     fullName: 'Recipient Name',
     avatarUrl: 'https://avatar.com/recipient.jpg',
+    email: 'recipient@example.com',
   },
   project: null,
   transaction: null,
@@ -69,10 +68,8 @@ describe('MessageRepository', () => {
   let mockPrismaClient: any;
 
   beforeEach(() => {
-    // Reset mocks before each test
     vi.clearAllMocks();
 
-    // Create mock Prisma Client with message methods
     mockPrismaClient = {
       message: {
         create: vi.fn(),
@@ -85,13 +82,11 @@ describe('MessageRepository', () => {
       },
     };
 
-    // Create MessageRepository with mocked Prisma
     messageRepository = new MessageRepository(mockPrismaClient as PrismaClient);
   });
 
   describe('create', () => {
     it('should create a new message with correct data', async () => {
-      // Arrange
       const messageData = {
         senderId: 'sender123',
         recipientId: 'recipient123',
@@ -107,10 +102,8 @@ describe('MessageRepository', () => {
 
       mockPrismaClient.message.create.mockResolvedValue(expectedMessage);
 
-      // Act
       const result = await messageRepository.create(messageData);
 
-      // Assert
       expect(mockPrismaClient.message.create).toHaveBeenCalledWith({
         data: {
           senderId: messageData.senderId,
@@ -134,6 +127,7 @@ describe('MessageRepository', () => {
               username: true,
               fullName: true,
               avatarUrl: true,
+              email: true,
             },
           },
           project: {
@@ -155,7 +149,6 @@ describe('MessageRepository', () => {
     });
 
     it('should create message without projectId or transactionId', async () => {
-      // Arrange
       const messageData = {
         senderId: 'sender123',
         recipientId: 'recipient123',
@@ -165,10 +158,8 @@ describe('MessageRepository', () => {
       const expectedMessage = createMockMessageWithRelations(messageData);
       mockPrismaClient.message.create.mockResolvedValue(expectedMessage);
 
-      // Act
       const result = await messageRepository.create(messageData);
 
-      // Assert
       expect(mockPrismaClient.message.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
@@ -181,7 +172,6 @@ describe('MessageRepository', () => {
     });
 
     it('should throw error when database operation fails', async () => {
-      // Arrange
       const messageData = {
         senderId: 'sender123',
         recipientId: 'recipient123',
@@ -190,7 +180,6 @@ describe('MessageRepository', () => {
 
       mockPrismaClient.message.create.mockRejectedValue(new Error('DB Error'));
 
-      // Act & Assert
       await expect(messageRepository.create(messageData)).rejects.toThrow(
         '[MessageRepository] Failed to create message'
       );
@@ -199,7 +188,6 @@ describe('MessageRepository', () => {
 
   describe('getConversation', () => {
     it('should get messages between two users', async () => {
-      // Arrange
       const userId1 = 'user1';
       const userId2 = 'user2';
 
@@ -210,10 +198,8 @@ describe('MessageRepository', () => {
 
       mockPrismaClient.message.findMany.mockResolvedValue(expectedMessages);
 
-      // Act
       const result = await messageRepository.getConversation(userId1, userId2);
 
-      // Assert
       expect(mockPrismaClient.message.findMany).toHaveBeenCalledWith({
         where: {
           OR: [
@@ -229,17 +215,14 @@ describe('MessageRepository', () => {
     });
 
     it('should filter by projectId when provided', async () => {
-      // Arrange
       const userId1 = 'user1';
       const userId2 = 'user2';
       const projectId = 'project123';
 
       mockPrismaClient.message.findMany.mockResolvedValue([]);
 
-      // Act
       await messageRepository.getConversation(userId1, userId2, projectId);
 
-      // Assert
       expect(mockPrismaClient.message.findMany).toHaveBeenCalledWith({
         where: {
           OR: [
@@ -254,21 +237,16 @@ describe('MessageRepository', () => {
     });
 
     it('should return empty array when no messages exist', async () => {
-      // Arrange
       mockPrismaClient.message.findMany.mockResolvedValue([]);
 
-      // Act
       const result = await messageRepository.getConversation('user1', 'user2');
 
-      // Assert
       expect(result).toEqual([]);
     });
 
     it('should throw error when database operation fails', async () => {
-      // Arrange
       mockPrismaClient.message.findMany.mockRejectedValue(new Error('DB Error'));
 
-      // Act & Assert
       await expect(messageRepository.getConversation('user1', 'user2')).rejects.toThrow(
         '[MessageRepository] Failed to get conversation'
       );
@@ -277,19 +255,16 @@ describe('MessageRepository', () => {
 
   describe('getConversations', () => {
     it('should get all unique conversations for user', async () => {
-      // Arrange
       const userId = 'user123';
 
-      // Mock sent messages
       mockPrismaClient.message.findMany
         .mockResolvedValueOnce([
           { recipientId: 'user2', projectId: null, transactionId: null },
-        ]) // sent
+        ])
         .mockResolvedValueOnce([
           { senderId: 'user3', projectId: null, transactionId: null },
-        ]); // received
+        ]);
 
-      // Mock latest message for each conversation (with proper user IDs)
       const latestMessage1 = {
         ...createMockMessageWithRelations({
           senderId: userId,
@@ -310,38 +285,32 @@ describe('MessageRepository', () => {
       };
 
       mockPrismaClient.message.findFirst
-        .mockResolvedValueOnce(latestMessage1) // user2 conversation
-        .mockResolvedValueOnce(latestMessage2); // user3 conversation
+        .mockResolvedValueOnce(latestMessage1)
+        .mockResolvedValueOnce(latestMessage2);
 
-      // Mock unread counts
       mockPrismaClient.message.count
-        .mockResolvedValueOnce(2) // user2 unread
-        .mockResolvedValueOnce(5); // user3 unread
+        .mockResolvedValueOnce(2)
+        .mockResolvedValueOnce(5);
 
-      // Act
       const result = await messageRepository.getConversations(userId);
 
-      // Assert
       expect(result).toHaveLength(2);
-      expect(result[0]!.partnerId).toBe('user2'); // More recent message
+      expect(result[0]!.partnerId).toBe('user2');
       expect(result[0]!.unreadCount).toBe(2);
-      expect(result[1]!.partnerId).toBe('user3'); // Older message
+      expect(result[1]!.partnerId).toBe('user3');
       expect(result[1]!.unreadCount).toBe(5);
     });
 
     it('should filter by projectId when provided', async () => {
-      // Arrange
       const userId = 'user123';
       const projectId = 'project123';
 
       mockPrismaClient.message.findMany
-        .mockResolvedValueOnce([]) // sent
-        .mockResolvedValueOnce([]); // received
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([]);
 
-      // Act
       await messageRepository.getConversations(userId, projectId);
 
-      // Assert
       expect(mockPrismaClient.message.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({ projectId }),
@@ -350,14 +319,12 @@ describe('MessageRepository', () => {
     });
 
     it('should sort conversations by latest message date (newest first)', async () => {
-      // Arrange
       const userId = 'user123';
 
       mockPrismaClient.message.findMany
         .mockResolvedValueOnce([{ recipientId: 'user2' }])
         .mockResolvedValueOnce([{ senderId: 'user3' }]);
 
-      // Older message
       const olderMessage = {
         ...createMockMessageWithRelations({
           recipientId: userId,
@@ -367,7 +334,6 @@ describe('MessageRepository', () => {
         senderId: 'user2',
       };
 
-      // Newer message
       const newerMessage = {
         ...createMockMessageWithRelations({
           recipientId: userId,
@@ -383,32 +349,25 @@ describe('MessageRepository', () => {
 
       mockPrismaClient.message.count.mockResolvedValue(0);
 
-      // Act
       const result = await messageRepository.getConversations(userId);
 
-      // Assert
-      expect(result[0]!.partnerId).toBe('user3'); // Newer message first
-      expect(result[1]!.partnerId).toBe('user2'); // Older message second
+      expect(result[0]!.partnerId).toBe('user3');
+      expect(result[1]!.partnerId).toBe('user2');
     });
 
     it('should return empty array when user has no conversations', async () => {
-      // Arrange
       mockPrismaClient.message.findMany
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([]);
 
-      // Act
       const result = await messageRepository.getConversations('user123');
 
-      // Assert
       expect(result).toEqual([]);
     });
 
     it('should throw error when database operation fails', async () => {
-      // Arrange
       mockPrismaClient.message.findMany.mockRejectedValue(new Error('DB Error'));
 
-      // Act & Assert
       await expect(messageRepository.getConversations('user123')).rejects.toThrow(
         '[MessageRepository] Failed to get conversations'
       );
@@ -417,14 +376,11 @@ describe('MessageRepository', () => {
 
   describe('markAsRead', () => {
     it('should mark messages as read', async () => {
-      // Arrange
       const messageIds = ['msg1', 'msg2', 'msg3'];
       mockPrismaClient.message.updateMany.mockResolvedValue({ count: 3 });
 
-      // Act
       const result = await messageRepository.markAsRead(messageIds);
 
-      // Assert
       expect(mockPrismaClient.message.updateMany).toHaveBeenCalledWith({
         where: {
           id: { in: messageIds },
@@ -439,22 +395,17 @@ describe('MessageRepository', () => {
     });
 
     it('should return 0 when no unread messages found', async () => {
-      // Arrange
       const messageIds = ['msg1', 'msg2'];
       mockPrismaClient.message.updateMany.mockResolvedValue({ count: 0 });
 
-      // Act
       const result = await messageRepository.markAsRead(messageIds);
 
-      // Assert
       expect(result).toBe(0);
     });
 
     it('should throw error when database operation fails', async () => {
-      // Arrange
       mockPrismaClient.message.updateMany.mockRejectedValue(new Error('DB Error'));
 
-      // Act & Assert
       await expect(messageRepository.markAsRead(['msg1'])).rejects.toThrow(
         '[MessageRepository] Failed to mark messages as read'
       );
@@ -463,18 +414,15 @@ describe('MessageRepository', () => {
 
   describe('markConversationAsRead', () => {
     it('should mark all messages from sender to recipient as read', async () => {
-      // Arrange
       const recipientId = 'recipient123';
       const senderId = 'sender123';
       mockPrismaClient.message.updateMany.mockResolvedValue({ count: 5 });
 
-      // Act
       const result = await messageRepository.markConversationAsRead(
         recipientId,
         senderId
       );
 
-      // Assert
       expect(mockPrismaClient.message.updateMany).toHaveBeenCalledWith({
         where: {
           senderId,
@@ -490,16 +438,13 @@ describe('MessageRepository', () => {
     });
 
     it('should filter by projectId when provided', async () => {
-      // Arrange
       const recipientId = 'recipient123';
       const senderId = 'sender123';
       const projectId = 'project123';
       mockPrismaClient.message.updateMany.mockResolvedValue({ count: 2 });
 
-      // Act
       await messageRepository.markConversationAsRead(recipientId, senderId, projectId);
 
-      // Assert
       expect(mockPrismaClient.message.updateMany).toHaveBeenCalledWith({
         where: {
           senderId,
@@ -515,10 +460,8 @@ describe('MessageRepository', () => {
     });
 
     it('should throw error when database operation fails', async () => {
-      // Arrange
       mockPrismaClient.message.updateMany.mockRejectedValue(new Error('DB Error'));
 
-      // Act & Assert
       await expect(
         messageRepository.markConversationAsRead('recipient', 'sender')
       ).rejects.toThrow('[MessageRepository] Failed to mark conversation as read');
@@ -527,14 +470,11 @@ describe('MessageRepository', () => {
 
   describe('getUnreadCount', () => {
     it('should count unread messages for user', async () => {
-      // Arrange
       const userId = 'user123';
       mockPrismaClient.message.count.mockResolvedValue(10);
 
-      // Act
       const result = await messageRepository.getUnreadCount(userId);
 
-      // Assert
       expect(mockPrismaClient.message.count).toHaveBeenCalledWith({
         where: {
           recipientId: userId,
@@ -545,15 +485,12 @@ describe('MessageRepository', () => {
     });
 
     it('should filter by sender when provided', async () => {
-      // Arrange
       const userId = 'user123';
       const senderId = 'sender123';
       mockPrismaClient.message.count.mockResolvedValue(3);
 
-      // Act
       const result = await messageRepository.getUnreadCount(userId, senderId);
 
-      // Assert
       expect(mockPrismaClient.message.count).toHaveBeenCalledWith({
         where: {
           recipientId: userId,
@@ -565,21 +502,16 @@ describe('MessageRepository', () => {
     });
 
     it('should return 0 when no unread messages', async () => {
-      // Arrange
       mockPrismaClient.message.count.mockResolvedValue(0);
 
-      // Act
       const result = await messageRepository.getUnreadCount('user123');
 
-      // Assert
       expect(result).toBe(0);
     });
 
     it('should throw error when database operation fails', async () => {
-      // Arrange
       mockPrismaClient.message.count.mockRejectedValue(new Error('DB Error'));
 
-      // Act & Assert
       await expect(messageRepository.getUnreadCount('user123')).rejects.toThrow(
         '[MessageRepository] Failed to get unread count'
       );
@@ -588,15 +520,12 @@ describe('MessageRepository', () => {
 
   describe('findById', () => {
     it('should find message by ID with relations', async () => {
-      // Arrange
       const messageId = 'msg123';
       const expectedMessage = createMockMessageWithRelations({ id: messageId });
       mockPrismaClient.message.findUnique.mockResolvedValue(expectedMessage);
 
-      // Act
       const result = await messageRepository.findById(messageId);
 
-      // Assert
       expect(mockPrismaClient.message.findUnique).toHaveBeenCalledWith({
         where: { id: messageId },
         include: expect.any(Object),
@@ -605,21 +534,16 @@ describe('MessageRepository', () => {
     });
 
     it('should return null when message not found', async () => {
-      // Arrange
       mockPrismaClient.message.findUnique.mockResolvedValue(null);
 
-      // Act
       const result = await messageRepository.findById('nonexistent');
 
-      // Assert
       expect(result).toBeNull();
     });
 
     it('should throw error when database operation fails', async () => {
-      // Arrange
       mockPrismaClient.message.findUnique.mockRejectedValue(new Error('DB Error'));
 
-      // Act & Assert
       await expect(messageRepository.findById('msg123')).rejects.toThrow(
         '[MessageRepository] Failed to find message'
       );
@@ -628,15 +552,12 @@ describe('MessageRepository', () => {
 
   describe('delete', () => {
     it('should delete message by ID', async () => {
-      // Arrange
       const messageId = 'msg123';
       const deletedMessage = createMockMessage({ id: messageId });
       mockPrismaClient.message.delete.mockResolvedValue(deletedMessage);
 
-      // Act
       const result = await messageRepository.delete(messageId);
 
-      // Assert
       expect(mockPrismaClient.message.delete).toHaveBeenCalledWith({
         where: { id: messageId },
       });
@@ -644,20 +565,16 @@ describe('MessageRepository', () => {
     });
 
     it('should throw error when message not found', async () => {
-      // Arrange
       mockPrismaClient.message.delete.mockRejectedValue(new Error('Record not found'));
 
-      // Act & Assert
       await expect(messageRepository.delete('nonexistent')).rejects.toThrow(
         '[MessageRepository] Failed to delete message'
       );
     });
 
     it('should throw error when database operation fails', async () => {
-      // Arrange
       mockPrismaClient.message.delete.mockRejectedValue(new Error('DB Error'));
 
-      // Act & Assert
       await expect(messageRepository.delete('msg123')).rejects.toThrow(
         '[MessageRepository] Failed to delete message'
       );

@@ -15,7 +15,6 @@ import {
 import type { ReviewRepository } from '@/lib/repositories/ReviewRepository';
 import type { UserRepository } from '@/lib/repositories/UserRepository';
 
-// Mock implementations
 const mockReviewRepository: ReviewRepository = {
   create: vi.fn(),
   findByTransactionId: vi.fn(),
@@ -47,7 +46,6 @@ const mockEmailService = {
   sendNewReviewNotification: vi.fn().mockResolvedValue(undefined),
 };
 
-// Mock data helpers
 const createMockUser = (id: string) => ({
   id,
   username: `user${id}`,
@@ -96,10 +94,8 @@ describe('ReviewService', () => {
   let reviewService: ReviewService;
 
   beforeEach(() => {
-    // Reset all mocks before each test
     vi.clearAllMocks();
 
-    // Create fresh instance
     reviewService = new ReviewService(
       mockReviewRepository,
       mockUserRepository,
@@ -108,9 +104,6 @@ describe('ReviewService', () => {
     );
   });
 
-  // ============================================
-  // CREATE REVIEW TESTS
-  // ============================================
 
   describe('createReview', () => {
     const buyerId = 'buyer123';
@@ -123,20 +116,17 @@ describe('ReviewService', () => {
     };
 
     beforeEach(() => {
-      // Mock transaction exists and payment succeeded
       vi.mocked(mockTransactionRepository.findById).mockResolvedValue(
         createMockTransaction()
       );
 
-      // Mock users exist
       vi.mocked(mockUserRepository.findById)
         .mockResolvedValueOnce(createMockUser('buyer123') as any)
+        .mockResolvedValueOnce(createMockUser('seller123') as any)
         .mockResolvedValueOnce(createMockUser('seller123') as any);
 
-      // Mock no existing review
       vi.mocked(mockReviewRepository.findByTransactionId).mockResolvedValue(null);
 
-      // Mock update analytics success (async, non-blocking)
       vi.mocked(mockReviewRepository.updateSellerAnalytics).mockResolvedValue({} as any);
     });
 
@@ -194,7 +184,7 @@ describe('ReviewService', () => {
 
       expect(mockReviewRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          comment: 'Great work!', // Trimmed
+          comment: 'Great work!',
         })
       );
     });
@@ -205,7 +195,6 @@ describe('ReviewService', () => {
 
       await reviewService.createReview(buyerId, validReviewData);
 
-      // Should be called asynchronously
       expect(mockReviewRepository.updateSellerAnalytics).toHaveBeenCalledWith(
         'seller123'
       );
@@ -217,7 +206,14 @@ describe('ReviewService', () => {
 
       await reviewService.createReview(buyerId, validReviewData);
 
-      expect(mockEmailService.sendNewReviewNotification).toHaveBeenCalledWith(mockReview);
+      expect(mockEmailService.sendNewReviewNotification).toHaveBeenCalledWith(
+        mockReview,
+        {
+          email: 'userseller123@example.com',
+          fullName: 'User seller123',
+          username: 'userseller123',
+        }
+      );
     });
 
     it('should not throw if email notification fails', async () => {
@@ -227,13 +223,11 @@ describe('ReviewService', () => {
         new Error('Email service down')
       );
 
-      // Should not throw
       await expect(
         reviewService.createReview(buyerId, validReviewData)
       ).resolves.toBeDefined();
     });
 
-    // Validation error tests
     it('should reject missing transaction ID', async () => {
       const invalidData = {
         ...validReviewData,
@@ -323,7 +317,6 @@ describe('ReviewService', () => {
       await expect(reviewService.createReview(buyerId, validData)).resolves.toBeDefined();
     });
 
-    // Permission error tests
     it('should reject if transaction not found', async () => {
       vi.mocked(mockTransactionRepository.findById).mockResolvedValue(null);
 
@@ -363,7 +356,7 @@ describe('ReviewService', () => {
     });
 
     it('should reject if buyer does not exist', async () => {
-      vi.mocked(mockUserRepository.findById).mockReset().mockResolvedValueOnce(null); // Buyer not found
+      vi.mocked(mockUserRepository.findById).mockReset().mockResolvedValueOnce(null);
 
       await expect(reviewService.createReview(buyerId, validReviewData)).rejects.toThrow(
         ReviewPermissionError
@@ -373,8 +366,8 @@ describe('ReviewService', () => {
     it('should reject if seller does not exist', async () => {
       vi.mocked(mockUserRepository.findById)
         .mockReset()
-        .mockResolvedValueOnce(createMockUser('buyer123') as any) // Buyer exists
-        .mockResolvedValueOnce(null); // Seller not found
+        .mockResolvedValueOnce(createMockUser('buyer123') as any)
+        .mockResolvedValueOnce(null);
 
       await expect(reviewService.createReview(buyerId, validReviewData)).rejects.toThrow(
         ReviewPermissionError
@@ -382,9 +375,6 @@ describe('ReviewService', () => {
     });
   });
 
-  // ============================================
-  // GET SELLER REVIEWS TESTS
-  // ============================================
 
   describe('getSellerReviews', () => {
     it('should get seller reviews', async () => {
@@ -440,9 +430,6 @@ describe('ReviewService', () => {
     });
   });
 
-  // ============================================
-  // GET SELLER RATING STATS TESTS
-  // ============================================
 
   describe('getSellerRatingStats', () => {
     it('should get seller rating stats', async () => {
@@ -473,9 +460,6 @@ describe('ReviewService', () => {
     });
   });
 
-  // ============================================
-  // GET BUYER REVIEWS TESTS
-  // ============================================
 
   describe('getBuyerReviews', () => {
     it('should get buyer reviews', async () => {
@@ -515,9 +499,6 @@ describe('ReviewService', () => {
     });
   });
 
-  // ============================================
-  // IS TRANSACTION REVIEWED TESTS
-  // ============================================
 
   describe('isTransactionReviewed', () => {
     it('should return true if transaction is reviewed', async () => {
