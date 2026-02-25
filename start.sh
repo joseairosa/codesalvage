@@ -2,8 +2,8 @@
 set -x
 
 echo "[start.sh] Running database migrations..."
-MAX_RETRIES=5
-RETRY_DELAY=5
+MAX_RETRIES=2
+RETRY_DELAY=2
 RETRY_COUNT=0
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do

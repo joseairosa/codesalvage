@@ -40,12 +40,12 @@ import type { UserRepository } from '@/lib/repositories/UserRepository';
  */
 export interface CreateReviewRequest {
   transactionId: string;
-  overallRating: number; // 1-5
+  overallRating: number;
   comment?: string;
-  codeQualityRating?: number; // 1-5
-  documentationRating?: number; // 1-5
-  responsivenessRating?: number; // 1-5
-  accuracyRating?: number; // 1-5
+  codeQualityRating?: number;
+  documentationRating?: number;
+  responsivenessRating?: number;
+  accuracyRating?: number;
   isAnonymous?: boolean;
 }
 
@@ -98,8 +98,8 @@ export class ReviewService {
   constructor(
     private reviewRepository: ReviewRepository,
     private userRepository: UserRepository,
-    private transactionRepository?: any, // TransactionRepository (not yet implemented)
-    private emailService?: any // EmailService type (optional for now)
+    private transactionRepository?: any,
+    private emailService?: any
   ) {
     console.log('[ReviewService] Initialized');
   }
@@ -128,14 +128,11 @@ export class ReviewService {
   ): Promise<ReviewWithRelations> {
     console.log('[ReviewService] Creating review for transaction:', data.transactionId);
 
-    // Validate input
     await this.validateReviewData(buyerId, data);
 
-    // Get transaction to find sellerId
     // TODO: Replace with actual TransactionRepository when implemented
     const transaction = await this.getTransaction(data.transactionId);
 
-    // Convert request to repository input
     const createInput: CreateReviewInput = {
       transactionId: data.transactionId,
       sellerId: transaction.sellerId,
@@ -149,19 +146,27 @@ export class ReviewService {
       isAnonymous: data.isAnonymous || false,
     };
 
-    // Create review
     const review = await this.reviewRepository.create(createInput);
 
-    // Update seller analytics (async, don't wait)
     this.reviewRepository.updateSellerAnalytics(transaction.sellerId).catch((err) => {
       console.error('[ReviewService] Failed to update seller analytics:', err);
     });
 
-    // Send email notification (async, don't wait)
     if (this.emailService) {
-      this.emailService.sendNewReviewNotification(review).catch((err: Error) => {
-        console.error('[ReviewService] Failed to send email notification:', err);
-      });
+      this.userRepository
+        .findById(transaction.sellerId)
+        .then((seller) => {
+          if (seller?.email) {
+            return this.emailService.sendNewReviewNotification(review, {
+              email: seller.email,
+              fullName: seller.fullName,
+              username: seller.username,
+            });
+          }
+        })
+        .catch((err: Error) => {
+          console.error('[ReviewService] Failed to send email notification:', err);
+        });
     }
 
     console.log('[ReviewService] Review created successfully:', review.id);
@@ -184,7 +189,6 @@ export class ReviewService {
   ): Promise<PaginatedReviews> {
     console.log('[ReviewService] Getting reviews for seller:', sellerId);
 
-    // Verify seller exists
     const seller = await this.userRepository.findById(sellerId);
     if (!seller) {
       throw new ReviewNotFoundError('Seller not found');
@@ -205,7 +209,6 @@ export class ReviewService {
   async getSellerRatingStats(sellerId: string): Promise<SellerRatingStats> {
     console.log('[ReviewService] Getting rating stats for seller:', sellerId);
 
-    // Verify seller exists
     const seller = await this.userRepository.findById(sellerId);
     if (!seller) {
       throw new ReviewNotFoundError('Seller not found');
@@ -230,7 +233,6 @@ export class ReviewService {
   ): Promise<PaginatedReviews> {
     console.log('[ReviewService] Getting reviews by buyer:', buyerId);
 
-    // Verify buyer exists
     const buyer = await this.userRepository.findById(buyerId);
     if (!buyer) {
       throw new ReviewNotFoundError('Buyer not found');
@@ -269,25 +271,21 @@ export class ReviewService {
     buyerId: string,
     data: CreateReviewRequest
   ): Promise<void> {
-    // Transaction validation
     if (!data.transactionId || data.transactionId.trim().length === 0) {
       throw new ReviewValidationError('Transaction ID is required', 'transactionId');
     }
 
-    // Check if transaction exists
     const transaction = await this.getTransaction(data.transactionId);
     if (!transaction) {
       throw new ReviewValidationError('Transaction not found', 'transactionId');
     }
 
-    // Permission check: only buyer can review
     if (transaction.buyerId !== buyerId) {
       throw new ReviewPermissionError(
         'Only the buyer of this transaction can submit a review'
       );
     }
 
-    // Payment status check
     if (transaction.paymentStatus !== 'succeeded') {
       throw new ReviewValidationError(
         'Can only review completed transactions',
@@ -295,7 +293,6 @@ export class ReviewService {
       );
     }
 
-    // Check if already reviewed
     const existingReview = await this.reviewRepository.findByTransactionId(
       data.transactionId
     );
@@ -306,7 +303,6 @@ export class ReviewService {
       );
     }
 
-    // Overall rating validation
     if (data.overallRating === undefined || data.overallRating === null) {
       throw new ReviewValidationError('Overall rating is required', 'overallRating');
     }
@@ -318,7 +314,6 @@ export class ReviewService {
       );
     }
 
-    // Optional ratings validation
     if (
       data.codeQualityRating !== undefined &&
       data.codeQualityRating !== null &&
@@ -363,7 +358,6 @@ export class ReviewService {
       );
     }
 
-    // Comment validation
     if (data.comment) {
       const commentLength = data.comment.trim().length;
       if (commentLength > MAX_COMMENT_LENGTH) {
@@ -374,13 +368,11 @@ export class ReviewService {
       }
     }
 
-    // Buyer exists validation
     const buyer = await this.userRepository.findById(buyerId);
     if (!buyer) {
       throw new ReviewPermissionError('Buyer user not found');
     }
 
-    // Seller exists validation
     const seller = await this.userRepository.findById(transaction.sellerId);
     if (!seller) {
       throw new ReviewPermissionError('Seller user not found');
@@ -409,7 +401,6 @@ export class ReviewService {
    */
   private async getTransaction(transactionId: string): Promise<any> {
     // TODO: Replace with actual TransactionRepository.findById() call
-    // For now, use direct Prisma access (temporary until TransactionRepository implemented)
     console.warn(
       '[ReviewService] Using temporary transaction lookup - replace with TransactionRepository'
     );
@@ -418,7 +409,6 @@ export class ReviewService {
       return await this.transactionRepository.findById(transactionId);
     }
 
-    // Temporary fallback (will be removed once TransactionRepository exists)
     throw new ReviewValidationError(
       'Transaction lookup not yet implemented',
       'transactionId'
