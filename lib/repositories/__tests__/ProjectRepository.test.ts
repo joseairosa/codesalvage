@@ -294,6 +294,28 @@ describe('ProjectRepository', () => {
       expect(findManyArgs.where).not.toHaveProperty('status');
       expect(findManyArgs.where).toMatchObject({ sellerId: 'seller-123' });
     });
+
+    it('should default to isApproved=true when no sellerId is provided', async () => {
+      vi.mocked(mockPrismaClient.$transaction).mockResolvedValue([[], 0] as any);
+
+      await projectRepository.search({});
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const findManyArgs = vi.mocked(mockPrismaClient.project.findMany).mock
+        .calls[0]![0]!;
+      expect(findManyArgs.where).toMatchObject({ isApproved: true });
+    });
+
+    it('should NOT apply isApproved filter when sellerId is provided', async () => {
+      vi.mocked(mockPrismaClient.$transaction).mockResolvedValue([[], 0] as any);
+
+      await projectRepository.search({ sellerId: 'seller-123' });
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const findManyArgs = vi.mocked(mockPrismaClient.project.findMany).mock
+        .calls[0]![0]!;
+      expect(findManyArgs.where).not.toHaveProperty('isApproved');
+    });
   });
 
   describe('findBySellerId', () => {
