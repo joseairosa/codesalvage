@@ -57,9 +57,10 @@ model User {
   sellerVerificationDate DateTime? @map("seller_verification_date")
 
   // Metadata
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  lastLogin DateTime? @map("last_login")
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
+  lastLogin                DateTime? @map("last_login")
+  onboardingDismissedAt    DateTime? @map("onboarding_dismissed_at")
 
   // Relations
   projectsCreated      Project[]         @relation("SellerProjects")

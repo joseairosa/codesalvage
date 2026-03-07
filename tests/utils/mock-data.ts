@@ -74,6 +74,7 @@ export function createMockUser(overrides?: Partial<User>): User {
     createdAt: new Date(),
     updatedAt: new Date(),
     lastLogin: new Date(),
+    onboardingDismissedAt: null,
     ...overrides,
   };
 }

@@ -12,27 +12,39 @@ import { stripeService } from '@/lib/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, AlertTriangle, CreditCard, Clock } from 'lucide-react';
+import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist';
+import type { OnboardingStep } from '@/components/onboarding/OnboardingChecklist';
 
 export default async function DashboardPage() {
   const session = await requireAuth();
 
-  const [projectCount, messageCount, transactionCount, user] = await Promise.all([
-    prisma.project.count({ where: { sellerId: session.user.id } }),
-    prisma.message.count({
-      where: {
-        OR: [{ senderId: session.user.id }, { recipientId: session.user.id }],
-      },
-    }),
-    prisma.transaction.count({
-      where: {
-        OR: [{ buyerId: session.user.id }, { sellerId: session.user.id }],
-      },
-    }),
-    prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { createdAt: true, stripeAccountId: true, isVerifiedSeller: true },
-    }),
-  ]);
+  const [projectCount, messageCount, transactionCount, buyerPurchaseCount, user] =
+    await Promise.all([
+      prisma.project.count({ where: { sellerId: session.user.id } }),
+      prisma.message.count({
+        where: {
+          OR: [{ senderId: session.user.id }, { recipientId: session.user.id }],
+        },
+      }),
+      prisma.transaction.count({
+        where: {
+          OR: [{ buyerId: session.user.id }, { sellerId: session.user.id }],
+        },
+      }),
+      prisma.transaction.count({
+        where: { buyerId: session.user.id, paymentStatus: 'succeeded' },
+      }),
+      prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          createdAt: true,
+          stripeAccountId: true,
+          isVerifiedSeller: true,
+          bio: true,
+          onboardingDismissedAt: true,
+        },
+      }),
+    ]);
 
   let isVerifiedSeller = session.user.isVerifiedSeller;
   let onboardingStatus: {
@@ -58,6 +70,49 @@ export default async function DashboardPage() {
     }
   }
 
+  // Build onboarding steps from real DB state
+  const profileDone = Boolean(user?.bio && user.bio.trim().length > 0);
+  const onboardingSteps: OnboardingStep[] = session.user.isSeller
+    ? [
+        {
+          id: 'profile',
+          label: 'Complete your profile',
+          description: 'Add a bio so buyers know who you are.',
+          done: profileDone,
+          href: '/settings',
+        },
+        {
+          id: 'stripe',
+          label: 'Connect payment account',
+          description: 'Required before buyers can purchase your projects.',
+          done: isVerifiedSeller,
+          href: '/seller/onboard',
+        },
+        {
+          id: 'project',
+          label: 'List your first project',
+          description: 'Turn your unfinished code into revenue.',
+          done: projectCount > 0,
+          href: '/projects/new',
+        },
+      ]
+    : [
+        {
+          id: 'profile',
+          label: 'Complete your profile',
+          description: 'Add a bio so sellers know who you are.',
+          done: profileDone,
+          href: '/settings',
+        },
+        {
+          id: 'purchase',
+          label: 'Make your first purchase',
+          description: 'Find a project that fits your skills and complete it.',
+          done: buyerPurchaseCount > 0,
+          href: '/projects',
+        },
+      ];
+
   return (
     <div className="container mx-auto py-10">
       <div className="mb-8 flex items-center justify-between">
@@ -80,6 +135,14 @@ export default async function DashboardPage() {
           </Button>
         )}
       </div>
+
+      <OnboardingChecklist
+        steps={onboardingSteps}
+        dismissed={
+          user?.onboardingDismissedAt !== null &&
+          user?.onboardingDismissedAt !== undefined
+        }
+      />
 
       {session.user.isSeller &&
         !isVerifiedSeller &&
