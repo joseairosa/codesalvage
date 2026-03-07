@@ -85,9 +85,7 @@ describe('DisputeOversight', () => {
     await waitFor(() => screen.getByText('Awesome Project'));
 
     const fetchSpy = vi.mocked(globalThis.fetch);
-    expect(fetchSpy).toHaveBeenCalledWith(
-      expect.stringContaining('status=pending')
-    );
+    expect(fetchSpy).toHaveBeenCalledWith(expect.stringContaining('status=pending'));
   });
 
   it('shows Resolve button for pending disputes', async () => {
@@ -138,17 +136,32 @@ describe('DisputeOversight', () => {
 
   it('submits resolve form and refreshes disputes', async () => {
     const user = userEvent.setup();
-    const fetchSpy = vi.spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ disputes: MOCK_DISPUTES }) } as Response)
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ dispute: { ...MOCK_DISPUTES[0], status: 'resolved_refund' } }) } as Response)
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ disputes: [] }) } as Response);
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ disputes: MOCK_DISPUTES }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          dispute: { ...MOCK_DISPUTES[0], status: 'resolved_refund' },
+        }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ disputes: [] }),
+      } as Response);
 
     render(<DisputeOversight />);
     await waitFor(() => screen.getByRole('button', { name: /resolve/i }));
     await user.click(screen.getByRole('button', { name: /resolve/i }));
 
     // Fill notes
-    await user.type(screen.getByRole('textbox'), 'Full refund issued after thorough review');
+    await user.type(
+      screen.getByRole('textbox'),
+      'Full refund issued after thorough review'
+    );
 
     // Trigger form submission directly via API call mock (outcome/action select interaction
     // requires complex Radix UI interaction — verify the fetch call shape instead)
@@ -158,10 +171,16 @@ describe('DisputeOversight', () => {
   it('shows error message when resolve API fails', async () => {
     const user = userEvent.setup();
     vi.spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ disputes: MOCK_DISPUTES }) } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ disputes: MOCK_DISPUTES }),
+      } as Response)
       .mockResolvedValueOnce({
         ok: false,
-        json: async () => ({ error: 'Cannot refund', message: 'Transaction already refunded' }),
+        json: async () => ({
+          error: 'Cannot refund',
+          message: 'Transaction already refunded',
+        }),
       } as Response);
 
     render(<DisputeOversight />);
