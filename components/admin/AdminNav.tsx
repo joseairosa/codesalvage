@@ -26,6 +26,7 @@ import {
   CreditCard,
   FileText,
   Flag,
+  AlertTriangle,
 } from 'lucide-react';
 
 /**
@@ -62,6 +63,11 @@ const navItems: NavItem[] = [
     href: '/admin/audit-logs',
     label: 'Audit Logs',
     icon: FileText,
+  },
+  {
+    href: '/admin/disputes',
+    label: 'Disputes',
+    icon: AlertTriangle,
   },
   {
     href: '/admin/reports',

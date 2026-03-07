@@ -106,3 +106,22 @@ export interface RepoTransferEmailData {
 export interface StripeConnectConfirmedEmailData {
   sellerName: string;
 }
+
+export interface DisputeOpenedEmailData {
+  buyerName: string;
+  sellerName: string;
+  projectTitle: string;
+  reason: string;
+  description: string;
+  transactionId: string;
+  disputeId: string;
+}
+
+export interface DisputeResolvedEmailData {
+  recipientName: string;
+  projectTitle: string;
+  resolution: string;
+  resolutionNote: string;
+  transactionId: string;
+  disputeId: string;
+}
