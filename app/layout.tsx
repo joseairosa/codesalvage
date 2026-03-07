@@ -14,6 +14,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   title: 'CodeSalvage - Marketplace for Incomplete Software Projects',
   description:
     'Buy and sell incomplete software projects. Turn your 80% complete side project into revenue.',
