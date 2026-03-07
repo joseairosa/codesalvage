@@ -375,6 +375,8 @@ export class ProjectRepository {
 
     if (filters.sellerId) {
       where.sellerId = filters.sellerId;
+    } else {
+      where.isApproved = true;
     }
 
     if (filters.featured !== undefined) {

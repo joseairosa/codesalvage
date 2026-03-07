@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     ports:
-      - '3011:3000' # Host:Container - Port 3011 to avoid conflicts
+      - '3011:3011' # Host:Container - Port 3011 (next dev -p 3011)
     volumes:
       - .:/app
       - /app/node_modules

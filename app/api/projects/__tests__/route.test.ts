@@ -86,6 +86,24 @@ describe('GET /api/projects — status filter defaulting', () => {
     );
   });
 
+  it('passes sortBy field name through to service unchanged (e.g. priceCents, viewCount)', async () => {
+    await GET(makeRequest('sortBy=priceCents&sortOrder=asc'));
+
+    expect(mockSearchProjects).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ sortBy: 'priceCents', sortOrder: 'asc' })
+    );
+  });
+
+  it('passes viewCount sort field through correctly', async () => {
+    await GET(makeRequest('sortBy=viewCount&sortOrder=desc'));
+
+    expect(mockSearchProjects).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ sortBy: 'viewCount', sortOrder: 'desc' })
+    );
+  });
+
   it('returns 200 with project results', async () => {
     mockSearchProjects.mockResolvedValueOnce({
       projects: [{ id: 'proj-1', title: 'Test Project' }],
