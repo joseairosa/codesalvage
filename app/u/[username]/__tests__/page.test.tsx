@@ -250,4 +250,32 @@ describe('generateMetadata', () => {
     expect(og.title).toBeDefined();
     expect(og.description).toBeDefined();
   });
+
+  it('sets twitter card to summary', async () => {
+    mockUserFindUnique.mockResolvedValue(mockUser);
+    const meta = await generateMetadata({
+      params: Promise.resolve({ username: 'testseller' }),
+    });
+    const twitter = meta.twitter as { card?: string } | undefined;
+    expect(twitter?.card).toBe('summary');
+  });
+
+  it('sets canonical URL for seller profile', async () => {
+    mockUserFindUnique.mockResolvedValue(mockUser);
+    const meta = await generateMetadata({
+      params: Promise.resolve({ username: 'testseller' }),
+    });
+    const alternates = meta.alternates as { canonical?: string } | undefined;
+    expect(alternates?.canonical).toContain('/u/testseller');
+  });
+
+  it('includes avatar URL in twitter images when avatarUrl is set', async () => {
+    const userWithAvatar = { ...mockUser, avatarUrl: 'https://example.com/avatar.png' };
+    mockUserFindUnique.mockResolvedValue(userWithAvatar);
+    const meta = await generateMetadata({
+      params: Promise.resolve({ username: 'testseller' }),
+    });
+    const twitter = meta.twitter as { images?: string[] } | undefined;
+    expect(twitter?.images).toContain('https://example.com/avatar.png');
+  });
 });

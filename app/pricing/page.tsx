@@ -25,6 +25,21 @@ export const metadata: Metadata = {
     description:
       'Free tier with 3 projects or Pro plan with unlimited listings for $9.99/month',
     type: 'website',
+    images: [
+      {
+        url: '/images/opengraph-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'CodeSalvage Pricing Plans',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pricing Plans - CodeSalvage',
+    description:
+      'Free tier with 3 projects or Pro plan with unlimited listings for $9.99/month',
+    images: ['/images/opengraph-image.png'],
   },
 };
 
