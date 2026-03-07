@@ -59,7 +59,9 @@ describe('generateMetadata', () => {
 
   it('returns fallback title for missing project', async () => {
     mockProjectFindUnique.mockResolvedValue(null);
-    const meta = await generateMetadata({ params: Promise.resolve({ id: 'nonexistent' }) });
+    const meta = await generateMetadata({
+      params: Promise.resolve({ id: 'nonexistent' }),
+    });
     expect(meta.title).toBe('Project Not Found — CodeSalvage');
   });
 
@@ -157,7 +159,9 @@ describe('ProjectDetailLayout JSON-LD', () => {
       children: null,
     });
     const html = renderToStaticMarkup(jsx as React.ReactElement);
-    const match = html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([^<]+)<\/script>/);
+    const match = html.match(
+      /<script[^>]*type="application\/ld\+json"[^>]*>([^<]+)<\/script>/
+    );
     if (!match?.[1]) return null;
     return JSON.parse(match[1]) as Record<string, unknown>;
   }

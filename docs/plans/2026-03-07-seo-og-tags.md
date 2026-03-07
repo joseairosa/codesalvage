@@ -18,6 +18,7 @@ Type: Feature
 ## Scope
 
 ### In Scope
+
 - Dynamic `generateMetadata` for project detail pages (`/projects/[id]`)
 - Static metadata for browse page (`/projects`), how-it-works, pricing
 - Homepage metadata: confirmed covered by root layout (`app/layout.tsx:16-56`) — no separate update needed
@@ -30,6 +31,7 @@ Type: Feature
 - Unit tests for metadata generation and OG image endpoint
 
 ### Out of Scope
+
 - OG images for seller profiles (already has avatar-based OG — keeping seller avatar as the image)
 - OG images for browse page (uses default site image)
 - Sitemap.xml generation (separate task)
@@ -99,10 +101,12 @@ Type: Feature
 **Dependencies:** None
 
 **Files:**
+
 - Create: `app/projects/[id]/layout.tsx`
 - Test: `app/projects/[id]/__tests__/layout.test.tsx`
 
 **Key Decisions / Notes:**
+
 - Follow the pattern from `app/u/[username]/page.tsx:63-96`
 - Fetch project with Prisma directly (not via API): `prisma.project.findUnique({ where: { id }, select: { title, description, category, priceCents, completionPercentage, techStack, status, isApproved, seller: { select: { username } } } })`
 - Return `robots: { index: false }` for non-active or unapproved projects
@@ -114,6 +118,7 @@ Type: Feature
 - Layout renders `{children}` only — no visual wrapper
 
 **Definition of Done:**
+
 - [ ] `app/projects/[id]/layout.tsx` exports `generateMetadata` that fetches project data
 - [ ] Title, description, OG title/description/image/url, twitter card, canonical URL all set
 - [ ] Non-active/unapproved projects get `robots: { index: false }`
@@ -122,6 +127,7 @@ Type: Feature
 - [ ] No diagnostics errors
 
 **Verify:**
+
 ```
 npx vitest run app/projects/[id]/__tests__/layout.test.tsx --reporter=verbose
 ```
@@ -135,10 +141,12 @@ npx vitest run app/projects/[id]/__tests__/layout.test.tsx --reporter=verbose
 **Dependencies:** None (can be built in parallel with Task 1)
 
 **Files:**
+
 - Create: `app/api/og/route.tsx`
 - Test: `app/api/og/__tests__/route.test.ts`
 
 **Key Decisions / Notes:**
+
 - Use `next/og` `ImageResponse` API (built into Next.js 15)
 - Route: `GET /api/og?id=<projectId>`
 - Image size: 1200x630 (standard OG)
@@ -152,6 +160,7 @@ npx vitest run app/projects/[id]/__tests__/layout.test.tsx --reporter=verbose
 - No rate limiting needed (static-ish content, cached)
 
 **Definition of Done:**
+
 - [ ] `GET /api/og?id=<projectId>` returns a PNG image
 - [ ] Image shows project title, formatted price, completion %, top 3 tech stack badges
 - [ ] Image has CodeSalvage branding (logo or text)
@@ -162,6 +171,7 @@ npx vitest run app/projects/[id]/__tests__/layout.test.tsx --reporter=verbose
 - [ ] No diagnostics errors
 
 **Verify:**
+
 ```
 npx vitest run app/api/og/__tests__/route.test.ts --reporter=verbose
 curl -I http://localhost:3011/api/og?id=test-id
@@ -176,6 +186,7 @@ curl -I http://localhost:3011/api/og?id=test-id
 **Dependencies:** Task 1
 
 **Files:**
+
 - Create: `app/projects/layout.tsx` (browse page metadata — wraps both `/projects` and `/projects/[id]`)
 - Modify: `app/projects/[id]/layout.tsx` (add JSON-LD script tag)
 - Modify: `app/how-it-works/page.tsx` (add/update metadata export if missing OG tags)
@@ -183,6 +194,7 @@ curl -I http://localhost:3011/api/og?id=test-id
 - Modify: `app/u/[username]/page.tsx` (add twitter card + canonical URL to existing generateMetadata)
 
 **Key Decisions / Notes:**
+
 - **Browse page:** `app/projects/page.tsx` is a client component (`'use client'`), so it cannot export metadata. The `app/projects/layout.tsx` server component is the required workaround — same pattern as the project detail layout.
 - Browse page metadata is static: title "Browse Projects — CodeSalvage", description about marketplace
 - `app/projects/layout.tsx` sets metadata for the browse page; nested `app/projects/[id]/layout.tsx` overrides for detail pages (Next.js metadata merging)
@@ -193,6 +205,7 @@ curl -I http://localhost:3011/api/og?id=test-id
 - **Homepage:** Root layout metadata (`app/layout.tsx:16-56`) already covers the homepage with title, description, OG image, twitter card, and robots. No separate update needed — confirmed sufficient.
 
 **Definition of Done:**
+
 - [ ] `/projects` has title "Browse Projects — CodeSalvage" with OG tags
 - [ ] `/projects/[id]` has JSON-LD Product schema in page source
 - [ ] How-it-works page has complete OG tags (title, description, image, type)
@@ -203,6 +216,7 @@ curl -I http://localhost:3011/api/og?id=test-id
 - [ ] No diagnostics errors
 
 **Verify:**
+
 ```
 npm run test:ci
 curl -s http://localhost:3011/projects | grep -o '<title>.*</title>'
@@ -217,11 +231,13 @@ curl -s http://localhost:3011/projects | grep -o '<title>.*</title>'
 **Dependencies:** Tasks 1, 2, 3
 
 **Files:**
+
 - Create: `app/projects/[id]/__tests__/layout.test.tsx` (if not created in Task 1)
 - Create: `app/api/og/__tests__/route.test.ts` (if not created in Task 2)
 - Modify: existing test files as needed
 
 **Key Decisions / Notes:**
+
 - Mock Prisma for metadata tests (same pattern as `app/u/[username]/__tests__/page.test.tsx`)
 - Test generateMetadata returns correct title/description/OG for a valid project
 - Test generateMetadata returns fallback for missing project
@@ -231,6 +247,7 @@ curl -s http://localhost:3011/projects | grep -o '<title>.*</title>'
 - Test JSON-LD contains correct Product schema fields
 
 **Definition of Done:**
+
 - [ ] Metadata tests: valid project, missing project, non-indexable project
 - [ ] OG image tests: valid response, missing project fallback, cache headers
 - [ ] JSON-LD test: correct schema shape
@@ -238,6 +255,7 @@ curl -s http://localhost:3011/projects | grep -o '<title>.*</title>'
 - [ ] No diagnostics errors
 
 **Verify:**
+
 ```
 npm run test:ci
 ```
@@ -250,16 +268,17 @@ npm run test:ci
 
 ## Risks and Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| Layout.tsx metadata fetch duplicates page.tsx data fetch | Medium | Low | The layout's Prisma query is independent of the page's client-side API fetch — there is no request deduplication between them. The overhead is acceptable because: (1) layout's select is narrow (7 fields), (2) query is fast (indexed by ID), (3) metadata generation is server-side and does not block client rendering. |
-| OG image generation slow in production | Low | Medium | Set 24h cache headers. ImageResponse is lightweight (no headless browser). |
-| Project description too long for OG | Medium | Low | Truncate to 160 chars in generateMetadata. |
-| `app/projects/layout.tsx` interferes with nested `[id]/layout.tsx` | Low | Medium | Next.js merges metadata — nested layout overrides parent. Test that `/projects` gets browse metadata and `/projects/[id]` gets project metadata. |
+| Risk                                                               | Likelihood | Impact | Mitigation                                                                                                                                                                                                                                                                                                                  |
+| ------------------------------------------------------------------ | ---------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Layout.tsx metadata fetch duplicates page.tsx data fetch           | Medium     | Low    | The layout's Prisma query is independent of the page's client-side API fetch — there is no request deduplication between them. The overhead is acceptable because: (1) layout's select is narrow (7 fields), (2) query is fast (indexed by ID), (3) metadata generation is server-side and does not block client rendering. |
+| OG image generation slow in production                             | Low        | Medium | Set 24h cache headers. ImageResponse is lightweight (no headless browser).                                                                                                                                                                                                                                                  |
+| Project description too long for OG                                | Medium     | Low    | Truncate to 160 chars in generateMetadata.                                                                                                                                                                                                                                                                                  |
+| `app/projects/layout.tsx` interferes with nested `[id]/layout.tsx` | Low        | Medium | Next.js merges metadata — nested layout overrides parent. Test that `/projects` gets browse metadata and `/projects/[id]` gets project metadata.                                                                                                                                                                            |
 
 ## Goal Verification
 
 ### Truths
+
 1. Sharing a project URL on Twitter/Slack shows a rich preview with title, price, and project card image
 2. `view-source` on `/projects/abc123` shows `<meta property="og:title">` with the project name
 3. `view-source` on `/projects/abc123` shows `<script type="application/ld+json">` with Product schema
@@ -268,12 +287,14 @@ npm run test:ci
 6. Browse page (`/projects`) has its own distinct title and OG tags
 
 ### Artifacts
+
 1. `app/projects/[id]/layout.tsx` — server layout with generateMetadata for project detail
 2. `app/api/og/route.tsx` — dynamic OG image generation endpoint
 3. `app/projects/layout.tsx` — browse page metadata
 4. Updated static page metadata (how-it-works, pricing)
 
 ### Key Links
+
 1. `generateMetadata` in layout → Prisma project fetch → OG tags in HTML head
 2. OG image URL in metadata → `/api/og?id=X` → ImageResponse with project data
 3. JSON-LD script in layout → Product schema with price/availability from project data

@@ -26,7 +26,11 @@ function getSchemaAvailability(status: string, isApproved: boolean): string {
   return 'https://schema.org/InStock';
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
   const { id } = await params;
 
   const project = await prisma.project.findUnique({
