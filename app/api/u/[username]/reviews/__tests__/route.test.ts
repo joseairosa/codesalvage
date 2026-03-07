@@ -25,7 +25,7 @@ vi.mock('@/lib/repositories/ReviewRepository', () => ({
 }));
 
 vi.mock('@/lib/middleware/withRateLimit', () => ({
-  withPublicRateLimit: (handler: Function) => handler,
+  withPublicRateLimit: (handler: (...args: unknown[]) => unknown) => handler,
 }));
 
 const makeRequest = (username: string, page = '1', limit = '10') =>
