@@ -100,6 +100,10 @@ interface AnalyticsData {
     revenue: number;
     transactionCount: number;
   }>;
+  viewsOverTime: Array<{
+    date: string;
+    viewCount: number;
+  }>;
   topProjects: Array<{
     projectId: string;
     projectTitle: string;
@@ -240,7 +244,7 @@ export function AnalyticsDashboard() {
     return null;
   }
 
-  const { summary, revenueOverTime, topProjects } = analytics;
+  const { summary, revenueOverTime, viewsOverTime, topProjects } = analytics;
 
   return (
     <div className="space-y-6">
@@ -373,6 +377,55 @@ export function AnalyticsDashboard() {
           ) : (
             <div className="flex h-[300px] items-center justify-center text-gray-500">
               No revenue data for selected period
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Views Over Time Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Views Over Time</CardTitle>
+          <CardDescription>Listing views across all your projects</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {viewsOverTime.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={viewsOverTime}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={(date: any) =>
+                    new Date(date).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  }
+                />
+                <YAxis allowDecimals={false} />
+                <Tooltip
+                  labelFormatter={(date: any) =>
+                    new Date(date).toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })
+                  }
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="viewCount"
+                  stroke="#8b5cf6"
+                  strokeWidth={2}
+                  name="Views"
+                  dot={{ fill: '#8b5cf6' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex h-[300px] items-center justify-center text-gray-500">
+              No view data for selected period
             </div>
           )}
         </CardContent>

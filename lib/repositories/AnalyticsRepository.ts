@@ -18,6 +18,9 @@
  */
 
 import type { PrismaClient } from '@prisma/client';
+import { monotonicFactory } from 'ulidx';
+
+const generateUlid = monotonicFactory();
 
 /**
  * Seller revenue summary
@@ -61,6 +64,7 @@ export interface SellerAnalyticsOverview {
   userId: string;
   summary: SellerRevenueSummary;
   revenueOverTime: RevenueDataPoint[];
+  viewsOverTime: ViewsDataPoint[];
   topProjects: ProjectPerformanceMetrics[];
 }
 
@@ -70,6 +74,14 @@ export interface SellerAnalyticsOverview {
 export interface DateRangeFilter {
   startDate?: Date;
   endDate?: Date;
+}
+
+/**
+ * Views time series data point
+ */
+export interface ViewsDataPoint {
+  date: string;
+  viewCount: number;
 }
 
 export class AnalyticsRepository {
@@ -321,9 +333,10 @@ export class AnalyticsRepository {
     sellerId: string,
     dateRange: DateRangeFilter
   ): Promise<SellerAnalyticsOverview> {
-    const [summary, revenueOverTime, topProjects] = await Promise.all([
+    const [summary, revenueOverTime, viewsOverTime, topProjects] = await Promise.all([
       this.getSellerRevenueSummary(sellerId, dateRange),
       this.getRevenueOverTime(sellerId, dateRange),
+      this.getViewsOverTime(sellerId, dateRange),
       this.getTopProjects(sellerId, 10, dateRange),
     ]);
 
@@ -331,8 +344,69 @@ export class AnalyticsRepository {
       userId: sellerId,
       summary,
       revenueOverTime,
+      viewsOverTime,
       topProjects,
     };
+  }
+
+  /**
+   * Log a view event for a project
+   *
+   * @param projectId - Project that was viewed
+   */
+  async logViewEvent(projectId: string): Promise<void> {
+    await this.prisma.projectViewEvent.create({
+      data: {
+        id: generateUlid(),
+        projectId,
+      },
+    });
+  }
+
+  /**
+   * Get views over time for a seller's projects
+   *
+   * @param sellerId - Seller user ID
+   * @param dateRange - Date range filter
+   * @param granularity - Time granularity
+   * @returns Array of views data points
+   */
+  async getViewsOverTime(
+    sellerId: string,
+    dateRange: DateRangeFilter,
+    granularity: 'day' | 'week' | 'month' = 'day'
+  ): Promise<ViewsDataPoint[]> {
+    const sellerProjects = await this.prisma.project.findMany({
+      where: { sellerId },
+      select: { id: true },
+    });
+
+    if (sellerProjects.length === 0) return [];
+
+    const projectIds = sellerProjects.map((p) => p.id);
+
+    const whereCreatedAt: { gte?: Date; lte?: Date } = {};
+    if (dateRange.startDate) whereCreatedAt.gte = dateRange.startDate;
+    if (dateRange.endDate) whereCreatedAt.lte = dateRange.endDate;
+
+    const events = await this.prisma.projectViewEvent.findMany({
+      where: {
+        projectId: { in: projectIds },
+        createdAt: whereCreatedAt,
+      },
+      select: { createdAt: true },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    const viewsByDate = new Map<string, number>();
+    for (const event of events) {
+      const date = this.formatDateByGranularity(event.createdAt, granularity);
+      viewsByDate.set(date, (viewsByDate.get(date) ?? 0) + 1);
+    }
+
+    return Array.from(viewsByDate.entries())
+      .map(([date, viewCount]) => ({ date, viewCount }))
+      .sort((a, b) => a.date.localeCompare(b.date));
   }
 
   /**
