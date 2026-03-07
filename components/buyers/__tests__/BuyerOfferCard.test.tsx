@@ -10,6 +10,11 @@ vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }));
 vi.mock('next/image', () => ({
   default: ({ alt }: { alt: string }) => React.createElement('img', { alt }),
 }));
+// Override global next/link mock to render a real <a> so href assertions work
+vi.mock('next/link', () => ({
+  default: ({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) =>
+    React.createElement('a', { href, className }, children),
+}));
 
 const baseOffer: OfferItem = {
   id: 'offer-1',
@@ -181,6 +186,25 @@ describe('BuyerOfferCard', () => {
       const offerWithMsg = { ...baseOffer, message: 'Please consider my offer' };
       render(<BuyerOfferCard {...baseProps} offer={offerWithMsg} />);
       expect(screen.getByText(/please consider my offer/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('seller profile link', () => {
+    it('renders seller name as a link to /u/[username] when username is present', () => {
+      render(<BuyerOfferCard {...baseProps} />);
+      const link = screen.getByRole('link', { name: /seller name/i });
+      expect(link).toHaveAttribute('href', '/u/selleruser');
+    });
+
+    it('renders seller name as plain text when username is null', () => {
+      const noUsernameOffer = {
+        ...baseOffer,
+        seller: { ...baseOffer.seller, username: null, fullName: null },
+      };
+      render(<BuyerOfferCard {...baseProps} offer={noUsernameOffer} />);
+      // Should render the email fallback without a link
+      expect(screen.queryByRole('link', { name: /seller@example\.com/i })).not.toBeInTheDocument();
+      expect(screen.getByText('seller@example.com')).toBeInTheDocument();
     });
   });
 });

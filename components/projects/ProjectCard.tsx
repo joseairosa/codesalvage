@@ -252,17 +252,25 @@ export function ProjectCard({
               </Avatar>
               <div className="flex-1 overflow-hidden">
                 <div className="flex items-center gap-1.5">
-                  <p className="truncate text-sm font-medium">
+                  <Link
+                    href={`/u/${project.seller.username}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="truncate text-sm font-medium hover:underline"
+                  >
                     {project.seller.fullName || project.seller.username}
-                  </p>
+                  </Link>
                   <ProBadge
                     subscription={project.seller.subscription ?? null}
                     size="sm"
                   />
                 </div>
-                <p className="truncate text-xs text-muted-foreground">
+                <Link
+                  href={`/u/${project.seller.username}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="truncate text-xs text-muted-foreground hover:underline"
+                >
                   @{project.seller.username}
-                </p>
+                </Link>
               </div>
             </div>
           )}
