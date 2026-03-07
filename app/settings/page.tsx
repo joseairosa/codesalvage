@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { UserSettingsForm } from '@/components/settings/UserSettingsForm';
+import { AvatarUpload } from '@/components/settings/AvatarUpload';
 
 export default async function SettingsPage() {
   const session = await requireAuth();
@@ -30,6 +31,7 @@ export default async function SettingsPage() {
       emailVerified: true,
       isSeller: true,
       createdAt: true,
+      avatarUrl: true,
     },
   });
 
@@ -58,7 +60,20 @@ export default async function SettingsPage() {
           <CardTitle>Profile</CardTitle>
           <CardDescription>Update your public profile information</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-8">
+          {/* Avatar upload */}
+          <div className="flex justify-center border-b pb-8">
+            <AvatarUpload
+              currentAvatarUrl={user.avatarUrl ?? null}
+              userInitials={(user.fullName ?? user.username ?? 'U')
+                .split(' ')
+                .map((n) => n[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2)}
+            />
+          </div>
+
           <UserSettingsForm
             initialData={{
               fullName: user.fullName ?? '',
