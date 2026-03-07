@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     siteName: 'CodeSalvage',
     images: [
       {
-        url: '/images/opengraph-image.png',
+        url: `${env.NEXT_PUBLIC_APP_URL}/images/opengraph-image.png`,
         width: 1200,
         height: 630,
         alt: 'CodeSalvage - Marketplace for Incomplete Software Projects',
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     title: 'CodeSalvage - Marketplace for Incomplete Software Projects',
     description:
       'Buy and sell incomplete software projects. Turn your 80% complete side project into revenue.',
-    images: ['/images/opengraph-image.png'],
+    images: [`${env.NEXT_PUBLIC_APP_URL}/images/opengraph-image.png`],
   },
   robots: {
     index: true,
