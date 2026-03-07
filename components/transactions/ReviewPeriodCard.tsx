@@ -20,6 +20,7 @@
 
 import * as React from 'react';
 import { Shield, Clock, CheckCircle2, ArrowRightLeft, Loader2 } from 'lucide-react';
+import { DisputeForm } from '@/components/transactions/DisputeForm';
 import {
   Card,
   CardContent,
@@ -80,6 +81,7 @@ export function ReviewPeriodCard({
   const escrowReleaseDate = stage.metadata?.['escrowReleaseDate']
     ? new Date(stage.metadata['escrowReleaseDate'] as string)
     : null;
+  const escrowStatus = (stage.metadata?.['escrowStatus'] as string) ?? null;
 
   const daysElapsed = REVIEW_PERIOD_DAYS - daysRemaining;
   const progressPercent = Math.min(
@@ -228,6 +230,20 @@ export function ReviewPeriodCard({
                 <p className="text-xs text-destructive">{transferError}</p>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Buyer: Open Dispute button during active held escrow */}
+        {userRole === 'buyer' && isActive && escrowStatus === 'held' && (
+          <div className="space-y-2 border-t pt-4">
+            <p className="text-xs text-muted-foreground">
+              If the project significantly differs from its description, you can open a
+              dispute before the review period ends.
+            </p>
+            <DisputeForm
+              transactionId={transactionId}
+              onDisputeOpened={() => onActionComplete?.()}
+            />
           </div>
         )}
 

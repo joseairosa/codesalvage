@@ -5,6 +5,8 @@ import userEvent from '@testing-library/user-event';
 import { ReviewPeriodCard } from '../ReviewPeriodCard';
 import type { TimelineStage } from '@/lib/services/RepositoryTransferService';
 
+window.HTMLElement.prototype.scrollIntoView = vi.fn();
+
 const activeStage: TimelineStage = {
   name: 'Project Review',
   status: 'active',
@@ -13,6 +15,19 @@ const activeStage: TimelineStage = {
   metadata: {
     daysRemaining: 5,
     escrowReleaseDate: '2026-03-01T00:00:00Z',
+    escrowStatus: 'held',
+  },
+};
+
+const activeDisputedStage: TimelineStage = {
+  name: 'Project Review',
+  status: 'active',
+  description: '5 days remaining to review and raise any disputes',
+  actions: [],
+  metadata: {
+    daysRemaining: 5,
+    escrowReleaseDate: '2026-03-01T00:00:00Z',
+    escrowStatus: 'disputed',
   },
 };
 
@@ -21,7 +36,7 @@ const completedStage: TimelineStage = {
   status: 'completed',
   description: 'Project review period has ended',
   actions: [],
-  metadata: { daysRemaining: 0 },
+  metadata: { daysRemaining: 0, escrowStatus: 'released' },
 };
 
 const upcomingStage: TimelineStage = {
@@ -120,6 +135,26 @@ describe('ReviewPeriodCard', () => {
         <ReviewPeriodCard stage={activeStage} userRole="buyer" transactionId="txn-1" />
       );
       expect(screen.queryByText(/the buyer has until/i)).not.toBeInTheDocument();
+    });
+
+    it('shows Open Dispute button when escrowStatus is held', () => {
+      render(
+        <ReviewPeriodCard stage={activeStage} userRole="buyer" transactionId="txn-1" />
+      );
+      expect(screen.getByRole('button', { name: /open dispute/i })).toBeInTheDocument();
+    });
+
+    it('does not show Open Dispute button when escrowStatus is disputed', () => {
+      render(
+        <ReviewPeriodCard
+          stage={activeDisputedStage}
+          userRole="buyer"
+          transactionId="txn-1"
+        />
+      );
+      expect(
+        screen.queryByRole('button', { name: /open dispute/i })
+      ).not.toBeInTheDocument();
     });
   });
 
