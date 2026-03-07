@@ -21,6 +21,7 @@ import {
   UserRepository,
   SubscriptionRepository,
 } from '@/lib/repositories';
+import { AnalyticsRepository } from '@/lib/repositories/AnalyticsRepository';
 import {
   ProjectService,
   SubscriptionService,
@@ -37,6 +38,7 @@ import { z } from 'zod';
 const projectRepository = new ProjectRepository(prisma);
 const userRepository = new UserRepository(prisma);
 const subscriptionRepository = new SubscriptionRepository(prisma);
+const analyticsRepository = new AnalyticsRepository(prisma);
 const subscriptionService = new SubscriptionService(
   subscriptionRepository,
   userRepository
@@ -45,7 +47,8 @@ const projectService = new ProjectService(
   projectRepository,
   userRepository,
   subscriptionService,
-  r2Service
+  r2Service,
+  analyticsRepository
 );
 
 /**

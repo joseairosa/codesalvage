@@ -73,6 +73,10 @@ export interface AnalyticsOverviewResponse {
     revenue: number;
     transactionCount: number;
   }>;
+  viewsOverTime: Array<{
+    date: string;
+    viewCount: number;
+  }>;
   topProjects: Array<{
     projectId: string;
     projectTitle: string;
@@ -275,6 +279,7 @@ export class AnalyticsService {
         revenue: point.revenueCents,
         transactionCount: point.transactionCount,
       })),
+      viewsOverTime: analytics.viewsOverTime,
       topProjects: analytics.topProjects.map((project) => ({
         projectId: project.projectId,
         projectTitle: project.title,

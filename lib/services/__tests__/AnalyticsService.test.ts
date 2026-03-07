@@ -72,6 +72,7 @@ const mockAnalyticsOverview = {
   userId: 'user123',
   summary: mockRevenueSummary,
   revenueOverTime: mockRevenueOverTime,
+  viewsOverTime: [] as { date: string; viewCount: number }[],
   topProjects: mockTopProjects,
 };
 

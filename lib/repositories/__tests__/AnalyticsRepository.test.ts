@@ -17,6 +17,10 @@ const mockPrismaClient = {
   transaction: {
     findMany: vi.fn(),
   },
+  projectViewEvent: {
+    create: vi.fn(),
+    findMany: vi.fn(),
+  },
 } as unknown as PrismaClient;
 
 describe('AnalyticsRepository', () => {
@@ -345,11 +349,20 @@ describe('AnalyticsRepository', () => {
           },
         ] as any);
 
-      vi.mocked(mockPrismaClient.project.findMany)
-        .mockResolvedValueOnce([
-          { viewCount: 100, priceCents: 10000, transactions: [] },
-        ] as any)
-        .mockResolvedValueOnce([
+      // Use mockImplementation to differentiate calls by select shape
+      vi.mocked(mockPrismaClient.project.findMany).mockImplementation(((args: any) => {
+        const select = args?.select ?? {};
+        if (select.id && !select.title && !select.viewCount) {
+          // getViewsOverTime: only needs { id }
+          return Promise.resolve([{ id: 'proj1' }]);
+        } else if (select.viewCount && !select.title) {
+          // getSellerRevenueSummary: needs { viewCount, favoriteCount, priceCents }
+          return Promise.resolve([
+            { viewCount: 100, priceCents: 10000, favoriteCount: 5 },
+          ]);
+        }
+        // getTopProjects: needs full project with transactions
+        return Promise.resolve([
           {
             id: 'proj1',
             title: 'Project 1',
@@ -357,7 +370,10 @@ describe('AnalyticsRepository', () => {
             favoriteCount: 10,
             transactions: [{ sellerReceivesCents: 8200 }],
           },
-        ] as any);
+        ]);
+      }) as any);
+
+      vi.mocked(mockPrismaClient.projectViewEvent.findMany).mockResolvedValue([]);
 
       const result = await analyticsRepository.getSellerAnalyticsOverview(
         'seller123',
@@ -367,6 +383,7 @@ describe('AnalyticsRepository', () => {
       expect(result.userId).toBe('seller123');
       expect(result.summary).toBeDefined();
       expect(result.revenueOverTime).toBeDefined();
+      expect(result.viewsOverTime).toBeDefined();
       expect(result.topProjects).toBeDefined();
     });
   });

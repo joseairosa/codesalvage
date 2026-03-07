@@ -126,7 +126,8 @@ export class ProjectService {
     private projectRepository: ProjectRepository,
     private userRepository: any, // UserRepository type (avoiding circular dependency)
     private subscriptionService: SubscriptionService,
-    private r2Service?: R2Service
+    private r2Service?: R2Service,
+    private analyticsRepository?: { logViewEvent: (projectId: string) => Promise<void> }
   ) {
     console.log('[ProjectService] Initialized');
   }
@@ -340,9 +341,12 @@ export class ProjectService {
     }
 
     if (incrementView && project.status === 'active') {
-      // Increment view count asynchronously (don't wait)
+      // Increment view count and log event asynchronously (don't wait)
       this.projectRepository.incrementViewCount(projectId).catch((err) => {
         console.error('[ProjectService] Failed to increment view count:', err);
+      });
+      this.analyticsRepository?.logViewEvent(projectId).catch((err) => {
+        console.error('[ProjectService] Failed to log view event:', err);
       });
     }
 
