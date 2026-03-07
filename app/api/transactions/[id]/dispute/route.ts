@@ -15,11 +15,16 @@ import {
   DisputeValidationError,
   DisputePermissionError,
 } from '@/lib/services/DisputeService';
+import { emailService } from '@/lib/services/EmailService';
 import { z } from 'zod';
 
 const disputeRepository = new DisputeRepository(prisma);
 const transactionRepository = new TransactionRepository(prisma);
-const disputeService = new DisputeService(disputeRepository, transactionRepository);
+const disputeService = new DisputeService(
+  disputeRepository,
+  transactionRepository,
+  emailService
+);
 
 const openDisputeSchema = z.object({
   reason: z.string().min(1),

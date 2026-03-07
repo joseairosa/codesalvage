@@ -15,6 +15,7 @@ import * as offers from './email/offer-emails';
 import * as reviews from './email/review-message-emails';
 import * as listings from './email/listing-emails';
 import * as account from './email/account-emails';
+import * as disputeEmails from './email/dispute-emails';
 import type { MessageWithRelations } from '@/lib/repositories/MessageRepository';
 import type { ReviewWithRelations } from '@/lib/repositories/ReviewRepository';
 
@@ -33,6 +34,8 @@ export type {
   PaymentFailedEmailData,
   RepoTransferEmailData,
   StripeConnectConfirmedEmailData,
+  DisputeOpenedEmailData,
+  DisputeResolvedEmailData,
 } from './email/types';
 
 import type {
@@ -49,6 +52,8 @@ import type {
   PaymentFailedEmailData,
   RepoTransferEmailData,
   StripeConnectConfirmedEmailData,
+  DisputeOpenedEmailData,
+  DisputeResolvedEmailData,
 } from './email/types';
 
 export class EmailService {
@@ -190,6 +195,32 @@ export class EmailService {
     d: StripeConnectConfirmedEmailData
   ): Promise<void> {
     return account.sendStripeConnectConfirmedNotification(this.send, this.appUrl, r, d);
+  }
+
+  sendDisputeOpenedSellerNotification(
+    r: EmailRecipient,
+    d: DisputeOpenedEmailData
+  ): Promise<void> {
+    return disputeEmails.sendDisputeOpenedSellerNotification(
+      this.send,
+      this.appUrl,
+      r,
+      d
+    );
+  }
+
+  sendDisputeOpenedAdminNotification(
+    r: EmailRecipient,
+    d: DisputeOpenedEmailData
+  ): Promise<void> {
+    return disputeEmails.sendDisputeOpenedAdminNotification(this.send, this.appUrl, r, d);
+  }
+
+  sendDisputeResolvedNotification(
+    r: EmailRecipient,
+    d: DisputeResolvedEmailData
+  ): Promise<void> {
+    return disputeEmails.sendDisputeResolvedNotification(this.send, this.appUrl, r, d);
   }
 }
 

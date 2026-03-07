@@ -98,3 +98,6 @@ export type {
 
 export { RepositoryTransferRepository } from './RepositoryTransferRepository';
 export type { CreateRepositoryTransferInput } from './RepositoryTransferRepository';
+
+export { DisputeRepository } from './DisputeRepository';
+export type { CreateDisputeInput } from './DisputeRepository';

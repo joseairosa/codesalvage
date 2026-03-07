@@ -22,6 +22,7 @@ import {
   ProjectRepository,
   TransactionRepository,
 } from '@/lib/repositories';
+import { DisputeRepository } from '@/lib/repositories/DisputeRepository';
 import { AdminService, emailService, stripeService } from '@/lib/services';
 
 let adminServiceInstance: AdminService | null = null;
@@ -29,6 +30,7 @@ let adminRepositoryInstance: AdminRepository | null = null;
 let userRepositoryInstance: UserRepository | null = null;
 let projectRepositoryInstance: ProjectRepository | null = null;
 let transactionRepositoryInstance: TransactionRepository | null = null;
+let disputeRepositoryInstance: DisputeRepository | null = null;
 
 /**
  * Get AdminRepository instance (singleton)
@@ -76,6 +78,18 @@ export function getTransactionRepository(): TransactionRepository {
     transactionRepositoryInstance = new TransactionRepository(prisma);
   }
   return transactionRepositoryInstance;
+}
+
+/**
+ * Get DisputeRepository instance (singleton)
+ *
+ * @returns DisputeRepository instance
+ */
+export function getDisputeRepository(): DisputeRepository {
+  if (!disputeRepositoryInstance) {
+    disputeRepositoryInstance = new DisputeRepository(prisma);
+  }
+  return disputeRepositoryInstance;
 }
 
 /**

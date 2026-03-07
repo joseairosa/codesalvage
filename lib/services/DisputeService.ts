@@ -8,6 +8,9 @@
 
 import type { DisputeRepository } from '../repositories/DisputeRepository';
 import type { TransactionRepository } from '../repositories/TransactionRepository';
+import type { EmailService } from './EmailService';
+
+const ADMIN_EMAIL = 'admin@codesalvage.com';
 
 export const DISPUTE_REASONS = [
   'description_mismatch',
@@ -39,7 +42,8 @@ export class DisputePermissionError extends Error {
 export class DisputeService {
   constructor(
     private disputeRepository: DisputeRepository,
-    private transactionRepository: TransactionRepository
+    private transactionRepository: TransactionRepository,
+    private emailService?: EmailService
   ) {
     console.log('[DisputeService] Initialized');
   }
@@ -109,6 +113,42 @@ export class DisputeService {
 
     // Mark transaction escrow as disputed — pauses auto-release cron
     await this.transactionRepository.updateEscrowStatus(transactionId, 'disputed');
+
+    // Non-blocking email notifications — fire and forget
+    if (this.emailService) {
+      const sellerEmail = transaction.seller?.email;
+      const sellerName =
+        transaction.seller?.fullName ?? transaction.seller?.username ?? 'Seller';
+      const buyerName =
+        transaction.buyer?.fullName ?? transaction.buyer?.username ?? 'Buyer';
+      const projectTitle = transaction.project?.title ?? 'your project';
+
+      const emailData = {
+        buyerName,
+        sellerName,
+        projectTitle,
+        reason,
+        description: description.trim(),
+        transactionId,
+        disputeId: dispute.id,
+      };
+
+      if (sellerEmail) {
+        this.emailService
+          .sendDisputeOpenedSellerNotification(
+            { email: sellerEmail, name: sellerName },
+            emailData
+          )
+          .catch((e) => console.error('[DisputeService] Seller notification failed:', e));
+      }
+
+      this.emailService
+        .sendDisputeOpenedAdminNotification(
+          { email: ADMIN_EMAIL, name: 'CodeSalvage Admin' },
+          emailData
+        )
+        .catch((e) => console.error('[DisputeService] Admin notification failed:', e));
+    }
 
     console.log('[DisputeService] Dispute opened:', dispute.id);
     return dispute;
