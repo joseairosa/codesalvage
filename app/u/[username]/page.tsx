@@ -13,6 +13,7 @@
 import { notFound, redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
+import { env } from '@/config/env';
 import { ReviewRepository } from '@/lib/repositories/ReviewRepository';
 import { ProjectCard, type ProjectCardData } from '@/components/projects/ProjectCard';
 import { RatingBreakdown } from '@/components/profile/RatingBreakdown';
@@ -86,11 +87,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${user.username} — CodeSalvage`,
     description,
+    alternates: {
+      canonical: `${env.NEXT_PUBLIC_APP_URL}/u/${normalized}`,
+    },
     openGraph: {
       title: `${displayName} (@${user.username}) — CodeSalvage`,
       description,
       type: 'profile',
       ...(user.avatarUrl ? { images: [{ url: user.avatarUrl }] } : {}),
+    },
+    twitter: {
+      card: 'summary',
+      title: `${displayName} (@${user.username}) — CodeSalvage`,
+      description,
+      ...(user.avatarUrl ? { images: [user.avatarUrl] } : {}),
     },
   };
 }

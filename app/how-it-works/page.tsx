@@ -42,6 +42,27 @@ export const metadata: Metadata = {
   title: 'How It Works - CodeSalvage',
   description:
     'Learn how CodeSalvage works for buyers and sellers. Browse incomplete projects, purchase code, and bring your ideas to life.',
+  openGraph: {
+    type: 'website',
+    title: 'How It Works - CodeSalvage',
+    description:
+      'Learn how CodeSalvage works for buyers and sellers. Browse incomplete projects, purchase code, and bring your ideas to life.',
+    images: [
+      {
+        url: '/images/opengraph-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'CodeSalvage — How It Works',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'How It Works - CodeSalvage',
+    description:
+      'Learn how CodeSalvage works for buyers and sellers. Browse incomplete projects, purchase code, and bring your ideas to life.',
+    images: ['/images/opengraph-image.png'],
+  },
 };
 
 interface ProcessStep {
