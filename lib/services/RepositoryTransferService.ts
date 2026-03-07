@@ -565,6 +565,7 @@ export class RepositoryTransferService {
       metadata: {
         escrowReleaseDate: escrowReleaseDate ?? null,
         daysRemaining: daysRemaining ?? 0,
+        escrowStatus: transaction.escrowStatus,
       },
     };
   }
