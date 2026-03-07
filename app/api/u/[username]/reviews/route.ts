@@ -27,9 +27,15 @@ async function getSellerReviews(
     const { username } = await params;
     const { searchParams } = request.nextUrl;
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
-    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') ?? '10', 10)));
+    const limit = Math.min(
+      50,
+      Math.max(1, parseInt(searchParams.get('limit') ?? '10', 10))
+    );
 
-    console.log(`[${componentName}] Fetching reviews for username:`, username, { page, limit });
+    console.log(`[${componentName}] Fetching reviews for username:`, username, {
+      page,
+      limit,
+    });
 
     const user = await userRepository.findByUsername(username);
 
@@ -47,7 +53,9 @@ async function getSellerReviews(
         : review.buyer,
     }));
 
-    console.log(`[${componentName}] Returning ${reviews.length} reviews (total: ${result.total})`);
+    console.log(
+      `[${componentName}] Returning ${reviews.length} reviews (total: ${result.total})`
+    );
 
     return NextResponse.json(
       {

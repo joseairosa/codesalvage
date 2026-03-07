@@ -103,7 +103,12 @@ describe('SellerReviewsSection', () => {
       <SellerReviewsSection
         username="testseller"
         initialReviews={[mockReview]}
-        initialPagination={{ ...defaultPagination, total: 25, totalPages: 3, hasNext: true }}
+        initialPagination={{
+          ...defaultPagination,
+          total: 25,
+          totalPages: 3,
+          hasNext: true,
+        }}
       />
     );
     expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();

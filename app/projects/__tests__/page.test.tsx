@@ -53,15 +53,7 @@ vi.mock('@/components/ui/select', () => ({
 
 // Mock Slider to avoid Radix UI pointer/resize internals in jsdom
 vi.mock('@/components/ui/slider', () => ({
-  Slider: ({
-    min,
-    max,
-    value,
-  }: {
-    min: number;
-    max: number;
-    value: number[];
-  }) =>
+  Slider: ({ min, max, value }: { min: number; max: number; value: number[] }) =>
     React.createElement('div', {
       role: 'slider',
       'aria-valuemin': min,
@@ -76,8 +68,7 @@ describe('ProjectSearchPage', () => {
     mockSearchParamsGet.mockReturnValue(null);
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () =>
-        Promise.resolve({ projects: [], total: 0, page: 1, pages: 0 }),
+      json: () => Promise.resolve({ projects: [], total: 0, page: 1, pages: 0 }),
     });
   });
 
@@ -108,9 +99,7 @@ describe('ProjectSearchPage', () => {
       expect(screen.getByText('Category')).toBeInTheDocument();
     });
 
-    expect(
-      screen.queryByRole('button', { name: /apply filters/i })
-    ).toBeNull();
+    expect(screen.queryByRole('button', { name: /apply filters/i })).toBeNull();
     expect(
       screen.queryByRole('button', { name: /hide filters|show filters/i })
     ).toBeNull();

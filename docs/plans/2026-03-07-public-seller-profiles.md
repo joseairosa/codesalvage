@@ -18,6 +18,7 @@ Type: Feature
 ## Scope
 
 ### In Scope
+
 - `/u/[username]` page with profile header, projects grid, reviews section
 - `generateMetadata()` for SEO (title, description, OG tags)
 - Aggregate rating display (stars + count) in profile header
@@ -29,6 +30,7 @@ Type: Feature
 - Unit tests for data-fetching logic
 
 ### Out of Scope
+
 - Avatar upload (separate roadmap item #5)
 - Seller analytics (separate roadmap item #4)
 - Follow/subscribe to seller
@@ -65,7 +67,7 @@ Type: Feature
       where: { sellerId: user.id, status: { in: ['active', 'sold'] }, isApproved: true },
       include: { seller: { include: { subscription: true } } },
       orderBy: { createdAt: 'desc' },
-    })
+    });
     ```
   - **ProjectCardData.seller.subscription expects a `benefits` sub-object** that the raw Prisma `Subscription` model does NOT have. The `benefits` object is computed at runtime. Compute it inline from the raw subscription: if `plan === "pro" && status === "active"`, return pro benefits object `{ verificationBadge: true, unlimitedProjects: true, advancedAnalytics: true, featuredListingDiscount: true }`; otherwise return free benefits (all false). See `SubscriptionService` for the canonical mapping.
   - **Banned sellers:** Check `isBanned` — return 404 for banned users.
@@ -101,9 +103,11 @@ Type: Feature
 **Dependencies:** None
 
 **Files:**
+
 - Create: `app/u/[username]/page.tsx`
 
 **Key Decisions / Notes:**
+
 - Server Component — fetch directly from Prisma (no API call)
 - Normalize `params.username` to lowercase. If original !== lowercase, use `redirect()` from `next/navigation` to `/u/${lowercase}` for canonical URLs.
 - Query user: `prisma.user.findUnique({ where: { username: normalized } })`. Return `notFound()` if user is null, `isSeller === false`, or `isBanned === true`.
@@ -113,7 +117,7 @@ Type: Feature
     where: { sellerId: user.id, status: { in: ['active', 'sold'] }, isApproved: true },
     include: { seller: { include: { subscription: true } } },
     orderBy: { createdAt: 'desc' },
-  })
+  });
   ```
 - Compute `benefits` from raw subscription for `ProjectCardData.seller.subscription` (see Gotchas).
 - Query rating stats: instantiate `ReviewRepository` and call `getSellerRatingStats(user.id)`.
@@ -123,6 +127,7 @@ Type: Feature
 - `generateMetadata()` returns: `{ title: "username — CodeSalvage", description: bio || "Seller on CodeSalvage", openGraph: { title, description, type: "profile", images: [avatarUrl] } }`. If no avatarUrl, omit `images`.
 
 **Definition of Done:**
+
 - [ ] `/u/validusername` renders profile with header, projects grid, and star rating
 - [ ] `/u/nonexistent` returns 404
 - [ ] `/u/buyeronly` (isSeller: false) returns 404
@@ -134,6 +139,7 @@ Type: Feature
 - [ ] No diagnostics errors
 
 **Verify:**
+
 ```
 curl -sI http://localhost:3011/u/TestUser | grep -i location
 curl -s http://localhost:3011/u/testuser | grep -o 'og:[a-z]*'
@@ -148,12 +154,14 @@ curl -s http://localhost:3011/u/testuser | grep -o 'og:[a-z]*'
 **Dependencies:** Task 1
 
 **Files:**
+
 - Create: `components/profile/SellerReviewsSection.tsx` (client component for pagination)
 - Create: `components/profile/RatingBreakdown.tsx` (server-renderable rating bars)
 - Create: `app/api/u/[username]/reviews/route.ts` (public, rate-limited)
 - Modify: `app/u/[username]/page.tsx` (add reviews section, pass initial data + stats)
 
 **Key Decisions / Notes:**
+
 - Aggregate rating (stars, count, breakdown bars by rating) rendered server-side in page.tsx using data from `getSellerRatingStats()`.
 - `RatingBreakdown` component: horizontal bar chart showing 5★ through 1★ distribution with counts and percentage widths.
 - Individual reviews list uses a client component (`SellerReviewsSection`) for pagination.
@@ -166,6 +174,7 @@ curl -s http://localhost:3011/u/testuser | grep -o 'og:[a-z]*'
 - Pass initial first page of reviews from server to avoid a loading flash.
 
 **Definition of Done:**
+
 - [ ] Rating breakdown displays 5★–1★ bars with counts
 - [ ] Reviews list shows buyer info, rating, comment, project name, date
 - [ ] Anonymous reviews show "Anonymous Buyer" with generic avatar
@@ -176,6 +185,7 @@ curl -s http://localhost:3011/u/testuser | grep -o 'og:[a-z]*'
 - [ ] No diagnostics errors
 
 **Verify:**
+
 ```
 curl -s 'http://localhost:3011/api/u/testuser/reviews?page=1&limit=5' | jq .
 ```
@@ -189,16 +199,19 @@ curl -s 'http://localhost:3011/api/u/testuser/reviews?page=1&limit=5' | jq .
 **Dependencies:** Task 1
 
 **Files:**
+
 - Modify: `components/projects/ProjectCard.tsx` (seller name section, lines ~254-265)
 - Modify: `components/buyers/BuyerOfferCard.tsx` (seller name display, lines ~145-148)
 
 **Key Decisions / Notes:**
+
 - In `ProjectCard.tsx`: The entire card is wrapped in `<Link href={/projects/${id}}>`. The seller fullName (line 256) and @username (line 264) need to link to `/u/${seller.username}`. Use `<Link href={/u/${seller.username}} onClick={e => e.stopPropagation()} className="hover:underline">` to prevent the parent card link from firing.
 - In `BuyerOfferCard.tsx`: The seller name at line 146 is inside a `<span>`. Replace with `<Link href={/u/${offer.seller.username}} className="hover:underline">`. Check if it's inside an outer `<Link>` — it's not (the card is a `<Card>`, not a link), so a simple `<Link>` works.
 - Keep avatar non-clickable.
 - Link styling: `hover:underline` to keep it subtle.
 
 **Definition of Done:**
+
 - [ ] Clicking seller name on ProjectCard navigates to `/u/[username]` (does NOT open project detail)
 - [ ] Clicking seller name on BuyerOfferCard navigates to `/u/[username]`
 - [ ] Links have hover:underline styling
@@ -206,6 +219,7 @@ curl -s 'http://localhost:3011/api/u/testuser/reviews?page=1&limit=5' | jq .
 - [ ] No diagnostics errors
 
 **Verify:**
+
 - Visual verification in browser — click seller name on a project card, confirm navigation to profile page
 
 ---
@@ -217,11 +231,13 @@ curl -s 'http://localhost:3011/api/u/testuser/reviews?page=1&limit=5' | jq .
 **Dependencies:** Tasks 1, 2, 3
 
 **Files:**
+
 - Create: `app/api/u/[username]/reviews/__tests__/route.test.ts`
 - Create: `components/profile/__tests__/SellerReviewsSection.test.tsx`
 - Create: `components/profile/__tests__/RatingBreakdown.test.tsx`
 
 **Key Decisions / Notes:**
+
 - Mock Prisma and repositories for API route tests
 - Test reviews API: returns paginated reviews for valid seller, 404 for non-existent user, 404 for non-seller, 404 for banned user, respects anonymous flag in response
 - Test SellerReviewsSection: renders reviews list, handles empty state, pagination controls visible when >1 page
@@ -229,12 +245,14 @@ curl -s 'http://localhost:3011/api/u/testuser/reviews?page=1&limit=5' | jq .
 - Follow existing test patterns in `app/api/` and `components/` test directories
 
 **Definition of Done:**
+
 - [ ] All new tests pass
 - [ ] Tests cover: valid reviews response, 404 cases (nonexistent, non-seller, banned), anonymous reviews, pagination, empty states, rating breakdown rendering
 - [ ] All existing tests still pass (`npm run test:ci`)
 - [ ] No diagnostics errors
 
 **Verify:**
+
 ```
 npm run test:ci
 ```
@@ -247,16 +265,17 @@ npm run test:ci
 
 ## Risks and Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| `stopPropagation` on seller link breaks card click on some browsers | Low | Medium | Test in Chrome + Firefox; fallback to `<a>` with manual navigation if needed |
-| Performance with many projects per seller | Low | Medium | Server-side rendering; projects query uses Prisma `take` limit if needed in future |
-| Username route conflicts with other routes | Low | High | `/u/` prefix avoids all conflicts — no other routes start with `/u/` |
-| ProBadge breaks due to missing computed benefits | Medium | Medium | Compute benefits inline from raw subscription data; add explicit test for pro seller rendering |
+| Risk                                                                | Likelihood | Impact | Mitigation                                                                                     |
+| ------------------------------------------------------------------- | ---------- | ------ | ---------------------------------------------------------------------------------------------- |
+| `stopPropagation` on seller link breaks card click on some browsers | Low        | Medium | Test in Chrome + Firefox; fallback to `<a>` with manual navigation if needed                   |
+| Performance with many projects per seller                           | Low        | Medium | Server-side rendering; projects query uses Prisma `take` limit if needed in future             |
+| Username route conflicts with other routes                          | Low        | High   | `/u/` prefix avoids all conflicts — no other routes start with `/u/`                           |
+| ProBadge breaks due to missing computed benefits                    | Medium     | Medium | Compute benefits inline from raw subscription data; add explicit test for pro seller rendering |
 
 ## Goal Verification
 
 ### Truths
+
 1. Visiting `/u/[valid-seller-username]` displays a profile page with bio, avatar, member since, and star rating
 2. The profile page shows the seller's active and sold (approved) projects in a grid
 3. The profile page shows a paginated list of buyer reviews with ratings and comments
@@ -267,6 +286,7 @@ npm run test:ci
 8. Mixed-case URLs redirect to lowercase canonical URL
 
 ### Artifacts
+
 1. `app/u/[username]/page.tsx` — profile page with `generateMetadata()`
 2. `components/profile/SellerReviewsSection.tsx` — client-side paginated reviews
 3. `components/profile/RatingBreakdown.tsx` — star rating distribution bars
@@ -274,6 +294,7 @@ npm run test:ci
 5. Updated `ProjectCard.tsx` and `BuyerOfferCard.tsx` with seller profile links
 
 ### Key Links
+
 1. `UserRepository.findByUsername()` → page data fetch → profile header
 2. Raw Prisma query (with seller+subscription include) → computed benefits → `ProjectCard` grid
 3. `ReviewRepository.getSellerRatingStats()` → `RatingBreakdown` component

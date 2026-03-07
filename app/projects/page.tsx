@@ -243,10 +243,17 @@ function ProjectSearchContent() {
     return raw ? raw.split(',').filter(Boolean) : [];
   });
 
-  const initCompletion: [number, number] = [urlInt('minCompletion', 50), urlInt('maxCompletion', 95)];
-  const [completionRange, setCompletionRange] = React.useState<[number, number]>(initCompletion);
+  const initCompletion: [number, number] = [
+    urlInt('minCompletion', 50),
+    urlInt('maxCompletion', 95),
+  ];
+  const [completionRange, setCompletionRange] =
+    React.useState<[number, number]>(initCompletion);
 
-  const initPrice: [number, number] = [urlInt('minPrice', 100), urlInt('maxPrice', 100000)];
+  const initPrice: [number, number] = [
+    urlInt('minPrice', 100),
+    urlInt('maxPrice', 100000),
+  ];
   const [priceRange, setPriceRange] = React.useState<[number, number]>(initPrice);
 
   const [sortBy, setSortBy] = React.useState(
@@ -254,8 +261,10 @@ function ProjectSearchContent() {
   );
 
   // Display-only slider states — update on drag (onValueChange); actual state updates on release (onValueCommit)
-  const [completionRangeDisplay, setCompletionRangeDisplay] = React.useState<[number, number]>(initCompletion);
-  const [priceRangeDisplay, setPriceRangeDisplay] = React.useState<[number, number]>(initPrice);
+  const [completionRangeDisplay, setCompletionRangeDisplay] =
+    React.useState<[number, number]>(initCompletion);
+  const [priceRangeDisplay, setPriceRangeDisplay] =
+    React.useState<[number, number]>(initPrice);
 
   // Ref to skip page-reset effect on first render (so URL-restored page is preserved)
   const isFirstFilterRender = React.useRef(true);
@@ -356,7 +365,7 @@ function ProjectSearchContent() {
       return;
     }
     setCurrentPage(1);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, category, selectedTechStack, completionRange, priceRange, sortBy]);
 
   /**
@@ -370,7 +379,8 @@ function ProjectSearchContent() {
       const params = new URLSearchParams();
       if (searchQuery) params.set('query', searchQuery);
       if (category !== 'all') params.set('category', category);
-      if (selectedTechStack.length > 0) params.set('techStack', selectedTechStack.join(','));
+      if (selectedTechStack.length > 0)
+        params.set('techStack', selectedTechStack.join(','));
       if (completionRange[0] !== 50 || completionRange[1] !== 95) {
         params.set('minCompletion', completionRange[0].toString());
         params.set('maxCompletion', completionRange[1].toString());
@@ -389,7 +399,16 @@ function ProjectSearchContent() {
     return () => {
       if (urlSyncTimer.current) clearTimeout(urlSyncTimer.current);
     };
-  }, [searchQuery, category, selectedTechStack, completionRange, priceRange, sortBy, currentPage, router]);
+  }, [
+    searchQuery,
+    category,
+    selectedTechStack,
+    completionRange,
+    priceRange,
+    sortBy,
+    currentPage,
+    router,
+  ]);
 
   /**
    * Handle search - reset to page 1 and fetch
@@ -530,7 +549,8 @@ function ProjectSearchContent() {
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium">Price</label>
                     <span className="text-xs text-muted-foreground">
-                      {formatPrice(priceRangeDisplay[0])} – {formatPrice(priceRangeDisplay[1])}
+                      {formatPrice(priceRangeDisplay[0])} –{' '}
+                      {formatPrice(priceRangeDisplay[1])}
                     </span>
                   </div>
                   <Slider
@@ -538,7 +558,9 @@ function ProjectSearchContent() {
                     max={100000}
                     step={100}
                     value={priceRangeDisplay}
-                    onValueChange={(value) => setPriceRangeDisplay(value as [number, number])}
+                    onValueChange={(value) =>
+                      setPriceRangeDisplay(value as [number, number])
+                    }
                     onValueCommit={(value) => setPriceRange(value as [number, number])}
                   />
                 </div>
@@ -556,8 +578,12 @@ function ProjectSearchContent() {
                     max={95}
                     step={5}
                     value={completionRangeDisplay}
-                    onValueChange={(value) => setCompletionRangeDisplay(value as [number, number])}
-                    onValueCommit={(value) => setCompletionRange(value as [number, number])}
+                    onValueChange={(value) =>
+                      setCompletionRangeDisplay(value as [number, number])
+                    }
+                    onValueCommit={(value) =>
+                      setCompletionRange(value as [number, number])
+                    }
                   />
                 </div>
               </div>
@@ -586,9 +612,7 @@ function ProjectSearchContent() {
         <div className="space-y-6">
           {/* Results Header */}
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              {totalResults} projects found
-            </p>
+            <p className="text-sm text-muted-foreground">{totalResults} projects found</p>
             <div className="flex items-center gap-2">
               <label className="text-sm text-muted-foreground">Sort by:</label>
               <Select value={sortBy} onValueChange={setSortBy}>

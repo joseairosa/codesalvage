@@ -1,0 +1,111 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - link "CodeSalvage home" [ref=e5] [cursor=pointer]:
+      - /url: /
+      - img "CodeSalvage logo" [ref=e6]
+      - generic [ref=e7]: CodeSalvage
+  - main [ref=e14]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - heading "Browse Projects" [level=1] [ref=e18]
+        - paragraph [ref=e19]: Discover incomplete projects ready to be finished
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - img [ref=e22]
+          - textbox "Search projects by title, description, or technology..." [ref=e25]
+        - button "Search" [ref=e26] [cursor=pointer]:
+          - img
+          - text: Search
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - text: Category
+            - combobox [ref=e32] [cursor=pointer]:
+              - img [ref=e33]
+            - combobox [ref=e35]
+          - generic [ref=e37]:
+            - generic [ref=e38]: Price
+            - generic [ref=e39]: $100 – $100,000
+          - generic [ref=e44]:
+            - generic [ref=e45]: Completion
+            - generic [ref=e46]: 50% – 95%
+        - generic [ref=e50]:
+          - text: Tech Stack
+          - generic [ref=e51]:
+            - generic [ref=e52] [cursor=pointer]: React
+            - generic [ref=e53] [cursor=pointer]: Node.js
+            - generic [ref=e54] [cursor=pointer]: TypeScript
+            - generic [ref=e55] [cursor=pointer]: Python
+            - generic [ref=e56] [cursor=pointer]: Next.js
+            - generic [ref=e57] [cursor=pointer]: PostgreSQL
+            - generic [ref=e58] [cursor=pointer]: MongoDB
+            - generic [ref=e59] [cursor=pointer]: Go
+            - generic [ref=e60] [cursor=pointer]: Rust
+            - generic [ref=e61] [cursor=pointer]: Django
+            - generic [ref=e62] [cursor=pointer]: FastAPI
+            - generic [ref=e63] [cursor=pointer]: Vue.js
+            - generic [ref=e64] [cursor=pointer]: Angular
+            - generic [ref=e65] [cursor=pointer]: Flutter
+            - generic [ref=e66] [cursor=pointer]: Swift
+      - generic [ref=e68]:
+        - paragraph [ref=e69]: 0 projects found
+        - generic [ref=e70]:
+          - generic [ref=e71]: "Sort by:"
+          - combobox [ref=e72] [cursor=pointer]:
+            - img [ref=e73]
+          - combobox [ref=e75]
+  - contentinfo [ref=e113]:
+    - generic [ref=e114]:
+      - generic [ref=e115]:
+        - generic [ref=e116]:
+          - link "CodeSalvage home" [ref=e117] [cursor=pointer]:
+            - /url: /
+            - img "CodeSalvage logo" [ref=e118]
+          - paragraph [ref=e119]: The marketplace for incomplete software projects. Buy unfinished projects and bring them to life.
+          - generic [ref=e120]:
+            - link "GitHub" [ref=e121] [cursor=pointer]:
+              - /url: https://github.com/codesalvage
+              - img [ref=e122]
+            - link "Twitter" [ref=e125] [cursor=pointer]:
+              - /url: https://twitter.com/codesalvage
+              - img [ref=e126]
+            - link "LinkedIn" [ref=e128] [cursor=pointer]:
+              - /url: https://linkedin.com/company/codesalvage
+              - img [ref=e129]
+            - link "Email" [ref=e133] [cursor=pointer]:
+              - /url: mailto:hello@codesalvage.com
+              - img [ref=e134]
+        - generic [ref=e137]:
+          - heading "Product" [level=3] [ref=e138]
+          - list [ref=e139]:
+            - listitem [ref=e140]:
+              - link "Browse Projects" [ref=e141] [cursor=pointer]:
+                - /url: /projects
+            - listitem [ref=e142]:
+              - link "How It Works" [ref=e143] [cursor=pointer]:
+                - /url: /how-it-works
+            - listitem [ref=e144]:
+              - link "Pricing" [ref=e145] [cursor=pointer]:
+                - /url: /pricing
+        - generic [ref=e146]:
+          - heading "For Sellers" [level=3] [ref=e147]
+          - list [ref=e148]:
+            - listitem [ref=e149]:
+              - link "Start Selling" [ref=e150] [cursor=pointer]:
+                - /url: /seller/onboard
+            - listitem [ref=e151]:
+              - link "Seller Dashboard" [ref=e152] [cursor=pointer]:
+                - /url: /seller/dashboard
+        - generic [ref=e153]:
+          - heading "Account" [level=3] [ref=e154]
+          - list [ref=e155]:
+            - listitem [ref=e156]:
+              - link "Dashboard" [ref=e157] [cursor=pointer]:
+                - /url: /dashboard
+            - listitem [ref=e158]:
+              - link "Messages" [ref=e159] [cursor=pointer]:
+                - /url: /messages
+            - listitem [ref=e160]:
+              - link "Settings" [ref=e161] [cursor=pointer]:
+                - /url: /settings
+      - paragraph [ref=e164]: © 2026 CodeSalvage. All rights reserved.

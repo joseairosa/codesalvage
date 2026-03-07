@@ -1,0 +1,118 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - link "CodeSalvage home" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img "CodeSalvage logo" [ref=e6]
+    - main [ref=e9]:
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - heading "Browse Projects" [level=1] [ref=e13]
+          - paragraph [ref=e14]: Discover incomplete projects ready to be finished
+        - generic [ref=e15]:
+          - generic [ref=e16]:
+            - img [ref=e17]
+            - textbox "Search projects by title, description, or technology..." [ref=e20]
+          - button "Search" [ref=e21] [cursor=pointer]:
+            - img
+            - text: Search
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - generic [ref=e26]:
+              - text: Category
+              - combobox [ref=e27] [cursor=pointer]:
+                - generic: All Categories
+                - img [ref=e28]
+            - generic [ref=e30]:
+              - generic [ref=e31]:
+                - generic [ref=e32]: Price
+                - generic [ref=e33]: $100 – $100,000
+              - slider "Minimum" [ref=e38]
+            - generic [ref=e39]:
+              - generic [ref=e40]:
+                - generic [ref=e41]: Completion
+                - generic [ref=e42]: 50% – 95%
+              - slider "Minimum" [ref=e47]
+          - generic [ref=e48]:
+            - text: Tech Stack
+            - generic [ref=e49]:
+              - generic [ref=e50] [cursor=pointer]: React
+              - generic [ref=e51] [cursor=pointer]: Node.js
+              - generic [ref=e52] [cursor=pointer]: TypeScript
+              - generic [ref=e53] [cursor=pointer]: Python
+              - generic [ref=e54] [cursor=pointer]: Next.js
+              - generic [ref=e55] [cursor=pointer]: PostgreSQL
+              - generic [ref=e56] [cursor=pointer]: MongoDB
+              - generic [ref=e57] [cursor=pointer]: Go
+              - generic [ref=e58] [cursor=pointer]: Rust
+              - generic [ref=e59] [cursor=pointer]: Django
+              - generic [ref=e60] [cursor=pointer]: FastAPI
+              - generic [ref=e61] [cursor=pointer]: Vue.js
+              - generic [ref=e62] [cursor=pointer]: Angular
+              - generic [ref=e63] [cursor=pointer]: Flutter
+              - generic [ref=e64] [cursor=pointer]: Swift
+        - generic [ref=e66]:
+          - paragraph [ref=e67]: 0 projects found
+          - generic [ref=e68]:
+            - generic [ref=e69]: "Sort by:"
+            - combobox [ref=e70] [cursor=pointer]:
+              - generic: Newest First
+              - img [ref=e71]
+    - contentinfo [ref=e110]:
+      - generic [ref=e111]:
+        - generic [ref=e112]:
+          - generic [ref=e113]:
+            - link "CodeSalvage home" [ref=e114] [cursor=pointer]:
+              - /url: /
+              - img "CodeSalvage logo" [ref=e115]
+            - paragraph [ref=e116]: The marketplace for incomplete software projects. Buy unfinished projects and bring them to life.
+            - generic [ref=e117]:
+              - link "GitHub" [ref=e118] [cursor=pointer]:
+                - /url: https://github.com/codesalvage
+                - img [ref=e119]
+              - link "Twitter" [ref=e122] [cursor=pointer]:
+                - /url: https://twitter.com/codesalvage
+                - img [ref=e123]
+              - link "LinkedIn" [ref=e125] [cursor=pointer]:
+                - /url: https://linkedin.com/company/codesalvage
+                - img [ref=e126]
+              - link "Email" [ref=e130] [cursor=pointer]:
+                - /url: mailto:hello@codesalvage.com
+                - img [ref=e131]
+          - generic [ref=e134]:
+            - heading "Product" [level=3] [ref=e135]
+            - list [ref=e136]:
+              - listitem [ref=e137]:
+                - link "Browse Projects" [ref=e138] [cursor=pointer]:
+                  - /url: /projects
+              - listitem [ref=e139]:
+                - link "How It Works" [ref=e140] [cursor=pointer]:
+                  - /url: /how-it-works
+              - listitem [ref=e141]:
+                - link "Pricing" [ref=e142] [cursor=pointer]:
+                  - /url: /pricing
+          - generic [ref=e143]:
+            - heading "For Sellers" [level=3] [ref=e144]
+            - list [ref=e145]:
+              - listitem [ref=e146]:
+                - link "Start Selling" [ref=e147] [cursor=pointer]:
+                  - /url: /seller/onboard
+              - listitem [ref=e148]:
+                - link "Seller Dashboard" [ref=e149] [cursor=pointer]:
+                  - /url: /seller/dashboard
+          - generic [ref=e150]:
+            - heading "Account" [level=3] [ref=e151]
+            - list [ref=e152]:
+              - listitem [ref=e153]:
+                - link "Dashboard" [ref=e154] [cursor=pointer]:
+                  - /url: /dashboard
+              - listitem [ref=e155]:
+                - link "Messages" [ref=e156] [cursor=pointer]:
+                  - /url: /messages
+              - listitem [ref=e157]:
+                - link "Settings" [ref=e158] [cursor=pointer]:
+                  - /url: /settings
+        - paragraph [ref=e161]: © 2026 CodeSalvage. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=e167] [cursor=pointer]:
+    - img [ref=e168]
+  - alert [ref=e171]

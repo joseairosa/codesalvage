@@ -66,7 +66,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const user = await prisma.user.findUnique({
     where: { username: normalized },
-    select: { fullName: true, username: true, bio: true, avatarUrl: true, isSeller: true, isBanned: true },
+    select: {
+      fullName: true,
+      username: true,
+      bio: true,
+      avatarUrl: true,
+      isSeller: true,
+      isBanned: true,
+    },
   });
 
   if (!user || !user.isSeller || user.isBanned) {
@@ -178,7 +185,10 @@ export default async function SellerProfilePage({ params }: PageProps) {
         <div className="flex-1 text-center sm:text-left">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">{displayName}</h1>
-            <ProBadge subscription={computeSubscriptionForCard(user.subscription ?? null)} size="sm" />
+            <ProBadge
+              subscription={computeSubscriptionForCard(user.subscription ?? null)}
+              size="sm"
+            />
           </div>
           <p className="text-muted-foreground">@{user.username}</p>
 
@@ -195,9 +205,12 @@ export default async function SellerProfilePage({ params }: PageProps) {
             {ratingStats.totalReviews > 0 && (
               <div className="flex items-center gap-1.5 text-sm">
                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span className="font-medium">{ratingStats.averageRating.toFixed(1)}</span>
+                <span className="font-medium">
+                  {ratingStats.averageRating.toFixed(1)}
+                </span>
                 <span className="text-muted-foreground">
-                  ({ratingStats.totalReviews} review{ratingStats.totalReviews !== 1 ? 's' : ''})
+                  ({ratingStats.totalReviews} review
+                  {ratingStats.totalReviews !== 1 ? 's' : ''})
                 </span>
               </div>
             )}

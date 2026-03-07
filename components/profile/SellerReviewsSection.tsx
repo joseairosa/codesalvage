@@ -92,7 +92,9 @@ export function SellerReviewsSection({
     setIsLoading(true);
     setFetchError(null);
     try {
-      const res = await fetch(`/api/u/${username}/reviews?page=${page}&limit=${pagination.limit}`);
+      const res = await fetch(
+        `/api/u/${username}/reviews?page=${page}&limit=${pagination.limit}`
+      );
       if (!res.ok) {
         setFetchError('Failed to load reviews. Please try again.');
         return;

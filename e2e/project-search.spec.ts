@@ -113,7 +113,9 @@ test.describe('Project Search - Filters', () => {
 
   // The Show/Hide Filters toggle was removed in favour of the always-visible horizontal filter bar.
   // This test verifies that the filter controls are visible without any user interaction.
-  test('should show horizontal filter bar with all controls visible', async ({ page }) => {
+  test('should show horizontal filter bar with all controls visible', async ({
+    page,
+  }) => {
     console.log(`[${componentName}] Testing horizontal filter bar visibility`);
 
     // Category filter label should be visible immediately — no toggle needed
@@ -153,7 +155,11 @@ test.describe('Project Search - Filters', () => {
     console.log(`[${componentName}] Testing tech stack filter`);
 
     // Click a tech stack badge in the horizontal filter bar
-    await page.locator('[data-slot="badge"]').filter({ hasText: /^React$/ }).first().click();
+    await page
+      .locator('[data-slot="badge"]')
+      .filter({ hasText: /^React$/ })
+      .first()
+      .click();
     await page.waitForTimeout(500);
 
     // URL should auto-sync after clicking (no Apply Filters button)
@@ -168,9 +174,17 @@ test.describe('Project Search - Filters', () => {
     console.log(`[${componentName}] Testing multiple tech stack selection`);
 
     // Click multiple tech stack badges in the horizontal filter bar
-    await page.locator('[data-slot="badge"]').filter({ hasText: /^React$/ }).first().click();
+    await page
+      .locator('[data-slot="badge"]')
+      .filter({ hasText: /^React$/ })
+      .first()
+      .click();
     await page.waitForTimeout(200);
-    await page.locator('[data-slot="badge"]').filter({ hasText: /^Node\.js$/ }).first().click();
+    await page
+      .locator('[data-slot="badge"]')
+      .filter({ hasText: /^Node\.js$/ })
+      .first()
+      .click();
     await page.waitForTimeout(500);
 
     // Both should be in URL (auto-synced, no Apply Filters button)

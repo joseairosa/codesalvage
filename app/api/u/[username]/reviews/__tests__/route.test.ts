@@ -98,8 +98,17 @@ describe('GET /api/u/[username]/reviews', () => {
         comment: 'Great seller!',
         isAnonymous: false,
         createdAt: new Date('2026-01-01'),
-        buyer: { id: 'buyer-1', username: 'buyer1', fullName: 'Buyer One', avatarUrl: null },
-        transaction: { id: 'txn-1', projectId: 'proj-1', project: { id: 'proj-1', title: 'My Project' } },
+        buyer: {
+          id: 'buyer-1',
+          username: 'buyer1',
+          fullName: 'Buyer One',
+          avatarUrl: null,
+        },
+        transaction: {
+          id: 'txn-1',
+          projectId: 'proj-1',
+          project: { id: 'proj-1', title: 'My Project' },
+        },
       },
     ];
 
@@ -141,8 +150,17 @@ describe('GET /api/u/[username]/reviews', () => {
           comment: 'Good project',
           isAnonymous: true,
           createdAt: new Date('2026-01-02'),
-          buyer: { id: 'buyer-2', username: 'buyer2', fullName: 'Buyer Two', avatarUrl: null },
-          transaction: { id: 'txn-2', projectId: 'proj-2', project: { id: 'proj-2', title: 'Another Project' } },
+          buyer: {
+            id: 'buyer-2',
+            username: 'buyer2',
+            fullName: 'Buyer Two',
+            avatarUrl: null,
+          },
+          transaction: {
+            id: 'txn-2',
+            projectId: 'proj-2',
+            project: { id: 'proj-2', title: 'Another Project' },
+          },
         },
       ],
       total: 1,

@@ -18,6 +18,7 @@ Type: Feature
 ## Scope
 
 ### In Scope
+
 - Fix sort field name mapping (`price` → `priceCents`, `completion` → `completionPercentage`, `views` → `viewCount`)
 - Add `isApproved: true` to the repository search WHERE clause
 - Restyle filters from sidebar card to horizontal bar above project grid
@@ -29,6 +30,7 @@ Type: Feature
 - Update E2E test expectations for sort field names
 
 ### Out of Scope
+
 - Full-text search improvements (Elasticsearch, trigram indexes)
 - Saved searches / search history
 - Filter counts (showing "Web App (12)")
@@ -100,11 +102,13 @@ Type: Feature
 **Dependencies:** None
 
 **Files:**
+
 - Modify: `app/projects/page.tsx` (update `SORT_OPTIONS` values)
 - Modify: `lib/repositories/ProjectRepository.ts` (add `isApproved: true` to search WHERE)
 - Modify: `lib/repositories/__tests__/ProjectRepository.test.ts` (add isApproved test)
 
 **Key Decisions / Notes:**
+
 - Update `SORT_OPTIONS` values to use DB field names (labels unchanged):
   - `'price-asc'` → `'priceCents-asc'`
   - `'price-desc'` → `'priceCents-desc'`
@@ -115,6 +119,7 @@ Type: Feature
 - Labels in `SORT_OPTIONS` remain the same — only the `value` field changes.
 
 **Definition of Done:**
+
 - [ ] `SORT_OPTIONS` values use actual DB field names (`priceCents`, `completionPercentage`, `viewCount`)
 - [ ] `ProjectRepository.search()` includes `isApproved: true` in WHERE by default
 - [ ] `isApproved` filter is skipped when `sellerId` is provided
@@ -124,6 +129,7 @@ Type: Feature
 - [ ] No diagnostics errors
 
 **Verify:**
+
 ```
 npx vitest run lib/repositories/__tests__/ProjectRepository.test.ts --reporter=verbose
 ```
@@ -137,9 +143,11 @@ npx vitest run lib/repositories/__tests__/ProjectRepository.test.ts --reporter=v
 **Dependencies:** Task 1
 
 **Files:**
+
 - Modify: `app/projects/page.tsx` (restructure layout from sidebar to horizontal bar)
 
 **Key Decisions / Notes:**
+
 - Remove the `lg:grid-cols-4` grid layout that splits sidebar + results. Replace with a single-column layout: header → search bar → horizontal filter bar → results.
 - Horizontal filter bar structure (all in a bordered card):
   - Row 1: Category select + Price range slider (with label) + Completion range slider (with label)
@@ -155,6 +163,7 @@ npx vitest run lib/repositories/__tests__/ProjectRepository.test.ts --reporter=v
 - Use `onValueCommit` on sliders for triggering fetch (fires on pointer up), `onValueChange` for live visual update. This avoids rapid API calls during drag.
 
 **Definition of Done:**
+
 - [ ] Filters display in a horizontal bar above the project grid (not a sidebar)
 - [ ] Category, price range, completion range, and tech stack badges all render in the bar
 - [ ] Project grid uses full width (no sidebar column taking space)
@@ -165,6 +174,7 @@ npx vitest run lib/repositories/__tests__/ProjectRepository.test.ts --reporter=v
 - [ ] No diagnostics errors
 
 **Verify:**
+
 - Visual verification in browser at `/projects` at both desktop and mobile (375px) viewports
 
 ---
@@ -176,9 +186,11 @@ npx vitest run lib/repositories/__tests__/ProjectRepository.test.ts --reporter=v
 **Dependencies:** Task 2
 
 **Files:**
+
 - Modify: `app/projects/page.tsx` (add URL read/write for all filters)
 
 **Key Decisions / Notes:**
+
 - **URL param schema** (keep `sortBy` as param name — don't rename to avoid E2E test breakage):
   - `query` — search text (string)
   - `category` — category value (string, omit if "all")
@@ -199,6 +211,7 @@ npx vitest run lib/repositories/__tests__/ProjectRepository.test.ts --reporter=v
 - **Page reset on filter change:** When any filter other than `page` changes, reset `currentPage` to 1. The URL sync will then omit the `page` param (default).
 
 **Definition of Done:**
+
 - [ ] All filter state reads from URL params on page load
 - [ ] All filter changes write back to URL params
 - [ ] Copying the URL and opening in a new tab restores the exact filter state
@@ -208,6 +221,7 @@ npx vitest run lib/repositories/__tests__/ProjectRepository.test.ts --reporter=v
 - [ ] No diagnostics errors
 
 **Verify:**
+
 ```
 # Manually test in browser:
 # 1. Set filters → verify URL updates
@@ -224,12 +238,14 @@ npx vitest run lib/repositories/__tests__/ProjectRepository.test.ts --reporter=v
 **Dependencies:** Tasks 1, 2, 3
 
 **Files:**
+
 - Modify: `lib/repositories/__tests__/ProjectRepository.test.ts` (isApproved tests — if not already added in Task 1)
 - Modify: `app/api/projects/__tests__/route.test.ts` (sort field mapping tests)
 - Create: `app/projects/__tests__/page.test.tsx` (URL sync tests, filter rendering)
 - Modify: `e2e/project-search.spec.ts` (update sort expectation at line 268, un-skip and update applicable tests)
 
 **Key Decisions / Notes:**
+
 - **Repository tests:** Verify in Task 1 — add test that `search()` includes `isApproved: true` by default and that `isApproved` is NOT applied when `sellerId` is provided.
 - **API route tests:** Verify sort field values are passed through correctly (e.g., `priceCents`, `viewCount`).
 - **Page tests:** Test URL param reading/writing. Mock `useSearchParams` and `useRouter` from `next/navigation`. Verify filter controls render in horizontal layout. Test that active filter badges appear.
@@ -240,6 +256,7 @@ npx vitest run lib/repositories/__tests__/ProjectRepository.test.ts --reporter=v
 - Follow existing test patterns in `app/api/projects/__tests__/route.test.ts` and `components/buyers/__tests__/BuyerOfferCard.test.tsx`.
 
 **Definition of Done:**
+
 - [ ] Repository test: isApproved defaults to true
 - [ ] Repository test: isApproved skipped when sellerId provided
 - [ ] API route test: sort field names pass through correctly
@@ -251,6 +268,7 @@ npx vitest run lib/repositories/__tests__/ProjectRepository.test.ts --reporter=v
 - [ ] No diagnostics errors
 
 **Verify:**
+
 ```
 npm run test:ci
 ```
@@ -264,17 +282,18 @@ npm run test:ci
 
 ## Risks and Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| Slider rapid API calls during drag | Medium | Low | Use `onValueCommit` (fires on pointer up) for API fetch, `onValueChange` for visual updates only |
-| Existing tests break from sort field rename | Low | Medium | Update `SORT_OPTIONS` values only — labels stay the same. Run full test suite after change. |
-| Price slider UX (dollars vs cents confusion) | Low | Medium | Keep existing dollar display in UI, convert to cents only for API call (already implemented). |
-| Horizontal bar too tall on mobile with all filters expanded | Low | Low | Use `flex-wrap` and verify at 375px viewport. Tech stack badges wrap naturally. |
-| E2E sort test expectations stale | Medium | Low | Update `e2e/project-search.spec.ts` line 268 in Task 4. Currently `test.skip` so not a CI blocker, but should be fixed. |
+| Risk                                                        | Likelihood | Impact | Mitigation                                                                                                              |
+| ----------------------------------------------------------- | ---------- | ------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Slider rapid API calls during drag                          | Medium     | Low    | Use `onValueCommit` (fires on pointer up) for API fetch, `onValueChange` for visual updates only                        |
+| Existing tests break from sort field rename                 | Low        | Medium | Update `SORT_OPTIONS` values only — labels stay the same. Run full test suite after change.                             |
+| Price slider UX (dollars vs cents confusion)                | Low        | Medium | Keep existing dollar display in UI, convert to cents only for API call (already implemented).                           |
+| Horizontal bar too tall on mobile with all filters expanded | Low        | Low    | Use `flex-wrap` and verify at 375px viewport. Tech stack badges wrap naturally.                                         |
+| E2E sort test expectations stale                            | Medium     | Low    | Update `e2e/project-search.spec.ts` line 268 in Task 4. Currently `test.skip` so not a CI blocker, but should be fixed. |
 
 ## Goal Verification
 
 ### Truths
+
 1. Visiting `/projects?category=web_app` shows only web app projects
 2. Visiting `/projects?sortBy=priceCents-asc` shows projects sorted by price ascending
 3. Selecting tech stack badges and refreshing the page retains the selection
@@ -283,11 +302,13 @@ npm run test:ci
 6. The filter bar renders horizontally above the project grid (no sidebar)
 
 ### Artifacts
+
 1. Updated `app/projects/page.tsx` — horizontal layout, URL sync, fixed sort values, onValueCommit for sliders
 2. Updated `lib/repositories/ProjectRepository.ts` — isApproved filter
 3. Updated test files — sort mapping, isApproved, page URL sync, E2E expectations
 
 ### Key Links
+
 1. `SORT_OPTIONS` values → page splits on hyphen → API `sortBy` param → `PaginationOptions.sortBy` → Prisma `orderBy`
 2. URL `searchParams` ↔ React state ↔ `fetchProjects()` API call params
 3. `ProjectRepository.search()` WHERE clause → `isApproved: true` default

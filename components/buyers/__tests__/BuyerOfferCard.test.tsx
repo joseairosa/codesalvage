@@ -12,8 +12,15 @@ vi.mock('next/image', () => ({
 }));
 // Override global next/link mock to render a real <a> so href assertions work
 vi.mock('next/link', () => ({
-  default: ({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) =>
-    React.createElement('a', { href, className }, children),
+  default: ({
+    href,
+    children,
+    className,
+  }: {
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }) => React.createElement('a', { href, className }, children),
 }));
 
 const baseOffer: OfferItem = {
@@ -203,7 +210,9 @@ describe('BuyerOfferCard', () => {
       };
       render(<BuyerOfferCard {...baseProps} offer={noUsernameOffer} />);
       // Should render the email fallback without a link
-      expect(screen.queryByRole('link', { name: /seller@example\.com/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: /seller@example\.com/i })
+      ).not.toBeInTheDocument();
       expect(screen.getByText('seller@example.com')).toBeInTheDocument();
     });
   });

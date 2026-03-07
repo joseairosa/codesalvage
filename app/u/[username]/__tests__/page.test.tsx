@@ -24,8 +24,12 @@ const {
   mockProjectFindMany: vi.fn(),
   mockGetSellerRatingStats: vi.fn(),
   mockGetSellerReviews: vi.fn(),
-  mockNotFound: vi.fn(() => { throw new Error('NEXT_NOT_FOUND'); }),
-  mockRedirect: vi.fn((url: string) => { throw new Error(`NEXT_REDIRECT:${url}`); }),
+  mockNotFound: vi.fn(() => {
+    throw new Error('NEXT_NOT_FOUND');
+  }),
+  mockRedirect: vi.fn((url: string) => {
+    throw new Error(`NEXT_REDIRECT:${url}`);
+  }),
 }));
 
 vi.mock('@/lib/prisma', () => ({
@@ -49,7 +53,9 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/components/projects/ProjectCard', () => ({ ProjectCard: () => null }));
 vi.mock('@/components/profile/RatingBreakdown', () => ({ RatingBreakdown: () => null }));
-vi.mock('@/components/profile/SellerReviewsSection', () => ({ SellerReviewsSection: () => null }));
+vi.mock('@/components/profile/SellerReviewsSection', () => ({
+  SellerReviewsSection: () => null,
+}));
 vi.mock('@/components/seller/ProBadge', () => ({ ProBadge: () => null }));
 vi.mock('@/components/ui/avatar', () => ({
   Avatar: ({ children }: { children: React.ReactNode }) => children,
@@ -143,8 +149,12 @@ describe('SellerProfilePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Re-implement throws after clearAllMocks resets them
-    mockNotFound.mockImplementation(() => { throw new Error('NEXT_NOT_FOUND'); });
-    mockRedirect.mockImplementation((url: string) => { throw new Error(`NEXT_REDIRECT:${url}`); });
+    mockNotFound.mockImplementation(() => {
+      throw new Error('NEXT_NOT_FOUND');
+    });
+    mockRedirect.mockImplementation((url: string) => {
+      throw new Error(`NEXT_REDIRECT:${url}`);
+    });
     mockProjectFindMany.mockResolvedValue([]);
     mockGetSellerRatingStats.mockResolvedValue(emptyRatingStats);
     mockGetSellerReviews.mockResolvedValue(emptyReviewData);
@@ -193,37 +203,49 @@ describe('generateMetadata', () => {
 
   it('returns not-found title when user does not exist', async () => {
     mockUserFindUnique.mockResolvedValue(null);
-    const meta = await generateMetadata({ params: Promise.resolve({ username: 'nobody' }) });
+    const meta = await generateMetadata({
+      params: Promise.resolve({ username: 'nobody' }),
+    });
     expect(meta.title).toMatch(/not found/i);
   });
 
   it('returns correct title for a valid seller', async () => {
     mockUserFindUnique.mockResolvedValue(mockUser);
-    const meta = await generateMetadata({ params: Promise.resolve({ username: 'testseller' }) });
+    const meta = await generateMetadata({
+      params: Promise.resolve({ username: 'testseller' }),
+    });
     expect(meta.title).toBe('testseller — CodeSalvage');
   });
 
   it('returns bio as description when present', async () => {
     mockUserFindUnique.mockResolvedValue(mockUser);
-    const meta = await generateMetadata({ params: Promise.resolve({ username: 'testseller' }) });
+    const meta = await generateMetadata({
+      params: Promise.resolve({ username: 'testseller' }),
+    });
     expect(meta.description).toBe('Building great things');
   });
 
   it('returns fallback description when bio is absent', async () => {
     mockUserFindUnique.mockResolvedValue({ ...mockUser, bio: null });
-    const meta = await generateMetadata({ params: Promise.resolve({ username: 'testseller' }) });
+    const meta = await generateMetadata({
+      params: Promise.resolve({ username: 'testseller' }),
+    });
     expect(meta.description).toContain('seller on CodeSalvage');
   });
 
   it('returns openGraph with type="profile"', async () => {
     mockUserFindUnique.mockResolvedValue(mockUser);
-    const meta = await generateMetadata({ params: Promise.resolve({ username: 'testseller' }) });
+    const meta = await generateMetadata({
+      params: Promise.resolve({ username: 'testseller' }),
+    });
     expect((meta.openGraph as { type: string }).type).toBe('profile');
   });
 
   it('includes og:title and og:description', async () => {
     mockUserFindUnique.mockResolvedValue(mockUser);
-    const meta = await generateMetadata({ params: Promise.resolve({ username: 'testseller' }) });
+    const meta = await generateMetadata({
+      params: Promise.resolve({ username: 'testseller' }),
+    });
     const og = meta.openGraph as { title?: string; description?: string };
     expect(og.title).toBeDefined();
     expect(og.description).toBeDefined();
