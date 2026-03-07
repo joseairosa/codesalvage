@@ -13,6 +13,7 @@
 
 import * as React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -142,9 +143,18 @@ export function BuyerOfferCard({
                   {sellerInitials(offer.seller)}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm text-muted-foreground">
-                {sellerName(offer.seller)}
-              </span>
+              {offer.seller.username ? (
+                <Link
+                  href={`/u/${offer.seller.username}`}
+                  className="text-sm text-muted-foreground hover:underline"
+                >
+                  {sellerName(offer.seller)}
+                </Link>
+              ) : (
+                <span className="text-sm text-muted-foreground">
+                  {sellerName(offer.seller)}
+                </span>
+              )}
             </div>
 
             {/* Pricing */}
