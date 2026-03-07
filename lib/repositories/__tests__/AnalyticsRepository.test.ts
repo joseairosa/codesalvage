@@ -350,28 +350,28 @@ describe('AnalyticsRepository', () => {
         ] as any);
 
       // Use mockImplementation to differentiate calls by select shape
-      vi.mocked(mockPrismaClient.project.findMany).mockImplementation(
-        (args: any) => {
-          const select = args?.select ?? {};
-          if (select.id && !select.title && !select.viewCount) {
-            // getViewsOverTime: only needs { id }
-            return Promise.resolve([{ id: 'proj1' }]);
-          } else if (select.viewCount && !select.title) {
-            // getSellerRevenueSummary: needs { viewCount, favoriteCount, priceCents }
-            return Promise.resolve([{ viewCount: 100, priceCents: 10000, favoriteCount: 5 }]);
-          }
-          // getTopProjects: needs full project with transactions
+      vi.mocked(mockPrismaClient.project.findMany).mockImplementation(((args: any) => {
+        const select = args?.select ?? {};
+        if (select.id && !select.title && !select.viewCount) {
+          // getViewsOverTime: only needs { id }
+          return Promise.resolve([{ id: 'proj1' }]);
+        } else if (select.viewCount && !select.title) {
+          // getSellerRevenueSummary: needs { viewCount, favoriteCount, priceCents }
           return Promise.resolve([
-            {
-              id: 'proj1',
-              title: 'Project 1',
-              viewCount: 100,
-              favoriteCount: 10,
-              transactions: [{ sellerReceivesCents: 8200 }],
-            },
+            { viewCount: 100, priceCents: 10000, favoriteCount: 5 },
           ]);
         }
-      );
+        // getTopProjects: needs full project with transactions
+        return Promise.resolve([
+          {
+            id: 'proj1',
+            title: 'Project 1',
+            viewCount: 100,
+            favoriteCount: 10,
+            transactions: [{ sellerReceivesCents: 8200 }],
+          },
+        ]);
+      }) as any);
 
       vi.mocked(mockPrismaClient.projectViewEvent.findMany).mockResolvedValue([]);
 
