@@ -26,15 +26,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ProjectCard, type ProjectCardData } from '@/components/projects/ProjectCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import {
   Select,
@@ -43,15 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Search,
-  SlidersHorizontal,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  Star,
-  CheckCircle2,
-} from 'lucide-react';
+import { Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const componentName = 'ProjectSearchPage';
 
@@ -211,11 +196,11 @@ const CATEGORIES = [
 const SORT_OPTIONS = [
   { value: 'createdAt-desc', label: 'Newest First' },
   { value: 'createdAt-asc', label: 'Oldest First' },
-  { value: 'price-asc', label: 'Price: Low to High' },
-  { value: 'price-desc', label: 'Price: High to Low' },
-  { value: 'completion-desc', label: 'Completion: High to Low' },
-  { value: 'completion-asc', label: 'Completion: Low to High' },
-  { value: 'views-desc', label: 'Most Popular' },
+  { value: 'priceCents-asc', label: 'Price: Low to High' },
+  { value: 'priceCents-desc', label: 'Price: High to Low' },
+  { value: 'completionPercentage-desc', label: 'Completion: High to Low' },
+  { value: 'completionPercentage-asc', label: 'Completion: Low to High' },
+  { value: 'viewCount-desc', label: 'Most Popular' },
 ];
 
 /**
@@ -243,23 +228,54 @@ function ProjectSearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // State for filters
+  // Helper: parse integer URL param with fallback
+  const urlInt = (key: string, fallback: number) => {
+    const raw = searchParams.get(key);
+    const parsed = raw !== null ? parseInt(raw, 10) : NaN;
+    return isNaN(parsed) ? fallback : parsed;
+  };
+
+  // State for filters (initialized from URL params for shareability)
   const [searchQuery, setSearchQuery] = React.useState(searchParams.get('query') || '');
   const [category, setCategory] = React.useState(searchParams.get('category') || 'all');
-  const [selectedTechStack, setSelectedTechStack] = React.useState<string[]>([]);
-  const [completionRange, setCompletionRange] = React.useState<[number, number]>([
-    50, 95,
-  ]);
-  const [priceRange, setPriceRange] = React.useState<[number, number]>([100, 100000]);
+  const [selectedTechStack, setSelectedTechStack] = React.useState<string[]>(() => {
+    const raw = searchParams.get('techStack');
+    return raw ? raw.split(',').filter(Boolean) : [];
+  });
+
+  const initCompletion: [number, number] = [
+    urlInt('minCompletion', 50),
+    urlInt('maxCompletion', 95),
+  ];
+  const [completionRange, setCompletionRange] =
+    React.useState<[number, number]>(initCompletion);
+
+  const initPrice: [number, number] = [
+    urlInt('minPrice', 100),
+    urlInt('maxPrice', 100000),
+  ];
+  const [priceRange, setPriceRange] = React.useState<[number, number]>(initPrice);
+
   const [sortBy, setSortBy] = React.useState(
     searchParams.get('sortBy') || 'createdAt-desc'
   );
-  const [showFilters, setShowFilters] = React.useState(true);
+
+  // Display-only slider states — update on drag (onValueChange); actual state updates on release (onValueCommit)
+  const [completionRangeDisplay, setCompletionRangeDisplay] =
+    React.useState<[number, number]>(initCompletion);
+  const [priceRangeDisplay, setPriceRangeDisplay] =
+    React.useState<[number, number]>(initPrice);
+
+  // Ref to skip page-reset effect on first render (so URL-restored page is preserved)
+  const isFirstFilterRender = React.useRef(true);
+
+  // URL sync debounce timer
+  const urlSyncTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // State for results
   const [projects, setProjects] = React.useState<ProjectCardData[]>([]);
   const [totalResults, setTotalResults] = React.useState(0);
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [currentPage, setCurrentPage] = React.useState(urlInt('page', 1));
   const [totalPages, setTotalPages] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -340,6 +356,61 @@ function ProjectSearchContent() {
   }, [fetchProjects]);
 
   /**
+   * Reset to page 1 when filters change interactively (skip first render so
+   * URL-restored page numbers are preserved on initial load)
+   */
+  React.useEffect(() => {
+    if (isFirstFilterRender.current) {
+      isFirstFilterRender.current = false;
+      return;
+    }
+    setCurrentPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, category, selectedTechStack, completionRange, priceRange, sortBy]);
+
+  /**
+   * Sync filter state back to URL params (debounced 300ms).
+   * Uses router.replace() to avoid cluttering browser history.
+   * Default values are omitted to keep URLs clean.
+   */
+  React.useEffect(() => {
+    if (urlSyncTimer.current) clearTimeout(urlSyncTimer.current);
+    urlSyncTimer.current = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (searchQuery) params.set('query', searchQuery);
+      if (category !== 'all') params.set('category', category);
+      if (selectedTechStack.length > 0)
+        params.set('techStack', selectedTechStack.join(','));
+      if (completionRange[0] !== 50 || completionRange[1] !== 95) {
+        params.set('minCompletion', completionRange[0].toString());
+        params.set('maxCompletion', completionRange[1].toString());
+      }
+      if (priceRange[0] !== 100 || priceRange[1] !== 100000) {
+        params.set('minPrice', priceRange[0].toString());
+        params.set('maxPrice', priceRange[1].toString());
+      }
+      if (sortBy !== 'createdAt-desc') params.set('sortBy', sortBy);
+      if (currentPage !== 1) params.set('page', currentPage.toString());
+
+      const search = params.toString();
+      router.replace(search ? `/projects?${search}` : '/projects', { scroll: false });
+    }, 300);
+
+    return () => {
+      if (urlSyncTimer.current) clearTimeout(urlSyncTimer.current);
+    };
+  }, [
+    searchQuery,
+    category,
+    selectedTechStack,
+    completionRange,
+    priceRange,
+    sortBy,
+    currentPage,
+    router,
+  ]);
+
+  /**
    * Handle search - reset to page 1 and fetch
    */
   const handleSearch = React.useCallback(() => {
@@ -357,7 +428,9 @@ function ProjectSearchContent() {
     setCategory('all');
     setSelectedTechStack([]);
     setCompletionRange([50, 95]);
+    setCompletionRangeDisplay([50, 95]);
     setPriceRange([100, 100000]);
+    setPriceRangeDisplay([100, 100000]);
     setSortBy('createdAt-desc');
     setCurrentPage(1);
     router.push('/projects');
@@ -386,7 +459,7 @@ function ProjectSearchContent() {
 
   return (
     <div className="container mx-auto max-w-7xl py-10">
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold">Browse Projects</h1>
@@ -411,14 +484,6 @@ function ProjectSearchContent() {
           <Button onClick={handleSearch}>
             <Search className="mr-2 h-4 w-4" />
             Search
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setShowFilters(!showFilters)}
-            className="hidden md:flex"
-          >
-            <SlidersHorizontal className="mr-2 h-4 w-4" />
-            {showFilters ? 'Hide' : 'Show'} Filters
           </Button>
         </div>
 
@@ -456,255 +521,209 @@ function ProjectSearchContent() {
           </div>
         )}
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-          {/* Filters Sidebar */}
-          {showFilters && (
-            <div className="space-y-6 lg:col-span-1">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Filters</CardTitle>
-                  <CardDescription>Refine your search</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Category Filter */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Category</label>
-                    <Select value={category} onValueChange={setCategory}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {CATEGORIES.map((cat) => (
-                          <SelectItem key={cat.value} value={cat.value}>
-                            {cat.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <Separator />
-
-                  {/* Tech Stack Filter */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Tech Stack</label>
-                    <div className="flex flex-wrap gap-1.5">
-                      {POPULAR_TECH_STACKS.map((tech) => (
-                        <Badge
-                          key={tech}
-                          variant={
-                            selectedTechStack.includes(tech) ? 'default' : 'outline'
-                          }
-                          className="cursor-pointer"
-                          onClick={() => toggleTechStack(tech)}
-                        >
-                          {tech}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Completion Range */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <label className="text-sm font-medium">Completion</label>
-                      <span className="text-sm text-muted-foreground">
-                        {completionRange[0]}% - {completionRange[1]}%
-                      </span>
-                    </div>
-                    <Slider
-                      min={50}
-                      max={95}
-                      step={5}
-                      value={completionRange}
-                      onValueChange={(value) =>
-                        setCompletionRange(value as [number, number])
-                      }
-                      className="w-full"
-                    />
-                  </div>
-
-                  <Separator />
-
-                  {/* Price Range */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <label className="text-sm font-medium">Price Range</label>
-                      <span className="text-sm text-muted-foreground">
-                        {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
-                      </span>
-                    </div>
-                    <Slider
-                      min={100}
-                      max={100000}
-                      step={100}
-                      value={priceRange}
-                      onValueChange={(value) => setPriceRange(value as [number, number])}
-                      className="w-full"
-                    />
-                  </div>
-
-                  <Separator />
-
-                  {/* Apply Filters Button */}
-                  <Button onClick={handleSearch} className="w-full">
-                    Apply Filters
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Featured Info */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Star className="h-4 w-4 text-yellow-500" fill="currentColor" />
-                    Featured Projects
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm text-muted-foreground">
-                  <p>
-                    Featured projects are hand-picked by our team for quality and
-                    completeness.
-                  </p>
-                  <div className="flex items-center gap-2 text-xs">
-                    <CheckCircle2 className="h-3 w-3 text-green-500" />
-                    <span>Verified code quality</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <CheckCircle2 className="h-3 w-3 text-green-500" />
-                    <span>Responsive seller</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Results */}
-          <div className={showFilters ? 'lg:col-span-3' : 'lg:col-span-4'}>
-            <div className="space-y-6">
-              {/* Results Header */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    {totalResults} projects found
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <label className="text-sm text-muted-foreground">Sort by:</label>
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-[180px]">
+        {/* Horizontal Filter Bar */}
+        <Card>
+          <CardContent className="py-4">
+            <div className="space-y-4">
+              {/* Row 1: Category + Price + Completion */}
+              <div className="flex flex-wrap items-end gap-4">
+                {/* Category */}
+                <div className="min-w-[160px] flex-1 space-y-1.5">
+                  <label className="text-sm font-medium">Category</label>
+                  <Select value={category} onValueChange={setCategory}>
+                    <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {SORT_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
+                      {CATEGORIES.map((cat) => (
+                        <SelectItem key={cat.value} value={cat.value}>
+                          {cat.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Price Range */}
+                <div className="min-w-[200px] flex-1 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">Price</label>
+                    <span className="text-xs text-muted-foreground">
+                      {formatPrice(priceRangeDisplay[0])} –{' '}
+                      {formatPrice(priceRangeDisplay[1])}
+                    </span>
+                  </div>
+                  <Slider
+                    min={100}
+                    max={100000}
+                    step={100}
+                    value={priceRangeDisplay}
+                    onValueChange={(value) =>
+                      setPriceRangeDisplay(value as [number, number])
+                    }
+                    onValueCommit={(value) => setPriceRange(value as [number, number])}
+                  />
+                </div>
+
+                {/* Completion Range */}
+                <div className="min-w-[200px] flex-1 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">Completion</label>
+                    <span className="text-xs text-muted-foreground">
+                      {completionRangeDisplay[0]}% – {completionRangeDisplay[1]}%
+                    </span>
+                  </div>
+                  <Slider
+                    min={50}
+                    max={95}
+                    step={5}
+                    value={completionRangeDisplay}
+                    onValueChange={(value) =>
+                      setCompletionRangeDisplay(value as [number, number])
+                    }
+                    onValueCommit={(value) =>
+                      setCompletionRange(value as [number, number])
+                    }
+                  />
+                </div>
               </div>
 
-              {/* Loading State */}
-              {isLoading && (
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-                  {[...Array(6)].map((_, i) => (
-                    <Card key={i} className="overflow-hidden">
-                      <div className="aspect-video animate-pulse bg-muted" />
-                      <CardContent className="space-y-3 p-6">
-                        <div className="h-6 animate-pulse rounded bg-muted" />
-                        <div className="h-4 animate-pulse rounded bg-muted" />
-                        <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-
-              {/* Error State */}
-              {error && !isLoading && (
-                <Card className="border-destructive p-12 text-center">
-                  <div className="mx-auto max-w-md space-y-4">
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-                      <X className="h-6 w-6 text-destructive" />
-                    </div>
-                    <h3 className="text-lg font-semibold">Failed to load projects</h3>
-                    <p className="text-sm text-muted-foreground">{error}</p>
-                    <Button onClick={() => fetchProjects()}>Try Again</Button>
-                  </div>
-                </Card>
-              )}
-
-              {/* Project Grid */}
-              {!isLoading && !error && projects.length > 0 && (
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-                  {projects.map((project) => (
-                    <ProjectCard key={project.id} project={project} />
-                  ))}
-                </div>
-              )}
-
-              {/* Empty State */}
-              {!isLoading && !error && projects.length === 0 && (
-                <Card className="p-12 text-center">
-                  <div className="mx-auto max-w-md space-y-4">
-                    <Image
-                      src="/images/empty-projects.png"
-                      alt="No projects found"
-                      width={160}
-                      height={160}
-                      className="mx-auto"
-                    />
-                    <h3 className="text-lg font-semibold">No projects found</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Try adjusting your filters or search query to find more results.
-                    </p>
-                    <Button onClick={handleClearFilters}>Clear all filters</Button>
-                  </div>
-                </Card>
-              )}
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    Previous
-                  </Button>
-
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setCurrentPage(page)}
+              {/* Row 2: Tech Stack Badge Pills */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Tech Stack</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {POPULAR_TECH_STACKS.map((tech) => (
+                    <Badge
+                      key={tech}
+                      variant={selectedTechStack.includes(tech) ? 'default' : 'outline'}
+                      className="cursor-pointer"
+                      onClick={() => toggleTechStack(tech)}
                     >
-                      {page}
-                    </Button>
+                      {tech}
+                    </Badge>
                   ))}
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
                 </div>
-              )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Results */}
+        <div className="space-y-6">
+          {/* Results Header */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">{totalResults} projects found</p>
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-muted-foreground">Sort by:</label>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SORT_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
+
+          {/* Loading State */}
+          {isLoading && (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} className="overflow-hidden">
+                  <div className="aspect-video animate-pulse bg-muted" />
+                  <CardContent className="space-y-3 p-6">
+                    <div className="h-6 animate-pulse rounded bg-muted" />
+                    <div className="h-4 animate-pulse rounded bg-muted" />
+                    <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && !isLoading && (
+            <Card className="border-destructive p-12 text-center">
+              <div className="mx-auto max-w-md space-y-4">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
+                  <X className="h-6 w-6 text-destructive" />
+                </div>
+                <h3 className="text-lg font-semibold">Failed to load projects</h3>
+                <p className="text-sm text-muted-foreground">{error}</p>
+                <Button onClick={() => fetchProjects()}>Try Again</Button>
+              </div>
+            </Card>
+          )}
+
+          {/* Project Grid */}
+          {!isLoading && !error && projects.length > 0 && (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {projects.map((project) => (
+                <ProjectCard key={project.id} project={project} />
+              ))}
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!isLoading && !error && projects.length === 0 && (
+            <Card className="p-12 text-center">
+              <div className="mx-auto max-w-md space-y-4">
+                <Image
+                  src="/images/empty-projects.png"
+                  alt="No projects found"
+                  width={160}
+                  height={160}
+                  className="mx-auto"
+                />
+                <h3 className="text-lg font-semibold">No projects found</h3>
+                <p className="text-sm text-muted-foreground">
+                  Try adjusting your filters or search query to find more results.
+                </p>
+                <Button onClick={handleClearFilters}>Clear all filters</Button>
+              </div>
+            </Card>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </Button>
+              ))}
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

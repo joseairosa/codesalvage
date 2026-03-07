@@ -111,20 +111,19 @@ test.describe('Project Search - Filters', () => {
     await expect(page.getByText('Price Range')).toBeVisible();
   });
 
-  test('should toggle filter visibility on desktop', async ({ page }) => {
-    console.log(`[${componentName}] Testing filter toggle`);
+  // The Show/Hide Filters toggle was removed in favour of the always-visible horizontal filter bar.
+  // This test verifies that the filter controls are visible without any user interaction.
+  test('should show horizontal filter bar with all controls visible', async ({
+    page,
+  }) => {
+    console.log(`[${componentName}] Testing horizontal filter bar visibility`);
 
-    // Check if toggle button exists
-    const toggleButton = page.getByRole('button', { name: /hide filters|show filters/i });
+    // Category filter label should be visible immediately — no toggle needed
+    await expect(page.getByText('Category')).toBeVisible();
 
-    if (await toggleButton.isVisible()) {
-      // Click to hide filters
-      await toggleButton.click();
-      await page.waitForTimeout(300);
-
-      // Filters might be hidden or button text changed
-      await expect(toggleButton).toContainText(/show filters/i);
-    }
+    // Price and Completion labels should also be in the filter bar
+    await expect(page.getByText('Price')).toBeVisible();
+    await expect(page.getByText('Completion')).toBeVisible();
   });
 
   // TODO: Fix - category filter interaction doesn't match expected UI
@@ -151,40 +150,44 @@ test.describe('Project Search - Filters', () => {
     await expect(page.getByText('Web App')).toBeVisible();
   });
 
-  // TODO: Fix - tech stack filter interaction doesn't match expected UI
+  // TODO: Fix - tech stack filter interaction selector needs update for horizontal bar
   test.skip('should allow tech stack filter selection', async ({ page }) => {
     console.log(`[${componentName}] Testing tech stack filter`);
 
-    // Click a tech stack badge
-    await page.locator('text=React').first().click();
-    await page.waitForTimeout(300);
-
-    // Apply filters
-    await page.getByRole('button', { name: /apply filters/i }).click();
+    // Click a tech stack badge in the horizontal filter bar
+    await page
+      .locator('[data-slot="badge"]')
+      .filter({ hasText: /^React$/ })
+      .first()
+      .click();
     await page.waitForTimeout(500);
 
-    // Check URL has techStack parameter
+    // URL should auto-sync after clicking (no Apply Filters button)
     expect(page.url()).toContain('techStack=React');
 
     // Active filter badge should be shown
     await expect(page.locator('text=React').first()).toBeVisible();
   });
 
-  // TODO: Fix - tech stack filter interaction doesn't match expected UI
+  // TODO: Fix - tech stack filter interaction selector needs update for horizontal bar
   test.skip('should allow multiple tech stack selections', async ({ page }) => {
     console.log(`[${componentName}] Testing multiple tech stack selection`);
 
-    // Click multiple tech stack badges
-    await page.locator('text=React').first().click();
+    // Click multiple tech stack badges in the horizontal filter bar
+    await page
+      .locator('[data-slot="badge"]')
+      .filter({ hasText: /^React$/ })
+      .first()
+      .click();
     await page.waitForTimeout(200);
-    await page.locator('text=Node.js').first().click();
-    await page.waitForTimeout(200);
-
-    // Apply filters
-    await page.getByRole('button', { name: /apply filters/i }).click();
+    await page
+      .locator('[data-slot="badge"]')
+      .filter({ hasText: /^Node\.js$/ })
+      .first()
+      .click();
     await page.waitForTimeout(500);
 
-    // Both should be in URL
+    // Both should be in URL (auto-synced, no Apply Filters button)
     expect(page.url()).toContain('React');
     expect(page.url()).toContain('Node.js');
   });
@@ -264,8 +267,8 @@ test.describe('Project Search - Sort and Pagination', () => {
     await page.getByText('Price: Low to High', { exact: true }).click();
     await page.waitForTimeout(500);
 
-    // Check URL has sortBy parameter
-    expect(page.url()).toContain('sortBy=price-asc');
+    // Check URL has sortBy parameter (value uses DB field name after Task 1 fix)
+    expect(page.url()).toContain('sortBy=priceCents-asc');
   });
 
   test('should display pagination controls', async ({ page }) => {
