@@ -16,7 +16,10 @@ const {
   MockPermissionError,
 } = vi.hoisted(() => {
   class MockValidationError extends Error {
-    constructor(message: string, public field?: string) {
+    constructor(
+      message: string,
+      public field?: string
+    ) {
       super(message);
       this.name = 'DisputeValidationError';
     }
@@ -106,7 +109,9 @@ describe('POST /api/transactions/[id]/dispute', () => {
     mockAuthenticateApiRequest.mockResolvedValue({ user: { id: 'buyer1' } });
 
     const response = await POST(
-      makePostRequest('tx1', { description: 'This is a long enough description for the test.' }),
+      makePostRequest('tx1', {
+        description: 'This is a long enough description for the test.',
+      }),
       makeParams('tx1')
     );
     const body = await response.json();
@@ -119,7 +124,10 @@ describe('POST /api/transactions/[id]/dispute', () => {
     mockAuthenticateApiRequest.mockResolvedValue({ user: { id: 'buyer1' } });
 
     const response = await POST(
-      makePostRequest('tx1', { reason: 'description_mismatch', description: 'Too short' }),
+      makePostRequest('tx1', {
+        reason: 'description_mismatch',
+        description: 'Too short',
+      }),
       makeParams('tx1')
     );
     const body = await response.json();
@@ -147,7 +155,9 @@ describe('POST /api/transactions/[id]/dispute', () => {
 
   it('returns 403 when service throws DisputePermissionError', async () => {
     mockAuthenticateApiRequest.mockResolvedValue({ user: { id: 'seller1' } });
-    mockOpenDispute.mockRejectedValue(new MockPermissionError('Only the buyer can open a dispute'));
+    mockOpenDispute.mockRejectedValue(
+      new MockPermissionError('Only the buyer can open a dispute')
+    );
 
     const response = await POST(makePostRequest('tx1', validBody), makeParams('tx1'));
     const body = await response.json();
@@ -221,7 +231,9 @@ describe('GET /api/transactions/[id]/dispute', () => {
 
   it('returns 403 when service throws DisputePermissionError', async () => {
     mockAuthenticateApiRequest.mockResolvedValue({ user: { id: 'random-user' } });
-    mockGetDisputeForTransaction.mockRejectedValue(new MockPermissionError('Access denied'));
+    mockGetDisputeForTransaction.mockRejectedValue(
+      new MockPermissionError('Access denied')
+    );
 
     const response = await GET(makeGetRequest('tx1'), makeParams('tx1'));
     const body = await response.json();

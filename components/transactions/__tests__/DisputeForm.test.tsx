@@ -134,9 +134,7 @@ describe('DisputeForm', () => {
     await userEvent.click(screen.getByRole('button', { name: /submit dispute/i }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/dispute filed/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/dispute filed/i)).toBeInTheDocument();
     });
   });
 

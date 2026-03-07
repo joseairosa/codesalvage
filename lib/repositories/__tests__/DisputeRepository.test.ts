@@ -92,7 +92,12 @@ describe('DisputeRepository', () => {
         resolvedAt: new Date(),
       } as any);
 
-      await repo.updateStatus('ulid123', 'resolved_refund', 'Full refund approved', 'admin1');
+      await repo.updateStatus(
+        'ulid123',
+        'resolved_refund',
+        'Full refund approved',
+        'admin1'
+      );
 
       expect(mockPrismaClient.dispute.update).toHaveBeenCalledWith(
         expect.objectContaining({

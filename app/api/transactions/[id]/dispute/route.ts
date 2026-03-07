@@ -10,7 +10,11 @@ import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { DisputeRepository } from '@/lib/repositories/DisputeRepository';
 import { TransactionRepository } from '@/lib/repositories/TransactionRepository';
-import { DisputeService, DisputeValidationError, DisputePermissionError } from '@/lib/services/DisputeService';
+import {
+  DisputeService,
+  DisputeValidationError,
+  DisputePermissionError,
+} from '@/lib/services/DisputeService';
 import { z } from 'zod';
 
 const disputeRepository = new DisputeRepository(prisma);

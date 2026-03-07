@@ -3,7 +3,11 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { DisputeService, DisputeValidationError, DisputePermissionError } from '../DisputeService';
+import {
+  DisputeService,
+  DisputeValidationError,
+  DisputePermissionError,
+} from '../DisputeService';
 
 const mockDisputeRepo = {
   create: vi.fn(),
@@ -54,14 +58,22 @@ describe('DisputeService', () => {
       );
 
       expect(result.id).toBe('dispute1');
-      expect(mockTransactionRepo.updateEscrowStatus).toHaveBeenCalledWith('tx1', 'disputed');
+      expect(mockTransactionRepo.updateEscrowStatus).toHaveBeenCalledWith(
+        'tx1',
+        'disputed'
+      );
     });
 
     it('should throw DisputePermissionError if caller is not the buyer', async () => {
       mockTransactionRepo.findById.mockResolvedValue(mockTransaction);
 
       await expect(
-        service.openDispute('seller1', 'tx1', 'description_mismatch', 'This is a long enough description here.')
+        service.openDispute(
+          'seller1',
+          'tx1',
+          'description_mismatch',
+          'This is a long enough description here.'
+        )
       ).rejects.toThrow(DisputePermissionError);
     });
 
@@ -72,7 +84,12 @@ describe('DisputeService', () => {
       });
 
       await expect(
-        service.openDispute('buyer1', 'tx1', 'description_mismatch', 'This is a long enough description here.')
+        service.openDispute(
+          'buyer1',
+          'tx1',
+          'description_mismatch',
+          'This is a long enough description here.'
+        )
       ).rejects.toThrow(DisputeValidationError);
     });
 
@@ -83,7 +100,12 @@ describe('DisputeService', () => {
       });
 
       await expect(
-        service.openDispute('buyer1', 'tx1', 'description_mismatch', 'This is a long enough description here.')
+        service.openDispute(
+          'buyer1',
+          'tx1',
+          'description_mismatch',
+          'This is a long enough description here.'
+        )
       ).rejects.toThrow(DisputeValidationError);
     });
 
@@ -92,7 +114,12 @@ describe('DisputeService', () => {
       mockDisputeRepo.findByTransactionId.mockResolvedValue({ id: 'existing-dispute' });
 
       await expect(
-        service.openDispute('buyer1', 'tx1', 'description_mismatch', 'This is a long enough description here.')
+        service.openDispute(
+          'buyer1',
+          'tx1',
+          'description_mismatch',
+          'This is a long enough description here.'
+        )
       ).rejects.toThrow(DisputeValidationError);
     });
 
@@ -101,7 +128,12 @@ describe('DisputeService', () => {
       mockDisputeRepo.findByTransactionId.mockResolvedValue(null);
 
       await expect(
-        service.openDispute('buyer1', 'tx1', 'invalid_reason', 'This is a long enough description here.')
+        service.openDispute(
+          'buyer1',
+          'tx1',
+          'invalid_reason',
+          'This is a long enough description here.'
+        )
       ).rejects.toThrow(DisputeValidationError);
     });
 
@@ -118,7 +150,10 @@ describe('DisputeService', () => {
   describe('getDisputeForTransaction', () => {
     it('should return dispute for buyer', async () => {
       mockTransactionRepo.findById.mockResolvedValue(mockTransaction);
-      mockDisputeRepo.findByTransactionId.mockResolvedValue({ id: 'dispute1', status: 'pending' });
+      mockDisputeRepo.findByTransactionId.mockResolvedValue({
+        id: 'dispute1',
+        status: 'pending',
+      });
 
       const result = await service.getDisputeForTransaction('buyer1', 'tx1');
       expect(result?.id).toBe('dispute1');
@@ -126,7 +161,10 @@ describe('DisputeService', () => {
 
     it('should return dispute for seller too', async () => {
       mockTransactionRepo.findById.mockResolvedValue(mockTransaction);
-      mockDisputeRepo.findByTransactionId.mockResolvedValue({ id: 'dispute1', status: 'pending' });
+      mockDisputeRepo.findByTransactionId.mockResolvedValue({
+        id: 'dispute1',
+        status: 'pending',
+      });
 
       const result = await service.getDisputeForTransaction('seller1', 'tx1');
       expect(result?.id).toBe('dispute1');

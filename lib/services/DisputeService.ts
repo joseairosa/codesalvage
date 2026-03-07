@@ -122,8 +122,7 @@ export class DisputeService {
     const transaction = await this.transactionRepository.findById(transactionId);
     if (!transaction) return null;
 
-    const isParty =
-      transaction.buyerId === userId || transaction.sellerId === userId;
+    const isParty = transaction.buyerId === userId || transaction.sellerId === userId;
     if (!isParty) {
       throw new DisputePermissionError('Access denied');
     }
