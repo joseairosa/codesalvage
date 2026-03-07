@@ -12,12 +12,11 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
-// Use process.env directly so Next.js static analysis can inline this at build time.
-// Accessing via the env module prevents the SWC transform from replacing the value.
-const APP_URL = process.env['NEXT_PUBLIC_APP_URL'] || 'https://codesalvage.com';
+const SITE_URL = 'https://codesalvage.com';
+const OG_IMAGE_URL = 'https://codesalvage.com/images/opengraph-image.png';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(APP_URL),
+  metadataBase: new URL(SITE_URL),
   title: 'CodeSalvage - Marketplace for Incomplete Software Projects',
   description:
     'Buy and sell incomplete software projects. Turn your 80% complete side project into revenue.',
@@ -32,14 +31,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: APP_URL,
+    url: SITE_URL,
     title: 'CodeSalvage - Marketplace for Incomplete Software Projects',
     description:
       'Buy and sell incomplete software projects. Turn your 80% complete side project into revenue.',
     siteName: 'CodeSalvage',
     images: [
       {
-        url: `${APP_URL}/images/opengraph-image.png`,
+        url: OG_IMAGE_URL,
         width: 1200,
         height: 630,
         alt: 'CodeSalvage - Marketplace for Incomplete Software Projects',
@@ -51,7 +50,7 @@ export const metadata: Metadata = {
     title: 'CodeSalvage - Marketplace for Incomplete Software Projects',
     description:
       'Buy and sell incomplete software projects. Turn your 80% complete side project into revenue.',
-    images: [`${APP_URL}/images/opengraph-image.png`],
+    images: [OG_IMAGE_URL],
   },
   robots: {
     index: true,
