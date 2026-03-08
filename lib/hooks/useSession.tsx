@@ -33,6 +33,7 @@ interface SessionUser {
   id: string;
   email: string;
   name?: string;
+  image?: string | null;
   username: string;
   githubUsername: string | null;
   isSeller: boolean;
@@ -54,12 +55,14 @@ interface AuthContextValue {
   data: Session | null;
   status: SessionStatus;
   signOut: () => Promise<void>;
+  refreshSession: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
   data: null,
   status: 'loading',
   signOut: async () => {},
+  refreshSession: async () => {},
 });
 
 /**
@@ -78,7 +81,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch('/api/auth/me');
       if (!res.ok) return null;
       const data = await res.json();
-      return data.user || null;
+      if (!data.user) return null;
+      return {
+        ...data.user,
+        image: data.user.avatarUrl ?? null,
+      };
     } catch {
       console.error('[AuthProvider] Failed to fetch user data');
       return null;
@@ -159,6 +166,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [fetchUserData, updateSession]);
 
+  const refreshSession = useCallback(async () => {
+    const userData = await fetchUserData();
+    if (!userData) {
+      console.warn(
+        '[AuthProvider] refreshSession: failed to fetch user data, session unchanged'
+      );
+      return;
+    }
+    updateSession({
+      user: {
+        ...userData,
+        name: sessionRef.current?.user.name ?? userData.email,
+      },
+    });
+  }, [fetchUserData, updateSession]);
+
   const signOut = async () => {
     console.log('[AuthProvider] Sign out requested');
     try {
@@ -174,7 +197,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ data: session, status, signOut }}>
+    <AuthContext.Provider value={{ data: session, status, signOut, refreshSession }}>
       {children}
     </AuthContext.Provider>
   );

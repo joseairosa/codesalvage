@@ -28,6 +28,7 @@ export interface AuthResult {
     isSeller: boolean;
     isVerifiedSeller: boolean;
     isBanned: boolean;
+    avatarUrl?: string | null;
   };
   firebaseUid?: string;
   apiKeyId?: string;
@@ -84,6 +85,7 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
     isSeller: true,
     isVerifiedSeller: true,
     isBanned: true,
+    avatarUrl: true,
   } as const;
 
   try {
@@ -191,6 +193,7 @@ export async function verifyApiKey(key: string): Promise<AuthResult> {
           isSeller: true,
           isVerifiedSeller: true,
           isBanned: true,
+          avatarUrl: true,
         },
       },
     },

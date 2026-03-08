@@ -10,9 +10,21 @@ import { AvatarUpload } from '../AvatarUpload';
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
+const mockRefreshSession = vi.fn();
+
+vi.mock('@/lib/hooks/useSession', () => ({
+  useSession: vi.fn(() => ({
+    data: null,
+    status: 'unauthenticated',
+    signOut: vi.fn(),
+    refreshSession: mockRefreshSession,
+  })),
+}));
+
 describe('AvatarUpload', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockRefreshSession.mockResolvedValue(undefined);
   });
 
   describe('initial render', () => {
@@ -57,16 +69,16 @@ describe('AvatarUpload', () => {
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
-    it('shows error for file exceeding 5MB', async () => {
+    it('shows error for file exceeding 2MB', async () => {
       render(<AvatarUpload currentAvatarUrl={null} userInitials="JD" />);
 
       const input = document.querySelector('input[type="file"]') as HTMLInputElement;
-      const largeContent = new Uint8Array(6 * 1024 * 1024); // 6MB
+      const largeContent = new Uint8Array(3 * 1024 * 1024); // 3MB — over the 2MB limit
       const file = new File([largeContent], 'big.png', { type: 'image/png' });
       fireEvent.change(input, { target: { files: [file] } });
 
       await waitFor(() => {
-        expect(screen.getByText(/smaller than 5mb/i)).toBeInTheDocument();
+        expect(screen.getByText(/smaller than 2mb/i)).toBeInTheDocument();
       });
       expect(mockFetch).not.toHaveBeenCalled();
     });
@@ -104,9 +116,64 @@ describe('AvatarUpload', () => {
         expect(img).toHaveAttribute('src', newAvatarUrl);
       });
     });
+
+    it('calls refreshSession after successful upload', async () => {
+      const newAvatarUrl = 'https://r2.example.com/new-avatar.png';
+
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            uploadUrl: 'https://r2.upload.com/presign',
+            publicUrl: newAvatarUrl,
+          }),
+        })
+        .mockResolvedValueOnce({ ok: true })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ avatarUrl: newAvatarUrl }),
+        });
+
+      render(<AvatarUpload currentAvatarUrl={null} userInitials="JD" />);
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+      const file = new File(['img'], 'avatar.png', { type: 'image/png' });
+      fireEvent.change(input, { target: { files: [file] } });
+
+      await waitFor(() => {
+        expect(mockRefreshSession).toHaveBeenCalledTimes(1);
+      });
+    });
   });
 
   describe('upload error handling', () => {
+    it('does not call refreshSession when save to DB fails', async () => {
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            uploadUrl: 'https://r2.upload.com/presign',
+            publicUrl: 'https://r2.example.com/avatar.png',
+          }),
+        })
+        .mockResolvedValueOnce({ ok: true }) // R2 PUT succeeds
+        .mockResolvedValueOnce({
+          ok: false,
+          json: async () => ({ error: 'Failed to save avatar' }),
+        }); // PATCH /api/user/avatar fails
+
+      render(<AvatarUpload currentAvatarUrl={null} userInitials="JD" />);
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+      const file = new File(['img'], 'avatar.png', { type: 'image/png' });
+      fireEvent.change(input, { target: { files: [file] } });
+
+      await waitFor(() => {
+        expect(screen.getByText(/failed to save avatar/i)).toBeInTheDocument();
+      });
+      expect(mockRefreshSession).not.toHaveBeenCalled();
+    });
+
     it('shows error when presign request fails', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,

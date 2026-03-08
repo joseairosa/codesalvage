@@ -174,4 +174,83 @@ describe('useSession', () => {
     expect(screen.getByTestId('status').textContent).toBe('loading');
     expect(screen.getByTestId('data').textContent).toBe('no-data');
   });
+
+  it('should expose refreshSession as a callable function', () => {
+    function Consumer() {
+      const { refreshSession } = useSession();
+      return (
+        <span data-testid="has-refresh">
+          {typeof refreshSession === 'function' ? 'yes' : 'no'}
+        </span>
+      );
+    }
+
+    render(<Consumer />);
+    expect(screen.getByTestId('has-refresh').textContent).toBe('yes');
+  });
+});
+
+describe('refreshSession behavior', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockFirebaseAuth = null;
+  });
+
+  it('should fetch user data and update session.user.image from avatarUrl', async () => {
+    // Start unauthenticated (Firebase not configured)
+    mockFirebaseAuth = null;
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        user: {
+          id: 'u1',
+          email: 'a@b.com',
+          username: 'ab',
+          githubUsername: null,
+          isSeller: false,
+          isVerifiedSeller: false,
+          isAdmin: false,
+          isBanned: false,
+          avatarUrl: 'https://r2.example.com/avatar.png',
+        },
+      }),
+    });
+    global.fetch = mockFetch;
+
+    let refreshFn: (() => Promise<void>) | undefined;
+
+    function Consumer() {
+      const { data, status, refreshSession } = useSession();
+      refreshFn = refreshSession;
+      return (
+        <div>
+          <span data-testid="image">{data?.user?.image ?? 'none'}</span>
+          <span data-testid="status">{status}</span>
+        </div>
+      );
+    }
+
+    render(
+      <AuthProvider>
+        <Consumer />
+      </AuthProvider>
+    );
+
+    // Wait for initial unauthenticated state
+    await waitFor(() => {
+      expect(screen.getByTestId('status').textContent).toBe('unauthenticated');
+    });
+    expect(screen.getByTestId('image').textContent).toBe('none');
+
+    // Trigger session refresh — should fetch /api/auth/me and update session
+    await act(async () => {
+      await refreshFn!();
+    });
+
+    // image should be populated from avatarUrl returned by /api/auth/me
+    expect(screen.getByTestId('image').textContent).toBe(
+      'https://r2.example.com/avatar.png'
+    );
+  });
 });
