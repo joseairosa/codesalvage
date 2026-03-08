@@ -18,33 +18,42 @@ import type { OnboardingStep } from '@/components/onboarding/OnboardingChecklist
 export default async function DashboardPage() {
   const session = await requireAuth();
 
-  const [projectCount, messageCount, transactionCount, buyerPurchaseCount, user] =
-    await Promise.all([
-      prisma.project.count({ where: { sellerId: session.user.id } }),
-      prisma.message.count({
-        where: {
-          OR: [{ senderId: session.user.id }, { recipientId: session.user.id }],
-        },
-      }),
-      prisma.transaction.count({
-        where: {
-          OR: [{ buyerId: session.user.id }, { sellerId: session.user.id }],
-        },
-      }),
-      prisma.transaction.count({
-        where: { buyerId: session.user.id, paymentStatus: 'succeeded' },
-      }),
-      prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: {
-          createdAt: true,
-          stripeAccountId: true,
-          isVerifiedSeller: true,
-          bio: true,
-          onboardingDismissedAt: true,
-        },
-      }),
-    ]);
+  const [
+    projectCount,
+    messageCount,
+    transactionCount,
+    buyerPurchaseCount,
+    user,
+    favoriteCount,
+    sentMessageCount,
+  ] = await Promise.all([
+    prisma.project.count({ where: { sellerId: session.user.id } }),
+    prisma.message.count({
+      where: {
+        OR: [{ senderId: session.user.id }, { recipientId: session.user.id }],
+      },
+    }),
+    prisma.transaction.count({
+      where: {
+        OR: [{ buyerId: session.user.id }, { sellerId: session.user.id }],
+      },
+    }),
+    prisma.transaction.count({
+      where: { buyerId: session.user.id, paymentStatus: 'succeeded' },
+    }),
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        createdAt: true,
+        stripeAccountId: true,
+        isVerifiedSeller: true,
+        bio: true,
+        onboardingDismissedAt: true,
+      },
+    }),
+    prisma.favorite.count({ where: { userId: session.user.id } }),
+    prisma.message.count({ where: { senderId: session.user.id } }),
+  ]);
 
   let isVerifiedSeller = session.user.isVerifiedSeller;
   let onboardingStatus: {
@@ -95,6 +104,13 @@ export default async function DashboardPage() {
           done: projectCount > 0,
           href: '/projects/new',
         },
+        {
+          id: 'message',
+          label: 'Send your first message',
+          description: 'Reach out to a buyer to start a conversation.',
+          done: sentMessageCount > 0,
+          href: '/messages',
+        },
       ]
     : [
         {
@@ -103,6 +119,13 @@ export default async function DashboardPage() {
           description: 'Add a bio so sellers know who you are.',
           done: profileDone,
           href: '/settings',
+        },
+        {
+          id: 'favorite',
+          label: 'Favorite a project',
+          description: 'Save a project you like to revisit it later.',
+          done: favoriteCount > 0,
+          href: '/projects',
         },
         {
           id: 'purchase',
