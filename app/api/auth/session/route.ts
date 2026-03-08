@@ -15,6 +15,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyFirebaseToken } from '@/lib/firebase-auth';
+import { getAuth } from '@/lib/firebase-admin';
 
 /**
  * POST /api/auth/session
@@ -36,12 +37,21 @@ export async function POST(request: NextRequest) {
 
     console.log('[Session API] Verifying Firebase token');
 
+    // Verify ID token (also auto-creates/links user in DB on first sign-in)
     await verifyFirebaseToken(idToken);
 
-    console.log('[Session API] Token verified, storing in cookie');
+    console.log('[Session API] Token verified, creating Firebase session cookie');
+
+    // Exchange short-lived ID token (1hr) for a proper 7-day session cookie
+    const SESSION_DURATION_MS = 60 * 60 * 24 * 7 * 1000; // 7 days in ms
+    const sessionCookie = await getAuth().createSessionCookie(idToken, {
+      expiresIn: SESSION_DURATION_MS,
+    });
+
+    console.log('[Session API] Session cookie created, storing in cookie');
 
     const cookieStore = await cookies();
-    cookieStore.set('session', idToken, {
+    cookieStore.set('session', sessionCookie, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -62,11 +72,9 @@ export async function POST(request: NextRequest) {
       errorMessage.includes('No credentials');
     const statusCode = isConfigError ? 500 : 401;
 
+    console.error('[Session API] Auth error:', errorMessage);
     return NextResponse.json(
-      {
-        error: isConfigError ? 'Server configuration error' : 'Invalid token',
-        details: errorMessage,
-      },
+      { error: isConfigError ? 'Server configuration error' : 'Invalid token' },
       { status: statusCode }
     );
   }

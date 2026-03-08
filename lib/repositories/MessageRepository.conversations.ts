@@ -32,78 +32,97 @@ export async function getConversations(
       distinct: ['senderId', 'projectId'],
     });
 
-    const conversationPartnerIds = new Set<string>();
-    sentMessages.forEach((msg) => conversationPartnerIds.add(msg.recipientId));
-    receivedMessages.forEach((msg) => conversationPartnerIds.add(msg.senderId));
+    const partnerIds = new Set<string>();
+    sentMessages.forEach((msg) => partnerIds.add(msg.recipientId));
+    receivedMessages.forEach((msg) => partnerIds.add(msg.senderId));
 
-    const conversations = await Promise.all(
-      Array.from(conversationPartnerIds).map(async (partnerId) => {
-        const latestMessage = await prisma.message.findFirst({
-          where: {
-            OR: [
-              { senderId: userId, recipientId: partnerId },
-              { senderId: partnerId, recipientId: userId },
-            ],
-            ...(projectId && { projectId }),
+    if (partnerIds.size === 0) {
+      return [];
+    }
+
+    const partnerIdsArray = Array.from(partnerIds);
+
+    // Batch-load all messages between userId and all partners in one query (ordered newest first)
+    const allMessages = await prisma.message.findMany({
+      where: {
+        OR: [
+          { senderId: userId, recipientId: { in: partnerIdsArray } },
+          { senderId: { in: partnerIdsArray }, recipientId: userId },
+        ],
+        ...(projectId && { projectId }),
+      },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        sender: {
+          select: { id: true, username: true, fullName: true, avatarUrl: true },
+        },
+        recipient: {
+          select: {
+            id: true,
+            username: true,
+            fullName: true,
+            avatarUrl: true,
+            email: true,
           },
-          orderBy: { createdAt: 'desc' },
-          include: {
-            sender: {
-              select: { id: true, username: true, fullName: true, avatarUrl: true },
-            },
-            recipient: {
-              select: {
-                id: true,
-                username: true,
-                fullName: true,
-                avatarUrl: true,
-                email: true,
-              },
-            },
-            project: {
-              select: { id: true, title: true, thumbnailImageUrl: true },
-            },
-          },
-        });
+        },
+        project: {
+          select: { id: true, title: true, thumbnailImageUrl: true },
+        },
+      },
+    });
 
-        if (!latestMessage) return null;
+    // Group by partner — first occurrence per partner is the latest (sorted desc above)
+    const latestByPartner = new Map<string, (typeof allMessages)[0]>();
+    for (const message of allMessages) {
+      const partnerId =
+        message.senderId === userId ? message.recipientId : message.senderId;
+      if (!latestByPartner.has(partnerId)) {
+        latestByPartner.set(partnerId, message);
+      }
+    }
 
-        const unreadCount = await prisma.message.count({
-          where: {
-            senderId: partnerId,
-            recipientId: userId,
-            isRead: false,
-            ...(projectId && { projectId }),
-          },
-        });
+    // Batch-load all unread counts with a single groupBy (instead of N count queries)
+    const unreadGroups = await prisma.message.groupBy({
+      by: ['senderId'],
+      where: {
+        senderId: { in: partnerIdsArray },
+        recipientId: userId,
+        isRead: false,
+        ...(projectId && { projectId }),
+      },
+      _count: { id: true },
+    });
 
-        const partner =
-          latestMessage.senderId === userId
-            ? latestMessage.recipient
-            : latestMessage.sender;
-
-        return {
-          partnerId: partner.id,
-          partner,
-          latestMessage: {
-            id: latestMessage.id,
-            content: latestMessage.content,
-            createdAt: latestMessage.createdAt,
-            isRead: latestMessage.isRead,
-            senderId: latestMessage.senderId,
-          },
-          project: latestMessage.project,
-          unreadCount,
-        };
-      })
+    const unreadByPartner = new Map<string, number>(
+      unreadGroups.map((g) => [g.senderId, g._count.id])
     );
 
-    const validConversations = conversations
-      .filter((c) => c !== null)
-      .sort(
-        (a, b) =>
-          b!.latestMessage.createdAt.getTime() - a!.latestMessage.createdAt.getTime()
-      ) as ConversationSummary[];
+    const conversations: ConversationSummary[] = Array.from(
+      latestByPartner.entries()
+    ).map(([partnerId, latestMessage]) => {
+      const partner =
+        latestMessage.senderId === userId
+          ? latestMessage.recipient
+          : latestMessage.sender;
+
+      return {
+        partnerId: partner.id,
+        partner,
+        latestMessage: {
+          id: latestMessage.id,
+          content: latestMessage.content,
+          createdAt: latestMessage.createdAt,
+          isRead: latestMessage.isRead,
+          senderId: latestMessage.senderId,
+        },
+        project: latestMessage.project,
+        unreadCount: unreadByPartner.get(partnerId) ?? 0,
+      };
+    });
+
+    const validConversations = conversations.sort(
+      (a, b) => b.latestMessage.createdAt.getTime() - a.latestMessage.createdAt.getTime()
+    );
 
     console.log('[MessageRepository] Found', validConversations.length, 'conversations');
     return validConversations;

@@ -156,6 +156,18 @@ const nextConfig: NextConfig = {
             key: 'Strict-Transport-Security',
             value: 'max-age=31536000; includeSubDomains',
           },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https: blob:",
+              "connect-src 'self' https://api.stripe.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
+              'frame-src https://js.stripe.com https://hooks.stripe.com',
+              "font-src 'self' data:",
+            ].join('; '),
+          },
         ],
       },
     ];

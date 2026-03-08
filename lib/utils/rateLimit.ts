@@ -306,9 +306,10 @@ export const RateLimitPresets = {
 export function getClientIP(request: NextRequest): string {
   const forwardedFor = request.headers.get('x-forwarded-for');
   if (forwardedFor) {
-    const firstIP = forwardedFor.split(',')[0];
-    if (firstIP) {
-      return firstIP.trim();
+    const ips = forwardedFor.split(',');
+    const trustedIP = ips[ips.length - 1];
+    if (trustedIP) {
+      return trustedIP.trim();
     }
   }
 
