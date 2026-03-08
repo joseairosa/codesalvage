@@ -27,7 +27,11 @@
  */
 
 import { cookies } from 'next/headers';
-import { verifyFirebaseToken, verifyAuth, type AuthResult } from './firebase-auth';
+import {
+  verifyFirebaseSessionCookie,
+  verifyAuth,
+  type AuthResult,
+} from './firebase-auth';
 
 /**
  * Authenticate API request using cookies OR Authorization header
@@ -50,7 +54,7 @@ export async function authenticateApiRequest(
 
     if (sessionToken) {
       console.log('[API Auth] Found session token in cookie, verifying');
-      const auth = await verifyFirebaseToken(sessionToken);
+      const auth = await verifyFirebaseSessionCookie(sessionToken);
       console.log('[API Auth] Cookie auth successful for user:', auth.user.id);
       return auth;
     }

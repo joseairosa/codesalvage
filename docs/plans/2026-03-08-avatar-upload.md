@@ -9,196 +9,157 @@ Type: Feature
 
 ## Summary
 
-**Goal:** Complete avatar upload feature — upload infrastructure is already built (AvatarUpload component, PATCH /api/user/avatar, R2Service, avatarUrl in schema). What remains is wiring avatarUrl into the session data source, updating client-side file size limit to 2MB, and refreshing the session after upload so the nav bar updates immediately.
-**Architecture:** Existing 3-layer pattern (Route -> Service -> Repository). R2 presigned URL upload flow already complete.
-**Tech Stack:** Next.js 15, Cloudflare R2, Firebase auth, Shadcn Avatar
+**Goal:** Wire up the avatar upload feature end-to-end by fixing two auth utilities broken by the recent session-cookie security fix, and adding the R2 domain to the CSP so browser uploads aren't blocked.
+
+**Architecture:** The UI component (`AvatarUpload`), API routes (`/api/upload`, `/api/user/avatar`), and Prisma schema field (`avatarUrl`) are already fully implemented. The upload flow is: client → presigned URL from `/api/upload` → PUT directly to R2 → PATCH `/api/user/avatar` with the public URL. The two auth utilities that power steps 1 and 3 call `verifyIdToken()` but the session cookie is now a Firebase Admin session cookie (after security fix #7), which requires `verifySessionCookie()`. Additionally the CSP `connect-src` doesn't include the R2 endpoint domain, so the browser blocks the presigned PUT.
+
+**Tech Stack:** Next.js 15, Firebase Admin SDK, Cloudflare R2, Prisma, Vitest
 
 ## Scope
 
 ### In Scope
 
-- Wire `avatarUrl` into `/api/auth/me` response, `verifyFirebaseToken` DB query, and `SessionUser` interface
-- Update `AvatarUpload` client-side size limit from 5MB to 2MB
-- Add session refresh after successful avatar upload so nav bar updates without page reload
-- Unit tests for all changes
+- Fix `lib/api-auth.ts` cookie path: `verifyFirebaseToken` → `verifyFirebaseSessionCookie`
+- Fix `app/api/auth/me/route.ts`: `verifyFirebaseToken` → `verifyFirebaseSessionCookie`
+- Fix `next.config.ts` CSP: add `https://*.r2.cloudflarestorage.com` to `connect-src`
+- Update unit tests for both files
 
 ### Out of Scope
 
-- Server-side image resizing (defer — client uploads directly to R2)
-- Avatar deletion/reset to default
-- Gravatar fallback
-- Messaging UI changes (already fully wired with `avatarUrl`)
+- Rate limiting on avatar endpoint (deferred)
+- Client-side crop UI (current "pick file" UX is sufficient)
+- Avatar deletion
+- R2 URL validation on `PATCH /api/user/avatar` (currently accepts any valid URL as `avatarUrl`; a future hardening task should restrict to the project's own R2 public base URL)
 
 ## Context for Implementer
 
-**Patterns to follow:**
+> The avatar upload feature is 90% done. All the UI and API are wired up. The only problems are in the auth layer and CSP.
 
-- `components/projects/ProjectCard.tsx:246` — uses `<AvatarImage src={project.seller.avatarUrl || undefined}>` pattern
-- `app/u/[username]/page.tsx:191` — seller profile uses same pattern
-- `components/reviews/ReviewsList.tsx:211-212` — reviews use `review.buyer.avatarUrl`
+- **Root cause:** Security fix #7 (PR #82, 2026-03-08) changed `POST /api/auth/session` to store a Firebase Admin session cookie (via `admin.auth().createSessionCookie()`) instead of the raw ID token. `auth-helpers.ts` was updated to use `verifyFirebaseSessionCookie`, but two other places that also read the `session` cookie were missed: `lib/api-auth.ts` (used by all API routes) and `app/api/auth/me/route.ts` (used by `refreshSession()` after upload).
+- **Pattern to follow:** `lib/auth-helpers.ts:53,63,113,170` — all use `verifyFirebaseSessionCookie(sessionToken)`. Mirror this exact pattern.
+- **`verifyFirebaseSessionCookie`** is exported from `lib/firebase-auth.ts:184`. It calls `authInstance.verifySessionCookie(cookie, true /* checkRevoked */)`.
+- **CSP location:** `next.config.ts` in the `headers()` function, the `Content-Security-Policy` value string. The upload goes via a presigned S3-compatible URL to Cloudflare's R2 endpoint (`https://<account-id>.r2.cloudflarestorage.com`). The wildcard `https://*.r2.cloudflarestorage.com` covers all account IDs.
+- **Key files:**
+  - `lib/firebase-auth.ts` — `verifyFirebaseSessionCookie` (line 184), `verifyFirebaseToken` (line 52)
+  - `lib/api-auth.ts` — `authenticateApiRequest` reads `session` cookie (line 49-56)
+  - `app/api/auth/me/route.ts` — direct call to `verifyFirebaseToken` (line 22)
+  - `next.config.ts` — `Content-Security-Policy` header (line ~162)
+  - `lib/services/R2Service.ts` — `getUploadUrl` returns a presigned URL pointing at `env.R2_ENDPOINT`
+- **Gotcha:** The Authorization header path in `api-auth.ts` calls `verifyAuth` → `verifyFirebaseToken`. This path handles programmatic API key/ID token access and must NOT be changed — ID tokens are still valid for the Authorization header. Only the cookie path changes.
+- **Test files:**
+  - `lib/__tests__/api-auth.test.ts` — does NOT exist yet; must be created
+  - `app/api/auth/me/__tests__/route.test.ts` — EXISTS; mock key `verifyFirebaseToken` on line 20 must be renamed to `verifyFirebaseSessionCookie`
 
-**Key files already built:**
+## Runtime Environment
 
-- `components/settings/AvatarUpload.tsx` — full upload component (presigned URL -> R2 -> PATCH /api/user/avatar)
-- `app/api/user/avatar/route.ts` — PATCH endpoint saves avatarUrl to DB
-- `app/settings/page.tsx` — settings page already renders AvatarUpload
-- `components/layout/UserMenu.tsx:82` — uses `user.image` from session (KEY GAP: `image` is always undefined)
-- `components/layout/MobileMenu.tsx` — may also need avatar wiring
-
-**Session data flow (critical path):**
-
-1. `lib/firebase-auth.ts` `verifyFirebaseToken` — queries DB user, builds auth object (currently MISSING `avatarUrl`)
-2. `app/api/auth/me/route.ts` — returns session user object (currently MISSING `avatarUrl`)
-3. `lib/hooks/useSession.tsx` — `SessionUser` interface (currently has NO `image` or `avatarUrl` field)
-4. `components/layout/NavigationAuthArea.tsx` → passes `session.user` to `UserMenu`/`MobileMenu`
-5. `UserMenu` reads `user.image` → always `undefined` → always shows initials fallback
-
-**Gotchas:**
-
-- `UserMenu` uses `user.image` (line 82) but the DB field is `avatarUrl`. Must map through the entire session chain.
-- After upload, `AvatarUpload` updates local state but does NOT refresh the session context. Nav bar won't update until page reload.
-- Messaging UI (`app/messages/[userId]/page.tsx`) already renders `avatarUrl` — no changes needed there.
+- **Start:** `npm run docker:dev` (app on port 3011)
+- **Health:** `curl http://localhost:3011/api/ping`
+- **Settings page:** `http://localhost:3011/settings` (requires auth)
 
 ## Progress Tracking
 
-- [x] Task 1: Wire avatarUrl through session chain to nav bar
-- [x] Task 2: Update size limit + add session refresh after upload
-- [x] Task 3: Tests
-      **Total Tasks:** 3 | **Completed:** 3 | **Remaining:** 0
+- [x] Task 1: Fix cookie auth in `api-auth.ts` and `me` route
+- [x] Task 2: Fix CSP to allow R2 presigned uploads
+
+**Total Tasks:** 2 | **Completed:** 2 | **Remaining:** 0
 
 ## Implementation Tasks
 
-### Task 1: Wire avatarUrl through session chain to nav bar
+### Task 1: Fix cookie-based session verification in auth utilities
 
-**Objective:** Add `avatarUrl` to every layer of the session data flow so UserMenu and MobileMenu display the user's avatar.
+**Objective:** Change `api-auth.ts` and `me/route.ts` to call `verifyFirebaseSessionCookie` for cookie-based auth, so that `/api/upload` and `/api/user/avatar` work correctly after the security fix that switched session cookies to Firebase Admin session cookie format.
 
 **Dependencies:** None
 
 **Files:**
 
-- Modify: `lib/firebase-auth.ts` — add `avatarUrl` to the Prisma select in `verifyFirebaseToken`
-- Modify: `app/api/auth/me/route.ts` — include `avatarUrl` in the response object
-- Modify: `lib/hooks/useSession.tsx` — add `image?: string | null` to `SessionUser` interface, map from `avatarUrl`
-- Inspect: `components/layout/MobileMenu.tsx` — check if it shows avatar, add if missing
+- Modify: `lib/api-auth.ts`
+- Modify: `app/api/auth/me/route.ts`
+- Create: `lib/__tests__/api-auth.test.ts` (no test file exists; must be created)
+- Modify: `app/api/auth/me/__tests__/route.test.ts` (rename mock)
 
 **Key Decisions / Notes:**
 
-- The session chain is: `verifyFirebaseToken` DB query -> `/api/auth/me` response -> `SessionUser` interface -> UserMenu/MobileMenu
-- Map DB `avatarUrl` to `image` in the `SessionUser` so `UserMenu`'s existing `user.image` works
-- Check MobileMenu.tsx for avatar display, wire if needed
+- In `lib/api-auth.ts` line 30: add `verifyFirebaseSessionCookie` to the import alongside `verifyAuth`; remove `verifyFirebaseToken` from the import (it's no longer needed in this file). Change line 53: `verifyFirebaseToken(sessionToken)` → `verifyFirebaseSessionCookie(sessionToken)`.
+- In `app/api/auth/me/route.ts`: change the import and the single call on line 22 from `verifyFirebaseToken` → `verifyFirebaseSessionCookie`.
+- **Do NOT change** the Authorization header path in `api-auth.ts` — it calls `verifyAuth` which handles ID tokens. That path is correct.
+- Follow the exact pattern from `lib/auth-helpers.ts:53`: `const auth = await verifyFirebaseSessionCookie(sessionToken);`
 
 **Definition of Done:**
 
-- [ ] `GET /api/auth/me` for a user with `avatarUrl` set returns it in the response
-- [ ] `SessionUser.image` is populated from `avatarUrl`
-- [ ] UserMenu renders avatar image (not just initials) when `avatarUrl` is set
-- [ ] MobileMenu shows avatar if applicable
-- [ ] Type-check passes
-- [ ] `npm run test:ci` passes
+- [ ] `lib/api-auth.ts` imports and calls `verifyFirebaseSessionCookie` for cookie path
+- [ ] `app/api/auth/me/route.ts` imports and calls `verifyFirebaseSessionCookie`
+- [ ] `verifyFirebaseToken` is no longer imported in either file (for the cookie path)
+- [ ] `app/api/auth/me/__tests__/route.test.ts`: `vi.mock('@/lib/firebase-auth')` exports `verifyFirebaseSessionCookie` (not `verifyFirebaseToken`); `mockVerifyFirebaseToken` renamed to `mockVerifyFirebaseSessionCookie` in `vi.hoisted()` and all three test bodies
+- [ ] `lib/__tests__/api-auth.test.ts` created with at minimum: (1) cookie path calls `verifyFirebaseSessionCookie` not `verifyFirebaseToken`, (2) Authorization header path calls `verifyAuth`, (3) returns `null` when both paths fail
+- [ ] All unit tests pass
+
+**Verify:**
+
+- `npm run test:ci -- --reporter=verbose 2>&1 | grep -E "api-auth|auth/me|PASS|FAIL"`
+
+---
+
+### Task 2: Fix CSP to allow R2 presigned URL uploads
+
+**Objective:** Add Cloudflare R2's cloudflarestorage.com domain to the CSP `connect-src` directive so the browser doesn't block the presigned PUT upload in `AvatarUpload.tsx`.
+
+**Dependencies:** None
+
+**Files:**
+
+- Modify: `next.config.ts`
+
+**Key Decisions / Notes:**
+
+- The presigned upload URL from `r2Service.getUploadUrl()` points to `env.R2_ENDPOINT` which is a Cloudflare R2 endpoint of the form `https://<account-id>.r2.cloudflarestorage.com`.
+- The wildcard `https://*.r2.cloudflarestorage.com` in `connect-src` covers all valid R2 account endpoints.
+- Location in `next.config.ts`: the `Content-Security-Policy` value is a joined string in `headers()`. Add the wildcard to the `connect-src` directive, keeping the existing domains.
+- No test needed — this is a config change. Manual verification is the DoD.
+
+**Definition of Done:**
+
+- [ ] `connect-src` in `next.config.ts` includes `https://*.r2.cloudflarestorage.com`
+- [ ] TypeScript type-check passes: `npm run type-check`
+- [ ] The `Content-Security-Policy` header value in the response includes the R2 domain
 
 **Verify:**
 
 - `npm run type-check`
-- `npm run test:ci`
+- `grep "r2.cloudflarestorage.com" next.config.ts`
 
-### Task 2: Update AvatarUpload size limit + session refresh after upload
-
-**Objective:** Change client-side max file size from 5MB to 2MB. Add session refresh after successful upload so nav bar updates immediately without page reload.
-
-**Dependencies:** Task 1 (session must include `avatarUrl` for refresh to show the avatar)
-
-**Files:**
-
-- Modify: `components/settings/AvatarUpload.tsx` (MAX_FILE_SIZE, error text, help text)
-- Modify: `lib/hooks/useSession.tsx` or auth provider — expose `refreshSession` function
-- Modify: `components/settings/AvatarUpload.tsx` — call `refreshSession` after successful PATCH
-
-**Key Decisions / Notes:**
-
-- Change `MAX_FILE_SIZE = 5 * 1024 * 1024` to `2 * 1024 * 1024`
-- Update error message from "5MB" to "2MB" (line 46)
-- Update help text from "Max 5MB" to "Max 2MB" (line 176)
-- Expose `refreshSession()` from `useSession()` hook (or equivalent) that re-fetches `/api/auth/me`
-- Call `refreshSession()` in `AvatarUpload` after the successful PATCH response
-
-**Definition of Done:**
-
-- [ ] AvatarUpload rejects files > 2MB with "Image must be smaller than 2MB." error
-- [ ] Help text shows "Max 2MB"
-- [ ] Nav bar avatar updates immediately after upload without page reload
-- [ ] Type-check passes
-
-**Verify:**
-
-- `npm run type-check`
-
-### Task 3: Tests
-
-**Objective:** Add tests for session avatar mapping, size limit, and session refresh after upload.
-
-**Dependencies:** Task 1, Task 2
-
-**Files:**
-
-- Modify: `components/settings/__tests__/` (AvatarUpload tests)
-- Create or modify: test for `/api/auth/me` avatar response if route test exists
-
-**Key Decisions / Notes:**
-
-- Test AvatarUpload rejects files > 2MB
-- Test AvatarUpload calls `refreshSession` (or equivalent) after successful upload
-- Test `/api/auth/me` returns `avatarUrl` when user has one set (if route test file exists)
-
-**Definition of Done:**
-
-- [ ] Test validates 2MB size limit rejection in AvatarUpload
-- [ ] Test verifies session refresh is called after successful upload
-- [ ] All existing tests pass
-- [ ] `npm run test:ci` green
-
-**Verify:**
-
-- `npm run test:ci`
+---
 
 ## Testing Strategy
 
-- Unit tests for AvatarUpload size validation and session refresh call
-- Unit/integration test for `/api/auth/me` avatarUrl inclusion
-- Type-check for session shape changes
+- **Unit tests:** For Task 1, run vitest to verify existing mock-based tests pass with the updated imports.
+- **Integration test:** After both tasks, verify the full upload flow manually on the running app (settings page → pick image → upload succeeds, avatar appears in nav).
+- **CSP check:** Use browser DevTools → Network → check the `Content-Security-Policy` response header on any page load.
 
 ## Risks and Mitigations
 
-| Risk                                  | Likelihood | Impact | Mitigation                                                                                                      |
-| ------------------------------------- | ---------- | ------ | --------------------------------------------------------------------------------------------------------------- |
-| avatarUrl missing from session chain  | Confirmed  | High   | Add `avatarUrl` to Prisma select in `verifyFirebaseToken`, `/api/auth/me` response, and `SessionUser` interface |
-| Nav bar doesn't update after upload   | Confirmed  | High   | Expose `refreshSession` from auth provider, call after PATCH success                                            |
-| MobileMenu doesn't accept avatar prop | Low        | Low    | Check MobileMenu interface, add if missing                                                                      |
+| Risk                                                                                          | Likelihood | Impact | Mitigation                                                                              |
+| --------------------------------------------------------------------------------------------- | ---------- | ------ | --------------------------------------------------------------------------------------- |
+| Existing unit tests for `api-auth.ts` mock `verifyFirebaseToken` and break with import change | Medium     | Low    | Update test mocks to mock `verifyFirebaseSessionCookie` instead                         |
+| R2 endpoint domain varies by region or config                                                 | Low        | Medium | Use wildcard `*.r2.cloudflarestorage.com` to cover all Cloudflare R2 account subdomains |
+| `me` route tests break if mocked incorrectly                                                  | Low        | Low    | Mirror test setup from `lib/hooks/__tests__/useSession.test.tsx`                        |
 
 ## Goal Verification
 
 ### Truths
 
-1. Uploading an avatar in settings saves it and the nav bar shows the new image immediately (no reload)
-2. Files larger than 2MB are rejected with a clear error message
-3. Seller avatars appear on project cards, seller profiles, reviews, and messages (all already wired)
-4. The initials fallback still works when no avatar is set
-5. `GET /api/auth/me` returns `avatarUrl` for users who have one
+1. Authenticated users can upload a profile image via the settings page
+2. The uploaded image appears immediately in the `AvatarUpload` preview after upload
+3. The `UserMenu` in the nav shows the uploaded avatar (via `user.image` in session)
+4. Invalid files (wrong type, too large) are rejected client-side with a clear error
+5. The `session` cookie is correctly verified for all avatar-related API calls
 
 ### Artifacts
 
-- `components/settings/AvatarUpload.tsx` — upload flow
-- `components/layout/UserMenu.tsx` — nav bar avatar
-- `lib/hooks/useSession.tsx` — SessionUser interface
-- `lib/firebase-auth.ts` — DB query for auth user
-- `app/api/auth/me/route.ts` — session API
+- `lib/api-auth.ts` — `authenticateApiRequest` uses `verifyFirebaseSessionCookie` for cookie path
+- `app/api/auth/me/route.ts` — uses `verifyFirebaseSessionCookie`
+- `next.config.ts` — CSP `connect-src` includes `https://*.r2.cloudflarestorage.com`
 
 ### Key Links
 
-- AvatarUpload -> POST /api/upload -> R2 presigned URL -> PATCH /api/user/avatar -> DB
-- DB avatarUrl -> verifyFirebaseToken -> /api/auth/me -> SessionUser.image -> UserMenu AvatarImage
-- DB avatarUrl -> ProjectCard seller.avatarUrl -> AvatarImage (already wired)
-- AvatarUpload success -> refreshSession() -> /api/auth/me -> updated SessionUser -> UserMenu re-renders
-
----
-
-Done: 3 | Left: 0
+- `AvatarUpload.tsx` → `POST /api/upload` (via `api-auth.ts`) → R2 presigned URL → `PUT *.r2.cloudflarestorage.com` (CSP gated) → `PATCH /api/user/avatar` (via `api-auth.ts`) → `GET /api/auth/me` (session refresh)
