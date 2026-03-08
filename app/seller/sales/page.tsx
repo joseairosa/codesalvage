@@ -162,7 +162,7 @@ export default function SellerSalesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [router]);
 
   React.useEffect(() => {
     if (sessionStatus === 'unauthenticated') {
