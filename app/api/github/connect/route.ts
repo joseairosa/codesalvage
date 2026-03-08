@@ -7,12 +7,13 @@
  * Redirects user to GitHub authorization page.
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { withAuthRateLimit } from '@/lib/middleware/withRateLimit';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
 
-export async function GET(request: Request) {
+async function connectGitHub(request: NextRequest) {
   // Must be authenticated
   const auth = await authenticateApiRequest(request);
   if (!auth) {
@@ -53,3 +54,5 @@ export async function GET(request: Request) {
     `https://github.com/login/oauth/authorize?${params.toString()}`
   );
 }
+
+export const GET = withAuthRateLimit(connectGitHub);

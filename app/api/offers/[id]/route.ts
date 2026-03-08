@@ -4,7 +4,8 @@
  * GET /api/offers/[id] — Get single offer (access-controlled)
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { OfferRepository } from '@/lib/repositories/OfferRepository';
@@ -32,8 +33,8 @@ const offerService = new OfferService(
 /**
  * GET /api/offers/[id]
  */
-export async function GET(
-  request: Request,
+async function getOffer(
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await authenticateApiRequest(request);
@@ -65,3 +66,5 @@ export async function GET(
     );
   }
 }
+
+export const GET = withApiRateLimit(getOffer);

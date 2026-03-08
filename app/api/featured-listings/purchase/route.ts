@@ -13,7 +13,8 @@
  * }
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
@@ -69,7 +70,7 @@ const purchaseSchema = z.object({
  * - Only active projects can be featured
  * - Seller must own the project
  */
-export async function POST(request: Request) {
+async function purchaseFeaturedListing(request: NextRequest) {
   try {
     const auth = await authenticateApiRequest(request);
     if (!auth) {
@@ -147,3 +148,5 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export const POST = withApiRateLimit(purchaseFeaturedListing);

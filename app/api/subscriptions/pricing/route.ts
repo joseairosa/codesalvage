@@ -10,7 +10,8 @@
  * GET /api/subscriptions/pricing
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { withPublicRateLimit } from '@/lib/middleware/withRateLimit';
 import { prisma } from '@/lib/prisma';
 import { SubscriptionService } from '@/lib/services/SubscriptionService';
 import { SubscriptionRepository } from '@/lib/repositories/SubscriptionRepository';
@@ -33,7 +34,7 @@ const subscriptionService = new SubscriptionService(
  * Get pricing information for all subscription plans (public endpoint)
  * Cached for 1 hour (pricing changes rarely)
  */
-export async function GET(_request: Request) {
+async function getPricing(_request: NextRequest) {
   try {
     console.log(`[${componentName}] Fetching subscription pricing`);
 
@@ -66,3 +67,5 @@ export async function GET(_request: Request) {
     );
   }
 }
+
+export const GET = withPublicRateLimit(getPricing);

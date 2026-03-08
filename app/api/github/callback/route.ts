@@ -8,13 +8,14 @@
  * Redirects back to /projects/new on success.
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { withAuthRateLimit } from '@/lib/middleware/withRateLimit';
 import { cookies } from 'next/headers';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { encrypt } from '@/lib/encryption';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: Request) {
+async function githubCallback(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
   const state = url.searchParams.get('state');
@@ -114,3 +115,5 @@ export async function GET(request: Request) {
   // Redirect back to project form with success
   return NextResponse.redirect(`${appUrl}/projects/new?github_connected=true`);
 }
+
+export const GET = withAuthRateLimit(githubCallback);

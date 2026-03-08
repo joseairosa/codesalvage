@@ -11,7 +11,8 @@
  * POST /api/subscriptions { plan: 'pro', paymentMethodId: 'pm_xxx' }
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
@@ -44,7 +45,7 @@ const createSubscriptionSchema = z.object({
  *
  * Get current subscription status for authenticated user
  */
-export async function GET(request: Request) {
+async function getSubscription(request: NextRequest) {
   try {
     const auth = await authenticateApiRequest(request);
     if (!auth) {
@@ -88,7 +89,7 @@ export async function GET(request: Request) {
  *
  * Create a new subscription for authenticated user
  */
-export async function POST(request: Request) {
+async function createSubscription(request: NextRequest) {
   try {
     const auth = await authenticateApiRequest(request);
     if (!auth) {
@@ -181,7 +182,7 @@ export async function POST(request: Request) {
  *
  * Cancel subscription at end of billing period
  */
-export async function DELETE(request: Request) {
+async function cancelSubscription(request: NextRequest) {
   try {
     const auth = await authenticateApiRequest(request);
     if (!auth) {
@@ -234,3 +235,7 @@ export async function DELETE(request: Request) {
     );
   }
 }
+
+export const GET = withApiRateLimit(getSubscription);
+export const POST = withApiRateLimit(createSubscription);
+export const DELETE = withApiRateLimit(cancelSubscription);

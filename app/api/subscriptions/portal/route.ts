@@ -10,7 +10,8 @@
  * POST /api/subscriptions/portal { returnUrl: 'https://app.com/settings' }
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
@@ -42,7 +43,7 @@ const createPortalSessionSchema = z.object({
  *
  * Create Stripe Customer Portal session for subscription management
  */
-export async function POST(request: Request) {
+async function createPortalSession(request: NextRequest) {
   try {
     const auth = await authenticateApiRequest(request);
     if (!auth) {
@@ -117,3 +118,5 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export const POST = withApiRateLimit(createPortalSession);
