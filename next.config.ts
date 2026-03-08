@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 import { setupHoneybadger } from '@honeybadger-io/nextjs';
+import { withSentryConfig } from '@sentry/nextjs';
 
 /**
  * Build-time validation for critical client-side environment variables.
@@ -163,7 +164,7 @@ const nextConfig: NextConfig = {
               "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://api.stripe.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.r2.cloudflarestorage.com",
+              "connect-src 'self' https://api.stripe.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.r2.cloudflarestorage.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
               'frame-src https://js.stripe.com https://hooks.stripe.com',
               "font-src 'self' data:",
             ].join('; '),
@@ -174,9 +175,26 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default setupHoneybadger(nextConfig, {
+const honeybadgerConfig = setupHoneybadger(nextConfig, {
   webpackPluginOptions: {
     apiKey: process.env['HONEYBADGER_API_KEY'] || '',
     assetsUrl: process.env['NEXT_PUBLIC_APP_URL'] || 'https://codesalvage.com',
   },
+});
+
+export default withSentryConfig(honeybadgerConfig, {
+  org: 'jose-airosa',
+  project: 'codesalvage-api',
+  ...(process.env['SENTRY_AUTH_TOKEN'] && {
+    authToken: process.env['SENTRY_AUTH_TOKEN'],
+  }),
+
+  // Upload wider set of client source files for better stack traces
+  widenClientFileUpload: true,
+
+  // Proxy Sentry requests through Next.js to bypass ad-blockers
+  tunnelRoute: '/monitoring',
+
+  // Suppress build output outside CI
+  silent: !process.env['CI'],
 });

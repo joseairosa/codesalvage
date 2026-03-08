@@ -12,6 +12,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import * as Sentry from '@sentry/nextjs';
 import { Button } from '@/components/ui/button';
 import { captureException } from '@/lib/utils/honeybadger';
 
@@ -23,6 +24,8 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
+    Sentry.captureException(error);
+
     // Report error to Honeybadger
     captureException(error, {
       tags: {
