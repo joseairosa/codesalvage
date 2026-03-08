@@ -131,8 +131,17 @@ export default function SellerSalesPage() {
     try {
       const response = await fetch(`/api/transactions?view=seller&page=${page}&limit=10`);
 
+      if (response.status === 401) {
+        console.log(`[${componentName}] Session expired, redirecting to sign-in`);
+        router.push('/auth/signin');
+        return;
+      }
+
       if (!response.ok) {
-        throw new Error('Failed to load sales');
+        const body = await response.json().catch(() => ({}));
+        const message = body?.error || `Request failed (${response.status})`;
+        console.error(`[${componentName}] Fetch failed: ${response.status}`, body);
+        throw new Error(message);
       }
 
       const data: SalesResponse = await response.json();

@@ -212,6 +212,7 @@ describe('GET /api/transactions', () => {
       const body = await response.json();
 
       expect(response.status).toBe(200);
+      expect(body.transactions).toHaveLength(0);
       expect(mockGetBuyerTransactions).toHaveBeenCalled();
       expect(mockGetSellerTransactions).not.toHaveBeenCalled();
     });
