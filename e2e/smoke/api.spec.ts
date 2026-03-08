@@ -110,4 +110,14 @@ test.describe('Protected API Endpoints (unauthenticated)', () => {
     });
     expect(response.status()).toBe(401);
   });
+
+  test('GET /api/transactions returns 401 (not 500)', async ({ request }) => {
+    const response = await request.get('/api/transactions?view=seller');
+    expect(response.status()).toBe(401);
+  });
+
+  test('GET /api/transactions?view=buyer returns 401 (not 500)', async ({ request }) => {
+    const response = await request.get('/api/transactions?view=buyer');
+    expect(response.status()).toBe(401);
+  });
 });
