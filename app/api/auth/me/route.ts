@@ -9,7 +9,7 @@
 
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { verifyFirebaseToken } from '@/lib/firebase-auth';
+import { verifyFirebaseSessionCookie } from '@/lib/firebase-auth';
 
 export async function GET() {
   try {
@@ -20,7 +20,7 @@ export async function GET() {
       return NextResponse.json({ user: null }, { status: 200 });
     }
 
-    const auth = await verifyFirebaseToken(sessionToken);
+    const auth = await verifyFirebaseSessionCookie(sessionToken);
 
     return NextResponse.json({
       user: {

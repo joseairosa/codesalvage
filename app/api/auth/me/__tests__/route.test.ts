@@ -7,9 +7,9 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockCookies, mockVerifyFirebaseToken } = vi.hoisted(() => ({
+const { mockCookies, mockVerifyFirebaseSessionCookie } = vi.hoisted(() => ({
   mockCookies: vi.fn(),
-  mockVerifyFirebaseToken: vi.fn(),
+  mockVerifyFirebaseSessionCookie: vi.fn(),
 }));
 
 vi.mock('next/headers', () => ({
@@ -17,7 +17,7 @@ vi.mock('next/headers', () => ({
 }));
 
 vi.mock('@/lib/firebase-auth', () => ({
-  verifyFirebaseToken: mockVerifyFirebaseToken,
+  verifyFirebaseSessionCookie: mockVerifyFirebaseSessionCookie,
 }));
 
 import { GET } from '../route';
@@ -57,7 +57,7 @@ describe('GET /api/auth/me', () => {
 
   it('returns full user object including avatarUrl when session is valid', async () => {
     mockCookieStore('valid-token');
-    mockVerifyFirebaseToken.mockResolvedValue({ user: { ...baseUser, avatarUrl: null } });
+    mockVerifyFirebaseSessionCookie.mockResolvedValue({ user: { ...baseUser, avatarUrl: null } });
 
     const response = await GET();
     const body = await response.json();
@@ -74,7 +74,7 @@ describe('GET /api/auth/me', () => {
   it('returns avatarUrl when user has an avatar set', async () => {
     const avatarUrl = 'https://r2.example.com/avatars/user-123.png';
     mockCookieStore('valid-token');
-    mockVerifyFirebaseToken.mockResolvedValue({
+    mockVerifyFirebaseSessionCookie.mockResolvedValue({
       user: { ...baseUser, avatarUrl },
     });
 
@@ -87,7 +87,7 @@ describe('GET /api/auth/me', () => {
 
   it('returns user: null when token verification fails', async () => {
     mockCookieStore('bad-token');
-    mockVerifyFirebaseToken.mockRejectedValue(new Error('Token expired'));
+    mockVerifyFirebaseSessionCookie.mockRejectedValue(new Error('Token expired'));
 
     const response = await GET();
     const body = await response.json();
