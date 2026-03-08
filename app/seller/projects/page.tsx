@@ -96,60 +96,22 @@ interface SellerProject {
 }
 
 /**
- * Mock seller projects (in production, fetch from API)
+ * Compute conversion rate for a single listing.
+ * Each project sells at most once, so purchaseCount is 0 or 1.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// @ts-expect-error - Kept for reference during development
-const _mockProjectsForReference: SellerProject[] = [
-  {
-    id: '1',
-    title: 'E-commerce Dashboard with Analytics',
-    category: 'web_app',
-    status: 'active',
-    completionPercentage: 85,
-    priceCents: 75000,
-    viewCount: 245,
-    favoriteCount: 32,
-    createdAt: new Date('2026-01-20'),
-    updatedAt: new Date('2026-01-24'),
-  },
-  {
-    id: '2',
-    title: 'Mobile Fitness Tracker App',
-    category: 'mobile_app',
-    status: 'active',
-    completionPercentage: 70,
-    priceCents: 125000,
-    viewCount: 178,
-    favoriteCount: 21,
-    createdAt: new Date('2026-01-18'),
-    updatedAt: new Date('2026-01-23'),
-  },
-  {
-    id: '3',
-    title: 'Real-time Chat Application',
-    category: 'web_app',
-    status: 'sold',
-    completionPercentage: 78,
-    priceCents: 95000,
-    viewCount: 312,
-    favoriteCount: 45,
-    createdAt: new Date('2026-01-15'),
-    updatedAt: new Date('2026-01-22'),
-  },
-  {
-    id: '4',
-    title: 'CLI Tool for Git Automation',
-    category: 'cli_tool',
-    status: 'draft',
-    completionPercentage: 92,
-    priceCents: 35000,
-    viewCount: 0,
-    favoriteCount: 0,
-    createdAt: new Date('2026-01-24'),
-    updatedAt: new Date('2026-01-24'),
-  },
-];
+function conversionRate(project: SellerProject): number {
+  if (project.viewCount === 0) return 0;
+  const sold = project.status === 'sold' ? 1 : 0;
+  return sold / project.viewCount;
+}
+
+/**
+ * Format conversion rate as a percentage string
+ */
+function formatConversionRate(rate: number): string {
+  if (rate === 0) return '—';
+  return `${(rate * 100).toFixed(2)}%`;
+}
 
 /**
  * Format price in cents to USD
@@ -525,6 +487,7 @@ export default function SellerProjectsPage() {
                     <TableHead>Price</TableHead>
                     <TableHead>Views</TableHead>
                     <TableHead>Favorites</TableHead>
+                    <TableHead>Conv. Rate</TableHead>
                     <TableHead>Updated</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -554,6 +517,9 @@ export default function SellerProjectsPage() {
                         </div>
                       </TableCell>
                       <TableCell>{project.favoriteCount}</TableCell>
+                      <TableCell className="text-sm">
+                        {formatConversionRate(conversionRate(project))}
+                      </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {formatDate(project.updatedAt)}
                       </TableCell>

@@ -102,10 +102,16 @@ export async function GET(
 
     console.log('[Project API] Getting project:', id);
 
+    // Track view unconditionally before the cache so every request is counted,
+    // not only cache misses. Fire-and-forget — does not block the response.
+    projectService.trackView(id).catch((err) => {
+      console.error('[Project API] Failed to track view:', err);
+    });
+
     const project = await getOrSetCache(
       CacheKeys.projectDetail(id),
       CacheTTL.PROJECT_DETAIL,
-      () => projectService.getProject(id, { incrementView: true })
+      () => projectService.getProject(id, { incrementView: false })
     );
 
     if (!project) {
