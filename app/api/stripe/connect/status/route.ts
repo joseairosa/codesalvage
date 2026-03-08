@@ -11,17 +11,19 @@
  * Response: { isOnboarded: true, accountId: "acct_..." }
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { stripeService } from '@/lib/services';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
+import { getOrSetCache, CacheKeys, CacheTTL } from '@/lib/utils/cache';
 
 /**
  * GET /api/stripe/connect/status
  *
  * Get Connect account status for current user
  */
-export async function GET(request: Request) {
+async function getConnectStatus(request: NextRequest) {
   try {
     // Check authentication
     const auth = await authenticateApiRequest(request);
@@ -58,8 +60,12 @@ export async function GET(request: Request) {
       );
     }
 
-    // Check account status with Stripe
-    const isOnboarded = await stripeService.isAccountOnboarded(user.stripeAccountId);
+    // Check account status with Stripe (cached — avoids external API call on every load)
+    const isOnboarded = await getOrSetCache(
+      CacheKeys.stripeConnectStatus(auth.user.id),
+      CacheTTL.SUBSCRIPTION,
+      () => stripeService.isAccountOnboarded(user.stripeAccountId!)
+    );
 
     console.log('[Stripe Status] Account status:', {
       accountId: user.stripeAccountId,
@@ -100,3 +106,5 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const GET = withApiRateLimit(getConnectStatus);

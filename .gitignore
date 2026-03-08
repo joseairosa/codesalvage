@@ -67,3 +67,4 @@ docker-compose.override.yml
 # Playwright CLI sessions
 .playwright-cli/
 spec-verify-*
+/smoke-report
