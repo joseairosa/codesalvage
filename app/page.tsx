@@ -8,10 +8,30 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { prisma } from '@/lib/prisma';
 
-export const dynamic = 'force-static';
+// Revalidate every hour — fresh enough for platform stats
+export const revalidate = 3600;
 
-export default function HomePage() {
+async function getHomepageStats() {
+  const [projectCount, transactionCount, ratingAgg] = await Promise.all([
+    prisma.project.count({ where: { status: { in: ['active', 'sold'] } } }),
+    prisma.transaction.count({ where: { paymentStatus: 'succeeded' } }),
+    prisma.review.aggregate({ _avg: { overallRating: true } }),
+  ]);
+
+  const avgRating = ratingAgg._avg.overallRating;
+
+  return {
+    projectCount,
+    transactionCount,
+    avgRating: avgRating !== null ? avgRating.toFixed(1) : null,
+  };
+}
+
+export default async function HomePage() {
+  const stats = await getHomepageStats();
+
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -57,15 +77,17 @@ export default function HomePage() {
         {/* Stats */}
         <div className="mt-12 grid grid-cols-3 gap-8 text-center">
           <div>
-            <div className="text-3xl font-bold">500+</div>
+            <div className="text-3xl font-bold">{stats.projectCount}</div>
             <div className="text-sm text-gray-600">Projects Listed</div>
           </div>
           <div>
-            <div className="text-3xl font-bold">100+</div>
+            <div className="text-3xl font-bold">{stats.transactionCount}</div>
             <div className="text-sm text-gray-600">Transactions</div>
           </div>
           <div>
-            <div className="text-3xl font-bold">4.8★</div>
+            <div className="text-3xl font-bold">
+              {stats.avgRating !== null ? `${stats.avgRating}★` : '—'}
+            </div>
             <div className="text-sm text-gray-600">Average Rating</div>
           </div>
         </div>
