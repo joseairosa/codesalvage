@@ -326,7 +326,9 @@ export function AnalyticsDashboard() {
             <TrendingUp className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{summary.conversionRate.toFixed(1)}%</div>
+            <div className="text-2xl font-bold">
+              {(summary.conversionRate * 100).toFixed(1)}%
+            </div>
             <p className="text-xs text-gray-600">Views to sales</p>
           </CardContent>
         </Card>
