@@ -4,7 +4,17 @@ Automated background jobs for periodic maintenance tasks.
 
 ## Available Jobs
 
-### 1. Escrow Release (`/api/cron/release-escrow`)
+### 1. Review Reminders (`/api/cron/review-reminders`)
+
+Sends a one-time review reminder email to buyers who haven't reviewed a completed purchase.
+
+- **Schedule**: Once per day (`0 10 * * *`)
+- **What it does**:
+  - Finds transactions where `escrowStatus = 'released'`, `escrowReleaseDate` was 3–7 days ago, and no review exists
+  - Emails each buyer a prompt to leave a review
+  - The 4-day window (days 3–7) ensures each transaction is caught even if the cron misses a day
+
+### 2. Escrow Release (`/api/cron/release-escrow`)
 
 Releases escrowed funds to sellers after the 7-day hold period.
 
