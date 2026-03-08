@@ -354,6 +354,26 @@ export class ProjectService {
   }
 
   /**
+   * Track a project view unconditionally (for use outside the cache layer).
+   *
+   * Performs a lightweight status check, then fires increment + event log
+   * asynchronously without blocking the caller.
+   *
+   * @param projectId - Project ID to track
+   */
+  async trackView(projectId: string): Promise<void> {
+    const project = await this.projectRepository.findById(projectId, false);
+    if (!project || project.status !== 'active') return;
+
+    this.projectRepository.incrementViewCount(projectId).catch((err) => {
+      console.error('[ProjectService] trackView: Failed to increment view count:', err);
+    });
+    this.analyticsRepository?.logViewEvent(projectId).catch((err) => {
+      console.error('[ProjectService] trackView: Failed to log view event:', err);
+    });
+  }
+
+  /**
    * Search projects
    *
    * @param filters - Search filters

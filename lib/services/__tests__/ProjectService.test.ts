@@ -666,6 +666,69 @@ describe('ProjectService', () => {
   });
 
   // ============================================
+  // TRACK VIEW TESTS
+  // ============================================
+
+  describe('trackView', () => {
+    const mockAnalyticsRepository = {
+      logViewEvent: vi.fn(),
+    };
+
+    let serviceWithAnalytics: ProjectService;
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      serviceWithAnalytics = new ProjectService(
+        mockProjectRepository,
+        mockUserRepository,
+        mockSubscriptionService,
+        mockR2Service,
+        mockAnalyticsRepository as any
+      );
+    });
+
+    it('should do nothing when project does not exist', async () => {
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue(null);
+
+      await serviceWithAnalytics.trackView('nonexistent');
+
+      expect(mockProjectRepository.incrementViewCount).not.toHaveBeenCalled();
+      expect(mockAnalyticsRepository.logViewEvent).not.toHaveBeenCalled();
+    });
+
+    it('should do nothing when project is not active', async () => {
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue({
+        id: 'proj1',
+        status: 'draft',
+      } as any);
+
+      await serviceWithAnalytics.trackView('proj1');
+
+      expect(mockProjectRepository.incrementViewCount).not.toHaveBeenCalled();
+      expect(mockAnalyticsRepository.logViewEvent).not.toHaveBeenCalled();
+    });
+
+    it('should fire incrementViewCount and logViewEvent for active project', async () => {
+      vi.mocked(mockProjectRepository.findById).mockResolvedValue({
+        id: 'proj1',
+        status: 'active',
+      } as any);
+      vi.mocked(mockProjectRepository.incrementViewCount).mockResolvedValue({} as any);
+      mockAnalyticsRepository.logViewEvent.mockResolvedValue(undefined);
+
+      await serviceWithAnalytics.trackView('proj1');
+
+      // Flush two microtask layers: one for the fire-and-forget promise chains,
+      // one for the .catch handlers attached inside trackView.
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(mockProjectRepository.incrementViewCount).toHaveBeenCalledWith('proj1');
+      expect(mockAnalyticsRepository.logViewEvent).toHaveBeenCalledWith('proj1');
+    });
+  });
+
+  // ============================================
   // SEARCH PROJECTS TESTS
   // ============================================
 
