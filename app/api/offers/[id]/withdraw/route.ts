@@ -4,7 +4,8 @@
  * POST /api/offers/[id]/withdraw — Withdraw (cancel) an offer
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { OfferRepository } from '@/lib/repositories/OfferRepository';
@@ -30,8 +31,8 @@ const offerService = new OfferService(
   emailService as any
 );
 
-export async function POST(
-  request: Request,
+async function withdrawOffer(
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await authenticateApiRequest(request);
@@ -69,3 +70,5 @@ export async function POST(
     );
   }
 }
+
+export const POST = withApiRateLimit(withdrawOffer);

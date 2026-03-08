@@ -5,7 +5,8 @@
  * GET  /api/offers — List offers (buyer or seller view)
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { OfferRepository } from '@/lib/repositories/OfferRepository';
@@ -34,7 +35,7 @@ const offerService = new OfferService(
 /**
  * POST /api/offers — Create a new offer
  */
-async function createOffer(request: Request) {
+async function createOffer(request: NextRequest) {
   const auth = await authenticateApiRequest(request);
   if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -95,7 +96,7 @@ async function createOffer(request: Request) {
  *   page=1  (optional, default 1)
  *   limit=20  (optional, default 20)
  */
-async function listOffers(request: Request) {
+async function listOffers(request: NextRequest) {
   const auth = await authenticateApiRequest(request);
   if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -147,5 +148,5 @@ async function listOffers(request: Request) {
   }
 }
 
-export const POST = createOffer;
-export const GET = listOffers;
+export const POST = withApiRateLimit(createOffer);
+export const GET = withApiRateLimit(listOffers);

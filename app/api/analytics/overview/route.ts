@@ -14,7 +14,8 @@
  * GET /api/analytics/overview?startDate=2026-01-01&endDate=2026-01-31&granularity=day
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import {
@@ -44,7 +45,7 @@ const analyticsService = new AnalyticsService(analyticsRepository, userRepositor
  * - Maximum date range is 1 year
  * - Start date must be before end date
  */
-export async function GET(request: Request) {
+async function getAnalyticsOverview(request: NextRequest) {
   try {
     const auth = await authenticateApiRequest(request);
     if (!auth) {
@@ -127,3 +128,5 @@ export async function GET(request: Request) {
     );
   }
 }
+
+export const GET = withApiRateLimit(getAnalyticsOverview);

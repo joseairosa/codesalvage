@@ -25,7 +25,8 @@
  * }
  */
 
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { withStrictRateLimit } from '@/lib/middleware/withRateLimit';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { r2Service, FileType } from '@/lib/services';
 import { z } from 'zod';
@@ -44,7 +45,7 @@ const uploadRequestSchema = z.object({
  *
  * Generate pre-signed upload URL
  */
-export async function POST(request: Request) {
+async function uploadFile(request: NextRequest) {
   try {
     // Check authentication
     const auth = await authenticateApiRequest(request);
@@ -101,3 +102,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const POST = withStrictRateLimit(uploadFile);
