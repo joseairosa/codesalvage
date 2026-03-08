@@ -10,8 +10,8 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { prisma } from '@/lib/prisma';
 
-// Revalidate every hour — fresh enough for platform stats
-export const revalidate = 3600;
+// Always server-render so stats are fresh without a DB at build time
+export const dynamic = 'force-dynamic';
 
 async function getHomepageStats() {
   const [projectCount, transactionCount, ratingAgg] = await Promise.all([
