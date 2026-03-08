@@ -185,7 +185,9 @@ const honeybadgerConfig = setupHoneybadger(nextConfig, {
 export default withSentryConfig(honeybadgerConfig, {
   org: 'jose-airosa',
   project: 'codesalvage-api',
-  ...(process.env['SENTRY_AUTH_TOKEN'] && { authToken: process.env['SENTRY_AUTH_TOKEN'] }),
+  ...(process.env['SENTRY_AUTH_TOKEN'] && {
+    authToken: process.env['SENTRY_AUTH_TOKEN'],
+  }),
 
   // Upload wider set of client source files for better stack traces
   widenClientFileUpload: true,
