@@ -179,7 +179,9 @@ describe('useSession', () => {
     function Consumer() {
       const { refreshSession } = useSession();
       return (
-        <span data-testid="has-refresh">{typeof refreshSession === 'function' ? 'yes' : 'no'}</span>
+        <span data-testid="has-refresh">
+          {typeof refreshSession === 'function' ? 'yes' : 'no'}
+        </span>
       );
     }
 
@@ -247,6 +249,8 @@ describe('refreshSession behavior', () => {
     });
 
     // image should be populated from avatarUrl returned by /api/auth/me
-    expect(screen.getByTestId('image').textContent).toBe('https://r2.example.com/avatar.png');
+    expect(screen.getByTestId('image').textContent).toBe(
+      'https://r2.example.com/avatar.png'
+    );
   });
 });

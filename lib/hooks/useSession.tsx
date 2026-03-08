@@ -169,7 +169,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshSession = useCallback(async () => {
     const userData = await fetchUserData();
     if (!userData) {
-      console.warn('[AuthProvider] refreshSession: failed to fetch user data, session unchanged');
+      console.warn(
+        '[AuthProvider] refreshSession: failed to fetch user data, session unchanged'
+      );
       return;
     }
     updateSession({
