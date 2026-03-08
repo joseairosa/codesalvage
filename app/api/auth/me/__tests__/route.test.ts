@@ -57,7 +57,9 @@ describe('GET /api/auth/me', () => {
 
   it('returns full user object including avatarUrl when session is valid', async () => {
     mockCookieStore('valid-token');
-    mockVerifyFirebaseSessionCookie.mockResolvedValue({ user: { ...baseUser, avatarUrl: null } });
+    mockVerifyFirebaseSessionCookie.mockResolvedValue({
+      user: { ...baseUser, avatarUrl: null },
+    });
 
     const response = await GET();
     const body = await response.json();

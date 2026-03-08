@@ -27,7 +27,11 @@
  */
 
 import { cookies } from 'next/headers';
-import { verifyFirebaseSessionCookie, verifyAuth, type AuthResult } from './firebase-auth';
+import {
+  verifyFirebaseSessionCookie,
+  verifyAuth,
+  type AuthResult,
+} from './firebase-auth';
 
 /**
  * Authenticate API request using cookies OR Authorization header
