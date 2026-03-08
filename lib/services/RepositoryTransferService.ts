@@ -28,6 +28,7 @@ import type {
 import { GitHubServiceError } from './GitHubService';
 import type { GitHubService } from './GitHubService';
 import type { NotificationService } from './NotificationService';
+import type { EmailService } from './EmailService';
 import { decrypt } from '@/lib/encryption';
 
 export class RepositoryTransferValidationError extends Error {
@@ -80,7 +81,8 @@ export class RepositoryTransferService {
     private repositoryTransferRepository: RepositoryTransferRepository,
     private transactionRepository: TransactionRepository,
     private gitHubService: GitHubService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private emailService?: EmailService
   ) {
     console.log('[RepositoryTransferService] Initialized');
   }
@@ -341,6 +343,28 @@ export class RepositoryTransferService {
           err
         );
       });
+
+    // Email the buyer confirming repo transfer is complete (fire-and-forget)
+    if (this.emailService && transaction.buyer?.email) {
+      const buyerName =
+        transaction.buyer.fullName ?? transaction.buyer.username ?? 'Buyer';
+      this.emailService
+        .sendRepoTransferCompleteNotification(
+          { email: transaction.buyer.email, name: buyerName },
+          {
+            buyerName,
+            projectTitle: transaction.project.title,
+            projectId: transaction.projectId,
+            transactionId,
+          }
+        )
+        .catch((err) => {
+          console.error(
+            '[RepositoryTransferService] Failed to send transfer complete email:',
+            err
+          );
+        });
+    }
 
     return updated;
   }

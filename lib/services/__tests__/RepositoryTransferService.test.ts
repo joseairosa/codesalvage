@@ -17,6 +17,7 @@ import type { RepositoryTransferRepository } from '@/lib/repositories/Repository
 import type { TransactionRepository } from '@/lib/repositories/TransactionRepository';
 import type { GitHubService } from '../GitHubService';
 import type { NotificationService } from '../NotificationService';
+import type { EmailService } from '../EmailService';
 
 vi.mock('@/lib/encryption', () => ({
   decrypt: vi.fn().mockReturnValue('decrypted-token'),
@@ -51,6 +52,10 @@ const mockGitHubService = {
 const mockNotificationService = {
   createNotification: vi.fn().mockResolvedValue({}),
 } as unknown as NotificationService;
+
+const mockEmailService = {
+  sendRepoTransferCompleteNotification: vi.fn().mockResolvedValue(undefined),
+} as unknown as EmailService;
 
 const createMockTransaction = (overrides = {}) => ({
   id: 'txn-123',
@@ -138,7 +143,8 @@ beforeEach(() => {
     mockRepositoryTransferRepository,
     mockTransactionRepository,
     mockGitHubService,
-    mockNotificationService
+    mockNotificationService,
+    mockEmailService
   );
 });
 
@@ -665,6 +671,40 @@ describe('RepositoryTransferService', () => {
 
       await expect(service.confirmTransfer('stranger-999', 'txn-123')).rejects.toThrow(
         RepositoryTransferPermissionError
+      );
+    });
+
+    it('should send transfer complete email to buyer', async () => {
+      const transaction = createMockTransaction();
+      const transfer = createMockTransfer({ status: 'invitation_sent' });
+      const updatedTransfer = createMockTransfer({
+        status: 'completed',
+        completedAt: new Date(),
+      });
+
+      (mockTransactionRepository.findById as ReturnType<typeof vi.fn>).mockResolvedValue(
+        transaction
+      );
+      (
+        mockRepositoryTransferRepository.findByTransactionId as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(transfer);
+      (
+        mockRepositoryTransferRepository.updateStatus as ReturnType<typeof vi.fn>
+      ).mockResolvedValue(updatedTransfer);
+
+      await service.confirmTransfer('buyer-123', 'txn-123');
+
+      // Allow fire-and-forget to settle
+      await Promise.resolve();
+
+      expect(mockEmailService.sendRepoTransferCompleteNotification).toHaveBeenCalledWith(
+        { email: 'buyer@test.com', name: 'Test Buyer' },
+        expect.objectContaining({
+          buyerName: 'Test Buyer',
+          projectTitle: 'Test Project',
+          projectId: 'project-123',
+          transactionId: 'txn-123',
+        })
       );
     });
 

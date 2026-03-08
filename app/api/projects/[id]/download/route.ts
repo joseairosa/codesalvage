@@ -14,7 +14,7 @@
 import { NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
-import { r2Service, FileType } from '@/lib/services';
+import { r2Service, FileType, emailService } from '@/lib/services';
 
 /**
  * POST /api/projects/[id]/download
@@ -54,6 +54,12 @@ export async function POST(
             githubUrl: true,
             githubRepoName: true,
           },
+        },
+        buyer: {
+          select: { fullName: true, username: true },
+        },
+        seller: {
+          select: { email: true, fullName: true, username: true },
         },
       },
       orderBy: {
@@ -101,6 +107,27 @@ export async function POST(
     });
 
     console.log('[Project Download] Access timestamp updated');
+
+    // Notify seller that buyer downloaded the code (fire-and-forget)
+    if (transaction.seller.email) {
+      const sellerName =
+        transaction.seller.fullName ?? transaction.seller.username ?? 'Seller';
+      const buyerName =
+        transaction.buyer.fullName ?? transaction.buyer.username ?? 'Buyer';
+      emailService
+        .sendCodeDownloadedNotification(
+          { email: transaction.seller.email, name: sellerName },
+          {
+            sellerName,
+            buyerName,
+            projectTitle: transaction.project.title,
+            transactionId: transaction.id,
+          }
+        )
+        .catch((err) => {
+          console.error('[Project Download] Failed to send code downloaded email:', err);
+        });
+    }
 
     return NextResponse.json(
       {
