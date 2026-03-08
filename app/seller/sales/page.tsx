@@ -122,38 +122,52 @@ export default function SellerSalesPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  const fetchSales = React.useCallback(async (page: number) => {
-    setIsLoading(true);
-    setError(null);
+  const fetchSales = React.useCallback(
+    async (page: number) => {
+      setIsLoading(true);
+      setError(null);
 
-    console.log(`[${componentName}] Fetching sales page:`, page);
+      console.log(`[${componentName}] Fetching sales page:`, page);
 
-    try {
-      const response = await fetch(`/api/transactions?view=seller&page=${page}&limit=10`);
+      try {
+        const response = await fetch(
+          `/api/transactions?view=seller&page=${page}&limit=10`
+        );
 
-      if (!response.ok) {
-        throw new Error('Failed to load sales');
+        if (response.status === 401) {
+          console.log(`[${componentName}] Session expired, redirecting to sign-in`);
+          router.push('/auth/signin');
+          return;
+        }
+
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({}));
+          const message = body?.error || `Request failed (${response.status})`;
+          console.error(`[${componentName}] Fetch failed: ${response.status}`, body);
+          throw new Error(message);
+        }
+
+        const data: SalesResponse = await response.json();
+
+        setSales(data.transactions);
+        setPagination({
+          page: data.page,
+          totalPages: data.totalPages,
+          total: data.total,
+          hasNext: data.hasNext,
+          hasPrev: data.hasPrev,
+        });
+
+        console.log(`[${componentName}] Loaded ${data.transactions.length} sales`);
+      } catch (err) {
+        console.error(`[${componentName}] Fetch error:`, err);
+        setError(err instanceof Error ? err.message : 'Failed to load sales');
+      } finally {
+        setIsLoading(false);
       }
-
-      const data: SalesResponse = await response.json();
-
-      setSales(data.transactions);
-      setPagination({
-        page: data.page,
-        totalPages: data.totalPages,
-        total: data.total,
-        hasNext: data.hasNext,
-        hasPrev: data.hasPrev,
-      });
-
-      console.log(`[${componentName}] Loaded ${data.transactions.length} sales`);
-    } catch (err) {
-      console.error(`[${componentName}] Fetch error:`, err);
-      setError(err instanceof Error ? err.message : 'Failed to load sales');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [router]
+  );
 
   React.useEffect(() => {
     if (sessionStatus === 'unauthenticated') {
