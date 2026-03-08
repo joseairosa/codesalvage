@@ -31,7 +31,8 @@ export default defineConfig({
   // Retry on network flakiness (live deployments can have transient errors)
   retries: process.env['CI'] ? 2 : 1,
 
-  workers: process.env['CI'] ? 2 : undefined,
+  // Spread pattern avoids `workers: undefined` which fails exactOptionalPropertyTypes
+  ...(process.env['CI'] ? { workers: 2 } : {}),
 
   reporter: [
     ['list'],

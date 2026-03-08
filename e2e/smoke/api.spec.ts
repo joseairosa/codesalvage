@@ -64,7 +64,8 @@ test.describe('GET /api/projects', () => {
 
     const body = await response.json();
     // Projects response may be paginated or flat array
-    const hasProjects = Array.isArray(body) || Array.isArray(body.projects) || Array.isArray(body.data);
+    const hasProjects =
+      Array.isArray(body) || Array.isArray(body.projects) || Array.isArray(body.data);
     expect(hasProjects).toBe(true);
   });
 

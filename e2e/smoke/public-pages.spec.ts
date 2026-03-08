@@ -72,7 +72,9 @@ test.describe('Projects Browse Page', () => {
   test('search input is present', async ({ page }) => {
     await page.goto('/projects');
     // A search input should exist somewhere on the page
-    const searchInput = page.locator('input[type="search"], input[placeholder*="Search" i]');
+    const searchInput = page.locator(
+      'input[type="search"], input[placeholder*="Search" i]'
+    );
     await expect(searchInput.first()).toBeVisible();
   });
 });
@@ -85,7 +87,9 @@ test.describe('Sign-In Page', () => {
 
   test('shows GitHub sign-in button', async ({ page }) => {
     await page.goto('/auth/signin');
-    const githubButton = page.getByRole('button', { name: /continue with github|sign in with github/i });
+    const githubButton = page.getByRole('button', {
+      name: /continue with github|sign in with github/i,
+    });
     await expect(githubButton).toBeVisible();
   });
 
@@ -96,9 +100,7 @@ test.describe('Sign-In Page', () => {
 });
 
 test.describe('Public Seller Profiles', () => {
-  test('valid /u/[username] page returns 200 or 404 (not 500)', async ({
-    request,
-  }) => {
+  test('valid /u/[username] page returns 200 or 404 (not 500)', async ({ request }) => {
     // Test a known-unlikely username — should 404 gracefully, not 500
     const response = await request.get('/u/nonexistent-user-smoke-test-xyzabc');
     expect([200, 404]).toContain(response.status());

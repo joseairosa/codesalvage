@@ -13,7 +13,9 @@ import { test, expect } from '@playwright/test';
 test.describe('Homepage SEO & Open Graph', () => {
   test('has og:title meta tag', async ({ page }) => {
     await page.goto('/');
-    const ogTitle = await page.locator('meta[property="og:title"]').getAttribute('content');
+    const ogTitle = await page
+      .locator('meta[property="og:title"]')
+      .getAttribute('content');
     expect(ogTitle).toBeTruthy();
     expect(ogTitle?.length).toBeGreaterThan(0);
   });
@@ -127,9 +129,7 @@ test.describe('Sign-In Page SEO', () => {
 
   test('sign-in page is not indexed (noindex)', async ({ page }) => {
     await page.goto('/auth/signin');
-    const robots = await page
-      .locator('meta[name="robots"]')
-      .getAttribute('content');
+    const robots = await page.locator('meta[name="robots"]').getAttribute('content');
     // Auth pages should either have noindex or no robots tag
     // We just ensure it doesn't accidentally have index,follow
     if (robots) {
