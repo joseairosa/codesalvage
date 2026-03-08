@@ -15,8 +15,9 @@ import { useRef, useState } from 'react';
 import { Camera, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useSession } from '@/lib/hooks/useSession';
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 interface AvatarUploadProps {
@@ -25,6 +26,7 @@ interface AvatarUploadProps {
 }
 
 export function AvatarUpload({ currentAvatarUrl, userInitials }: AvatarUploadProps) {
+  const { refreshSession } = useSession();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(currentAvatarUrl);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export function AvatarUpload({ currentAvatarUrl, userInitials }: AvatarUploadPro
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      setError('Image must be smaller than 5MB.');
+      setError('Image must be smaller than 2MB.');
       return;
     }
 
@@ -92,6 +94,11 @@ export function AvatarUpload({ currentAvatarUrl, userInitials }: AvatarUploadPro
       }
 
       setAvatarUrl(publicUrl);
+      try {
+        await refreshSession();
+      } catch {
+        // Session refresh failing is non-fatal — avatar was saved successfully
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed. Please try again.');
     } finally {
@@ -173,7 +180,7 @@ export function AvatarUpload({ currentAvatarUrl, userInitials }: AvatarUploadPro
         </Alert>
       )}
 
-      <p className="text-xs text-muted-foreground">JPEG, PNG, or WebP · Max 5MB</p>
+      <p className="text-xs text-muted-foreground">JPEG, PNG, or WebP · Max 2MB</p>
     </div>
   );
 }

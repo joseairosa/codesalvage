@@ -32,6 +32,7 @@ export async function GET() {
         isVerifiedSeller: auth.user.isVerifiedSeller,
         isAdmin: auth.user.isAdmin,
         isBanned: auth.user.isBanned,
+        avatarUrl: auth.user.avatarUrl ?? null,
       },
     });
   } catch {
