@@ -18,12 +18,14 @@ Type: Feature
 ## Scope
 
 ### In Scope
+
 - Fix `lib/api-auth.ts` cookie path: `verifyFirebaseToken` → `verifyFirebaseSessionCookie`
 - Fix `app/api/auth/me/route.ts`: `verifyFirebaseToken` → `verifyFirebaseSessionCookie`
 - Fix `next.config.ts` CSP: add `https://*.r2.cloudflarestorage.com` to `connect-src`
 - Update unit tests for both files
 
 ### Out of Scope
+
 - Rate limiting on avatar endpoint (deferred)
 - Client-side crop UI (current "pick file" UX is sufficient)
 - Avatar deletion
@@ -70,18 +72,21 @@ Type: Feature
 **Dependencies:** None
 
 **Files:**
+
 - Modify: `lib/api-auth.ts`
 - Modify: `app/api/auth/me/route.ts`
 - Create: `lib/__tests__/api-auth.test.ts` (no test file exists; must be created)
 - Modify: `app/api/auth/me/__tests__/route.test.ts` (rename mock)
 
 **Key Decisions / Notes:**
+
 - In `lib/api-auth.ts` line 30: add `verifyFirebaseSessionCookie` to the import alongside `verifyAuth`; remove `verifyFirebaseToken` from the import (it's no longer needed in this file). Change line 53: `verifyFirebaseToken(sessionToken)` → `verifyFirebaseSessionCookie(sessionToken)`.
 - In `app/api/auth/me/route.ts`: change the import and the single call on line 22 from `verifyFirebaseToken` → `verifyFirebaseSessionCookie`.
 - **Do NOT change** the Authorization header path in `api-auth.ts` — it calls `verifyAuth` which handles ID tokens. That path is correct.
 - Follow the exact pattern from `lib/auth-helpers.ts:53`: `const auth = await verifyFirebaseSessionCookie(sessionToken);`
 
 **Definition of Done:**
+
 - [ ] `lib/api-auth.ts` imports and calls `verifyFirebaseSessionCookie` for cookie path
 - [ ] `app/api/auth/me/route.ts` imports and calls `verifyFirebaseSessionCookie`
 - [ ] `verifyFirebaseToken` is no longer imported in either file (for the cookie path)
@@ -90,6 +95,7 @@ Type: Feature
 - [ ] All unit tests pass
 
 **Verify:**
+
 - `npm run test:ci -- --reporter=verbose 2>&1 | grep -E "api-auth|auth/me|PASS|FAIL"`
 
 ---
@@ -101,20 +107,24 @@ Type: Feature
 **Dependencies:** None
 
 **Files:**
+
 - Modify: `next.config.ts`
 
 **Key Decisions / Notes:**
+
 - The presigned upload URL from `r2Service.getUploadUrl()` points to `env.R2_ENDPOINT` which is a Cloudflare R2 endpoint of the form `https://<account-id>.r2.cloudflarestorage.com`.
 - The wildcard `https://*.r2.cloudflarestorage.com` in `connect-src` covers all valid R2 account endpoints.
 - Location in `next.config.ts`: the `Content-Security-Policy` value is a joined string in `headers()`. Add the wildcard to the `connect-src` directive, keeping the existing domains.
 - No test needed — this is a config change. Manual verification is the DoD.
 
 **Definition of Done:**
+
 - [ ] `connect-src` in `next.config.ts` includes `https://*.r2.cloudflarestorage.com`
 - [ ] TypeScript type-check passes: `npm run type-check`
 - [ ] The `Content-Security-Policy` header value in the response includes the R2 domain
 
 **Verify:**
+
 - `npm run type-check`
 - `grep "r2.cloudflarestorage.com" next.config.ts`
 
@@ -128,15 +138,16 @@ Type: Feature
 
 ## Risks and Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| Existing unit tests for `api-auth.ts` mock `verifyFirebaseToken` and break with import change | Medium | Low | Update test mocks to mock `verifyFirebaseSessionCookie` instead |
-| R2 endpoint domain varies by region or config | Low | Medium | Use wildcard `*.r2.cloudflarestorage.com` to cover all Cloudflare R2 account subdomains |
-| `me` route tests break if mocked incorrectly | Low | Low | Mirror test setup from `lib/hooks/__tests__/useSession.test.tsx` |
+| Risk                                                                                          | Likelihood | Impact | Mitigation                                                                              |
+| --------------------------------------------------------------------------------------------- | ---------- | ------ | --------------------------------------------------------------------------------------- |
+| Existing unit tests for `api-auth.ts` mock `verifyFirebaseToken` and break with import change | Medium     | Low    | Update test mocks to mock `verifyFirebaseSessionCookie` instead                         |
+| R2 endpoint domain varies by region or config                                                 | Low        | Medium | Use wildcard `*.r2.cloudflarestorage.com` to cover all Cloudflare R2 account subdomains |
+| `me` route tests break if mocked incorrectly                                                  | Low        | Low    | Mirror test setup from `lib/hooks/__tests__/useSession.test.tsx`                        |
 
 ## Goal Verification
 
 ### Truths
+
 1. Authenticated users can upload a profile image via the settings page
 2. The uploaded image appears immediately in the `AvatarUpload` preview after upload
 3. The `UserMenu` in the nav shows the uploaded avatar (via `user.image` in session)
@@ -144,9 +155,11 @@ Type: Feature
 5. The `session` cookie is correctly verified for all avatar-related API calls
 
 ### Artifacts
+
 - `lib/api-auth.ts` — `authenticateApiRequest` uses `verifyFirebaseSessionCookie` for cookie path
 - `app/api/auth/me/route.ts` — uses `verifyFirebaseSessionCookie`
 - `next.config.ts` — CSP `connect-src` includes `https://*.r2.cloudflarestorage.com`
 
 ### Key Links
+
 - `AvatarUpload.tsx` → `POST /api/upload` (via `api-auth.ts`) → R2 presigned URL → `PUT *.r2.cloudflarestorage.com` (CSP gated) → `PATCH /api/user/avatar` (via `api-auth.ts`) → `GET /api/auth/me` (session refresh)

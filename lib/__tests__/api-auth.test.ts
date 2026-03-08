@@ -14,15 +14,13 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const {
-  mockCookies,
-  mockVerifyFirebaseSessionCookie,
-  mockVerifyAuth,
-} = vi.hoisted(() => ({
-  mockCookies: vi.fn(),
-  mockVerifyFirebaseSessionCookie: vi.fn(),
-  mockVerifyAuth: vi.fn(),
-}));
+const { mockCookies, mockVerifyFirebaseSessionCookie, mockVerifyAuth } = vi.hoisted(
+  () => ({
+    mockCookies: vi.fn(),
+    mockVerifyFirebaseSessionCookie: vi.fn(),
+    mockVerifyAuth: vi.fn(),
+  })
+);
 
 vi.mock('next/headers', () => ({
   cookies: mockCookies,
@@ -71,7 +69,9 @@ describe('authenticateApiRequest', () => {
 
       const result = await authenticateApiRequest(makeRequest());
 
-      expect(mockVerifyFirebaseSessionCookie).toHaveBeenCalledWith('session-cookie-value');
+      expect(mockVerifyFirebaseSessionCookie).toHaveBeenCalledWith(
+        'session-cookie-value'
+      );
       expect(result).toEqual({ user: mockUser });
     });
 
@@ -154,7 +154,9 @@ describe('requireAdminApiAuth', () => {
 
   it('returns null when authenticated but not admin', async () => {
     mockCookieStore('session-cookie-value');
-    mockVerifyFirebaseSessionCookie.mockResolvedValue({ user: { ...mockUser, isAdmin: false } });
+    mockVerifyFirebaseSessionCookie.mockResolvedValue({
+      user: { ...mockUser, isAdmin: false },
+    });
 
     const result = await requireAdminApiAuth(makeRequest());
 
