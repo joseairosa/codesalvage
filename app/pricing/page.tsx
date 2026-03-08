@@ -11,7 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { getSession } from '@/lib/auth-helpers';
 import type { Metadata } from 'next';
@@ -49,16 +48,8 @@ export default async function PricingPage() {
   const isSeller = session?.user?.isSeller;
 
   return (
-    <div className="container mx-auto py-16">
-      <div className="mb-12 text-center">
-        <Image
-          src="/images/pricing-header.png"
-          alt="Pricing plans"
-          width={600}
-          height={338}
-          className="mx-auto mb-6 rounded-lg"
-          priority
-        />
+    <div className="container mx-auto py-10">
+      <div className="mb-10 text-center">
         <h1 className="mb-4 text-4xl font-bold">Choose Your Plan</h1>
         <p className="text-lg text-gray-600">
           Start with our free plan or upgrade to Pro for unlimited projects and advanced

@@ -285,8 +285,8 @@ function CheckoutSuccessContent() {
                 <Image
                   src="/images/checkout-success.png"
                   alt="Payment successful"
-                  width={600}
-                  height={338}
+                  width={160}
+                  height={90}
                   className="mx-auto mb-4 rounded-lg"
                 />
                 <div className="text-2xl font-bold">Payment Successful!</div>

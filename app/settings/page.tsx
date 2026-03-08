@@ -4,7 +4,6 @@
  * Allows users to edit their profile and view account information.
  */
 
-import Image from 'next/image';
 import { requireAuth } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import {
@@ -40,16 +39,8 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-10">
-      <div className="mb-8 text-center">
-        <Image
-          src="/images/settings-header.png"
-          alt="Settings"
-          width={600}
-          height={338}
-          className="mx-auto mb-6 rounded-lg"
-          priority
-        />
+    <div className="container mx-auto max-w-2xl px-4 py-8">
+      <div className="mb-6 text-center">
         <h1 className="text-3xl font-bold">Settings</h1>
         <p className="mt-1 text-muted-foreground">Manage your profile and account</p>
       </div>
