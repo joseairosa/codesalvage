@@ -91,7 +91,12 @@ const mockPaginatedResult = {
       escrowReleaseDate: '2026-03-15T00:00:00Z',
       releasedToSellerAt: null,
       createdAt: '2026-03-08T00:00:00Z',
-      project: { id: 'proj1', title: 'My App', description: 'A cool app', status: 'sold' },
+      project: {
+        id: 'proj1',
+        title: 'My App',
+        description: 'A cool app',
+        status: 'sold',
+      },
       buyer: { id: 'buyer1', username: 'buyeruser', fullName: 'Buyer User' },
       seller: { id: 'seller1', username: 'selleruser', fullName: 'Seller User' },
     },
@@ -136,7 +141,10 @@ describe('GET /api/transactions', () => {
       expect(body.totalPages).toBe(1);
       expect(body.hasNext).toBe(false);
       expect(body.hasPrev).toBe(false);
-      expect(mockGetSellerTransactions).toHaveBeenCalledWith('seller1', { page: 1, limit: 10 });
+      expect(mockGetSellerTransactions).toHaveBeenCalledWith('seller1', {
+        page: 1,
+        limit: 10,
+      });
     });
 
     it('returns 200 with empty list when seller has no transactions', async () => {
@@ -193,7 +201,10 @@ describe('GET /api/transactions', () => {
 
       expect(response.status).toBe(200);
       expect(body.transactions).toHaveLength(1);
-      expect(mockGetBuyerTransactions).toHaveBeenCalledWith('buyer1', { page: 1, limit: 20 });
+      expect(mockGetBuyerTransactions).toHaveBeenCalledWith('buyer1', {
+        page: 1,
+        limit: 20,
+      });
     });
 
     it('returns 200 when view param is absent (defaults to buyer)', async () => {
