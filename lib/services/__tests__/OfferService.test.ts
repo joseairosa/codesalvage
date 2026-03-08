@@ -44,6 +44,7 @@ const mockEmailService = {
   sendOfferAcceptedNotification: vi.fn().mockResolvedValue(undefined),
   sendOfferRejectedNotification: vi.fn().mockResolvedValue(undefined),
   sendOfferCounteredNotification: vi.fn().mockResolvedValue(undefined),
+  sendOfferExpiredNotification: vi.fn().mockResolvedValue(undefined),
 } as unknown as EmailService;
 
 // Mock data helpers
@@ -650,6 +651,34 @@ describe('OfferService', () => {
 
       expect(result).toBe(0);
       expect(mockOfferRepository.updateStatus).not.toHaveBeenCalled();
+    });
+
+    it('should send offer expired email to buyer when offer expires', async () => {
+      const expiredOffer = createMockOffer({ id: 'offer-1' });
+      (
+        mockOfferRepository.findExpiredOffers as ReturnType<typeof vi.fn>
+      ).mockResolvedValue([expiredOffer]);
+      (mockOfferRepository.updateStatus as ReturnType<typeof vi.fn>).mockResolvedValue(
+        {}
+      );
+
+      await service.expireOffers();
+
+      // Allow fire-and-forget to settle
+      await Promise.resolve();
+
+      expect(mockEmailService.sendOfferExpiredNotification).toHaveBeenCalledWith(
+        { email: 'buyer@test.com', name: 'Test Buyer' },
+        expect.objectContaining({
+          recipientName: 'Test Buyer',
+          otherPartyName: 'Test Seller',
+          projectTitle: 'Test Project',
+          projectId: 'project-123',
+          offeredPriceCents: 50000,
+          listingPriceCents: 100000,
+          offerUrl: '/dashboard/offers',
+        })
+      );
     });
   });
 });

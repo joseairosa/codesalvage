@@ -672,6 +672,8 @@ export class OfferService {
 
   private async notifyOfferExpired(offer: OfferWithRelations): Promise<void> {
     const projectTitle = offer.project.title;
+    const buyerName = offer.buyer.fullName || offer.buyer.username || 'Buyer';
+    const sellerName = offer.seller.fullName || offer.seller.username || 'Seller';
 
     // Notify both buyer and seller (in-app)
     await Promise.all([
@@ -694,5 +696,25 @@ export class OfferService {
         relatedEntityId: offer.id,
       }),
     ]);
+
+    // Email the buyer (fire-and-forget)
+    if (offer.buyer.email) {
+      this.emailService
+        .sendOfferExpiredNotification(
+          { email: offer.buyer.email, name: buyerName },
+          {
+            recipientName: buyerName,
+            otherPartyName: sellerName,
+            projectTitle,
+            projectId: offer.projectId,
+            offeredPriceCents: offer.offeredPriceCents,
+            listingPriceCents: offer.originalPriceCents,
+            offerUrl: `/dashboard/offers`,
+          }
+        )
+        .catch((err) => {
+          console.error('[OfferService] Failed to send offer expired email:', err);
+        });
+    }
   }
 }

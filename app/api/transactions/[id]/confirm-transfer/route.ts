@@ -25,6 +25,7 @@ import { TransactionRepository } from '@/lib/repositories/TransactionRepository'
 import { githubService } from '@/lib/services/GitHubService';
 import { NotificationService } from '@/lib/services/NotificationService';
 import { NotificationRepository } from '@/lib/repositories/NotificationRepository';
+import { emailService } from '@/lib/services';
 
 const componentName = 'ConfirmTransferAPI';
 
@@ -37,7 +38,8 @@ const repositoryTransferService = new RepositoryTransferService(
   repositoryTransferRepository,
   transactionRepository,
   githubService,
-  notificationService
+  notificationService,
+  emailService
 );
 
 /**
