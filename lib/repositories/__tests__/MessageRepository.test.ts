@@ -79,6 +79,7 @@ describe('MessageRepository', () => {
         updateMany: vi.fn(),
         delete: vi.fn(),
         count: vi.fn(),
+        groupBy: vi.fn(),
       },
     };
 
@@ -257,38 +258,38 @@ describe('MessageRepository', () => {
     it('should get all unique conversations for user', async () => {
       const userId = 'user123';
 
+      // Call 1: sent partner IDs, Call 2: received partner IDs
       mockPrismaClient.message.findMany
+        .mockResolvedValueOnce([{ recipientId: 'user2' }])
+        .mockResolvedValueOnce([{ senderId: 'user3' }])
+        // Call 3: batch load all messages between userId and all partners
         .mockResolvedValueOnce([
-          { recipientId: 'user2', projectId: null, transactionId: null },
-        ])
-        .mockResolvedValueOnce([
-          { senderId: 'user3', projectId: null, transactionId: null },
+          {
+            ...createMockMessageWithRelations({
+              senderId: userId,
+              recipientId: 'user2',
+              content: 'Latest to user2',
+              createdAt: new Date('2026-01-15T12:00:00Z'),
+            }),
+            recipient: { ...createMockUser('user2', 'user2'), email: 'user2@example.com' },
+          },
+          {
+            ...createMockMessageWithRelations({
+              senderId: 'user3',
+              recipientId: userId,
+              content: 'Latest from user3',
+              createdAt: new Date('2026-01-15T11:00:00Z'),
+            }),
+            sender: createMockUser('user3', 'user3'),
+            senderId: 'user3',
+          },
         ]);
 
-      const latestMessage1 = {
-        ...createMockMessageWithRelations({
-          senderId: userId,
-          content: 'Latest to user2',
-          createdAt: new Date('2026-01-15T12:00:00Z'),
-        }),
-        recipient: createMockUser('user2', 'user2'),
-      };
-
-      const latestMessage2 = {
-        ...createMockMessageWithRelations({
-          recipientId: userId,
-          content: 'Latest from user3',
-          createdAt: new Date('2026-01-15T11:00:00Z'),
-        }),
-        sender: createMockUser('user3', 'user3'),
-        senderId: 'user3',
-      };
-
-      mockPrismaClient.message.findFirst
-        .mockResolvedValueOnce(latestMessage1)
-        .mockResolvedValueOnce(latestMessage2);
-
-      mockPrismaClient.message.count.mockResolvedValueOnce(2).mockResolvedValueOnce(5);
+      // groupBy for unread counts
+      mockPrismaClient.message.groupBy.mockResolvedValueOnce([
+        { senderId: 'user2', _count: { id: 2 } },
+        { senderId: 'user3', _count: { id: 5 } },
+      ]);
 
       const result = await messageRepository.getConversations(userId);
 
@@ -307,8 +308,10 @@ describe('MessageRepository', () => {
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([]);
 
-      await messageRepository.getConversations(userId, projectId);
+      const result = await messageRepository.getConversations(userId, projectId);
 
+      // Empty partners → early return, no further queries
+      expect(result).toEqual([]);
       expect(mockPrismaClient.message.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({ projectId }),
@@ -319,12 +322,9 @@ describe('MessageRepository', () => {
     it('should sort conversations by latest message date (newest first)', async () => {
       const userId = 'user123';
 
-      mockPrismaClient.message.findMany
-        .mockResolvedValueOnce([{ recipientId: 'user2' }])
-        .mockResolvedValueOnce([{ senderId: 'user3' }]);
-
       const olderMessage = {
         ...createMockMessageWithRelations({
+          senderId: 'user2',
           recipientId: userId,
           createdAt: new Date('2026-01-14T10:00:00Z'),
         }),
@@ -334,6 +334,7 @@ describe('MessageRepository', () => {
 
       const newerMessage = {
         ...createMockMessageWithRelations({
+          senderId: 'user3',
           recipientId: userId,
           createdAt: new Date('2026-01-15T10:00:00Z'),
         }),
@@ -341,11 +342,13 @@ describe('MessageRepository', () => {
         senderId: 'user3',
       };
 
-      mockPrismaClient.message.findFirst
-        .mockResolvedValueOnce(olderMessage)
-        .mockResolvedValueOnce(newerMessage);
+      mockPrismaClient.message.findMany
+        .mockResolvedValueOnce([{ recipientId: 'user2' }])
+        .mockResolvedValueOnce([{ senderId: 'user3' }])
+        // Batch messages ordered newest first
+        .mockResolvedValueOnce([newerMessage, olderMessage]);
 
-      mockPrismaClient.message.count.mockResolvedValue(0);
+      mockPrismaClient.message.groupBy.mockResolvedValueOnce([]);
 
       const result = await messageRepository.getConversations(userId);
 
@@ -361,6 +364,8 @@ describe('MessageRepository', () => {
       const result = await messageRepository.getConversations('user123');
 
       expect(result).toEqual([]);
+      // No batch load or groupBy when there are no partners
+      expect(mockPrismaClient.message.groupBy).not.toHaveBeenCalled();
     });
 
     it('should throw error when database operation fails', async () => {

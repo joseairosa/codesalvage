@@ -175,6 +175,79 @@ export async function verifyFirebaseToken(token: string): Promise<AuthResult> {
 }
 
 /**
+ * Verify Firebase session cookie and return user
+ *
+ * Used by server-side auth helpers to validate the httpOnly session cookie
+ * created by POST /api/auth/session via admin.auth().createSessionCookie().
+ * Checks token revocation on every request.
+ */
+export async function verifyFirebaseSessionCookie(cookie: string): Promise<AuthResult> {
+  let authInstance: ReturnType<typeof getAuth>;
+  try {
+    authInstance = getAuth();
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Unknown initialization error';
+    console.error('[Firebase Auth] Admin SDK initialization failed:', msg);
+    throw new AuthenticationError(`Firebase Admin SDK not configured: ${msg}`);
+  }
+
+  let decodedClaims;
+  try {
+    decodedClaims = await authInstance.verifySessionCookie(cookie, true /* checkRevoked */);
+  } catch (error) {
+    const firebaseError = error as { code?: string; message?: string };
+    console.error('[Firebase Auth] Session cookie verification failed:', {
+      code: firebaseError.code,
+      message: firebaseError.message,
+    });
+    throw new AuthenticationError(
+      `Session cookie verification failed: ${firebaseError.code ?? firebaseError.message ?? 'unknown error'}`
+    );
+  }
+
+  const firebaseUid = decodedClaims.uid;
+  console.log('[Firebase Auth] Session cookie verified for UID:', firebaseUid);
+
+  const userSelect = {
+    id: true,
+    email: true,
+    username: true,
+    githubUsername: true,
+    isAdmin: true,
+    isSeller: true,
+    isVerifiedSeller: true,
+    isBanned: true,
+    avatarUrl: true,
+  } as const;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { firebaseUid },
+      select: userSelect,
+    });
+
+    if (!user) {
+      throw new AuthenticationError('User not found');
+    }
+
+    if (user.isBanned) {
+      console.warn('[Firebase Auth] Banned user attempted access:', user.id);
+      throw new AuthenticationError('User is banned');
+    }
+
+    return { user, firebaseUid };
+  } catch (error) {
+    if (error instanceof AuthenticationError) {
+      throw error;
+    }
+    console.error('[Firebase Auth] Database error during user lookup:', error);
+    throw new AuthenticationError(
+      `Database error: ${error instanceof Error ? error.message : 'unknown error'}`
+    );
+  }
+}
+
+/**
  * Verify API key (sk-xxx format) and return user
  */
 export async function verifyApiKey(key: string): Promise<AuthResult> {
