@@ -121,8 +121,7 @@ export async function getConversations(
     });
 
     const validConversations = conversations.sort(
-      (a, b) =>
-        b.latestMessage.createdAt.getTime() - a.latestMessage.createdAt.getTime()
+      (a, b) => b.latestMessage.createdAt.getTime() - a.latestMessage.createdAt.getTime()
     );
 
     console.log('[MessageRepository] Found', validConversations.length, 'conversations');

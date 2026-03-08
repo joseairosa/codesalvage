@@ -271,7 +271,10 @@ describe('MessageRepository', () => {
               content: 'Latest to user2',
               createdAt: new Date('2026-01-15T12:00:00Z'),
             }),
-            recipient: { ...createMockUser('user2', 'user2'), email: 'user2@example.com' },
+            recipient: {
+              ...createMockUser('user2', 'user2'),
+              email: 'user2@example.com',
+            },
           },
           {
             ...createMockMessageWithRelations({

@@ -193,7 +193,10 @@ export async function verifyFirebaseSessionCookie(cookie: string): Promise<AuthR
 
   let decodedClaims;
   try {
-    decodedClaims = await authInstance.verifySessionCookie(cookie, true /* checkRevoked */);
+    decodedClaims = await authInstance.verifySessionCookie(
+      cookie,
+      true /* checkRevoked */
+    );
   } catch (error) {
     const firebaseError = error as { code?: string; message?: string };
     console.error('[Firebase Auth] Session cookie verification failed:', {

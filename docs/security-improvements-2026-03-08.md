@@ -68,12 +68,12 @@ All third-party GitHub Actions were pinned to mutable `@v4` tags. A supply-chain
 
 **Fix:** Every action is now pinned to its full commit SHA with a version comment.
 
-| Action | SHA | Version |
-|--------|-----|---------|
-| `actions/checkout` | `34e114876b0b11c390a56381ad16ebd13914f8d5` | v4.3.1 |
-| `actions/setup-node` | `49933ea5288caeca8642d1e84afbd3f7d6820020` | v4.4.0 |
-| `codecov/codecov-action` | `b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238` | v4.6.0 |
-| `actions/upload-artifact` | `ea165f8d65b6e75b540449e92b4886f43607fa02` | v4.6.2 |
+| Action                    | SHA                                        | Version |
+| ------------------------- | ------------------------------------------ | ------- |
+| `actions/checkout`        | `34e114876b0b11c390a56381ad16ebd13914f8d5` | v4.3.1  |
+| `actions/setup-node`      | `49933ea5288caeca8642d1e84afbd3f7d6820020` | v4.4.0  |
+| `codecov/codecov-action`  | `b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238` | v4.6.0  |
+| `actions/upload-artifact` | `ea165f8d65b6e75b540449e92b4886f43607fa02` | v4.6.2  |
 
 **Maintenance:** Use Dependabot or `pin-github-action` CLI to keep SHAs current as new versions are released.
 
@@ -148,6 +148,7 @@ The user creation and account-linking logic (`verifyFirebaseToken`) still runs d
 ## Test Coverage
 
 All existing unit tests were updated to reflect the new implementations:
+
 - `lib/repositories/__tests__/MessageRepository.test.ts` — updated `getConversations` tests to mock `findMany` batch + `groupBy` instead of `findFirst` + `count`
 - Mock setup extended with `groupBy: vi.fn()` on the Prisma message mock
 

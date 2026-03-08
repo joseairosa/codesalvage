@@ -164,7 +164,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https: blob:",
               "connect-src 'self' https://api.stripe.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
-              "frame-src https://js.stripe.com https://hooks.stripe.com",
+              'frame-src https://js.stripe.com https://hooks.stripe.com',
               "font-src 'self' data:",
             ].join('; '),
           },
