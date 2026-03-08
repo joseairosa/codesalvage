@@ -304,6 +304,11 @@ export const CacheKeys = {
   /**
    * All cache for a user (for invalidation)
    */
+  sellerReviews: (sellerId: string, page: number, limit: number) =>
+    `reviews:seller:${sellerId}:${page}:${limit}`,
+
+  stripeConnectStatus: (userId: string) => `stripe:connect:status:${userId}`,
+
   userAll: (userId: string) => `user:${userId}:*`,
 
   /**
@@ -352,6 +357,10 @@ export const invalidateCache = {
   /**
    * Invalidate seller-related cache
    */
+  sellerReviews: async (sellerId: string) => {
+    await deleteCache(`reviews:seller:${sellerId}:*`);
+  },
+
   seller: async (sellerId: string) => {
     await deleteCache(CacheKeys.sellerAnalytics(sellerId, '*'));
     await deleteCache(CacheKeys.sellerProjects(sellerId));

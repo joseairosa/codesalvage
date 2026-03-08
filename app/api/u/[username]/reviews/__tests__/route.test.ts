@@ -28,6 +28,16 @@ vi.mock('@/lib/middleware/withRateLimit', () => ({
   withPublicRateLimit: (handler: (...args: unknown[]) => unknown) => handler,
 }));
 
+vi.mock('@/lib/utils/cache', () => ({
+  getOrSetCache: (_key: string, _ttl: number, fn: () => unknown) => fn(),
+  CacheKeys: {
+    sellerReviews: () => 'cache-key',
+  },
+  CacheTTL: {
+    ANALYTICS: 900,
+  },
+}));
+
 const makeRequest = (username: string, page = '1', limit = '10') =>
   new NextRequest(
     `http://localhost:3011/api/u/${username}/reviews?page=${page}&limit=${limit}`

@@ -24,6 +24,7 @@ import { ReviewRepository } from '@/lib/repositories/ReviewRepository';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { TransactionRepository } from '@/lib/repositories/TransactionRepository';
 import { z } from 'zod';
+import { getOrSetCache, CacheKeys, CacheTTL, invalidateCache } from '@/lib/utils/cache';
 
 const componentName = 'ReviewsAPI';
 
@@ -85,10 +86,11 @@ async function listReviews(request: NextRequest) {
 
     const page = Math.floor(offset / limit) + 1;
 
-    const result = await reviewService.getSellerReviews(sellerId, {
-      page,
-      limit,
-    });
+    const result = await getOrSetCache(
+      CacheKeys.sellerReviews(sellerId, page, limit),
+      CacheTTL.PROJECT_DETAIL,
+      () => reviewService.getSellerReviews(sellerId, { page, limit })
+    );
 
     const sanitizedReviews = result.reviews.map((review) => ({
       ...review,
@@ -180,6 +182,18 @@ async function createReview(request: NextRequest) {
     const review = await reviewService.createReview(auth.user.id, reviewData);
 
     console.log(`[${componentName}] Review created:`, review.id);
+
+    // Invalidate cached reviews and rating stats for the seller
+    const txn = await prisma.transaction.findUnique({
+      where: { id: review.transactionId },
+      select: { sellerId: true },
+    });
+    if (txn?.sellerId) {
+      await Promise.all([
+        invalidateCache.sellerReviews(txn.sellerId),
+        invalidateCache.seller(txn.sellerId),
+      ]);
+    }
 
     return NextResponse.json({ review }, { status: 201 });
   } catch (error) {

@@ -13,6 +13,7 @@ import { prisma } from '@/lib/prisma';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { ReviewRepository } from '@/lib/repositories/ReviewRepository';
 import { withPublicRateLimit } from '@/lib/middleware/withRateLimit';
+import { getOrSetCache, CacheKeys, CacheTTL } from '@/lib/utils/cache';
 
 const componentName = 'SellerReviewsAPI';
 
@@ -43,7 +44,11 @@ async function getSellerReviews(
       return NextResponse.json({ error: 'Seller not found' }, { status: 404 });
     }
 
-    const result = await reviewRepository.getSellerReviews(user.id, { page, limit });
+    const result = await getOrSetCache(
+      CacheKeys.sellerReviews(user.id, page, limit),
+      CacheTTL.ANALYTICS,
+      () => reviewRepository.getSellerReviews(user.id, { page, limit })
+    );
 
     // Mask anonymous buyer info
     const reviews = result.reviews.map((review) => ({
