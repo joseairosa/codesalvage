@@ -1,0 +1,102 @@
+name: Smoke Tests (Post-Deploy)
+
+# Runs after a push to main lands in production.
+# Triggered manually or automatically after the CI workflow passes on main.
+#
+# Required GitHub secret: SMOKE_TEST_URL
+#   Value: https://codesalvage.com (or staging URL)
+#   Set at: Settings → Secrets and variables → Actions
+
+on:
+  # Manual trigger — run smoke tests against any URL on demand
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'URL to smoke test (defaults to SMOKE_TEST_URL secret)'
+        required: false
+        type: string
+
+  # Automatic trigger — runs after CI completes on main (post-deploy)
+  workflow_run:
+    workflows: ['CI']
+    branches: [main]
+    types: [completed]
+
+jobs:
+  smoke-test:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # For workflow_run triggers: only run if CI passed
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Resolve target URL
+        id: url
+        run: |
+          # Manual dispatch input takes priority, then the secret
+          URL="${{ github.event.inputs.target_url || secrets.SMOKE_TEST_URL || 'https://codesalvage.com' }}"
+          echo "target_url=$URL" >> $GITHUB_OUTPUT
+          echo "Running smoke tests against: $URL"
+
+      - name: Wait for deployment to be ready
+        run: |
+          URL="${{ steps.url.outputs.target_url }}"
+          echo "Waiting for $URL/api/ping to be healthy..."
+          for i in $(seq 1 24); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL/api/ping" || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Deployment is healthy (attempt $i)"
+              exit 0
+            fi
+            echo "Attempt $i: status=$STATUS, waiting 10s..."
+            sleep 10
+          done
+          echo "❌ Deployment did not become healthy after 4 minutes"
+          exit 1
+
+      - name: Run smoke tests
+        run: npm run test:smoke
+        env:
+          SMOKE_TEST_URL: ${{ steps.url.outputs.target_url }}
+
+      - name: Upload smoke test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-report
+          path: smoke-report/
+          retention-days: 14
+
+      - name: Upload smoke test screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-screenshots
+          path: test-results/
+          retention-days: 7
+
+      - name: Report smoke test failure
+        if: failure()
+        run: |
+          echo "::error::Smoke tests failed against ${{ steps.url.outputs.target_url }}"
+          echo "::error::Download the smoke-report artifact to see the full report."
+          echo "::error::Download smoke-screenshots for screenshots of failures."
