@@ -1,0 +1,69 @@
+/**
+ * E2E Suite 2: User Identity
+ *
+ * Tests /api/auth/me, profile updates, notifications, github status.
+ */
+
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { createE2EUser, cleanupE2EData, disconnectPrisma, get, patch } from './helpers';
+import type { E2EUser } from './helpers';
+
+let buyer: E2EUser;
+
+beforeAll(async () => {
+  buyer = await createE2EUser();
+});
+
+afterAll(async () => {
+  await cleanupE2EData();
+  await disconnectPrisma();
+});
+
+describe('02 · User Identity', () => {
+  it('GET /api/auth/me (unauthenticated) → 401', async () => {
+    const { status } = await get('/api/auth/me');
+    expect(status).toBe(401);
+  });
+
+  it('GET /api/auth/me (API key) → 200 with user fields', async () => {
+    const { status, body } = await get('/api/auth/me', buyer.apiKey);
+    expect(status).toBe(200);
+    const b = body as Record<string, unknown>;
+    expect(b).toHaveProperty('id');
+    expect(b).toHaveProperty('email');
+    expect(b).toHaveProperty('username');
+    expect(b.username).toBe(buyer.username);
+  });
+
+  it('PATCH /api/user/profile → 200, bio updated', async () => {
+    const newBio = 'E2E test bio updated at ' + Date.now();
+    const { status, body } = await patch(
+      '/api/user/profile',
+      { bio: newBio },
+      buyer.apiKey
+    );
+    expect(status).toBe(200);
+    const b = body as Record<string, unknown>;
+    expect(b.bio).toBe(newBio);
+  });
+
+  it('GET /api/notifications → 200, returns array', async () => {
+    const { status, body } = await get('/api/notifications', buyer.apiKey);
+    expect(status).toBe(200);
+    const b = body as Record<string, unknown>;
+    const notifications = b.notifications ?? body;
+    expect(Array.isArray(notifications)).toBe(true);
+  });
+
+  it('GET /api/notifications/unread-count → 200, returns count', async () => {
+    const { status, body } = await get('/api/notifications/unread-count', buyer.apiKey);
+    expect(status).toBe(200);
+    const b = body as Record<string, unknown>;
+    expect(typeof b.count).toBe('number');
+  });
+
+  it('GET /api/user/github-status → 200', async () => {
+    const { status } = await get('/api/user/github-status', buyer.apiKey);
+    expect(status).toBe(200);
+  });
+});
