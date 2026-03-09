@@ -98,7 +98,7 @@ export function MobileMenu({ user }: MobileMenuProps) {
                 src={user.image ?? undefined}
                 alt={user.name ?? 'User avatar'}
               />
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-semibold text-white">
+              <AvatarFallback className="bg-primary text-sm font-semibold text-primary-foreground">
                 {initials}
               </AvatarFallback>
             </Avatar>

@@ -80,7 +80,7 @@ export function UserMenu({ user }: UserMenuProps) {
         >
           <Avatar className="h-9 w-9 border-2 border-gray-200">
             <AvatarImage src={user.image ?? undefined} alt={user.name ?? 'User avatar'} />
-            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-semibold text-white">
+            <AvatarFallback className="bg-primary text-sm font-semibold text-primary-foreground">
               {initials}
             </AvatarFallback>
           </Avatar>
