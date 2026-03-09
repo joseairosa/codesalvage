@@ -193,7 +193,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               {/* Support message */}
               <p className="text-center text-xs text-gray-500">
                 If this problem persists, please{' '}
-                <a href="/contact" className="underline hover:text-blue-600">
+                <a href="/contact" className="underline hover:text-primary">
                   contact support
                 </a>
               </p>

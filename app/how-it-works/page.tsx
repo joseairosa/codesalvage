@@ -369,10 +369,10 @@ export default function HowItWorksPage() {
       <div className="bg-gray-50 py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl">
-            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 p-px">
-              <div className="rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 px-8 py-10 sm:px-12">
+            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-teal-600 to-teal-700 p-px">
+              <div className="rounded-2xl bg-gradient-to-br from-teal-600 to-teal-700 px-8 py-10 sm:px-12">
                 <h3 className="text-2xl font-bold text-white">Transparent Pricing</h3>
-                <p className="mt-2 text-blue-100">
+                <p className="mt-2 text-teal-100">
                   No hidden fees. Know exactly what you pay or earn.
                 </p>
 
@@ -382,7 +382,7 @@ export default function HowItWorksPage() {
                       <DollarSign className="h-5 w-5 text-white" />
                     </div>
                     <p className="font-semibold text-white">Buyers: Listed Price</p>
-                    <p className="mt-1 text-sm text-blue-100">
+                    <p className="mt-1 text-sm text-teal-100">
                       No additional fees. What you see is what you pay.
                     </p>
                   </div>
@@ -392,7 +392,7 @@ export default function HowItWorksPage() {
                       <CheckCircle className="h-5 w-5 text-white" />
                     </div>
                     <p className="font-semibold text-white">Sellers: 82% Earnings</p>
-                    <p className="mt-1 text-sm text-blue-100">
+                    <p className="mt-1 text-sm text-teal-100">
                       18% platform commission covers payments, escrow, hosting, and
                       support.
                     </p>
@@ -403,7 +403,7 @@ export default function HowItWorksPage() {
                       <Shield className="h-5 w-5 text-white" />
                     </div>
                     <p className="font-semibold text-white">7-Day Review + Transfer</p>
-                    <p className="mt-1 text-sm text-blue-100">
+                    <p className="mt-1 text-sm text-teal-100">
                       Escrow held during review. Released after ownership transfer — not
                       just a timer.
                     </p>
@@ -416,12 +416,12 @@ export default function HowItWorksPage() {
       </div>
 
       {/* CTA Section */}
-      <div className="border-t bg-gradient-to-r from-blue-600 to-purple-600 py-16">
+      <div className="border-t bg-gradient-to-r from-teal-600 to-teal-700 py-16">
         <div className="container mx-auto px-4 text-center sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Ready to get started?
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-blue-100">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-teal-100">
             Join thousands of developers buying and selling incomplete software projects.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">

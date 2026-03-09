@@ -54,7 +54,7 @@ export function ProBadge({ subscription, size = 'md' }: ProBadgeProps) {
   return (
     <Badge
       variant="default"
-      className="bg-blue-600 text-white hover:bg-blue-700"
+      className="bg-primary text-primary-foreground hover:bg-primary/90"
       title="Verified Pro Seller"
     >
       <ShieldCheck className={`mr-1 ${sizeClasses[size]}`} />

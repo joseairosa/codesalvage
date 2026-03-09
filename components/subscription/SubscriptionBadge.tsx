@@ -21,7 +21,7 @@ export function SubscriptionBadge({
 }: SubscriptionBadgeProps) {
   if (plan === 'pro') {
     return (
-      <Badge className={`bg-blue-600 text-white ${className}`}>
+      <Badge className={`bg-primary text-primary-foreground ${className}`}>
         {showIcon && <Crown className="mr-1 h-3 w-3" />}
         Pro
       </Badge>

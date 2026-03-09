@@ -121,7 +121,7 @@ export function Footer() {
                     href={social.href}
                     target={social.external ? '_blank' : undefined}
                     rel={social.external ? 'noopener noreferrer' : undefined}
-                    className="text-gray-500 transition-colors hover:text-blue-600"
+                    className="text-gray-500 transition-colors hover:text-primary"
                     aria-label={social.label}
                   >
                     <Icon className="h-5 w-5" aria-hidden="true" />
@@ -142,7 +142,7 @@ export function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-600 transition-colors hover:text-blue-600"
+                      className="text-sm text-gray-600 transition-colors hover:text-primary"
                       target={link.external ? '_blank' : undefined}
                       rel={link.external ? 'noopener noreferrer' : undefined}
                     >

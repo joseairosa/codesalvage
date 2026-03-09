@@ -105,7 +105,7 @@ export default function GlobalError({
               If this problem persists, please{' '}
               <a
                 href="mailto:support@codesalvage.com"
-                className="text-blue-600 hover:underline"
+                className="text-primary hover:underline"
               >
                 contact support
               </a>

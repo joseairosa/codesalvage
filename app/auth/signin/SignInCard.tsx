@@ -99,7 +99,7 @@ export function SignInCard({
 
               <CardTitle className="text-3xl font-bold tracking-tight">
                 Welcome to{' '}
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
                   CodeSalvage
                 </span>
               </CardTitle>

@@ -75,7 +75,7 @@ export function UserMenu({ user }: UserMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="relative flex items-center gap-2 rounded-full transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="relative flex items-center gap-2 rounded-full transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           aria-label="Open user menu"
         >
           <Avatar className="h-9 w-9 border-2 border-gray-200">
