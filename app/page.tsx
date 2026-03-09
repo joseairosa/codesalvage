@@ -40,7 +40,7 @@ export default async function HomePage() {
           <div className="flex flex-1 flex-col gap-6 text-center md:text-left">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
               Turn Your{' '}
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">
                 Incomplete Projects
               </span>{' '}
               into Revenue

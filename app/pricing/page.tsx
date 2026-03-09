@@ -126,14 +126,14 @@ export default async function PricingPage() {
         </Card>
 
         {/* Pro Plan */}
-        <Card className="relative border-2 border-blue-600 shadow-lg">
+        <Card className="relative border-2 border-primary shadow-lg">
           <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-            <Badge className="bg-blue-600 text-white">Most Popular</Badge>
+            <Badge className="bg-primary text-white">Most Popular</Badge>
           </div>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span className="text-2xl">Pro</span>
-              <Badge className="bg-blue-600">Recommended</Badge>
+              <Badge className="bg-primary">Recommended</Badge>
             </CardTitle>
             <div className="mt-4">
               <span className="text-4xl font-bold">$9.99</span>
@@ -145,50 +145,50 @@ export default async function PricingPage() {
               <h3 className="font-semibold">Everything in Free, plus:</h3>
               <ul className="space-y-2">
                 <li className="flex items-start gap-2">
-                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
+                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
                   <span className="font-semibold">Unlimited active project listings</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
+                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
                   <span className="font-semibold">Advanced analytics dashboard</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
+                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
                   <span>Revenue tracking and insights</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
+                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
                   <span className="font-semibold">20% discount on featured listings</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
+                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
                   <span>Save up to $16/month on featured placements</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
+                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
                   <span className="font-semibold">Verified seller badge</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
+                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
                   <span>Priority support</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
+                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
                   <span>Cancel anytime</span>
                 </li>
               </ul>
             </div>
 
             {!isAuthenticated ? (
-              <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button asChild className="w-full bg-primary hover:bg-primary/90">
                 <Link href="/auth/signin">Sign In to Upgrade</Link>
               </Button>
             ) : !isSeller ? (
-              <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button asChild className="w-full bg-primary hover:bg-primary/90">
                 <Link href="/seller/onboard">Become a Seller</Link>
               </Button>
             ) : (
-              <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button asChild className="w-full bg-primary hover:bg-primary/90">
                 <Link href="/seller/subscription">Upgrade to Pro</Link>
               </Button>
             )}
@@ -223,7 +223,7 @@ export default async function PricingPage() {
                   <tr className="border-b">
                     <td className="py-3">7 days</td>
                     <td className="py-3 text-right">$29.99</td>
-                    <td className="py-3 text-right font-semibold text-blue-600">
+                    <td className="py-3 text-right font-semibold text-primary">
                       $23.99
                     </td>
                     <td className="py-3 text-right font-semibold text-green-600">
@@ -233,7 +233,7 @@ export default async function PricingPage() {
                   <tr className="border-b">
                     <td className="py-3">14 days</td>
                     <td className="py-3 text-right">$49.99</td>
-                    <td className="py-3 text-right font-semibold text-blue-600">
+                    <td className="py-3 text-right font-semibold text-primary">
                       $39.99
                     </td>
                     <td className="py-3 text-right font-semibold text-green-600">
@@ -243,7 +243,7 @@ export default async function PricingPage() {
                   <tr>
                     <td className="py-3">30 days</td>
                     <td className="py-3 text-right">$79.99</td>
-                    <td className="py-3 text-right font-semibold text-blue-600">
+                    <td className="py-3 text-right font-semibold text-primary">
                       $63.99
                     </td>
                     <td className="py-3 text-right font-semibold text-green-600">

@@ -77,7 +77,7 @@ export default async function SubscriptionManagementPage() {
                 <CardTitle className="flex items-center gap-3">
                   Current Plan:
                   {isPro ? (
-                    <Badge className="bg-blue-600 text-lg">Pro</Badge>
+                    <Badge className="bg-primary text-lg">Pro</Badge>
                   ) : (
                     <Badge variant="secondary" className="text-lg">
                       Free
@@ -131,7 +131,7 @@ export default async function SubscriptionManagementPage() {
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="flex items-start gap-2">
                   <Check
-                    className={`mt-1 h-5 w-5 flex-shrink-0 ${isPro ? 'text-blue-600' : 'text-gray-400'}`}
+                    className={`mt-1 h-5 w-5 flex-shrink-0 ${isPro ? 'text-primary' : 'text-gray-400'}`}
                   />
                   <span className={!isPro ? 'text-gray-600' : ''}>
                     {isPro ? 'Unlimited' : 'Up to 3'} active project listings
@@ -139,13 +139,13 @@ export default async function SubscriptionManagementPage() {
                 </div>
                 <div className="flex items-start gap-2">
                   <Check
-                    className={`mt-1 h-5 w-5 flex-shrink-0 ${isPro ? 'text-blue-600' : 'text-blue-600'}`}
+                    className={`mt-1 h-5 w-5 flex-shrink-0 ${isPro ? 'text-primary' : 'text-primary'}`}
                   />
                   <span>Basic project analytics</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <Check
-                    className={`mt-1 h-5 w-5 flex-shrink-0 ${isPro ? 'text-blue-600' : 'text-gray-400'}`}
+                    className={`mt-1 h-5 w-5 flex-shrink-0 ${isPro ? 'text-primary' : 'text-gray-400'}`}
                   />
                   <span className={!isPro ? 'text-gray-600' : ''}>
                     {isPro ? 'Advanced' : 'No'} analytics dashboard
@@ -153,7 +153,7 @@ export default async function SubscriptionManagementPage() {
                 </div>
                 <div className="flex items-start gap-2">
                   <Check
-                    className={`mt-1 h-5 w-5 flex-shrink-0 ${isPro ? 'text-blue-600' : 'text-gray-400'}`}
+                    className={`mt-1 h-5 w-5 flex-shrink-0 ${isPro ? 'text-primary' : 'text-gray-400'}`}
                   />
                   <span className={!isPro ? 'text-gray-600' : ''}>
                     {isPro ? '20%' : 'No'} featured listing discount
@@ -161,14 +161,14 @@ export default async function SubscriptionManagementPage() {
                 </div>
                 <div className="flex items-start gap-2">
                   <Check
-                    className={`mt-1 h-5 w-5 flex-shrink-0 ${isPro ? 'text-blue-600' : 'text-gray-400'}`}
+                    className={`mt-1 h-5 w-5 flex-shrink-0 ${isPro ? 'text-primary' : 'text-gray-400'}`}
                   />
                   <span className={!isPro ? 'text-gray-600' : ''}>
                     {isPro ? 'Verified' : 'No'} seller badge
                   </span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-blue-600" />
+                  <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
                   <span>Messaging with buyers</span>
                 </div>
               </div>
@@ -210,8 +210,8 @@ export default async function SubscriptionManagementPage() {
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-start gap-3 rounded-lg border p-4">
-                  <div className="rounded-full bg-blue-100 p-2">
-                    <Check className="h-5 w-5 text-blue-600" />
+                  <div className="rounded-full bg-primary/10 p-2">
+                    <Check className="h-5 w-5 text-primary" />
                   </div>
                   <div>
                     <h4 className="font-semibold">Unlimited Projects</h4>
@@ -222,8 +222,8 @@ export default async function SubscriptionManagementPage() {
                 </div>
 
                 <div className="flex items-start gap-3 rounded-lg border p-4">
-                  <div className="rounded-full bg-blue-100 p-2">
-                    <Check className="h-5 w-5 text-blue-600" />
+                  <div className="rounded-full bg-primary/10 p-2">
+                    <Check className="h-5 w-5 text-primary" />
                   </div>
                   <div>
                     <h4 className="font-semibold">20% Featured Listing Discount</h4>
@@ -235,8 +235,8 @@ export default async function SubscriptionManagementPage() {
                 </div>
 
                 <div className="flex items-start gap-3 rounded-lg border p-4">
-                  <div className="rounded-full bg-blue-100 p-2">
-                    <Check className="h-5 w-5 text-blue-600" />
+                  <div className="rounded-full bg-primary/10 p-2">
+                    <Check className="h-5 w-5 text-primary" />
                   </div>
                   <div>
                     <h4 className="font-semibold">Advanced Analytics</h4>
@@ -248,8 +248,8 @@ export default async function SubscriptionManagementPage() {
                 </div>
 
                 <div className="flex items-start gap-3 rounded-lg border p-4">
-                  <div className="rounded-full bg-blue-100 p-2">
-                    <Check className="h-5 w-5 text-blue-600" />
+                  <div className="rounded-full bg-primary/10 p-2">
+                    <Check className="h-5 w-5 text-primary" />
                   </div>
                   <div>
                     <h4 className="font-semibold">Verified Seller Badge</h4>
@@ -260,8 +260,8 @@ export default async function SubscriptionManagementPage() {
                 </div>
               </div>
 
-              <div className="mt-6 rounded-lg bg-blue-50 p-4">
-                <p className="text-center text-sm font-semibold text-blue-900">
+              <div className="mt-6 rounded-lg bg-primary/5 p-4">
+                <p className="text-center text-sm font-semibold text-foreground">
                   Only $9.99/month • Cancel anytime • No hidden fees
                 </p>
               </div>

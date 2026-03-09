@@ -54,7 +54,7 @@ export function ProjectLimitWarning({ projectCount }: ProjectLimitWarningProps) 
 
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Badge variant="default" className="bg-blue-600">
+              <Badge variant="default" className="bg-primary">
                 <Sparkles className="mr-1 h-3 w-3" />
                 Pro Benefits
               </Badge>

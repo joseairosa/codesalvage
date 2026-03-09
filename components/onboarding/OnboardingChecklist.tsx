@@ -56,23 +56,23 @@ export function OnboardingChecklist({ steps, dismissed }: OnboardingChecklistPro
 
   return (
     <Card
-      className="mb-8 border-indigo-200 bg-gradient-to-br from-indigo-50 to-purple-50"
+      className="mb-8 border-primary/20 bg-gradient-to-br from-teal-50 to-cyan-50"
       data-testid="onboarding-checklist"
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <CardTitle className="text-base text-indigo-900">
+            <CardTitle className="text-base text-teal-900">
               Get started on CodeSalvage
             </CardTitle>
-            <p className="mt-0.5 text-sm text-indigo-700">
+            <p className="mt-0.5 text-sm text-teal-700">
               {completedCount} of {steps.length} steps complete
             </p>
           </div>
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 shrink-0 text-indigo-400 hover:bg-indigo-100 hover:text-indigo-700"
+            className="h-7 w-7 shrink-0 text-primary/40 hover:bg-teal-100 hover:text-teal-700"
             onClick={handleDismiss}
             disabled={dismissing}
             aria-label="Dismiss onboarding checklist"
@@ -86,9 +86,9 @@ export function OnboardingChecklist({ steps, dismissed }: OnboardingChecklistPro
         </div>
 
         {/* Progress bar */}
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-indigo-100">
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-teal-100">
           <div
-            className="h-full rounded-full bg-indigo-500 transition-all duration-500"
+            className="h-full rounded-full bg-primary transition-all duration-500"
             style={{ width: `${(completedCount / steps.length) * 100}%` }}
             role="progressbar"
             aria-valuenow={completedCount}
@@ -104,7 +104,7 @@ export function OnboardingChecklist({ steps, dismissed }: OnboardingChecklistPro
             {step.done ? (
               <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
             ) : (
-              <Circle className="mt-0.5 h-5 w-5 shrink-0 text-indigo-300" />
+              <Circle className="mt-0.5 h-5 w-5 shrink-0 text-primary/30" />
             )}
             <div className="min-w-0 flex-1">
               {step.done ? (
@@ -114,7 +114,7 @@ export function OnboardingChecklist({ steps, dismissed }: OnboardingChecklistPro
               ) : (
                 <Link
                   href={step.href}
-                  className="text-sm font-medium text-indigo-900 underline-offset-2 hover:underline"
+                  className="text-sm font-medium text-teal-900 underline-offset-2 hover:underline"
                 >
                   {step.label}
                 </Link>

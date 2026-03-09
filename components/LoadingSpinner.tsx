@@ -59,7 +59,7 @@ const textSizeClasses = {
  * Color variant mappings
  */
 const colorClasses = {
-  primary: 'text-blue-600',
+  primary: 'text-primary',
   secondary: 'text-gray-600',
   white: 'text-white',
   gray: 'text-gray-400',
@@ -205,15 +205,15 @@ export function LoadingDots({ className }: { className?: string }) {
       aria-label="Loading"
     >
       <span
-        className="h-2 w-2 animate-bounce rounded-full bg-blue-600 [animation-delay:-0.3s]"
+        className="h-2 w-2 animate-bounce rounded-full bg-primary [animation-delay:-0.3s]"
         aria-hidden="true"
       />
       <span
-        className="h-2 w-2 animate-bounce rounded-full bg-blue-600 [animation-delay:-0.15s]"
+        className="h-2 w-2 animate-bounce rounded-full bg-primary [animation-delay:-0.15s]"
         aria-hidden="true"
       />
       <span
-        className="h-2 w-2 animate-bounce rounded-full bg-blue-600"
+        className="h-2 w-2 animate-bounce rounded-full bg-primary"
         aria-hidden="true"
       />
       <span className="sr-only">Loading</span>

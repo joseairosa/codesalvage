@@ -79,8 +79,8 @@ export function NavigationLinks({
             key={link.href}
             href={link.href}
             className={cn(
-              'text-sm font-medium transition-colors hover:text-blue-600',
-              isActive ? 'text-blue-600' : 'text-gray-700',
+              'text-sm font-medium transition-colors hover:text-primary',
+              isActive ? 'text-primary' : 'text-gray-700',
               'relative py-2'
             )}
             aria-current={isActive ? 'page' : undefined}
@@ -88,7 +88,7 @@ export function NavigationLinks({
             {link.label}
             {isActive && (
               <span
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                 aria-hidden="true"
               />
             )}
