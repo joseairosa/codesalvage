@@ -4,6 +4,7 @@ import { Navigation } from '@/components/layout/Navigation';
 import { Footer } from '@/components/layout/Footer';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Providers } from './providers';
+import { SentryClientInit } from '@/components/SentryClientInit';
 import './globals.css';
 
 const inter = Inter({
@@ -66,6 +67,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="min-h-screen bg-background font-sans antialiased">
+        <SentryClientInit />
         <Providers>
           <ErrorBoundary>
             <div className="flex min-h-screen flex-col">
