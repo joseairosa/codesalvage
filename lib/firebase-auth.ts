@@ -251,6 +251,27 @@ export async function verifyFirebaseSessionCookie(cookie: string): Promise<AuthR
 }
 
 /**
+ * Verify Firebase session cookie OR legacy ID token (backwards compatibility)
+ *
+ * PR #82 switched the `session` cookie from storing raw ID tokens to proper
+ * Firebase session cookies. Users logged in before that deploy still have ID
+ * tokens in their cookie. This function tries the new format first and falls
+ * back to the old format so existing sessions keep working until they expire
+ * naturally. Remove the ID-token fallback once session TTLs have cycled (~7d).
+ */
+export async function verifySessionCookieOrIdToken(token: string): Promise<AuthResult> {
+  try {
+    return await verifyFirebaseSessionCookie(token);
+  } catch {
+    // Legacy: token is a raw Firebase ID token (sessions created before PR #82)
+    console.log(
+      '[Firebase Auth] Session cookie verification failed, retrying as ID token'
+    );
+    return await verifyFirebaseToken(token);
+  }
+}
+
+/**
  * Verify API key (sk-xxx format) and return user
  */
 export async function verifyApiKey(key: string): Promise<AuthResult> {

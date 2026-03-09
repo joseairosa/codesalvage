@@ -2,7 +2,7 @@
  * api-auth.ts Tests
  *
  * Verifies that authenticateApiRequest:
- * - Uses verifyFirebaseSessionCookie (not verifyFirebaseToken) for the cookie path
+ * - Uses verifySessionCookieOrIdToken for the cookie path
  * - Uses verifyAuth for the Authorization header path
  * - Returns null when both paths fail
  *
@@ -14,10 +14,10 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockCookies, mockVerifyFirebaseSessionCookie, mockVerifyAuth } = vi.hoisted(
+const { mockCookies, mockVerifySessionCookieOrIdToken, mockVerifyAuth } = vi.hoisted(
   () => ({
     mockCookies: vi.fn(),
-    mockVerifyFirebaseSessionCookie: vi.fn(),
+    mockVerifySessionCookieOrIdToken: vi.fn(),
     mockVerifyAuth: vi.fn(),
   })
 );
@@ -27,7 +27,7 @@ vi.mock('next/headers', () => ({
 }));
 
 vi.mock('@/lib/firebase-auth', () => ({
-  verifyFirebaseSessionCookie: mockVerifyFirebaseSessionCookie,
+  verifySessionCookieOrIdToken: mockVerifySessionCookieOrIdToken,
   verifyAuth: mockVerifyAuth,
 }));
 
@@ -63,13 +63,13 @@ describe('authenticateApiRequest', () => {
   });
 
   describe('cookie path', () => {
-    it('calls verifyFirebaseSessionCookie when session cookie is present', async () => {
+    it('calls verifySessionCookieOrIdToken when session cookie is present', async () => {
       mockCookieStore('session-cookie-value');
-      mockVerifyFirebaseSessionCookie.mockResolvedValue({ user: mockUser });
+      mockVerifySessionCookieOrIdToken.mockResolvedValue({ user: mockUser });
 
       const result = await authenticateApiRequest(makeRequest());
 
-      expect(mockVerifyFirebaseSessionCookie).toHaveBeenCalledWith(
+      expect(mockVerifySessionCookieOrIdToken).toHaveBeenCalledWith(
         'session-cookie-value'
       );
       expect(result).toEqual({ user: mockUser });
@@ -77,17 +77,17 @@ describe('authenticateApiRequest', () => {
 
     it('returns auth result from session cookie without trying Authorization header', async () => {
       mockCookieStore('session-cookie-value');
-      mockVerifyFirebaseSessionCookie.mockResolvedValue({ user: mockUser });
+      mockVerifySessionCookieOrIdToken.mockResolvedValue({ user: mockUser });
 
       await authenticateApiRequest(makeRequest('Bearer some-token'));
 
-      expect(mockVerifyFirebaseSessionCookie).toHaveBeenCalledTimes(1);
+      expect(mockVerifySessionCookieOrIdToken).toHaveBeenCalledTimes(1);
       expect(mockVerifyAuth).not.toHaveBeenCalled();
     });
 
     it('falls through to Authorization header when session cookie auth fails', async () => {
       mockCookieStore('bad-session-cookie');
-      mockVerifyFirebaseSessionCookie.mockRejectedValue(new Error('Invalid session'));
+      mockVerifySessionCookieOrIdToken.mockRejectedValue(new Error('Invalid session'));
       mockVerifyAuth.mockResolvedValue({ user: mockUser });
 
       const result = await authenticateApiRequest(makeRequest('Bearer valid-token'));
@@ -120,7 +120,7 @@ describe('authenticateApiRequest', () => {
 
     it('returns null when cookie fails and no Authorization header is present', async () => {
       mockCookieStore('bad-cookie');
-      mockVerifyFirebaseSessionCookie.mockRejectedValue(new Error('Bad session'));
+      mockVerifySessionCookieOrIdToken.mockRejectedValue(new Error('Bad session'));
 
       const result = await authenticateApiRequest(makeRequest());
 
@@ -129,7 +129,7 @@ describe('authenticateApiRequest', () => {
 
     it('returns null when both cookie and Authorization header auth fail', async () => {
       mockCookieStore('bad-cookie');
-      mockVerifyFirebaseSessionCookie.mockRejectedValue(new Error('Bad session'));
+      mockVerifySessionCookieOrIdToken.mockRejectedValue(new Error('Bad session'));
       mockVerifyAuth.mockRejectedValue(new Error('Bad token'));
 
       const result = await authenticateApiRequest(makeRequest('Bearer bad-token'));
@@ -154,7 +154,7 @@ describe('requireAdminApiAuth', () => {
 
   it('returns null when authenticated but not admin', async () => {
     mockCookieStore('session-cookie-value');
-    mockVerifyFirebaseSessionCookie.mockResolvedValue({
+    mockVerifySessionCookieOrIdToken.mockResolvedValue({
       user: { ...mockUser, isAdmin: false },
     });
 
@@ -166,7 +166,7 @@ describe('requireAdminApiAuth', () => {
   it('returns auth result when authenticated as admin', async () => {
     const adminUser = { ...mockUser, isAdmin: true };
     mockCookieStore('session-cookie-value');
-    mockVerifyFirebaseSessionCookie.mockResolvedValue({ user: adminUser });
+    mockVerifySessionCookieOrIdToken.mockResolvedValue({ user: adminUser });
 
     const result = await requireAdminApiAuth(makeRequest());
 
