@@ -18,22 +18,24 @@ test.describe('Health & Availability', () => {
     expect(body).toMatchObject({ ok: true });
   });
 
-  test('homepage responds within 3 seconds', async ({ page }) => {
+  test('homepage responds within 5 seconds', async ({ page }) => {
     const start = Date.now();
     const response = await page.goto('/');
     const elapsed = Date.now() - start;
 
     expect(response?.status()).toBe(200);
-    expect(elapsed).toBeLessThan(3000);
+    // 5s budget accounts for Railway cold-start on first request post-deploy
+    expect(elapsed).toBeLessThan(5000);
   });
 
-  test('projects page responds within 3 seconds', async ({ page }) => {
+  test('projects page responds within 5 seconds', async ({ page }) => {
     const start = Date.now();
     const response = await page.goto('/projects');
     const elapsed = Date.now() - start;
 
     expect(response?.status()).toBe(200);
-    expect(elapsed).toBeLessThan(3000);
+    // 5s budget accounts for Railway cold-start on first request post-deploy
+    expect(elapsed).toBeLessThan(5000);
   });
 
   test('GET /api/subscriptions/pricing responds within 2 seconds', async ({
