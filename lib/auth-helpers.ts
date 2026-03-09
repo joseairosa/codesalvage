@@ -31,7 +31,7 @@
 
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { verifyFirebaseSessionCookie } from './firebase-auth';
+import { verifySessionCookieOrIdToken } from './firebase-auth';
 
 /**
  * Require admin authentication (Server Components)
@@ -60,7 +60,7 @@ export async function requireAdmin() {
   }
 
   try {
-    const auth = await verifyFirebaseSessionCookie(sessionToken);
+    const auth = await verifySessionCookieOrIdToken(sessionToken);
 
     if (!auth.user.isAdmin) {
       console.log(
@@ -120,7 +120,7 @@ export async function requireAdminApi() {
   }
 
   try {
-    const auth = await verifyFirebaseSessionCookie(sessionToken);
+    const auth = await verifySessionCookieOrIdToken(sessionToken);
 
     if (!auth.user.isAdmin) {
       console.log('[AuthHelpers] requireAdminApi: User is not admin');
@@ -167,7 +167,7 @@ export async function requireAuth() {
   }
 
   try {
-    const auth = await verifyFirebaseSessionCookie(sessionToken);
+    const auth = await verifySessionCookieOrIdToken(sessionToken);
 
     console.log('[AuthHelpers] requireAuth: Access granted for user:', auth.user.id);
 
@@ -206,7 +206,7 @@ export async function getSession() {
   }
 
   try {
-    const auth = await verifyFirebaseSessionCookie(sessionToken);
+    const auth = await verifySessionCookieOrIdToken(sessionToken);
 
     return {
       user: {
