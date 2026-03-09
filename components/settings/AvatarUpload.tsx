@@ -114,7 +114,7 @@ export function AvatarUpload({ currentAvatarUrl, userInitials }: AvatarUploadPro
     <div className="flex flex-col items-center gap-4">
       {/* Avatar preview */}
       <div className="relative">
-        <div className="h-24 w-24 overflow-hidden rounded-full bg-gradient-to-br from-blue-500 to-purple-600">
+        <div className="h-24 w-24 overflow-hidden rounded-full bg-primary">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -123,7 +123,7 @@ export function AvatarUpload({ currentAvatarUrl, userInitials }: AvatarUploadPro
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-2xl font-bold text-white">
+            <div className="flex h-full w-full items-center justify-center text-2xl font-bold text-primary-foreground">
               {userInitials}
             </div>
           )}
