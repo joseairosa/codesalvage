@@ -32,7 +32,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (!header.dsn) {
-      return NextResponse.json({ error: 'Missing DSN in envelope header' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Missing DSN in envelope header' },
+        { status: 400 }
+      );
     }
 
     // Validate the project ID matches our own — prevents this tunnel from
