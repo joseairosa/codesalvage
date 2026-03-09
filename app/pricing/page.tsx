@@ -223,9 +223,7 @@ export default async function PricingPage() {
                   <tr className="border-b">
                     <td className="py-3">7 days</td>
                     <td className="py-3 text-right">$29.99</td>
-                    <td className="py-3 text-right font-semibold text-primary">
-                      $23.99
-                    </td>
+                    <td className="py-3 text-right font-semibold text-primary">$23.99</td>
                     <td className="py-3 text-right font-semibold text-green-600">
                       $6.00
                     </td>
@@ -233,9 +231,7 @@ export default async function PricingPage() {
                   <tr className="border-b">
                     <td className="py-3">14 days</td>
                     <td className="py-3 text-right">$49.99</td>
-                    <td className="py-3 text-right font-semibold text-primary">
-                      $39.99
-                    </td>
+                    <td className="py-3 text-right font-semibold text-primary">$39.99</td>
                     <td className="py-3 text-right font-semibold text-green-600">
                       $10.00
                     </td>
@@ -243,9 +239,7 @@ export default async function PricingPage() {
                   <tr>
                     <td className="py-3">30 days</td>
                     <td className="py-3 text-right">$79.99</td>
-                    <td className="py-3 text-right font-semibold text-primary">
-                      $63.99
-                    </td>
+                    <td className="py-3 text-right font-semibold text-primary">$63.99</td>
                     <td className="py-3 text-right font-semibold text-green-600">
                       $16.00
                     </td>
