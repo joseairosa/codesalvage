@@ -10,7 +10,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
-import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
+import { withPollingRateLimit } from '@/lib/middleware/withRateLimit';
 import { NotificationService } from '@/lib/services/NotificationService';
 import { NotificationRepository } from '@/lib/repositories/NotificationRepository';
 
@@ -42,7 +42,7 @@ async function getUnreadCount(request: NextRequest) {
   }
 }
 
-export const GET = withApiRateLimit(getUnreadCount, async (request) => {
+export const GET = withPollingRateLimit(getUnreadCount, async (request) => {
   const auth = await authenticateApiRequest(request);
   return auth?.user.id || 'anonymous';
 });
