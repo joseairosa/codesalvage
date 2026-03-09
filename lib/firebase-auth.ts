@@ -264,7 +264,9 @@ export async function verifySessionCookieOrIdToken(token: string): Promise<AuthR
     return await verifyFirebaseSessionCookie(token);
   } catch {
     // Legacy: token is a raw Firebase ID token (sessions created before PR #82)
-    console.log('[Firebase Auth] Session cookie verification failed, retrying as ID token');
+    console.log(
+      '[Firebase Auth] Session cookie verification failed, retrying as ID token'
+    );
     return await verifyFirebaseToken(token);
   }
 }
