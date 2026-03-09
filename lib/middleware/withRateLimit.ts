@@ -109,3 +109,15 @@ export function withPublicRateLimit(handler: RouteHandler): RouteHandler {
 export function withStrictRateLimit(handler: RouteHandler): RouteHandler {
   return withRateLimit(handler, 'strict');
 }
+
+/**
+ * Apply polling rate limiting (30 requests / minute per user)
+ * Use for lightweight background polling endpoints (notification badges, status checks).
+ * Uses a separate namespace so polling does NOT consume the shared 'api' budget.
+ */
+export function withPollingRateLimit(
+  handler: RouteHandler,
+  getIdentifier?: (request: NextRequest) => Promise<string> | string
+): RouteHandler {
+  return withRateLimit(handler, 'polling', getIdentifier);
+}

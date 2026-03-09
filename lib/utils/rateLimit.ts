@@ -295,6 +295,17 @@ export const RateLimitPresets = {
     windowSeconds: 3600,
     namespace: 'strict',
   },
+
+  /**
+   * Polling endpoints: 30 requests / minute per user
+   * Use for lightweight background polling (notification badges, status checks).
+   * Separate namespace so polling does NOT consume the main 'api' budget.
+   */
+  polling: {
+    maxRequests: 30,
+    windowSeconds: 60,
+    namespace: 'poll',
+  },
 };
 
 /**

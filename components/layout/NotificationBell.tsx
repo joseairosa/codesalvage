@@ -22,6 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { NotificationItem, type NotificationItemData } from './NotificationItem';
 
 const POLL_INTERVAL = 30000; // 30 seconds
+const BACKOFF_DURATION = 5 * 60 * 1000; // 5 minutes after a 429
 
 export function NotificationBell() {
   const { data: session, status } = useSession();
@@ -32,15 +33,24 @@ export function NotificationBell() {
   const [isLoadingNotifications, setIsLoadingNotifications] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
 
+  // Tracks when we're allowed to poll again after a 429
+  const backoffUntilRef = React.useRef<number>(0);
+
   // Poll for unread count
   const fetchUnreadCount = React.useCallback(async () => {
     if (status !== 'authenticated') return;
+
+    // Skip fetch during backoff window
+    if (Date.now() < backoffUntilRef.current) return;
 
     try {
       const response = await fetch('/api/notifications/unread-count');
       if (response.ok) {
         const data = await response.json();
         setUnreadCount(data.unreadCount);
+      } else if (response.status === 429) {
+        // Back off for 5 minutes to avoid hammering the rate limiter
+        backoffUntilRef.current = Date.now() + BACKOFF_DURATION;
       }
     } catch (error) {
       console.error('[NotificationBell] Failed to fetch unread count:', error);
