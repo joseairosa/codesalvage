@@ -13,7 +13,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
-import { withApiRateLimit } from '@/lib/middleware/withRateLimit';
+import { withPollingRateLimit } from '@/lib/middleware/withRateLimit';
 import {
   TransactionService,
   TransactionValidationError,
@@ -137,7 +137,7 @@ async function listTransactions(request: NextRequest) {
  *
  * GET: API rate limiting (100 requests / minute per user)
  */
-export const GET = withApiRateLimit(listTransactions, async (request) => {
+export const GET = withPollingRateLimit(listTransactions, async (request) => {
   const auth = await authenticateApiRequest(request);
   return auth?.user.id;
 });

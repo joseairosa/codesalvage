@@ -84,7 +84,7 @@ const ANALYSIS_STAGES = [
   },
   { label: 'Reading code structure...', targetProgress: 50, durationMs: 2000 },
   {
-    label: 'AI is analyzing your project...',
+    label: 'Reviewing your codebase...',
     targetProgress: 85,
     durationMs: 8000,
   },

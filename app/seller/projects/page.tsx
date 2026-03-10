@@ -498,7 +498,7 @@ export default function SellerProjectsPage() {
                       <TableCell className="text-left font-medium">
                         <button
                           onClick={() => handleViewProject(project.id)}
-                          className="hover:underline"
+                          className="block w-full text-left hover:underline"
                         >
                           {project.title}
                         </button>

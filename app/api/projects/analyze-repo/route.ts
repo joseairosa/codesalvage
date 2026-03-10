@@ -24,7 +24,7 @@ import {
 } from '@/lib/services/RepoAnalysisService';
 import { prisma } from '@/lib/prisma';
 import { decrypt } from '@/lib/encryption';
-import { withRateLimit } from '@/lib/middleware/withRateLimit';
+import { withAnalysisRateLimit } from '@/lib/middleware/withRateLimit';
 import { getClientIP } from '@/lib/utils/rateLimit';
 import { getOrSetCache, CacheKeys, CacheTTL } from '@/lib/utils/cache';
 
@@ -38,7 +38,7 @@ const requestSchema = z.object({
     ),
 });
 
-export const POST = withRateLimit(
+export const POST = withAnalysisRateLimit(
   async (request: NextRequest) => {
     const auth = await authenticateApiRequest(request);
     if (!auth) {
@@ -138,7 +138,6 @@ export const POST = withRateLimit(
       },
     });
   },
-  'strict',
   async (request) => {
     const auth = await authenticateApiRequest(request);
     return auth?.user.id ?? getClientIP(request);
