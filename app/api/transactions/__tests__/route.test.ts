@@ -49,7 +49,6 @@ vi.mock('@/lib/prisma', () => ({ prisma: {} }));
 
 vi.mock('@/lib/middleware/withRateLimit', () => ({
   withApiRateLimit: (handler: any) => handler,
-  withPollingRateLimit: (handler: any) => handler,
 }));
 
 vi.mock('@/lib/services/TransactionService', () => ({
