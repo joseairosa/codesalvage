@@ -499,6 +499,42 @@ export class UserRepository {
   }
 
   /**
+   * Update user role flags (ADMIN ONLY)
+   *
+   * Updates any combination of isSeller, isVerifiedSeller, isAdmin flags in one call.
+   *
+   * @param userId - User ID to update
+   * @param roles - Object with optional role flag overrides
+   * @returns Updated user record
+   * @throws Error if user not found or update fails
+   */
+  async updateUserRoles(
+    userId: string,
+    roles: {
+      isSeller?: boolean;
+      isVerifiedSeller?: boolean;
+      isAdmin?: boolean;
+    }
+  ): Promise<User> {
+    console.log('[UserRepository] updateUserRoles called:', { userId, roles });
+
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: roles,
+      });
+
+      console.log('[UserRepository] User roles updated:', userId, roles);
+      return user;
+    } catch (error) {
+      console.error('[UserRepository] updateUserRoles failed:', error);
+      throw new Error(
+        '[UserRepository] Failed to update user roles - user may not exist'
+      );
+    }
+  }
+
+  /**
    * Get all users with pagination and filtering (ADMIN ONLY)
    *
    * Returns paginated list of users with optional filters.

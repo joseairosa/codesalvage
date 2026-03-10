@@ -2,34 +2,61 @@
  * E2E Test Helpers
  *
  * Creates test users through the real auth stack (Firebase Admin → session → API key)
- * to prove the full auth pipeline is wired correctly.
+ * to prove the full auth pipeline is wired correctly. All role flags and test data
+ * are seeded via admin API endpoints — no direct database access.
  *
  * Flow for createE2EUser:
  *   1. Firebase Admin SDK  → createUser() (Firebase user)
  *   2. Firebase Admin SDK  → createCustomToken() → REST API exchange → ID token
  *   3. POST /api/auth/session  (proves session endpoint works)
  *   4. POST /api/user/api-keys (proves API key creation works)
- *   5. Prisma UPDATE only for role flags (isSeller/isAdmin) — no public API exists
+ *   5. PATCH /api/admin/users/:id  (sets isSeller/isAdmin/isVerifiedSeller via admin API)
  *
- * Cleanup:
- *   - Firebase Admin SDK deletes all e2e_test_ Firebase users
- *   - Prisma removes all app records created by this run
+ * Flow for createE2EProject:
+ *   1. POST /api/projects (creates draft — seller must have isSeller: true)
+ *   2. POST /api/projects/:id/publish (sets status: active)
+ *   Note: isApproved is set to true at creation, so no admin approve step needed.
  *
- * Env vars (from .env.local for production runs):
+ * Flow for createE2EDraftProject:
+ *   1. POST /api/projects only (returns draft — used for Suite 09 approve/reject tests)
+ *
+ * Flow for seedTransaction:
+ *   POST /api/admin/e2e/seed-transaction (creates completed transaction for reviews)
+ *
+ * Cleanup (cleanupE2E):
+ *   1. DELETE /api/admin/e2e/cleanup  (removes all @e2etest.invalid users + related records)
+ *   2. Firebase Admin SDK deletes all e2e_test_* Firebase users
+ *
+ * Required env vars:
  *   E2E_BASE_URL                    — default: http://localhost:3011
  *   FIREBASE_SERVICE_ACCOUNT_BASE64 — Firebase Admin credentials
  *   NEXT_PUBLIC_FIREBASE_API_KEY    — needed for custom token → ID token exchange
- *   DATABASE_URL                    — dev DB (local) or prod DB (production run)
+ *   E2E_ADMIN_API_KEY               — API key of a pre-provisioned admin user in production
+ *
+ * E2E_ADMIN_API_KEY setup:
+ *   1. Create or identify an existing admin user on the platform (isAdmin: true)
+ *   2. Generate an API key for that user via: POST /api/user/api-keys (name: "E2E Admin Key")
+ *   3. Set E2E_ADMIN_API_KEY=<key-value> in Railway environment variables
+ *   4. The same key is used for: role setting, transaction seeding, and cleanup
  */
 
-import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
-import crypto from 'crypto';
 import * as admin from 'firebase-admin';
 
 export const BASE_URL = process.env['E2E_BASE_URL'] ?? 'http://localhost:3011';
 export const E2E_PREFIX = 'e2e_test_';
 const E2E_EMAIL_DOMAIN = 'e2etest.invalid';
+
+// ─── Admin API Key Guard ──────────────────────────────────────────────────────
+
+if (!process.env['E2E_ADMIN_API_KEY']) {
+  throw new Error(
+    '[E2E] E2E_ADMIN_API_KEY is not set — see helpers.ts header for setup instructions. ' +
+      'This key must belong to an admin user (isAdmin: true) in the target environment.'
+  );
+}
+
+const ADMIN_API_KEY = process.env['E2E_ADMIN_API_KEY'];
 
 // ─── Firebase Admin ──────────────────────────────────────────────────────────
 
@@ -99,13 +126,6 @@ async function createSessionCookie(idToken: string): Promise<string> {
   return match[1];
 }
 
-// ─── Prisma (for role flags & cleanup) ───────────────────────────────────────
-
-// Fresh client — avoids importing lib/prisma which pulls in env validation
-const prisma = new PrismaClient({
-  datasources: { db: { url: process.env['DATABASE_URL'] } },
-});
-
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 export interface E2EUser {
@@ -115,20 +135,14 @@ export interface E2EUser {
   apiKey: string;
   /** Raw session cookie, useful for endpoints that require cookie auth */
   sessionCookie: string;
-  /**
-   * True if role flags (isSeller/isAdmin/isVerifiedSeller) were successfully
-   * written to the DB. False when the DB is unreachable from this machine
-   * (e.g. running against Railway production which uses a private internal URL).
-   */
-  rolesSet: boolean;
 }
 
 /**
  * Create a test user through the real auth stack.
  *
- * User creation and API key creation go through the production API; role flags
- * (isSeller, isVerifiedSeller, isAdmin) are set via direct DB update because
- * no public endpoint exposes them.
+ * User creation and API key creation go through the production API.
+ * Role flags (isSeller, isVerifiedSeller, isAdmin) are set via
+ * PATCH /api/admin/users/:id using the pre-provisioned E2E_ADMIN_API_KEY.
  */
 export async function createE2EUser(opts?: {
   isSeller?: boolean;
@@ -181,40 +195,215 @@ export async function createE2EUser(opts?: {
   const keyBody = (await apiKeyRes.json()) as { apiKey: string };
   const apiKey = keyBody.apiKey;
 
-  // 6. Set role flags via Prisma (no public API for these).
-  // Soft-fails when the DB is unreachable (e.g. Railway internal network).
-  let rolesSet = false;
+  // 6. Set role flags via admin API
   if (opts?.isSeller || opts?.isVerifiedSeller || opts?.isAdmin) {
-    try {
-      await prisma.user.update({
-        where: { id },
-        data: {
-          isSeller: opts.isSeller ?? false,
-          isVerifiedSeller: opts.isVerifiedSeller ?? false,
-          isAdmin: opts.isAdmin ?? false,
-        },
-      });
-      rolesSet = true;
-    } catch (err) {
-      console.warn(
-        '[E2E] DB role flags could not be set (DB unreachable from this host). ' +
-          'Tests that require specific roles will be skipped.',
-        (err as Error).message
+    const patchRes = await fetch(`${BASE_URL}/api/admin/users/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${ADMIN_API_KEY}`,
+      },
+      body: JSON.stringify({
+        isSeller: opts.isSeller,
+        isVerifiedSeller: opts.isVerifiedSeller,
+        isAdmin: opts.isAdmin,
+      }),
+    });
+
+    if (!patchRes.ok) {
+      const errBody = await patchRes.text();
+      throw new Error(
+        `[E2E] PATCH /api/admin/users/${id} failed (${patchRes.status}): ${errBody}. ` +
+          'Check that E2E_ADMIN_API_KEY belongs to a user with isAdmin: true.'
       );
     }
-  } else {
-    rolesSet = true; // No roles needed, consider it "set"
+
+    const patchBody = (await patchRes.json()) as {
+      user: { isSeller: boolean; isAdmin: boolean; isVerifiedSeller: boolean };
+    };
+    if (opts.isSeller && !patchBody.user.isSeller) {
+      throw new Error(
+        `[E2E] Failed to set isSeller on user ${id} — check E2E_ADMIN_API_KEY`
+      );
+    }
+    if (opts.isAdmin && !patchBody.user.isAdmin) {
+      throw new Error(
+        `[E2E] Failed to set isAdmin on user ${id} — check E2E_ADMIN_API_KEY`
+      );
+    }
+    if (opts.isVerifiedSeller && !patchBody.user.isVerifiedSeller) {
+      throw new Error(
+        `[E2E] Failed to set isVerifiedSeller on user ${id} — check E2E_ADMIN_API_KEY`
+      );
+    }
   }
 
-  return { id, email, username, apiKey, sessionCookie, rolesSet };
+  return { id, email, username, apiKey, sessionCookie };
+}
+
+/**
+ * Create a published (active) E2E project via the API.
+ * Seller must have isSeller: true.
+ * Projects are auto-approved (isApproved: true) at creation — no admin approve step needed.
+ */
+export async function createE2EProject(
+  sellerApiKey: string
+): Promise<{ id: string; status: string; title: string }> {
+  const suffix = faker.string.alphanumeric(6).toLowerCase();
+
+  const createRes = await fetch(`${BASE_URL}/api/projects`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${sellerApiKey}`,
+    },
+    body: JSON.stringify({
+      title: `${E2E_PREFIX}Project ${suffix}`,
+      description:
+        'E2E test project with enough description content to pass validation requirements for a complete project listing on CodeSalvage.',
+      category: 'web_app',
+      completionPercentage: 75,
+      priceCents: 9900,
+      techStack: ['React', 'TypeScript'],
+      primaryLanguage: 'TypeScript',
+      licenseType: 'full_code',
+      accessLevel: 'full',
+    }),
+  });
+
+  if (!createRes.ok) {
+    const err = await createRes.text();
+    throw new Error(`[E2E] POST /api/projects failed (${createRes.status}): ${err}`);
+  }
+
+  const project = (await createRes.json()) as {
+    id: string;
+    status: string;
+    title: string;
+  };
+
+  // Publish the project (sets status: 'active')
+  const publishRes = await fetch(`${BASE_URL}/api/projects/${project.id}/publish`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${sellerApiKey}`,
+    },
+    body: JSON.stringify({}),
+  });
+
+  if (!publishRes.ok) {
+    const err = await publishRes.text();
+    throw new Error(
+      `[E2E] POST /api/projects/${project.id}/publish failed (${publishRes.status}): ${err}`
+    );
+  }
+
+  const published = (await publishRes.json()) as {
+    id: string;
+    status: string;
+    title: string;
+  };
+  return published;
+}
+
+/**
+ * Create a draft (unpublished) E2E project via the API.
+ * Used for Suite 09 admin approve/reject tests.
+ * The approve endpoint transitions draft → active, so we must not publish first.
+ */
+export async function createE2EDraftProject(
+  sellerApiKey: string
+): Promise<{ id: string; status: string; title: string }> {
+  const suffix = faker.string.alphanumeric(6).toLowerCase();
+
+  const createRes = await fetch(`${BASE_URL}/api/projects`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${sellerApiKey}`,
+    },
+    body: JSON.stringify({
+      title: `${E2E_PREFIX}Draft ${suffix}`,
+      description:
+        'E2E test draft project for admin approve/reject testing on CodeSalvage.',
+      category: 'web_app',
+      completionPercentage: 75,
+      priceCents: 9900,
+      techStack: ['Vue', 'JavaScript'],
+      primaryLanguage: 'JavaScript',
+      licenseType: 'full_code',
+      accessLevel: 'full',
+    }),
+  });
+
+  if (!createRes.ok) {
+    const err = await createRes.text();
+    throw new Error(
+      `[E2E] POST /api/projects (draft) failed (${createRes.status}): ${err}`
+    );
+  }
+
+  return createRes.json() as Promise<{ id: string; status: string; title: string }>;
+}
+
+/**
+ * Seed a completed transaction for E2E testing (used by the Reviews suite).
+ * Requires E2E_SEED_ENABLED=true in the target environment.
+ */
+export async function seedTransaction(data: {
+  projectId: string;
+  sellerId: string;
+  buyerId: string;
+  amountCents: number;
+}): Promise<{ id: string; paymentStatus: string; escrowStatus: string }> {
+  const res = await fetch(`${BASE_URL}/api/admin/e2e/seed-transaction`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${ADMIN_API_KEY}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(
+      `[E2E] POST /api/admin/e2e/seed-transaction failed (${res.status}): ${err}. ` +
+        'Ensure E2E_SEED_ENABLED=true is set in the target environment.'
+    );
+  }
+
+  const body = (await res.json()) as {
+    transaction: { id: string; paymentStatus: string; escrowStatus: string };
+  };
+  return body.transaction;
 }
 
 /**
  * Remove all data created by this E2E test run.
- * Deletes Firebase users (by email pattern) and all app DB records.
+ * Calls the admin cleanup endpoint to delete @e2etest.invalid users and related records,
+ * then deletes Firebase users.
  */
-export async function cleanupE2EData(): Promise<void> {
-  // 1. Delete Firebase users with e2e_test_ email prefix
+export async function cleanupE2E(): Promise<void> {
+  // 1. Delete app DB records via admin API
+  try {
+    const res = await fetch(`${BASE_URL}/api/admin/e2e/cleanup`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${ADMIN_API_KEY}` },
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.warn(`[E2E] Cleanup API returned ${res.status}: ${err}`);
+    } else {
+      const body = (await res.json()) as { deleted: Record<string, number> };
+      console.log('[E2E] Cleanup complete:', body.deleted);
+    }
+  } catch (err) {
+    console.warn('[E2E] Cleanup API call failed:', (err as Error).message);
+  }
+
+  // 2. Delete Firebase users with e2e_test_ email prefix
   try {
     const app = getFirebaseAdmin();
     const listResult = await app.auth().listUsers(1000);
@@ -224,50 +413,13 @@ export async function cleanupE2EData(): Promise<void> {
 
     if (e2eUids.length > 0) {
       await app.auth().deleteUsers(e2eUids);
+      console.log(`[E2E] Deleted ${e2eUids.length} Firebase user(s)`);
     }
   } catch (err) {
-    // Non-fatal — app DB cleanup still runs
     console.warn('[E2E] Firebase user cleanup failed:', err);
   }
 
-  // 2. Delete app DB records (FK-safe order).
-  // Soft-fails when DB is unreachable (e.g. Railway internal network from localhost).
-  try {
-    const users = await prisma.user.findMany({
-      where: { email: { contains: `@${E2E_EMAIL_DOMAIN}` } },
-      select: { id: true },
-    });
-
-    if (users.length === 0) return;
-    const ids = users.map((u) => u.id);
-
-    await prisma.$executeRawUnsafe('SET session_replication_role = replica;');
-    await prisma.message.deleteMany({
-      where: { OR: [{ senderId: { in: ids } }, { recipientId: { in: ids } }] },
-    });
-    await prisma.review.deleteMany({
-      where: { OR: [{ buyerId: { in: ids } }, { sellerId: { in: ids } }] },
-    });
-    await prisma.transaction.deleteMany({
-      where: { OR: [{ buyerId: { in: ids } }, { sellerId: { in: ids } }] },
-    });
-    await prisma.favorite.deleteMany({ where: { userId: { in: ids } } });
-    await prisma.project.deleteMany({ where: { sellerId: { in: ids } } });
-    await prisma.apiKey.deleteMany({ where: { userId: { in: ids } } });
-    await prisma.user.deleteMany({ where: { id: { in: ids } } });
-    await prisma.$executeRawUnsafe('SET session_replication_role = DEFAULT;');
-  } catch (err) {
-    console.warn(
-      '[E2E] DB cleanup skipped (DB unreachable from this host). ' +
-        'Firebase users were deleted above. App DB records will persist until next railway run cleanup.',
-      (err as Error).message
-    );
-  }
-}
-
-export async function disconnectPrisma(): Promise<void> {
-  await prisma.$disconnect();
-  // Clean up the Firebase app
+  // 3. Clean up the Firebase app instance
   if (firebaseApp) {
     await firebaseApp.delete();
     firebaseApp = null;
