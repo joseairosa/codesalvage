@@ -456,6 +456,8 @@ export async function api(
 export const get = (path: string, token?: string) => api('GET', path, { token });
 export const post = (path: string, body: unknown, token?: string) =>
   api('POST', path, { body, token });
+export const put = (path: string, body: unknown, token?: string) =>
+  api('PUT', path, { body, token });
 export const patch = (path: string, body: unknown, token?: string) =>
   api('PATCH', path, { body, token });
 export const del = (path: string, token?: string) => api('DELETE', path, { token });
