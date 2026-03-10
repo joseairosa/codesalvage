@@ -97,7 +97,9 @@ describe('POST /api/stripe/connect/onboard', () => {
     mockPrismaUserFindUnique.mockResolvedValue({ ...mockUser, stripeAccountId: null });
     mockCreateConnectAccount.mockResolvedValue('acct_new123');
     mockPrismaUserUpdate.mockResolvedValue({});
-    mockCreateAccountLink.mockResolvedValue('https://connect.stripe.com/onboard/acct_new123');
+    mockCreateAccountLink.mockResolvedValue(
+      'https://connect.stripe.com/onboard/acct_new123'
+    );
 
     const res = await POST(makeRequest());
     const body = await res.json();
@@ -118,8 +120,13 @@ describe('POST /api/stripe/connect/onboard', () => {
 
   it('uses existing account ID when one is already stored', async () => {
     mockAuthenticateApiRequest.mockResolvedValue({ user: { id: 'user1' } });
-    mockPrismaUserFindUnique.mockResolvedValue({ ...mockUser, stripeAccountId: 'acct_existing' });
-    mockCreateAccountLink.mockResolvedValue('https://connect.stripe.com/onboard/acct_existing');
+    mockPrismaUserFindUnique.mockResolvedValue({
+      ...mockUser,
+      stripeAccountId: 'acct_existing',
+    });
+    mockCreateAccountLink.mockResolvedValue(
+      'https://connect.stripe.com/onboard/acct_existing'
+    );
 
     const res = await POST(makeRequest());
     const body = await res.json();
@@ -132,11 +139,17 @@ describe('POST /api/stripe/connect/onboard', () => {
 
   it('self-heals: resets stale account ID and creates fresh account when resource_missing', async () => {
     mockAuthenticateApiRequest.mockResolvedValue({ user: { id: 'user1' } });
-    mockPrismaUserFindUnique.mockResolvedValue({ ...mockUser, stripeAccountId: 'acct_stale_test' });
-
-    const resourceMissingError = Object.assign(new Error('No such account: acct_stale_test'), {
-      code: 'resource_missing',
+    mockPrismaUserFindUnique.mockResolvedValue({
+      ...mockUser,
+      stripeAccountId: 'acct_stale_test',
     });
+
+    const resourceMissingError = Object.assign(
+      new Error('No such account: acct_stale_test'),
+      {
+        code: 'resource_missing',
+      }
+    );
     mockCreateAccountLink
       .mockRejectedValueOnce(resourceMissingError)
       .mockResolvedValueOnce('https://connect.stripe.com/onboard/acct_fresh');
@@ -166,7 +179,10 @@ describe('POST /api/stripe/connect/onboard', () => {
 
   it('re-throws non-resource_missing Stripe errors', async () => {
     mockAuthenticateApiRequest.mockResolvedValue({ user: { id: 'user1' } });
-    mockPrismaUserFindUnique.mockResolvedValue({ ...mockUser, stripeAccountId: 'acct_existing' });
+    mockPrismaUserFindUnique.mockResolvedValue({
+      ...mockUser,
+      stripeAccountId: 'acct_existing',
+    });
     mockCreateAccountLink.mockRejectedValue(new Error('Stripe network error'));
 
     const res = await POST(makeRequest());

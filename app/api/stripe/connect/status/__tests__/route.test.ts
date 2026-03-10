@@ -157,12 +157,18 @@ describe('GET /api/stripe/connect/status', () => {
 
   it('self-heals: resets stale account ID and returns needsOnboarding when resource_missing', async () => {
     mockAuthenticateApiRequest.mockResolvedValue({ user: { id: 'user1' } });
-    mockPrismaUserFindUnique.mockResolvedValue({ ...mockUser, stripeAccountId: 'acct_stale_test' });
+    mockPrismaUserFindUnique.mockResolvedValue({
+      ...mockUser,
+      stripeAccountId: 'acct_stale_test',
+    });
     mockPrismaUserUpdate.mockResolvedValue({});
 
-    const resourceMissingError = Object.assign(new Error('No such account: acct_stale_test'), {
-      code: 'resource_missing',
-    });
+    const resourceMissingError = Object.assign(
+      new Error('No such account: acct_stale_test'),
+      {
+        code: 'resource_missing',
+      }
+    );
     mockGetOrSetCache.mockRejectedValue(resourceMissingError);
 
     const res = await GET(makeRequest());

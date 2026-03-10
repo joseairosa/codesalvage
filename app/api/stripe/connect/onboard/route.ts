@@ -85,7 +85,11 @@ export async function POST(request: Request) {
 
     let onboardingUrl: string;
     try {
-      onboardingUrl = await stripeService.createAccountLink(accountId, returnUrl, refreshUrl);
+      onboardingUrl = await stripeService.createAccountLink(
+        accountId,
+        returnUrl,
+        refreshUrl
+      );
     } catch (linkError) {
       // Stored account ID doesn't exist in Stripe (e.g. test-mode ID after switching to live).
       // Clear it and create a fresh account so the seller can re-onboard.
@@ -112,7 +116,11 @@ export async function POST(request: Request) {
           data: { stripeAccountId: accountId, isSeller: true },
         });
 
-        onboardingUrl = await stripeService.createAccountLink(accountId, returnUrl, refreshUrl);
+        onboardingUrl = await stripeService.createAccountLink(
+          accountId,
+          returnUrl,
+          refreshUrl
+        );
       } else {
         throw linkError;
       }
