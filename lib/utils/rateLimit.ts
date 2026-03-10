@@ -267,11 +267,11 @@ export const RateLimitPresets = {
   },
 
   /**
-   * API endpoints: 100 requests / minute per user
+   * API endpoints: 500 requests / minute per user
    * Use for authenticated API routes
    */
   api: {
-    maxRequests: 100,
+    maxRequests: 500,
     windowSeconds: 60,
     namespace: 'api',
   },
