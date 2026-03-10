@@ -5,14 +5,7 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import {
-  createE2EUser,
-  cleanupE2EData,
-  disconnectPrisma,
-  get,
-  patch,
-  BASE_URL,
-} from './helpers';
+import { createE2EUser, cleanupE2E, get, patch, BASE_URL } from './helpers';
 import type { E2EUser } from './helpers';
 
 let buyer: E2EUser;
@@ -22,8 +15,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await cleanupE2EData();
-  await disconnectPrisma();
+  await cleanupE2E();
 });
 
 describe('02 · User Identity', () => {
