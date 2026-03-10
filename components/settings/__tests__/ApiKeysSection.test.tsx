@@ -46,7 +46,14 @@ function makePostResponse(overrides = {}) {
     json: () =>
       Promise.resolve({
         apiKey: 'sk-newkeyvalue',
-        keyData: { id: 'key3', name: 'test', prefix: 'sk-newk', status: 'active', expiresAt: null, createdAt: new Date().toISOString() },
+        keyData: {
+          id: 'key3',
+          name: 'test',
+          prefix: 'sk-newk',
+          status: 'active',
+          expiresAt: null,
+          createdAt: new Date().toISOString(),
+        },
         message: 'Save this key securely.',
         ...overrides,
       }),
@@ -100,7 +107,9 @@ describe('ApiKeysSection', () => {
     render(<ApiKeysSection />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Failed to load API keys \(undefined\)|Failed to load API keys/)).toBeDefined();
+      expect(
+        screen.getByText(/Failed to load API keys \(undefined\)|Failed to load API keys/)
+      ).toBeDefined();
     });
   });
 

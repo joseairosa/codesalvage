@@ -81,8 +81,8 @@ export default async function SettingsPage() {
         <CardHeader>
           <CardTitle>API Keys</CardTitle>
           <CardDescription>
-            Use API keys to authenticate requests from scripts or CI pipelines.
-            Keys start with <code className="text-xs">sk-</code>.
+            Use API keys to authenticate requests from scripts or CI pipelines. Keys start
+            with <code className="text-xs">sk-</code>.
           </CardDescription>
         </CardHeader>
         <CardContent>

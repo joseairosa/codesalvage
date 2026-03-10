@@ -121,7 +121,7 @@ export function ApiKeysSection() {
               API key created — save it now. You will not be able to see it again.
             </p>
             <div className="flex items-center gap-2">
-              <code className="flex-1 break-all rounded bg-green-100 px-3 py-2 text-xs font-mono text-green-900">
+              <code className="flex-1 break-all rounded bg-green-100 px-3 py-2 font-mono text-xs text-green-900">
                 {newKeyValue}
               </code>
               <Button
@@ -201,9 +201,7 @@ export function ApiKeysSection() {
             >
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{key.name}</p>
-                <p className="font-mono text-xs text-muted-foreground">
-                  {key.prefix}…
-                </p>
+                <p className="font-mono text-xs text-muted-foreground">{key.prefix}…</p>
               </div>
               <div className="flex shrink-0 items-center gap-3 text-xs text-muted-foreground">
                 {key.lastUsedAt ? (
