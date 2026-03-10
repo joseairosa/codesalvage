@@ -61,10 +61,12 @@ export default async function DashboardPage() {
     chargesEnabled: boolean;
     payoutsEnabled: boolean;
   } | null = null;
-  if (session.user.isSeller && !isVerifiedSeller && user?.stripeAccountId) {
+  if (session.user.isSeller && user?.stripeAccountId) {
     try {
       onboardingStatus = await stripeService.getOnboardingStatus(user.stripeAccountId);
-      if (onboardingStatus.chargesEnabled && onboardingStatus.detailsSubmitted) {
+      const fullyOnboarded =
+        onboardingStatus.chargesEnabled && onboardingStatus.detailsSubmitted;
+      if (fullyOnboarded && !isVerifiedSeller) {
         await prisma.user.update({
           where: { id: session.user.id },
           data: { isVerifiedSeller: true },
@@ -73,9 +75,31 @@ export default async function DashboardPage() {
         console.log('[Dashboard] Self-healed: updated isVerifiedSeller to true', {
           userId: session.user.id,
         });
+      } else if (!fullyOnboarded && isVerifiedSeller) {
+        await prisma.user.update({
+          where: { id: session.user.id },
+          data: { isVerifiedSeller: false },
+        });
+        isVerifiedSeller = false;
+        console.warn('[Dashboard] isVerifiedSeller was stale, reset to false', {
+          userId: session.user.id,
+        });
       }
     } catch (err) {
-      console.error('[Dashboard] Failed to check Stripe onboarding status:', err);
+      const stripeErr = err as { code?: string };
+      if (stripeErr.code === 'resource_missing') {
+        console.warn(
+          '[Dashboard] Stale stripeAccountId detected, resetting:',
+          user.stripeAccountId
+        );
+        await prisma.user.update({
+          where: { id: session.user.id },
+          data: { stripeAccountId: null, isVerifiedSeller: false },
+        });
+        isVerifiedSeller = false;
+      } else {
+        console.error('[Dashboard] Failed to check Stripe onboarding status:', err);
+      }
     }
   }
 
