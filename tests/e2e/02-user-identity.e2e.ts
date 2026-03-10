@@ -5,7 +5,14 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createE2EUser, cleanupE2EData, disconnectPrisma, get, patch } from './helpers';
+import {
+  createE2EUser,
+  cleanupE2EData,
+  disconnectPrisma,
+  get,
+  patch,
+  BASE_URL,
+} from './helpers';
 import type { E2EUser } from './helpers';
 
 let buyer: E2EUser;
@@ -20,31 +27,41 @@ afterAll(async () => {
 });
 
 describe('02 · User Identity', () => {
-  it('GET /api/auth/me (unauthenticated) → 401', async () => {
-    const { status } = await get('/api/auth/me');
-    expect(status).toBe(401);
-  });
-
-  it('GET /api/auth/me (API key) → 200 with user fields', async () => {
-    const { status, body } = await get('/api/auth/me', buyer.apiKey);
+  // /api/auth/me returns 200 with { user: null } when unauthenticated (not 401),
+  // so callers can distinguish "not logged in" from server errors.
+  it('GET /api/auth/me (unauthenticated) → 200 with null user', async () => {
+    const { status, body } = await get('/api/auth/me');
     expect(status).toBe(200);
     const b = body as Record<string, unknown>;
-    expect(b).toHaveProperty('id');
-    expect(b).toHaveProperty('email');
-    expect(b).toHaveProperty('username');
-    expect(b.username).toBe(buyer.username);
+    expect(b.user).toBeNull();
+  });
+
+  // /api/auth/me reads the session cookie (httpOnly), not the Authorization header.
+  // Use the session cookie from the E2E user directly.
+  it('GET /api/auth/me (session cookie) → 200 with user fields', async () => {
+    const res = await fetch(`${BASE_URL}/api/auth/me`, {
+      headers: { Cookie: `session=${buyer.sessionCookie}` },
+    });
+    expect(res.status).toBe(200);
+    const b = (await res.json()) as { user: Record<string, unknown> | null };
+    expect(b.user).not.toBeNull();
+    expect(b.user).toHaveProperty('id');
+    expect(b.user).toHaveProperty('email');
+    expect(b.user).toHaveProperty('username');
+    expect(b.user!['username']).toBe(buyer.username);
   });
 
   it('PATCH /api/user/profile → 200, bio updated', async () => {
     const newBio = 'E2E test bio updated at ' + Date.now();
     const { status, body } = await patch(
       '/api/user/profile',
-      { bio: newBio },
+      { bio: newBio, username: buyer.username },
       buyer.apiKey
     );
     expect(status).toBe(200);
-    const b = body as Record<string, unknown>;
-    expect(b.bio).toBe(newBio);
+    // Route returns { user: { id, fullName, username, bio } }
+    const b = body as { user: Record<string, unknown> };
+    expect(b.user.bio).toBe(newBio);
   });
 
   it('GET /api/notifications → 200, returns array', async () => {
@@ -59,7 +76,8 @@ describe('02 · User Identity', () => {
     const { status, body } = await get('/api/notifications/unread-count', buyer.apiKey);
     expect(status).toBe(200);
     const b = body as Record<string, unknown>;
-    expect(typeof b.count).toBe('number');
+    // Response shape: { unreadCount: number }
+    expect(typeof b.unreadCount).toBe('number');
   });
 
   it('GET /api/user/github-status → 200', async () => {
