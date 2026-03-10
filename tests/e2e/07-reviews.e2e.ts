@@ -58,7 +58,8 @@ describe('07 · Reviews', () => {
     );
     expect([200, 201]).toContain(status);
     const b = body as Record<string, unknown>;
-    expect(b).toHaveProperty('id');
+    const reviewObj = (b.review ?? b) as Record<string, unknown>;
+    expect(reviewObj).toHaveProperty('id');
   });
 
   it('GET /api/reviews?sellerId → list includes new review', async () => {
