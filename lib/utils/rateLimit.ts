@@ -306,6 +306,17 @@ export const RateLimitPresets = {
     windowSeconds: 60,
     namespace: 'poll',
   },
+
+  /**
+   * Analysis endpoints: 30 requests / hour per user
+   * Use for AI-powered analysis (repo analysis, code scanning).
+   * Separate namespace, higher than strict (10/hr) for core product workflows.
+   */
+  analysis: {
+    maxRequests: 30,
+    windowSeconds: 3600,
+    namespace: 'analysis',
+  },
 };
 
 /**

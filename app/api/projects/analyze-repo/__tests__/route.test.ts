@@ -49,6 +49,7 @@ vi.mock('@/lib/utils/cache', () => ({
 
 vi.mock('@/lib/middleware/withRateLimit', () => ({
   withRateLimit: (handler: unknown) => handler,
+  withAnalysisRateLimit: (handler: unknown) => handler,
 }));
 
 vi.mock('@/lib/prisma', () => ({

@@ -127,3 +127,17 @@ export function withPollingRateLimit(
 ): RouteHandler {
   return withRateLimit(handler, 'polling', getIdentifier);
 }
+
+/**
+ * Apply analysis rate limiting (30 requests / hour per user)
+ * Use for AI-powered analysis endpoints (repo analysis, code scanning).
+ * More generous than strict (10/hr) for core product workflows.
+ */
+export function withAnalysisRateLimit(
+  handler: RouteHandler,
+  getIdentifier?: (
+    request: NextRequest
+  ) => Promise<string | undefined> | string | undefined
+): RouteHandler {
+  return withRateLimit(handler, 'analysis', getIdentifier);
+}
