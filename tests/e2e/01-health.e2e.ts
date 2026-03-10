@@ -44,8 +44,8 @@ describe('01 · Health & Public Endpoints', () => {
   });
 
   it('Protected routes return 401 without auth', async () => {
+    // Note: /api/auth/me intentionally returns 200 with {user:null} when unauthenticated
     const routes = [
-      () => get('/api/auth/me'),
       () => get('/api/analytics/overview'),
       () => get('/api/transactions'),
       () => get('/api/notifications'),
