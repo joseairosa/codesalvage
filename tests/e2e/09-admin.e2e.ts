@@ -81,7 +81,8 @@ describe('09 · Admin', () => {
     });
     const approveBody = (await res.json()) as Record<string, unknown>;
     expect(res.status).toBe(200);
-    expect(approveBody).toHaveProperty('id');
+    const proj = (approveBody.project ?? approveBody) as Record<string, unknown>;
+    expect(proj).toHaveProperty('id');
   });
 
   it('PUT /api/admin/projects/:id/approve → 401 for non-admin', async () => {
@@ -110,7 +111,8 @@ describe('09 · Admin', () => {
     });
     expect(res.status).toBe(200);
     const b = (await res.json()) as Record<string, unknown>;
-    expect(b).toHaveProperty('id');
+    const userObj = (b.user ?? b) as Record<string, unknown>;
+    expect(userObj).toHaveProperty('id');
   });
 
   it('PUT /api/admin/users/:id/unban → 200 user unbanned', async () => {
@@ -124,7 +126,8 @@ describe('09 · Admin', () => {
     });
     expect(res.status).toBe(200);
     const b = (await res.json()) as Record<string, unknown>;
-    expect(b).toHaveProperty('id');
+    const userObj2 = (b.user ?? b) as Record<string, unknown>;
+    expect(userObj2).toHaveProperty('id');
   });
 
   it('PUT /api/admin/users/:id/ban → 401 for non-admin', async () => {

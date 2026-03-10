@@ -30,7 +30,7 @@ describe('06 · Offers', () => {
   it('POST /api/offers → 201, offer created with status pending', async () => {
     const { status, body } = await post(
       '/api/offers',
-      { projectId, amountCents: 15000, message: 'E2E test offer' },
+      { projectId, offeredPriceCents: 15000, message: 'E2E test offer' },
       buyer.apiKey
     );
     expect([200, 201]).toContain(status);
@@ -62,7 +62,7 @@ describe('06 · Offers', () => {
     if (!offerId) return;
     const { status, body } = await post(
       `/api/offers/${offerId}/counter`,
-      { amountCents: 17000, message: 'Counter offer from seller' },
+      { counterPriceCents: 17000, message: 'Counter offer from seller' },
       seller.apiKey
     );
     expect(status).toBe(200);
@@ -81,7 +81,7 @@ describe('06 · Offers', () => {
   it('POST /api/offers/:id/reject (seller) → status rejected', async () => {
     const { body: ob } = await post(
       '/api/offers',
-      { projectId, amountCents: 8000, message: 'Low offer to reject' },
+      { projectId, offeredPriceCents: 8000, message: 'Low offer to reject' },
       buyer.apiKey
     );
     const rejectId = (ob as Record<string, unknown>).id as string;
@@ -99,7 +99,7 @@ describe('06 · Offers', () => {
   it('POST /api/offers/:id/withdraw (buyer) → status withdrawn', async () => {
     const { body: ob } = await post(
       '/api/offers',
-      { projectId, amountCents: 12000, message: 'Offer to withdraw' },
+      { projectId, offeredPriceCents: 12000, message: 'Offer to withdraw' },
       buyer.apiKey
     );
     const withdrawOfferId = (ob as Record<string, unknown>).id as string;

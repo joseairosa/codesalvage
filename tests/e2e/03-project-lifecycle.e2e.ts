@@ -31,7 +31,7 @@ describe('03 · Project Lifecycle', () => {
           'This is an E2E test project with enough description content to pass validation requirements for a complete project listing.',
         category: 'web_app',
         completionPercentage: 75,
-        priceCents: 9900,
+        priceCents: 10000,
         techStack: ['React', 'TypeScript'],
         primaryLanguage: 'TypeScript',
         licenseType: 'full_code',
