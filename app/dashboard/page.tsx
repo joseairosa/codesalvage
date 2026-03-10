@@ -64,7 +64,8 @@ export default async function DashboardPage() {
   if (session.user.isSeller && user?.stripeAccountId) {
     try {
       onboardingStatus = await stripeService.getOnboardingStatus(user.stripeAccountId);
-      const fullyOnboarded = onboardingStatus.chargesEnabled && onboardingStatus.detailsSubmitted;
+      const fullyOnboarded =
+        onboardingStatus.chargesEnabled && onboardingStatus.detailsSubmitted;
       if (fullyOnboarded && !isVerifiedSeller) {
         await prisma.user.update({
           where: { id: session.user.id },
@@ -87,7 +88,10 @@ export default async function DashboardPage() {
     } catch (err) {
       const stripeErr = err as { code?: string };
       if (stripeErr.code === 'resource_missing') {
-        console.warn('[Dashboard] Stale stripeAccountId detected, resetting:', user.stripeAccountId);
+        console.warn(
+          '[Dashboard] Stale stripeAccountId detected, resetting:',
+          user.stripeAccountId
+        );
         await prisma.user.update({
           where: { id: session.user.id },
           data: { stripeAccountId: null, isVerifiedSeller: false },
