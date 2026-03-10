@@ -13,7 +13,7 @@
 
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { verifyFirebaseToken } from '@/lib/firebase-auth';
+import { verifySessionCookieOrIdToken } from '@/lib/firebase-auth';
 import { prisma } from '@/lib/prisma';
 
 /**
@@ -37,7 +37,7 @@ export async function POST(
     }
 
     // Verify authentication
-    const auth = await verifyFirebaseToken(sessionToken);
+    const auth = await verifySessionCookieOrIdToken(sessionToken);
 
     // Get keyId from params
     const { keyId } = await params;
