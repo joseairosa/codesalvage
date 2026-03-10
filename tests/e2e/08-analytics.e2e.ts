@@ -28,7 +28,7 @@ describe('08 · Seller Analytics', () => {
     const { status, body } = await get('/api/analytics/overview', seller.apiKey);
     expect(status).toBe(200);
     const b = body as Record<string, unknown>;
-    const hasKnownKey = ['totalRevenue', 'revenue', 'data', 'overview', 'projects'].some(
+    const hasKnownKey = ['summary', 'userId', 'revenueOverTime', 'topProjects'].some(
       (k) => k in b
     );
     expect(hasKnownKey).toBe(true);
