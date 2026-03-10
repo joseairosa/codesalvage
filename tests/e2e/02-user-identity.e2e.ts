@@ -52,8 +52,9 @@ describe('02 · User Identity', () => {
       buyer.apiKey
     );
     expect(status).toBe(200);
-    const b = body as Record<string, unknown>;
-    expect(b.bio).toBe(newBio);
+    // Route returns { user: { id, fullName, username, bio } }
+    const b = body as { user: Record<string, unknown> };
+    expect(b.user.bio).toBe(newBio);
   });
 
   it('GET /api/notifications → 200, returns array', async () => {
