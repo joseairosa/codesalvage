@@ -514,6 +514,7 @@ export class UserRepository {
       isSeller?: boolean;
       isVerifiedSeller?: boolean;
       isAdmin?: boolean;
+      stripeAccountId?: string | null;
     }
   ): Promise<User> {
     console.log('[UserRepository] updateUserRoles called:', { userId, roles });

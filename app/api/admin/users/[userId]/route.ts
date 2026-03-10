@@ -13,6 +13,7 @@
  * - isSeller?: boolean
  * - isVerifiedSeller?: boolean
  * - isAdmin?: boolean
+ * - stripeAccountId?: string | null
  *
  * Responses:
  * - 200: User roles updated successfully
@@ -32,13 +33,15 @@ const updateUserRolesSchema = z
     isSeller: z.boolean().optional(),
     isVerifiedSeller: z.boolean().optional(),
     isAdmin: z.boolean().optional(),
+    stripeAccountId: z.string().nullable().optional(),
   })
   .refine(
     (data) =>
       data.isSeller !== undefined ||
       data.isVerifiedSeller !== undefined ||
-      data.isAdmin !== undefined,
-    { message: 'At least one role field must be provided' }
+      data.isAdmin !== undefined ||
+      data.stripeAccountId !== undefined,
+    { message: 'At least one field must be provided' }
   );
 
 /**
@@ -70,7 +73,8 @@ export async function PATCH(
 
     const userRepo = getUserRepository();
     // Strip undefined values: exactOptionalPropertyTypes requires absent keys, not undefined ones
-    const roles: { isSeller?: boolean; isVerifiedSeller?: boolean; isAdmin?: boolean } =
+    // Note: null is a valid value for stripeAccountId (clears the field), so only filter strict undefined
+    const roles: { isSeller?: boolean; isVerifiedSeller?: boolean; isAdmin?: boolean; stripeAccountId?: string | null } =
       Object.fromEntries(
         Object.entries(validatedData).filter(([, v]) => v !== undefined)
       );
