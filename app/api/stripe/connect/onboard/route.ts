@@ -83,11 +83,40 @@ export async function POST(request: Request) {
     const returnUrl = `${baseUrl}/seller/dashboard`;
     const refreshUrl = `${baseUrl}/seller/onboard`;
 
-    const onboardingUrl = await stripeService.createAccountLink(
-      accountId,
-      returnUrl,
-      refreshUrl
-    );
+    let onboardingUrl: string;
+    try {
+      onboardingUrl = await stripeService.createAccountLink(accountId, returnUrl, refreshUrl);
+    } catch (linkError) {
+      // Stored account ID doesn't exist in Stripe (e.g. test-mode ID after switching to live).
+      // Clear it and create a fresh account so the seller can re-onboard.
+      const stripeErr = linkError as { code?: string };
+      if (stripeErr.code === 'resource_missing') {
+        console.warn(
+          '[Stripe Onboard] Stored account ID not found in Stripe, resetting and creating new account:',
+          accountId
+        );
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { stripeAccountId: null, isVerifiedSeller: false },
+        });
+
+        accountId = await stripeService.createConnectAccount({
+          id: user.id,
+          email: user.email,
+          fullName: user.fullName,
+        });
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { stripeAccountId: accountId, isSeller: true },
+        });
+
+        onboardingUrl = await stripeService.createAccountLink(accountId, returnUrl, refreshUrl);
+      } else {
+        throw linkError;
+      }
+    }
 
     console.log('[Stripe Onboard] Onboarding link created');
 
