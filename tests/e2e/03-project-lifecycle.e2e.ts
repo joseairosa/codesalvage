@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createE2EUser, cleanupE2E, get, post, patch, del } from './helpers';
+import { createE2EUser, cleanupE2E, get, post, put, del } from './helpers';
 import type { E2EUser } from './helpers';
 
 let seller: E2EUser;
@@ -31,7 +31,7 @@ describe('03 · Project Lifecycle', () => {
           'This is an E2E test project with enough description content to pass validation requirements for a complete project listing.',
         category: 'web_app',
         completionPercentage: 75,
-        priceCents: 9900,
+        priceCents: 10000,
         techStack: ['React', 'TypeScript'],
         primaryLanguage: 'TypeScript',
         licenseType: 'full_code',
@@ -55,9 +55,9 @@ describe('03 · Project Lifecycle', () => {
     expect(b.title).toBe('E2E Test Project');
   });
 
-  it('PATCH /api/projects/:id → 200, title updated', async () => {
+  it('PUT /api/projects/:id → 200, title updated', async () => {
     if (!projectId) return;
-    const { status, body } = await patch(
+    const { status, body } = await put(
       `/api/projects/${projectId}`,
       { title: 'E2E Test Project (Updated)' },
       seller.apiKey
@@ -89,9 +89,9 @@ describe('03 · Project Lifecycle', () => {
     expect(ids).toContain(projectId);
   });
 
-  it('PATCH /api/projects/:id (wrong user) → 403', async () => {
+  it('PUT /api/projects/:id (wrong user) → 403', async () => {
     if (!projectId) return;
-    const { status } = await patch(
+    const { status } = await put(
       `/api/projects/${projectId}`,
       { title: 'Should not work' },
       otherSeller.apiKey

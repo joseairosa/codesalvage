@@ -38,7 +38,8 @@ describe('05 · Messaging', () => {
     );
     expect([200, 201]).toContain(status);
     const b = body as Record<string, unknown>;
-    expect(b).toHaveProperty('id');
+    const msgObj = (b.message ?? b) as Record<string, unknown>;
+    expect(msgObj).toHaveProperty('id');
   });
 
   it('GET /api/messages → 200, conversation list returned', async () => {
@@ -61,7 +62,7 @@ describe('05 · Messaging', () => {
   it('POST /api/messages/read → 200, messages marked read', async () => {
     const { status } = await post(
       '/api/messages/read',
-      { senderId: buyer.id },
+      { userId: buyer.id },
       seller.apiKey
     );
     expect([200, 204]).toContain(status);

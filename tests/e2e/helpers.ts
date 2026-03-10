@@ -263,7 +263,7 @@ export async function createE2EProject(
         'E2E test project with enough description content to pass validation requirements for a complete project listing on CodeSalvage.',
       category: 'web_app',
       completionPercentage: 75,
-      priceCents: 9900,
+      priceCents: 10000,
       techStack: ['React', 'TypeScript'],
       primaryLanguage: 'TypeScript',
       licenseType: 'full_code',
@@ -329,7 +329,7 @@ export async function createE2EDraftProject(
         'E2E test draft project for admin approve/reject testing on CodeSalvage.',
       category: 'web_app',
       completionPercentage: 75,
-      priceCents: 9900,
+      priceCents: 10000,
       techStack: ['Vue', 'JavaScript'],
       primaryLanguage: 'JavaScript',
       licenseType: 'full_code',
@@ -456,6 +456,8 @@ export async function api(
 export const get = (path: string, token?: string) => api('GET', path, { token });
 export const post = (path: string, body: unknown, token?: string) =>
   api('POST', path, { body, token });
+export const put = (path: string, body: unknown, token?: string) =>
+  api('PUT', path, { body, token });
 export const patch = (path: string, body: unknown, token?: string) =>
   api('PATCH', path, { body, token });
 export const del = (path: string, token?: string) => api('DELETE', path, { token });
