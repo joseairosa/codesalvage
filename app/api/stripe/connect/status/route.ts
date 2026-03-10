@@ -61,11 +61,35 @@ async function getConnectStatus(request: NextRequest) {
     }
 
     // Check account status with Stripe (cached — avoids external API call on every load)
-    const isOnboarded = await getOrSetCache(
-      CacheKeys.stripeConnectStatus(auth.user.id),
-      CacheTTL.SUBSCRIPTION,
-      () => stripeService.isAccountOnboarded(user.stripeAccountId!)
-    );
+    let isOnboarded: boolean;
+    try {
+      isOnboarded = await getOrSetCache(
+        CacheKeys.stripeConnectStatus(auth.user.id),
+        CacheTTL.SUBSCRIPTION,
+        () => stripeService.isAccountOnboarded(user.stripeAccountId!)
+      );
+    } catch (statusError) {
+      // Stored account ID doesn't exist in Stripe (e.g. test-mode ID after switching to live).
+      // Reset so the seller is prompted to re-onboard.
+      const stripeErr = statusError as { code?: string };
+      if (stripeErr.code === 'resource_missing') {
+        console.warn(
+          '[Stripe Status] Stored account ID not found in Stripe, resetting:',
+          user.stripeAccountId
+        );
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { stripeAccountId: null, isVerifiedSeller: false },
+        });
+
+        return NextResponse.json(
+          { isOnboarded: false, accountId: null, needsOnboarding: true },
+          { status: 200 }
+        );
+      }
+      throw statusError;
+    }
 
     console.log('[Stripe Status] Account status:', {
       accountId: user.stripeAccountId,
