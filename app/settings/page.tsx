@@ -76,19 +76,21 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* API Keys Section */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>API Keys</CardTitle>
-          <CardDescription>
-            Use API keys to authenticate requests from scripts or CI pipelines. Keys start
-            with <code className="text-xs">sk-</code>.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ApiKeysSection />
-        </CardContent>
-      </Card>
+      {/* API Keys Section (admin only) */}
+      {session.user.isAdmin && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>API Keys</CardTitle>
+            <CardDescription>
+              Use API keys to authenticate requests from scripts or CI pipelines. Keys start
+              with <code className="text-xs">sk-</code>.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ApiKeysSection />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Account Info Section (read-only) */}
       <Card>
