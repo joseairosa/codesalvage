@@ -136,7 +136,7 @@ export default function BuyerPurchasesPage() {
       const response = await fetch(`/api/transactions?view=buyer&page=${page}&limit=10`);
 
       if (!response.ok) {
-        throw new Error('Failed to load purchases');
+        throw new Error(`Failed to load purchases (${response.status})`);
       }
 
       const data: PurchasesResponse = await response.json();
