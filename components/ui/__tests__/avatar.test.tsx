@@ -10,11 +10,13 @@ import { Avatar, AvatarImage, AvatarFallback } from '../avatar';
 // Radix AvatarImage withholds the <img> from the DOM until the image loads.
 // In jsdom images never load, so we mock the primitive to render directly.
 vi.mock('@radix-ui/react-avatar', async (importOriginal) => {
-  const original = await importOriginal<typeof import('@radix-ui/react-avatar')>();
+  const original = (await importOriginal()) as Record<string, unknown>;
   return {
     ...original,
     Image: React.forwardRef<HTMLImageElement, React.ImgHTMLAttributes<HTMLImageElement>>(
-      ({ className, ...props }, ref) => <img ref={ref} className={className} {...props} />
+      function MockAvatarImage({ className, ...props }, ref) {
+        return <img ref={ref} className={className} {...props} />;
+      }
     ),
   };
 });
