@@ -15,7 +15,7 @@
 
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { verifyFirebaseToken } from '@/lib/firebase-auth';
+import { verifySessionCookieOrIdToken } from '@/lib/firebase-auth';
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
 
@@ -35,7 +35,7 @@ export async function GET() {
     }
 
     // Verify authentication
-    const auth = await verifyFirebaseToken(sessionToken);
+    const auth = await verifySessionCookieOrIdToken(sessionToken);
 
     console.log('[API Keys] GET: Listing API keys for user:', auth.user.id);
 
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     }
 
     // Verify authentication
-    const auth = await verifyFirebaseToken(sessionToken);
+    const auth = await verifySessionCookieOrIdToken(sessionToken);
 
     // Parse request body
     const body = await request.json();

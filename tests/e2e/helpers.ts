@@ -115,6 +115,12 @@ export interface E2EUser {
   apiKey: string;
   /** Raw session cookie, useful for endpoints that require cookie auth */
   sessionCookie: string;
+  /**
+   * True if role flags (isSeller/isAdmin/isVerifiedSeller) were successfully
+   * written to the DB. False when the DB is unreachable from this machine
+   * (e.g. running against Railway production which uses a private internal URL).
+   */
+  rolesSet: boolean;
 }
 
 /**
@@ -169,22 +175,35 @@ export async function createE2EUser(opts?: {
     const err = await apiKeyRes.text();
     throw new Error(`[E2E] /api/user/api-keys failed (${apiKeyRes.status}): ${err}`);
   }
-  const keyBody = (await apiKeyRes.json()) as { key: string };
-  const apiKey = keyBody.key;
+  const keyBody = (await apiKeyRes.json()) as { apiKey: string };
+  const apiKey = keyBody.apiKey;
 
-  // 6. Set role flags via Prisma (no public API for these)
+  // 6. Set role flags via Prisma (no public API for these).
+  // Soft-fails when the DB is unreachable (e.g. Railway internal network).
+  let rolesSet = false;
   if (opts?.isSeller || opts?.isVerifiedSeller || opts?.isAdmin) {
-    await prisma.user.update({
-      where: { id },
-      data: {
-        isSeller: opts.isSeller ?? false,
-        isVerifiedSeller: opts.isVerifiedSeller ?? false,
-        isAdmin: opts.isAdmin ?? false,
-      },
-    });
+    try {
+      await prisma.user.update({
+        where: { id },
+        data: {
+          isSeller: opts.isSeller ?? false,
+          isVerifiedSeller: opts.isVerifiedSeller ?? false,
+          isAdmin: opts.isAdmin ?? false,
+        },
+      });
+      rolesSet = true;
+    } catch (err) {
+      console.warn(
+        '[E2E] DB role flags could not be set (DB unreachable from this host). ' +
+          'Tests that require specific roles will be skipped.',
+        (err as Error).message
+      );
+    }
+  } else {
+    rolesSet = true; // No roles needed, consider it "set"
   }
 
-  return { id, email, username, apiKey, sessionCookie };
+  return { id, email, username, apiKey, sessionCookie, rolesSet };
 }
 
 /**
@@ -208,30 +227,39 @@ export async function cleanupE2EData(): Promise<void> {
     console.warn('[E2E] Firebase user cleanup failed:', err);
   }
 
-  // 2. Delete app DB records (FK-safe order)
-  const users = await prisma.user.findMany({
-    where: { email: { contains: `@${E2E_EMAIL_DOMAIN}` } },
-    select: { id: true },
-  });
+  // 2. Delete app DB records (FK-safe order).
+  // Soft-fails when DB is unreachable (e.g. Railway internal network from localhost).
+  try {
+    const users = await prisma.user.findMany({
+      where: { email: { contains: `@${E2E_EMAIL_DOMAIN}` } },
+      select: { id: true },
+    });
 
-  if (users.length === 0) return;
-  const ids = users.map((u) => u.id);
+    if (users.length === 0) return;
+    const ids = users.map((u) => u.id);
 
-  await prisma.$executeRawUnsafe('SET session_replication_role = replica;');
-  await prisma.message.deleteMany({
-    where: { OR: [{ senderId: { in: ids } }, { recipientId: { in: ids } }] },
-  });
-  await prisma.review.deleteMany({
-    where: { OR: [{ buyerId: { in: ids } }, { sellerId: { in: ids } }] },
-  });
-  await prisma.transaction.deleteMany({
-    where: { OR: [{ buyerId: { in: ids } }, { sellerId: { in: ids } }] },
-  });
-  await prisma.favorite.deleteMany({ where: { userId: { in: ids } } });
-  await prisma.project.deleteMany({ where: { sellerId: { in: ids } } });
-  await prisma.apiKey.deleteMany({ where: { userId: { in: ids } } });
-  await prisma.user.deleteMany({ where: { id: { in: ids } } });
-  await prisma.$executeRawUnsafe('SET session_replication_role = DEFAULT;');
+    await prisma.$executeRawUnsafe('SET session_replication_role = replica;');
+    await prisma.message.deleteMany({
+      where: { OR: [{ senderId: { in: ids } }, { recipientId: { in: ids } }] },
+    });
+    await prisma.review.deleteMany({
+      where: { OR: [{ buyerId: { in: ids } }, { sellerId: { in: ids } }] },
+    });
+    await prisma.transaction.deleteMany({
+      where: { OR: [{ buyerId: { in: ids } }, { sellerId: { in: ids } }] },
+    });
+    await prisma.favorite.deleteMany({ where: { userId: { in: ids } } });
+    await prisma.project.deleteMany({ where: { sellerId: { in: ids } } });
+    await prisma.apiKey.deleteMany({ where: { userId: { in: ids } } });
+    await prisma.user.deleteMany({ where: { id: { in: ids } } });
+    await prisma.$executeRawUnsafe('SET session_replication_role = DEFAULT;');
+  } catch (err) {
+    console.warn(
+      '[E2E] DB cleanup skipped (DB unreachable from this host). ' +
+        'Firebase users were deleted above. App DB records will persist until next railway run cleanup.',
+      (err as Error).message
+    );
+  }
 }
 
 export async function disconnectPrisma(): Promise<void> {

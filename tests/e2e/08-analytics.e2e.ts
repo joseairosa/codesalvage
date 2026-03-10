@@ -5,6 +5,10 @@
  * - Seller can access their own analytics
  * - Non-seller (buyer) is rejected with 401/403
  * - Response shape contains expected fields
+ *
+ * Note: Tests that require the seller role (isSeller: true) are skipped
+ * when the production DB is unreachable from the test runner (Railway
+ * internal network). Non-role tests always run.
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
@@ -30,7 +34,10 @@ afterAll(async () => {
 });
 
 describe('08 · Seller Analytics', () => {
-  it('GET /api/analytics/overview → 200 for seller', async () => {
+  it('GET /api/analytics/overview → 200 for seller', async (ctx) => {
+    if (!seller.rolesSet) {
+      ctx.skip();
+    }
     const { status, body } = await get('/api/analytics/overview', seller.apiKey);
     expect(status).toBe(200);
     const b = body as Record<string, unknown>;
@@ -51,7 +58,10 @@ describe('08 · Seller Analytics', () => {
     expect(status).toBe(401);
   });
 
-  it('GET /api/analytics/overview?granularity=week → 200 for seller', async () => {
+  it('GET /api/analytics/overview?granularity=week → 200 for seller', async (ctx) => {
+    if (!seller.rolesSet) {
+      ctx.skip();
+    }
     const { status } = await get(
       '/api/analytics/overview?granularity=week',
       seller.apiKey
