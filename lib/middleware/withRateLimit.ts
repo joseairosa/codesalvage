@@ -49,7 +49,7 @@ type RouteHandler = (request: NextRequest, context?: any) => Promise<NextRespons
 export function withRateLimit(
   handler: RouteHandler,
   preset: keyof typeof RateLimitPresets,
-  getIdentifier?: (request: NextRequest) => Promise<string> | string
+  getIdentifier?: (request: NextRequest) => Promise<string | undefined> | string | undefined
 ): RouteHandler {
   return async (request: NextRequest, context?: any) => {
     // Get identifier (custom or default to IP)
@@ -89,7 +89,7 @@ export function withAuthRateLimit(handler: RouteHandler): RouteHandler {
  */
 export function withApiRateLimit(
   handler: RouteHandler,
-  getIdentifier?: (request: NextRequest) => Promise<string> | string
+  getIdentifier?: (request: NextRequest) => Promise<string | undefined> | string | undefined
 ): RouteHandler {
   return withRateLimit(handler, 'api', getIdentifier);
 }
@@ -117,7 +117,7 @@ export function withStrictRateLimit(handler: RouteHandler): RouteHandler {
  */
 export function withPollingRateLimit(
   handler: RouteHandler,
-  getIdentifier?: (request: NextRequest) => Promise<string> | string
+  getIdentifier?: (request: NextRequest) => Promise<string | undefined> | string | undefined
 ): RouteHandler {
   return withRateLimit(handler, 'polling', getIdentifier);
 }

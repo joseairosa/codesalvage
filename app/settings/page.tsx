@@ -16,6 +16,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { UserSettingsForm } from '@/components/settings/UserSettingsForm';
 import { AvatarUpload } from '@/components/settings/AvatarUpload';
+import { ApiKeysSection } from '@/components/settings/ApiKeysSection';
 
 export default async function SettingsPage() {
   const session = await requireAuth();
@@ -72,6 +73,20 @@ export default async function SettingsPage() {
               bio: user.bio ?? '',
             }}
           />
+        </CardContent>
+      </Card>
+
+      {/* API Keys Section */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>API Keys</CardTitle>
+          <CardDescription>
+            Use API keys to authenticate requests from scripts or CI pipelines.
+            Keys start with <code className="text-xs">sk-</code>.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ApiKeysSection />
         </CardContent>
       </Card>
 

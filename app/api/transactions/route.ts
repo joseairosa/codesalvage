@@ -139,5 +139,5 @@ async function listTransactions(request: NextRequest) {
  */
 export const GET = withApiRateLimit(listTransactions, async (request) => {
   const auth = await authenticateApiRequest(request);
-  return auth?.user.id || 'anonymous';
+  return auth?.user.id;
 });
