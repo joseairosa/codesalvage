@@ -65,7 +65,10 @@ beforeAll(async () => {
       });
       projectId = project.id;
     } catch (err) {
-      console.warn('[E2E] Project seed skipped (DB unreachable):', (err as Error).message);
+      console.warn(
+        '[E2E] Project seed skipped (DB unreachable):',
+        (err as Error).message
+      );
     }
   }
 

@@ -56,10 +56,7 @@ afterAll(async () => {
 
 describe('04 · Favorites', () => {
   it('GET /api/favorites/check/:id → not favorited initially', async () => {
-    const { status, body } = await get(
-      `/api/favorites/check/${projectId}`,
-      buyer.apiKey
-    );
+    const { status, body } = await get(`/api/favorites/check/${projectId}`, buyer.apiKey);
     expect(status).toBe(200);
     const b = body as Record<string, unknown>;
     expect(b.isFavorited).toBe(false);
@@ -71,10 +68,7 @@ describe('04 · Favorites', () => {
   });
 
   it('GET /api/favorites/check/:id → isFavorited: true', async () => {
-    const { status, body } = await get(
-      `/api/favorites/check/${projectId}`,
-      buyer.apiKey
-    );
+    const { status, body } = await get(`/api/favorites/check/${projectId}`, buyer.apiKey);
     expect(status).toBe(200);
     const b = body as Record<string, unknown>;
     expect(b.isFavorited).toBe(true);
@@ -98,10 +92,7 @@ describe('04 · Favorites', () => {
   });
 
   it('GET /api/favorites/check/:id → isFavorited: false after removal', async () => {
-    const { status, body } = await get(
-      `/api/favorites/check/${projectId}`,
-      buyer.apiKey
-    );
+    const { status, body } = await get(`/api/favorites/check/${projectId}`, buyer.apiKey);
     expect(status).toBe(200);
     const b = body as Record<string, unknown>;
     expect(b.isFavorited).toBe(false);

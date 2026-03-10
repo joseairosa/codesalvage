@@ -36,9 +36,13 @@ if (process.env['E2E_DATABASE_URL']) {
 }
 
 process.env['NODE_ENV'] = 'test';
-process.env['NEXT_PUBLIC_APP_URL'] = process.env['E2E_BASE_URL'] ?? 'http://localhost:3011';
+process.env['NEXT_PUBLIC_APP_URL'] =
+  process.env['E2E_BASE_URL'] ?? 'http://localhost:3011';
 
-console.log('[E2E Setup] Base URL:', process.env['E2E_BASE_URL'] ?? 'http://localhost:3011');
+console.log(
+  '[E2E Setup] Base URL:',
+  process.env['E2E_BASE_URL'] ?? 'http://localhost:3011'
+);
 console.log(
   '[E2E Setup] Database:',
   process.env['DATABASE_URL']?.replace(/:[^@]+@/, ':****@')

@@ -158,8 +158,11 @@ export async function createE2EUser(opts?: {
   const meRes = await fetch(`${BASE_URL}/api/auth/me`, {
     headers: { Cookie: `session=${sessionCookie}` },
   });
-  const meBody = (await meRes.json()) as { user: { id: string; username: string } | null };
-  if (!meBody.user) throw new Error('[E2E] /api/auth/me returned no user after session creation');
+  const meBody = (await meRes.json()) as {
+    user: { id: string; username: string } | null;
+  };
+  if (!meBody.user)
+    throw new Error('[E2E] /api/auth/me returned no user after session creation');
   const { id, username } = meBody.user;
 
   // 5. POST /api/user/api-keys → get an API key for Bearer auth

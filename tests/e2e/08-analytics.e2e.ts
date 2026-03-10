@@ -12,12 +12,7 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import {
-  createE2EUser,
-  cleanupE2EData,
-  disconnectPrisma,
-  get,
-} from './helpers';
+import { createE2EUser, cleanupE2EData, disconnectPrisma, get } from './helpers';
 import type { E2EUser } from './helpers';
 
 let seller: E2EUser;

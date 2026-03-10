@@ -106,10 +106,7 @@ describe('07 · Reviews', () => {
   });
 
   it('GET /api/reviews/stats/:sellerId → stats updated', async () => {
-    const { status, body } = await get(
-      `/api/reviews/stats/${seller.id}`,
-      buyer.apiKey
-    );
+    const { status, body } = await get(`/api/reviews/stats/${seller.id}`, buyer.apiKey);
     expect(status).toBe(200);
     const b = body as Record<string, unknown>;
     expect(typeof b.averageRating ?? b.overall).toBe('number');
