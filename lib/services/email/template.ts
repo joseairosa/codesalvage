@@ -5,9 +5,10 @@
  * Inject content via EmailTemplateData — heading, body HTML, and optional CTA button.
  *
  * Brand colours:
- *   Navy  #1e2a4a — header, footer, headings
- *   Teal  #06b6d4 — CTA buttons
- *   Light #f1f5f9 — page background
+ *   White  #ffffff  — header (matches website nav)
+ *   Teal   #47acb8  — CTA buttons, links (primary design token: hsl(186 44% 50%))
+ *   Dark   #0f172a  — headings
+ *   Light  #f1f5f9  — page background
  */
 
 export interface EmailTemplateData {
@@ -35,7 +36,7 @@ export function renderEmailTemplate(data: EmailTemplateData, appUrl: string): st
       <tr>
         <td align="center">
           <a href="${data.ctaUrl}"
-             style="display:inline-block;background:#06b6d4;color:#ffffff;font-family:Arial,sans-serif;
+             style="display:inline-block;background:#47acb8;color:#ffffff;font-family:Arial,sans-serif;
                     font-size:16px;font-weight:bold;text-decoration:none;padding:14px 32px;
                     border-radius:6px;letter-spacing:0.3px;">
             ${data.ctaText}
@@ -78,8 +79,9 @@ export function renderEmailTemplate(data: EmailTemplateData, appUrl: string): st
 
           <!-- ── Header ── -->
           <tr>
-            <td align="center" bgcolor="#1e2a4a"
-                style="padding: 28px 40px; border-radius: 8px 8px 0 0;">
+            <td align="center" bgcolor="#ffffff"
+                style="padding: 28px 40px; border-radius: 8px 8px 0 0;
+                       border-bottom: 1px solid #e2e8f0;">
               <a href="${appUrl}" style="text-decoration:none;">
                 <img src="${logoUrl}" alt="CodeSalvage"
                      width="240" height="57"
@@ -93,7 +95,7 @@ export function renderEmailTemplate(data: EmailTemplateData, appUrl: string): st
             <td class="email-card" bgcolor="#ffffff"
                 style="padding: 40px 48px 32px; border-radius: 0 0 8px 8px;">
 
-              <h1 style="margin:0 0 20px;color:#1e2a4a;font-size:24px;font-weight:700;
+              <h1 style="margin:0 0 20px;color:#0f172a;font-size:24px;font-weight:700;
                           line-height:1.3;letter-spacing:-0.3px;">
                 ${data.heading}
               </h1>
@@ -114,9 +116,9 @@ export function renderEmailTemplate(data: EmailTemplateData, appUrl: string): st
                 &copy; ${currentYear} CodeSalvage &mdash; Marketplace for Incomplete Software Projects
               </p>
               <p style="margin:0;color:#94a3b8;font-size:12px;">
-                <a href="${appUrl}" style="color:#06b6d4;text-decoration:none;">codesalvage.com</a>
+                <a href="${appUrl}" style="color:#47acb8;text-decoration:none;">codesalvage.com</a>
                 &nbsp;&middot;&nbsp;
-                <a href="${appUrl}/support" style="color:#06b6d4;text-decoration:none;">Support</a>
+                <a href="${appUrl}/support" style="color:#47acb8;text-decoration:none;">Support</a>
               </p>
             </td>
           </tr>
