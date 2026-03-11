@@ -22,6 +22,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tag, Loader2, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SellerOfferCard } from '@/components/sellers/SellerOfferCard';
+import { DashboardBreadcrumb } from '@/components/layout/DashboardBreadcrumb';
 
 const componentName = 'SellerOffersPage';
 
@@ -152,6 +153,7 @@ export default function SellerOffersPage() {
   return (
     <div className="container mx-auto max-w-7xl py-10">
       <div className="space-y-8">
+        <DashboardBreadcrumb label="Offers Received" />
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>

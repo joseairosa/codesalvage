@@ -23,6 +23,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tag, Loader2, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { BuyerOfferCard } from '@/components/buyers/BuyerOfferCard';
+import { DashboardBreadcrumb } from '@/components/layout/DashboardBreadcrumb';
 
 const componentName = 'BuyerOffersPage';
 
@@ -213,6 +214,7 @@ export default function BuyerOffersPage() {
   return (
     <div className="container mx-auto max-w-7xl py-10">
       <div className="space-y-8">
+        <DashboardBreadcrumb label="My Offers" />
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold">My Offers</h1>
