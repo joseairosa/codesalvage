@@ -37,11 +37,10 @@ describe('NavigationLinks', () => {
       expect(dashboardLink).not.toHaveAttribute('aria-current', 'page');
     });
 
-    it('marks My Offers active on /dashboard/offers', () => {
+    it('does not show My Offers in the top nav (moved to dashboard)', () => {
       mockPathname = '/dashboard/offers';
       render(<NavigationLinks isAuthenticated={true} isSeller={false} />);
-      const offersLink = screen.getByRole('link', { name: 'My Offers' });
-      expect(offersLink).toHaveAttribute('aria-current', 'page');
+      expect(screen.queryByRole('link', { name: 'My Offers' })).not.toBeInTheDocument();
     });
 
     it('marks Browse Projects active on /projects', () => {
@@ -60,16 +59,20 @@ describe('NavigationLinks', () => {
   });
 
   describe('link visibility', () => {
-    it('shows My Purchases for authenticated users', () => {
+    it('does not show My Purchases in the top nav (moved to dashboard)', () => {
       mockPathname = '/';
       render(<NavigationLinks isAuthenticated={true} isSeller={false} />);
-      expect(screen.getByRole('link', { name: 'My Purchases' })).toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: 'My Purchases' })
+      ).not.toBeInTheDocument();
     });
 
-    it('shows My Purchases for authenticated sellers too', () => {
+    it('does not show My Purchases for sellers in the top nav either', () => {
       mockPathname = '/';
       render(<NavigationLinks isAuthenticated={true} isSeller={true} />);
-      expect(screen.getByRole('link', { name: 'My Purchases' })).toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: 'My Purchases' })
+      ).not.toBeInTheDocument();
     });
 
     it('does not show My Purchases when unauthenticated', () => {
@@ -80,13 +83,21 @@ describe('NavigationLinks', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('marks My Purchases active on /buyer/purchases', () => {
-      mockPathname = '/buyer/purchases';
-      render(<NavigationLinks isAuthenticated={true} isSeller={false} />);
-      expect(screen.getByRole('link', { name: 'My Purchases' })).toHaveAttribute(
-        'aria-current',
-        'page'
-      );
+    it('shows only Browse Projects, How It Works, and Dashboard when authenticated', () => {
+      mockPathname = '/';
+      render(<NavigationLinks isAuthenticated={true} isSeller={true} />);
+      expect(screen.getByRole('link', { name: 'Browse Projects' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'How It Works' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
+      expect(screen.getAllByRole('link')).toHaveLength(3);
+    });
+
+    it('shows only Browse Projects and How It Works when unauthenticated', () => {
+      mockPathname = '/';
+      render(<NavigationLinks isAuthenticated={false} isSeller={false} />);
+      expect(screen.getByRole('link', { name: 'Browse Projects' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'How It Works' })).toBeInTheDocument();
+      expect(screen.getAllByRole('link')).toHaveLength(2);
     });
   });
 });
