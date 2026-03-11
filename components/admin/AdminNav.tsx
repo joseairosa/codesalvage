@@ -113,13 +113,13 @@ export function AdminNav() {
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                   isActive
-                    ? 'bg-blue-50 text-blue-700'
+                    ? 'bg-primary/10 text-primary'
                     : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 )}
                 aria-current={isActive ? 'page' : undefined}
               >
                 <Icon
-                  className={cn('h-5 w-5', isActive ? 'text-blue-700' : 'text-gray-500')}
+                  className={cn('h-5 w-5', isActive ? 'text-primary' : 'text-gray-500')}
                 />
                 {item.label}
               </Link>
@@ -128,14 +128,14 @@ export function AdminNav() {
         </div>
 
         {/* Admin Badge */}
-        <div className="mt-8 rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <div className="mt-8 rounded-lg border border-primary/20 bg-primary/10 p-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600">
-              <span className="text-xs font-bold text-white">A</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
+              <span className="text-xs font-bold text-primary-foreground">A</span>
             </div>
             <div className="flex-1">
-              <p className="text-xs font-semibold text-blue-900">Admin Access</p>
-              <p className="text-xs text-blue-700">Full Platform Control</p>
+              <p className="text-xs font-semibold text-primary">Admin Access</p>
+              <p className="text-xs text-primary/70">Full Platform Control</p>
             </div>
           </div>
         </div>
