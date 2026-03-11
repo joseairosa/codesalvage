@@ -71,6 +71,7 @@ import {
   FileText,
   AlertCircle,
 } from 'lucide-react';
+import { DashboardBreadcrumb } from '@/components/layout/DashboardBreadcrumb';
 
 const componentName = 'SellerProjectsPage';
 
@@ -350,6 +351,7 @@ export default function SellerProjectsPage() {
   return (
     <div className="container mx-auto max-w-7xl py-10">
       <div className="space-y-8">
+        <DashboardBreadcrumb label="My Projects" />
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>

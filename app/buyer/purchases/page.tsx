@@ -35,6 +35,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import { DashboardBreadcrumb } from '@/components/layout/DashboardBreadcrumb';
 
 const componentName = 'BuyerPurchasesPage';
 
@@ -189,6 +190,7 @@ export default function BuyerPurchasesPage() {
   return (
     <div className="container mx-auto max-w-5xl py-10">
       <div className="space-y-6">
+        <DashboardBreadcrumb label="My Purchases" />
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
