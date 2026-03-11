@@ -82,6 +82,7 @@ model User {
   offersMade           Offer[]          @relation("OffersMade")
   offersReceived       Offer[]          @relation("OffersReceived")
   disputesFiled        Dispute[]        @relation("DisputesFiled")
+  feedbacks            Feedback[]
 
   @@index([email])
   @@index([githubId], map: "idx_github_id")
@@ -682,6 +683,49 @@ model Dispute {
   @@index([buyerId], map: "idx_dispute_buyer_id")
   @@index([status], map: "idx_dispute_status")
   @@map("disputes")
+}
+
+// ============================================
+// FEEDBACK
+// ============================================
+
+model Feedback {
+  id String @id // ULID generated in repository layer
+
+  // Type: general | feature | bug | support
+  type String @default("general")
+
+  // Status workflow: new → in_progress → resolved | closed
+  status String @default("new")
+
+  // Priority: low | medium | high | critical
+  priority String @default("medium")
+
+  title   String
+  content String @db.Text
+  email   String // Submitter email (from form or user account)
+
+  // Optional link to authenticated user
+  userId String? @map("user_id")
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Request metadata
+  userAgent String? @map("user_agent") @db.Text
+
+  // Admin fields
+  adminNotes String?   @map("admin_notes") @db.Text
+  resolvedAt DateTime? @map("resolved_at")
+  resolvedBy String?   @map("resolved_by") // Admin user ID
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([status], map: "idx_feedback_status")
+  @@index([type], map: "idx_feedback_type")
+  @@index([priority], map: "idx_feedback_priority")
+  @@index([userId], map: "idx_feedback_user_id")
+  @@index([createdAt], map: "idx_feedback_created_at")
+  @@map("feedbacks")
 }
 
 // ============================================

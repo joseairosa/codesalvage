@@ -165,3 +165,9 @@ export type {
   TimelineAction,
   TimelineStage,
 } from './RepositoryTransferService';
+
+export {
+  FeedbackService,
+  FeedbackValidationError,
+  FeedbackNotFoundError,
+} from './FeedbackService';
