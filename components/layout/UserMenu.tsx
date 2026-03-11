@@ -116,16 +116,6 @@ export function UserMenu({ user }: UserMenuProps) {
           </Link>
         </DropdownMenuItem>
 
-        {/* Admin link */}
-        {user.isAdmin && (
-          <DropdownMenuItem asChild>
-            <Link href="/admin" className="flex cursor-pointer items-center gap-2">
-              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-              <span>Admin Panel</span>
-            </Link>
-          </DropdownMenuItem>
-        )}
-
         {/* My Purchases — visible to all authenticated users */}
         <DropdownMenuItem asChild>
           <Link
@@ -179,6 +169,22 @@ export function UserMenu({ user }: UserMenuProps) {
             <span>Settings</span>
           </Link>
         </DropdownMenuItem>
+
+        {/* Admin section — separated */}
+        {user.isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="px-2 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Admin
+            </DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <Link href="/admin" className="flex cursor-pointer items-center gap-2">
+                <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                <span>Admin Panel</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
 
         <DropdownMenuSeparator />
 
