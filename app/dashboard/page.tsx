@@ -11,7 +11,19 @@ import { prisma } from '@/lib/prisma';
 import { stripeService } from '@/lib/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, AlertTriangle, CreditCard, Clock } from 'lucide-react';
+import {
+  Plus,
+  AlertTriangle,
+  CreditCard,
+  Clock,
+  Tag,
+  ShoppingBag,
+  FolderOpen,
+  Inbox,
+  TrendingUp,
+  BarChart3,
+  ArrowRight,
+} from 'lucide-react';
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist';
 import type { OnboardingStep } from '@/components/onboarding/OnboardingChecklist';
 
@@ -274,6 +286,128 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Navigation Hub */}
+      <div className="mb-8">
+        <h2 className="mb-4 text-lg font-semibold text-gray-900">Quick Navigation</h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Link
+            href="/dashboard/offers"
+            className="group flex items-center gap-4 rounded-lg border bg-white p-4 shadow-sm transition-all hover:border-primary hover:shadow-md"
+          >
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
+              <Tag className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-gray-900">My Offers</p>
+              <p className="truncate text-sm text-gray-500">
+                Offers you&apos;ve made on projects
+              </p>
+            </div>
+            <ArrowRight className="h-4 w-4 flex-shrink-0 text-gray-400 transition-colors group-hover:text-primary" />
+          </Link>
+
+          <Link
+            href="/buyer/purchases"
+            className="group flex items-center gap-4 rounded-lg border bg-white p-4 shadow-sm transition-all hover:border-primary hover:shadow-md"
+          >
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
+              <ShoppingBag className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-gray-900">My Purchases</p>
+              <p className="truncate text-sm text-gray-500">
+                Projects you&apos;ve bought
+              </p>
+            </div>
+            <ArrowRight className="h-4 w-4 flex-shrink-0 text-gray-400 transition-colors group-hover:text-primary" />
+          </Link>
+
+          {session.user.isSeller && (
+            <>
+              <Link
+                href="/seller/projects"
+                className="group flex items-center gap-4 rounded-lg border bg-white p-4 shadow-sm transition-all hover:border-primary hover:shadow-md"
+              >
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <FolderOpen className="h-5 w-5 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-gray-900">My Projects</p>
+                  <p className="truncate text-sm text-gray-500">
+                    Projects you&apos;re selling
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 flex-shrink-0 text-gray-400 transition-colors group-hover:text-primary" />
+              </Link>
+
+              <Link
+                href="/seller/offers"
+                className="group flex items-center gap-4 rounded-lg border bg-white p-4 shadow-sm transition-all hover:border-primary hover:shadow-md"
+              >
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <Inbox className="h-5 w-5 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-gray-900">Offers Received</p>
+                  <p className="truncate text-sm text-gray-500">
+                    Buyer offers on your projects
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 flex-shrink-0 text-gray-400 transition-colors group-hover:text-primary" />
+              </Link>
+
+              <Link
+                href="/seller/sales"
+                className="group flex items-center gap-4 rounded-lg border bg-white p-4 shadow-sm transition-all hover:border-primary hover:shadow-md"
+              >
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-gray-900">My Sales</p>
+                  <p className="truncate text-sm text-gray-500">
+                    Completed project sales
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 flex-shrink-0 text-gray-400 transition-colors group-hover:text-primary" />
+              </Link>
+
+              <Link
+                href="/seller/analytics"
+                className="group flex items-center gap-4 rounded-lg border bg-white p-4 shadow-sm transition-all hover:border-primary hover:shadow-md"
+              >
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <BarChart3 className="h-5 w-5 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-gray-900">Analytics</p>
+                  <p className="truncate text-sm text-gray-500">
+                    Sales and performance metrics
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 flex-shrink-0 text-gray-400 transition-colors group-hover:text-primary" />
+              </Link>
+
+              <Link
+                href="/projects/new"
+                className="group flex items-center gap-4 rounded-lg border border-dashed bg-white p-4 shadow-sm transition-all hover:border-primary hover:shadow-md"
+              >
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <Plus className="h-5 w-5 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-gray-900">List Project</p>
+                  <p className="truncate text-sm text-gray-500">
+                    Publish a new project for sale
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 flex-shrink-0 text-gray-400 transition-colors group-hover:text-primary" />
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>

@@ -38,7 +38,7 @@ interface NavLink {
  */
 export function NavigationLinks({
   isAuthenticated,
-  isSeller,
+  isSeller: _isSeller,
   className,
 }: NavigationLinksProps) {
   const pathname = usePathname();
@@ -47,23 +47,7 @@ export function NavigationLinks({
     { href: '/projects', label: 'Browse Projects' },
     { href: '/how-it-works', label: 'How It Works' },
     ...(isAuthenticated
-      ? [
-          { href: '/dashboard', label: 'Dashboard', requiresAuth: true, exact: true },
-          { href: '/dashboard/offers', label: 'My Offers', requiresAuth: true },
-          { href: '/buyer/purchases', label: 'My Purchases', requiresAuth: true },
-          ...(isSeller
-            ? [
-                { href: '/seller/projects', label: 'My Projects', requiresSeller: true },
-                {
-                  href: '/seller/offers',
-                  label: 'Offers Received',
-                  requiresSeller: true,
-                },
-                { href: '/seller/sales', label: 'My Sales', requiresSeller: true },
-                { href: '/projects/new', label: 'List Project', requiresSeller: true },
-              ]
-            : []),
-        ]
+      ? [{ href: '/dashboard', label: 'Dashboard', requiresAuth: true, exact: true }]
       : []),
   ];
 
