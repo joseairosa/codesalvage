@@ -101,3 +101,14 @@ export type { CreateRepositoryTransferInput } from './RepositoryTransferReposito
 
 export { DisputeRepository } from './DisputeRepository';
 export type { CreateDisputeInput } from './DisputeRepository';
+
+export { FeedbackRepository } from './FeedbackRepository';
+export type {
+  CreateFeedbackInput,
+  UpdateFeedbackInput,
+  FeedbackFilters,
+  FeedbackStats,
+  FeedbackType,
+  FeedbackStatus,
+  FeedbackPriority,
+} from './FeedbackRepository';

@@ -27,6 +27,7 @@ import {
   FileText,
   Flag,
   AlertTriangle,
+  MessageSquare,
 } from 'lucide-react';
 
 /**
@@ -73,6 +74,11 @@ const navItems: NavItem[] = [
     href: '/admin/reports',
     label: 'Reports',
     icon: Flag,
+  },
+  {
+    href: '/admin/feedback',
+    label: 'Feedback',
+    icon: MessageSquare,
   },
 ];
 

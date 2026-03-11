@@ -23,7 +23,13 @@ import {
   TransactionRepository,
 } from '@/lib/repositories';
 import { DisputeRepository } from '@/lib/repositories/DisputeRepository';
-import { AdminService, emailService, stripeService } from '@/lib/services';
+import { FeedbackRepository } from '@/lib/repositories/FeedbackRepository';
+import {
+  AdminService,
+  FeedbackService,
+  emailService,
+  stripeService,
+} from '@/lib/services';
 
 let adminServiceInstance: AdminService | null = null;
 let adminRepositoryInstance: AdminRepository | null = null;
@@ -31,6 +37,8 @@ let userRepositoryInstance: UserRepository | null = null;
 let projectRepositoryInstance: ProjectRepository | null = null;
 let transactionRepositoryInstance: TransactionRepository | null = null;
 let disputeRepositoryInstance: DisputeRepository | null = null;
+let feedbackRepositoryInstance: FeedbackRepository | null = null;
+let feedbackServiceInstance: FeedbackService | null = null;
 
 /**
  * Get AdminRepository instance (singleton)
@@ -90,6 +98,26 @@ export function getDisputeRepository(): DisputeRepository {
     disputeRepositoryInstance = new DisputeRepository(prisma);
   }
   return disputeRepositoryInstance;
+}
+
+/**
+ * Get FeedbackRepository instance (singleton)
+ */
+export function getFeedbackRepository(): FeedbackRepository {
+  if (!feedbackRepositoryInstance) {
+    feedbackRepositoryInstance = new FeedbackRepository(prisma);
+  }
+  return feedbackRepositoryInstance;
+}
+
+/**
+ * Get FeedbackService instance (singleton)
+ */
+export function getFeedbackService(): FeedbackService {
+  if (!feedbackServiceInstance) {
+    feedbackServiceInstance = new FeedbackService(getFeedbackRepository());
+  }
+  return feedbackServiceInstance;
 }
 
 /**

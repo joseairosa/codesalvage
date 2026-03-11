@@ -5,6 +5,7 @@ import { Footer } from '@/components/layout/Footer';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Providers } from './providers';
 import { SentryClientInit } from '@/components/SentryClientInit';
+import { FeedbackWidget } from '@/components/FeedbackWidget';
 import './globals.css';
 
 const inter = Inter({
@@ -74,6 +75,7 @@ export default function RootLayout({
               <Navigation />
               <main className="flex-1">{children}</main>
               <Footer />
+              <FeedbackWidget />
             </div>
           </ErrorBoundary>
         </Providers>
