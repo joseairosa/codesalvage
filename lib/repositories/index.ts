@@ -112,3 +112,18 @@ export type {
   FeedbackStatus,
   FeedbackPriority,
 } from './FeedbackRepository';
+
+export { SellerPayoutDetailsRepository } from './SellerPayoutDetailsRepository';
+export type {
+  CreatePayoutDetailsInput,
+  UpdatePayoutDetailsInput,
+} from './SellerPayoutDetailsRepository';
+
+export { PayoutRequestRepository } from './PayoutRequestRepository';
+export type {
+  CreatePayoutRequestInput,
+  UpdatePayoutRequestStatusInput,
+  PayoutRequestFilters,
+  PayoutRequestWithRelations,
+  PaginatedPayoutRequests,
+} from './PayoutRequestRepository';

@@ -28,6 +28,7 @@ import {
   Flag,
   AlertTriangle,
   MessageSquare,
+  Wallet,
 } from 'lucide-react';
 
 /**
@@ -59,6 +60,11 @@ const navItems: NavItem[] = [
     href: '/admin/transactions',
     label: 'Transactions',
     icon: CreditCard,
+  },
+  {
+    href: '/admin/payouts',
+    label: 'Payouts',
+    icon: Wallet,
   },
   {
     href: '/admin/audit-logs',

@@ -307,8 +307,6 @@ export const CacheKeys = {
   sellerReviews: (sellerId: string, page: number, limit: number) =>
     `reviews:seller:${sellerId}:${page}:${limit}`,
 
-  stripeConnectStatus: (userId: string) => `stripe:connect:status:${userId}`,
-
   userAll: (userId: string) => `user:${userId}:*`,
 
   /**

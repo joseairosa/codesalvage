@@ -16,7 +16,6 @@
 import { redirect } from 'next/navigation';
 import { requireAuth } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
-import { stripeService } from '@/lib/services';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { AnalyticsDashboard } from '@/components/seller/AnalyticsDashboard';
@@ -38,37 +37,16 @@ export default async function SellerDashboardPage() {
       where: { id: session.user.id },
       select: {
         bio: true,
-        stripeAccountId: true,
-        isVerifiedSeller: true,
         onboardingDismissedAt: true,
+        sellerPayoutDetails: {
+          select: { isActive: true },
+        },
       },
     }),
     prisma.message.count({ where: { senderId: session.user.id } }),
   ]);
 
-  // Check Stripe onboarding status — only when stripeAccountId exists and not yet verified.
-  // onboardingDismissedAt is shared between buyer and seller dashboards.
-  let isVerifiedSeller = session.user.isVerifiedSeller;
-  if (!isVerifiedSeller && user?.stripeAccountId) {
-    try {
-      const onboardingStatus = await stripeService.getOnboardingStatus(
-        user.stripeAccountId
-      );
-      if (onboardingStatus.chargesEnabled && onboardingStatus.detailsSubmitted) {
-        await prisma.user.update({
-          where: { id: session.user.id },
-          data: { isVerifiedSeller: true },
-        });
-        isVerifiedSeller = true;
-        console.log('[SellerDashboard] Self-healed: updated isVerifiedSeller to true', {
-          userId: session.user.id,
-        });
-      }
-    } catch (err) {
-      console.error('[SellerDashboard] Failed to check Stripe onboarding status:', err);
-    }
-  }
-
+  const hasPayoutSetup = user?.sellerPayoutDetails?.isActive === true;
   const profileDone = Boolean(user?.bio && user.bio.trim().length > 0);
 
   const onboardingSteps: OnboardingStep[] = [
@@ -80,10 +58,10 @@ export default async function SellerDashboardPage() {
       href: '/settings',
     },
     {
-      id: 'stripe',
-      label: 'Connect payment account',
+      id: 'payout',
+      label: 'Set up payout details',
       description: 'Required before buyers can purchase your projects.',
-      done: isVerifiedSeller,
+      done: hasPayoutSetup,
       href: '/seller/onboard',
     },
     {

@@ -5,7 +5,7 @@
  *
  * Routes Stripe events to the appropriate handler in:
  * - stripe-handlers-payment.ts (payment_intent, charge, featured listing)
- * - stripe-handlers-subscription.ts (account, subscription, invoice)
+ * - stripe-handlers-subscription.ts (subscription, invoice)
  */
 
 import { NextResponse } from 'next/server';
@@ -27,7 +27,6 @@ import {
   handleRefund,
 } from './stripe-handlers-payment';
 import {
-  handleAccountUpdated,
   handleSubscriptionCreated,
   handleSubscriptionUpdated,
   handleSubscriptionDeleted,
@@ -110,9 +109,6 @@ export async function POST(request: Request) {
         break;
       case 'charge.refunded':
         await handleRefund(event.data.object as Stripe.Charge, paymentDeps);
-        break;
-      case 'account.updated':
-        await handleAccountUpdated(event.data.object as Stripe.Account, subscriptionDeps);
         break;
       case 'customer.subscription.created':
         await handleSubscriptionCreated(

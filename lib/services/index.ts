@@ -25,7 +25,6 @@ export { R2Service, r2Service, FileType } from './R2Service';
 export type { UploadConfig, UploadUrlResponse } from './R2Service';
 
 export { StripeService, stripeService } from './StripeService';
-export type { StripeUserData } from './StripeService';
 
 export { EmailService, emailService } from './EmailService';
 export type {
@@ -171,3 +170,14 @@ export {
   FeedbackValidationError,
   FeedbackNotFoundError,
 } from './FeedbackService';
+
+export {
+  PayoutService,
+  PayoutValidationError,
+  PayoutPermissionError,
+  PayoutNotFoundError,
+} from './PayoutService';
+export type {
+  SubmitPayoutDetailsInput,
+  ProcessBatchResult,
+} from './PayoutService';

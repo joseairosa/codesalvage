@@ -2,7 +2,7 @@
  * Seller Dashboard Page — Onboarding Checklist Tests
  *
  * Tests that OnboardingChecklist renders with 4 seller steps.
- * Pattern: mock dependencies → call async page directly → render JSX → assert.
+ * Pattern: mock dependencies -> call async page directly -> render JSX -> assert.
  *
  * next/link and next/navigation are mocked globally in tests/setup.ts.
  */
@@ -22,14 +22,7 @@ vi.mock('@/lib/prisma', () => ({
     message: { count: vi.fn() },
     user: {
       findUnique: vi.fn(),
-      update: vi.fn(),
     },
-  },
-}));
-
-vi.mock('@/lib/services', () => ({
-  stripeService: {
-    getOnboardingStatus: vi.fn(),
   },
 }));
 
@@ -72,9 +65,8 @@ function mockSellerSession() {
 function mockDefaultUser(overrides: Record<string, unknown> = {}) {
   mockUserFindUnique.mockResolvedValue({
     bio: null,
-    stripeAccountId: null,
-    isVerifiedSeller: false,
     onboardingDismissedAt: null,
+    sellerPayoutDetails: null,
     ...overrides,
   } as any);
 }
@@ -102,7 +94,7 @@ describe('SellerDashboardPage — onboarding checklist', () => {
     render(jsx);
 
     expect(screen.getByText('Complete your profile')).toBeInTheDocument();
-    expect(screen.getByText('Connect payment account')).toBeInTheDocument();
+    expect(screen.getByText('Set up payout details')).toBeInTheDocument();
     expect(screen.getByText('List your first project')).toBeInTheDocument();
     expect(screen.getByText('Send your first message')).toBeInTheDocument();
   });
@@ -118,7 +110,6 @@ describe('SellerDashboardPage — onboarding checklist', () => {
 
   it('marks "Send your first message" as done when sentMessageCount > 0', async () => {
     mockMessageCount.mockResolvedValue(1);
-    // Keep other steps not done so checklist stays visible
 
     const jsx = await SellerDashboardPage();
     render(jsx);
@@ -141,19 +132,17 @@ describe('SellerDashboardPage — onboarding checklist', () => {
     const jsx = await SellerDashboardPage();
     render(jsx);
 
-    // The page header is always present
     expect(screen.getByText('Seller Dashboard')).toBeInTheDocument();
     expect(screen.getByTestId('onboarding-checklist')).toBeInTheDocument();
   });
 
-  it('does not call getOnboardingStatus when stripeAccountId is null', async () => {
-    const { stripeService } = await import('@/lib/services');
-    const mockGetOnboarding = vi.mocked(stripeService.getOnboardingStatus);
+  it('marks payout step as done when sellerPayoutDetails is active', async () => {
+    mockDefaultUser({ sellerPayoutDetails: { isActive: true } });
 
-    mockDefaultUser({ stripeAccountId: null });
+    const jsx = await SellerDashboardPage();
+    render(jsx);
 
-    await SellerDashboardPage();
-
-    expect(mockGetOnboarding).not.toHaveBeenCalled();
+    const label = screen.getByText('Set up payout details');
+    expect(label).toHaveClass('line-through');
   });
 });

@@ -19,7 +19,7 @@ const sellerSteps: OnboardingStep[] = [
   },
   {
     id: 'stripe',
-    label: 'Connect payment account',
+    label: 'Set up payout details',
     description: 'Required before buyers can purchase your projects.',
     done: true,
     href: '/seller/onboard',
@@ -70,7 +70,7 @@ describe('OnboardingChecklist', () => {
 
   it('renders completed steps as struck-through text', () => {
     render(<OnboardingChecklist steps={sellerSteps} dismissed={false} />);
-    const completedLabel = screen.getByText('Connect payment account');
+    const completedLabel = screen.getByText('Set up payout details');
     expect(completedLabel).toBeInTheDocument();
     expect(completedLabel).toHaveClass('line-through');
   });

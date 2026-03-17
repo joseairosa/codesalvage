@@ -75,6 +75,10 @@ export const env = {
   CRON_SECRET: getOptionalEnvVar('CRON_SECRET'),
 
   GEMINI_API_KEY: getOptionalEnvVar('GEMINI_API_KEY'),
+
+  PAYPAL_CLIENT_ID: getOptionalEnvVar('PAYPAL_CLIENT_ID'),
+  PAYPAL_CLIENT_SECRET: getOptionalEnvVar('PAYPAL_CLIENT_SECRET'),
+  PAYPAL_MODE: getOptionalEnvVar('PAYPAL_MODE', 'sandbox'), // 'sandbox' or 'live'
 } as const;
 
 export function validateEnv() {
