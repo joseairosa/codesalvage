@@ -117,6 +117,21 @@ export interface DisputeOpenedEmailData {
   disputeId: string;
 }
 
+export interface PayoutCompletedEmailData {
+  sellerName: string;
+  amount: number;
+  transactionId: string;
+  payoutMethod: string;
+  projectTitle: string;
+}
+
+export interface PayoutFailedEmailData {
+  sellerName: string;
+  amount: number;
+  reason: string;
+  projectTitle: string;
+}
+
 export interface DisputeResolvedEmailData {
   recipientName: string;
   projectTitle: string;

@@ -9,6 +9,8 @@ import type {
   PaymentFailedEmailData,
   RepoTransferEmailData,
   StripeConnectConfirmedEmailData,
+  PayoutCompletedEmailData,
+  PayoutFailedEmailData,
 } from './types';
 
 const SUPPORT_EMAIL = 'support@codesalvage.com';
@@ -200,4 +202,61 @@ export async function sendStripeConnectConfirmedNotification(
     appUrl
   );
   await send(recipient, 'Your Stripe account is connected — start selling!', html);
+}
+
+export async function sendPayoutCompletedNotification(
+  send: SendEmailFn,
+  appUrl: string,
+  recipient: EmailRecipient,
+  data: PayoutCompletedEmailData
+): Promise<void> {
+  const html = renderEmailTemplate(
+    {
+      preheader: `Your payout of ${fmtCents(data.amount)} has been sent.`,
+      heading: 'Payout Sent!',
+      body: `
+        <p>Hi ${data.sellerName},</p>
+        <p>Your payout for <strong>${data.projectTitle}</strong> has been processed.</p>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px 24px;margin:24px 0;">
+          <p style="margin:4px 0;"><strong>Amount:</strong> ${fmtCents(data.amount)}</p>
+          <p style="margin:4px 0;"><strong>Method:</strong> ${data.payoutMethod === 'paypal' ? 'PayPal' : data.payoutMethod}</p>
+          <p style="margin:4px 0;"><strong>Transaction:</strong> <code>${data.transactionId}</code></p>
+        </div>
+        <p>Funds typically appear in your ${data.payoutMethod === 'paypal' ? 'PayPal account' : 'account'} within 1–2 business days.</p>
+      `,
+      ctaText: 'View Seller Dashboard',
+      ctaUrl: `${appUrl}/seller/dashboard`,
+    },
+    appUrl
+  );
+  await send(recipient, `Payout Sent – ${data.projectTitle}`, html);
+}
+
+export async function sendPayoutFailedNotification(
+  send: SendEmailFn,
+  appUrl: string,
+  recipient: EmailRecipient,
+  data: PayoutFailedEmailData
+): Promise<void> {
+  const html = renderEmailTemplate(
+    {
+      preheader: `Your payout of ${fmtCents(data.amount)} could not be processed.`,
+      heading: 'Payout Failed',
+      body: `
+        <p>Hi ${data.sellerName},</p>
+        <p>Unfortunately, your payout for <strong>${data.projectTitle}</strong> could not be processed.</p>
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:20px 24px;margin:24px 0;">
+          <p style="margin:4px 0;"><strong>Amount:</strong> ${fmtCents(data.amount)}</p>
+          <p style="margin:4px 0;"><strong>Reason:</strong> ${data.reason}</p>
+        </div>
+        <p>Please check your payout details in your seller settings. Our team will retry the
+        payout on the next processing date. If the issue persists, contact
+        <a href="mailto:support@codesalvage.com" style="color:#06b6d4;">support@codesalvage.com</a>.</p>
+      `,
+      ctaText: 'Update Payout Details',
+      ctaUrl: `${appUrl}/seller/onboard`,
+    },
+    appUrl
+  );
+  await send(recipient, `Payout Failed – ${data.projectTitle}`, html);
 }

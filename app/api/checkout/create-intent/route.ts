@@ -68,8 +68,10 @@ export async function POST(request: Request) {
             id: true,
             email: true,
             fullName: true,
-            stripeAccountId: true,
             isVerifiedSeller: true,
+            sellerPayoutDetails: {
+              select: { id: true, isActive: true },
+            },
           },
         },
       },
@@ -95,8 +97,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if seller has completed Stripe onboarding
-    if (!project.seller.stripeAccountId || !project.seller.isVerifiedSeller) {
+    // Check if seller has completed payout setup
+    if (!project.seller.sellerPayoutDetails?.isActive) {
       return NextResponse.json(
         { error: 'Seller has not completed payment setup' },
         { status: 400 }

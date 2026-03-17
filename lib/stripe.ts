@@ -4,7 +4,7 @@
  * Responsibilities:
  * - Initialize Stripe client for server-side operations
  * - Provide type-safe Stripe operations
- * - Configure Stripe Connect for marketplace
+ * - Provide payment breakdown calculations
  *
  * Architecture:
  * - Singleton Stripe instance
@@ -81,27 +81,6 @@ export function calculatePlatformFee(amountCents: number): number {
 }
 
 /**
- * Calculate seller payout amount (after platform fee and Stripe fees)
- *
- * @param amountCents - Total amount in cents
- * @returns Seller receives in cents
- *
- * @example
- * calculateSellerPayout(100000) // $1000 → returns 82070 ($820.70)
- * // Breakdown: $1000 - $150 (15% platform) - $29.30 (Stripe 2.9% + $0.30)
- */
-export function calculateSellerPayout(amountCents: number): number {
-  // Platform fee (15%)
-  const platformFee = calculatePlatformFee(amountCents);
-
-  // Stripe fee (2.9% + $0.30)
-  const stripeFee = Math.round(amountCents * 0.029 + 30);
-
-  // Seller receives: total - platform fee - Stripe fee
-  return amountCents - platformFee - stripeFee;
-}
-
-/**
  * Calculate breakdown of payment distribution
  *
  * @param amountCents - Total amount in cents
@@ -140,44 +119,3 @@ export const ESCROW_HOLD_MS = ESCROW_HOLD_DAYS * 24 * 60 * 60 * 1000;
 export function calculateEscrowReleaseDate(paymentDate: Date = new Date()): Date {
   return new Date(paymentDate.getTime() + ESCROW_HOLD_MS);
 }
-
-/**
- * Stripe Connect configuration
- *
- * Uses the `controller` parameter instead of `type` to support
- * platforms in countries with loss-liability restrictions (e.g. Malaysia).
- * With controller, Stripe is set as loss-liable instead of the platform.
- */
-export const STRIPE_CONNECT_CONFIG = {
-  /**
-   * Controller configuration for Connect accounts
-   *
-   * Express dashboard requires platform to be loss-liable, but MY-based
-   * platforms cannot be loss-liable. Solution: use 'full' dashboard type
-   * where Stripe handles losses and the connected account gets a full dashboard.
-   *
-   * - losses.payments: 'stripe' — Stripe is loss-liable (required for MY-based platforms)
-   * - fees.payer: 'account' — Connected account pays Stripe fees
-   * - stripe_dashboard.type: 'full' — Seller gets full Stripe dashboard
-   * - requirement_collection: 'stripe' — Stripe collects identity/verification requirements
-   */
-  controller: {
-    losses: { payments: 'stripe' as const },
-    fees: { payer: 'account' as const },
-    stripe_dashboard: { type: 'full' as const },
-    requirement_collection: 'stripe' as const,
-  },
-
-  /**
-   * Capabilities required for seller accounts
-   */
-  capabilities: {
-    card_payments: { requested: true },
-    transfers: { requested: true },
-  },
-
-  /**
-   * Business type for sellers
-   */
-  businessType: 'individual' as const,
-};

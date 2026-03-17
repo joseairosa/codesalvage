@@ -83,6 +83,8 @@ model User {
   offersReceived       Offer[]          @relation("OffersReceived")
   disputesFiled        Dispute[]        @relation("DisputesFiled")
   feedbacks            Feedback[]
+  sellerPayoutDetails  SellerPayoutDetails?
+  payoutRequests       PayoutRequest[]
 
   @@index([email])
   @@index([githubId], map: "idx_github_id")
@@ -266,6 +268,7 @@ model Transaction {
   offer              Offer?
   repositoryTransfer RepositoryTransfer?
   dispute            Dispute?
+  payoutRequest      PayoutRequest?
 
   @@index([projectId], map: "idx_project_id")
   @@index([sellerId], map: "idx_transaction_seller_id")
@@ -740,4 +743,70 @@ model ProjectViewEvent {
 
   @@index([projectId, createdAt])
   @@map("project_view_events")
+}
+
+// ============================================
+// SELLER PAYOUT DETAILS
+// ============================================
+
+model SellerPayoutDetails {
+  id String @id // ULID generated in repository layer
+
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Payout method and details
+  payoutMethod String  @map("payout_method") // 'paypal', 'wise', 'bank_transfer' (extensible)
+  payoutEmail  String  @map("payout_email") // PayPal email or Wise email
+  payoutDetails Json?  @map("payout_details") // Future: bank details as JSON
+
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId], map: "idx_seller_payout_user_id")
+  @@map("seller_payout_details")
+}
+
+// ============================================
+// PAYOUT REQUESTS
+// ============================================
+
+model PayoutRequest {
+  id String @id // ULID generated in repository layer
+
+  transactionId String      @unique @map("transaction_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Restrict)
+
+  sellerId String @map("seller_id")
+  seller   User   @relation(fields: [sellerId], references: [id], onDelete: Restrict)
+
+  // Amounts
+  amountCents     Int @map("amount_cents") // Amount to pay seller (from transaction.sellerReceivesCents)
+  commissionCents Int @map("commission_cents") // Platform commission (from transaction.commissionCents)
+
+  // Payout details (snapshot at creation time)
+  payoutMethod String @map("payout_method") // 'paypal', 'wise', 'bank_transfer'
+  payoutEmail  String @map("payout_email") // Recipient email
+
+  // Status workflow: pending → processing → completed | failed
+  status String @default("pending") // 'pending', 'processing', 'completed', 'failed'
+
+  // External tracking
+  externalReference String? @map("external_reference") // PayPal batch payout item ID or manual reference
+  batchId           String? @map("batch_id") // PayPal sender_batch_id for grouping
+
+  // Processing details
+  processedAt DateTime? @map("processed_at")
+  processedBy String?   @map("processed_by") // Admin user ID (null for automated)
+  failedReason String?  @map("failed_reason") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([status], map: "idx_payout_request_status")
+  @@index([sellerId], map: "idx_payout_request_seller_id")
+  @@index([batchId], map: "idx_payout_request_batch_id")
+  @@map("payout_requests")
 }

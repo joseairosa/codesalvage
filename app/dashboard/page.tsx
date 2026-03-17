@@ -8,14 +8,12 @@
 import Link from 'next/link';
 import { requireAuth } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
-import { stripeService } from '@/lib/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   Plus,
   AlertTriangle,
   CreditCard,
-  Clock,
   Tag,
   ShoppingBag,
   FolderOpen,
@@ -57,63 +55,19 @@ export default async function DashboardPage() {
       where: { id: session.user.id },
       select: {
         createdAt: true,
-        stripeAccountId: true,
         isVerifiedSeller: true,
         bio: true,
         onboardingDismissedAt: true,
+        sellerPayoutDetails: {
+          select: { isActive: true, payoutMethod: true },
+        },
       },
     }),
     prisma.favorite.count({ where: { userId: session.user.id } }),
     prisma.message.count({ where: { senderId: session.user.id } }),
   ]);
 
-  let isVerifiedSeller = session.user.isVerifiedSeller;
-  let onboardingStatus: {
-    detailsSubmitted: boolean;
-    chargesEnabled: boolean;
-    payoutsEnabled: boolean;
-  } | null = null;
-  if (session.user.isSeller && user?.stripeAccountId) {
-    try {
-      onboardingStatus = await stripeService.getOnboardingStatus(user.stripeAccountId);
-      const fullyOnboarded =
-        onboardingStatus.chargesEnabled && onboardingStatus.detailsSubmitted;
-      if (fullyOnboarded && !isVerifiedSeller) {
-        await prisma.user.update({
-          where: { id: session.user.id },
-          data: { isVerifiedSeller: true },
-        });
-        isVerifiedSeller = true;
-        console.log('[Dashboard] Self-healed: updated isVerifiedSeller to true', {
-          userId: session.user.id,
-        });
-      } else if (!fullyOnboarded && isVerifiedSeller) {
-        await prisma.user.update({
-          where: { id: session.user.id },
-          data: { isVerifiedSeller: false },
-        });
-        isVerifiedSeller = false;
-        console.warn('[Dashboard] isVerifiedSeller was stale, reset to false', {
-          userId: session.user.id,
-        });
-      }
-    } catch (err) {
-      const stripeErr = err as { code?: string };
-      if (stripeErr.code === 'resource_missing') {
-        console.warn(
-          '[Dashboard] Stale stripeAccountId detected, resetting:',
-          user.stripeAccountId
-        );
-        await prisma.user.update({
-          where: { id: session.user.id },
-          data: { stripeAccountId: null, isVerifiedSeller: false },
-        });
-        isVerifiedSeller = false;
-      } else {
-        console.error('[Dashboard] Failed to check Stripe onboarding status:', err);
-      }
-    }
-  }
+  const hasPayoutSetup = user?.sellerPayoutDetails?.isActive === true;
 
   // Build onboarding steps from real DB state
   const profileDone = Boolean(user?.bio && user.bio.trim().length > 0);
@@ -127,10 +81,10 @@ export default async function DashboardPage() {
           href: '/settings',
         },
         {
-          id: 'stripe',
-          label: 'Connect payment account',
+          id: 'payout',
+          label: 'Set up payout details',
           description: 'Required before buyers can purchase your projects.',
-          done: isVerifiedSeller,
+          done: hasPayoutSetup,
           href: '/seller/onboard',
         },
         {
@@ -203,53 +157,30 @@ export default async function DashboardPage() {
         }
       />
 
-      {session.user.isSeller &&
-        !isVerifiedSeller &&
-        onboardingStatus?.detailsSubmitted && (
-          <Card className="mb-8 border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50">
-            <CardContent className="flex items-center justify-between py-6">
-              <div className="flex items-start gap-3">
-                <Clock className="mt-0.5 h-6 w-6 flex-shrink-0 text-blue-600" />
-                <div>
-                  <h2 className="text-lg font-semibold text-blue-900">
-                    Account Under Review
-                  </h2>
-                  <p className="mt-1 text-sm text-blue-800">
-                    Your payment details have been submitted and are being reviewed by
-                    Stripe. This usually takes a few minutes but can take up to 24 hours.
-                  </p>
-                </div>
+      {session.user.isSeller && !hasPayoutSetup && (
+        <Card className="mb-8 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50">
+          <CardContent className="flex items-center justify-between py-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-6 w-6 flex-shrink-0 text-amber-600" />
+              <div>
+                <h2 className="text-lg font-semibold text-amber-900">
+                  Complete Your Payout Setup
+                </h2>
+                <p className="mt-1 text-sm text-amber-800">
+                  You need to set up your payout details before buyers can purchase your
+                  projects. This only takes a minute.
+                </p>
               </div>
-            </CardContent>
-          </Card>
-        )}
-
-      {session.user.isSeller &&
-        !isVerifiedSeller &&
-        !onboardingStatus?.detailsSubmitted && (
-          <Card className="mb-8 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50">
-            <CardContent className="flex items-center justify-between py-6">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="mt-0.5 h-6 w-6 flex-shrink-0 text-amber-600" />
-                <div>
-                  <h2 className="text-lg font-semibold text-amber-900">
-                    Complete Your Payment Setup
-                  </h2>
-                  <p className="mt-1 text-sm text-amber-800">
-                    You need to connect your Stripe account before buyers can purchase
-                    your projects. This only takes a few minutes.
-                  </p>
-                </div>
-              </div>
-              <Button asChild className="bg-amber-600 hover:bg-amber-700">
-                <Link href="/seller/onboard">
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Set Up Payments
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+            <Button asChild className="bg-amber-600 hover:bg-amber-700">
+              <Link href="/seller/onboard">
+                <CreditCard className="mr-2 h-4 w-4" />
+                Set Up Payouts
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {session.user.isSeller && (
         <Card className="mb-8 border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
@@ -457,11 +388,9 @@ export default async function DashboardPage() {
           <CardContent>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <span className="font-medium">Payments:</span>{' '}
-                {isVerifiedSeller ? (
+                <span className="font-medium">Payouts:</span>{' '}
+                {hasPayoutSetup ? (
                   <span className="text-green-600">Connected</span>
-                ) : onboardingStatus?.detailsSubmitted ? (
-                  <span className="text-blue-600">Under Review</span>
                 ) : (
                   <Link
                     href="/seller/onboard"

@@ -34,6 +34,8 @@ export type {
   PaymentFailedEmailData,
   RepoTransferEmailData,
   StripeConnectConfirmedEmailData,
+  PayoutCompletedEmailData,
+  PayoutFailedEmailData,
   DisputeOpenedEmailData,
   DisputeResolvedEmailData,
 } from './email/types';
@@ -52,6 +54,8 @@ import type {
   PaymentFailedEmailData,
   RepoTransferEmailData,
   StripeConnectConfirmedEmailData,
+  PayoutCompletedEmailData,
+  PayoutFailedEmailData,
   DisputeOpenedEmailData,
   DisputeResolvedEmailData,
 } from './email/types';
@@ -221,6 +225,20 @@ export class EmailService {
     d: DisputeResolvedEmailData
   ): Promise<void> {
     return disputeEmails.sendDisputeResolvedNotification(this.send, this.appUrl, r, d);
+  }
+
+  sendPayoutCompletedNotification(
+    r: EmailRecipient,
+    d: PayoutCompletedEmailData
+  ): Promise<void> {
+    return account.sendPayoutCompletedNotification(this.send, this.appUrl, r, d);
+  }
+
+  sendPayoutFailedNotification(
+    r: EmailRecipient,
+    d: PayoutFailedEmailData
+  ): Promise<void> {
+    return account.sendPayoutFailedNotification(this.send, this.appUrl, r, d);
   }
 }
 

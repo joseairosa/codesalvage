@@ -1,28 +1,26 @@
 /**
  * Escrow Release Cron Job
  *
- * Automated job that runs periodically to release escrowed funds to sellers.
- * Transfers funds from platform to seller after 7-day hold period.
+ * Automated job that runs periodically to release escrowed funds.
+ * Creates PayoutRequests for sellers after the 7-day hold period.
  *
  * GET /api/cron/release-escrow
  *
- * Should be called via cron (Railway Cron, Vercel Cron, or external service):
- * Schedule: Every 6 hours (cron: 0 *\/6 * * *)
- *
- * @example
- * GET /api/cron/release-escrow
- * Headers: { "Authorization": "Bearer <CRON_SECRET>" }
+ * Schedule: Every 6 hours (cron: 0 0,6,12,18 * * *)
  */
 
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { stripeService, emailService } from '@/lib/services';
+import { emailService } from '@/lib/services';
 import { env } from '@/config/env';
 import { TransactionRepository } from '@/lib/repositories/TransactionRepository';
 import { TransactionService } from '@/lib/services/TransactionService';
 import { UserRepository } from '@/lib/repositories/UserRepository';
 import { ProjectRepository } from '@/lib/repositories/ProjectRepository';
+import { SellerPayoutDetailsRepository } from '@/lib/repositories/SellerPayoutDetailsRepository';
+import { PayoutRequestRepository } from '@/lib/repositories/PayoutRequestRepository';
+import { PayoutService } from '@/lib/services/PayoutService';
 
 const componentName = 'EscrowReleaseCron';
 
@@ -34,11 +32,20 @@ const transactionService = new TransactionService(
   userRepository,
   projectRepository
 );
+const payoutDetailsRepo = new SellerPayoutDetailsRepository(prisma);
+const payoutRequestRepo = new PayoutRequestRepository(prisma);
+const payoutService = new PayoutService(
+  payoutDetailsRepo,
+  payoutRequestRepo,
+  userRepository,
+  transactionRepository,
+  emailService
+);
 
 /**
  * GET /api/cron/release-escrow
  *
- * Release escrowed funds for eligible transactions
+ * Release escrowed funds and create payout requests for eligible transactions
  */
 export async function GET() {
   try {
@@ -70,10 +77,12 @@ export async function GET() {
         seller: {
           select: {
             id: true,
-            stripeAccountId: true,
             email: true,
             fullName: true,
             username: true,
+            sellerPayoutDetails: {
+              select: { id: true, isActive: true, payoutMethod: true, payoutEmail: true },
+            },
           },
         },
         buyer: {
@@ -105,9 +114,11 @@ export async function GET() {
       try {
         console.log(`[${componentName}] Processing transaction:`, transaction.id);
 
-        if (!transaction.seller.stripeAccountId) {
+        // Check seller has active payout details
+        const payoutDetails = transaction.seller.sellerPayoutDetails;
+        if (!payoutDetails || !payoutDetails.isActive) {
           console.error(
-            `[${componentName}] Seller has no Stripe account:`,
+            `[${componentName}] Seller has no active payout details:`,
             transaction.sellerId
           );
           errorCount++;
@@ -118,13 +129,13 @@ export async function GET() {
 
         console.log(`[${componentName}] Escrow released via service:`, transaction.id);
 
-        const transfer = await stripeService.transferToSeller(
-          transaction.seller.stripeAccountId,
-          transaction.sellerReceivesCents,
+        // Create PayoutRequest instead of Stripe transfer
+        await payoutService.createPayoutRequest(transaction.id);
+
+        console.log(
+          `[${componentName}] Payout request created for transaction:`,
           transaction.id
         );
-
-        console.log(`[${componentName}] Stripe transfer completed:`, transfer.id);
 
         successCount++;
 

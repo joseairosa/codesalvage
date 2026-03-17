@@ -29,11 +29,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-vi.mock('@/lib/services', () => ({
-  stripeService: {
-    getOnboardingStatus: vi.fn(),
-  },
-}));
+vi.mock('@/lib/services', () => ({}));
 
 // ---- Imports (after vi.mock hoisting) ----
 
@@ -87,10 +83,10 @@ function mockSellerSession() {
 function mockDefaultUser(overrides: Record<string, unknown> = {}) {
   mockUserFindUnique.mockResolvedValue({
     bio: null,
-    stripeAccountId: null,
     isVerifiedSeller: false,
     onboardingDismissedAt: null,
     createdAt: new Date('2025-01-01'),
+    sellerPayoutDetails: null,
     ...overrides,
   } as any);
 }
@@ -211,7 +207,7 @@ describe('DashboardPage — seller onboarding steps', () => {
     render(jsx);
 
     expect(screen.getByText('Complete your profile')).toBeInTheDocument();
-    expect(screen.getByText('Connect payment account')).toBeInTheDocument();
+    expect(screen.getByText('Set up payout details')).toBeInTheDocument();
     expect(screen.getByText('List your first project')).toBeInTheDocument();
     expect(screen.getByText('Send your first message')).toBeInTheDocument();
   });
