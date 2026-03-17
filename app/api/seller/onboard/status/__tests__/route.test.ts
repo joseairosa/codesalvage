@@ -17,7 +17,9 @@ import { prisma } from '@/lib/prisma';
 import { GET } from '../route';
 
 const mockAuth = authenticateApiRequest as ReturnType<typeof vi.fn>;
-const mockFindUnique = (prisma as any).sellerPayoutDetails.findUnique as ReturnType<typeof vi.fn>;
+const mockFindUnique = (prisma as any).sellerPayoutDetails.findUnique as ReturnType<
+  typeof vi.fn
+>;
 
 describe('GET /api/seller/onboard/status', () => {
   beforeEach(() => {

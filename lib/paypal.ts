@@ -27,13 +27,18 @@ let _client: any = null;
 export function getPayPalClient(): any {
   if (!_client) {
     if (!env.PAYPAL_CLIENT_ID || !env.PAYPAL_CLIENT_SECRET) {
-      throw new Error('PayPal credentials are not configured (PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET)');
+      throw new Error(
+        'PayPal credentials are not configured (PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET)'
+      );
     }
 
     const environment =
       env.PAYPAL_MODE === 'live'
         ? new paypal.core.LiveEnvironment(env.PAYPAL_CLIENT_ID, env.PAYPAL_CLIENT_SECRET)
-        : new paypal.core.SandboxEnvironment(env.PAYPAL_CLIENT_ID, env.PAYPAL_CLIENT_SECRET);
+        : new paypal.core.SandboxEnvironment(
+            env.PAYPAL_CLIENT_ID,
+            env.PAYPAL_CLIENT_SECRET
+          );
 
     _client = new paypal.core.PayPalHttpClient(environment);
   }

@@ -74,7 +74,9 @@ describe('PayoutRequestRepository', () => {
         where: { id: 'ulid-1' },
         include: {
           seller: { select: { id: true, email: true, fullName: true, username: true } },
-          transaction: { select: { id: true, projectId: true, project: { select: { title: true } } } },
+          transaction: {
+            select: { id: true, projectId: true, project: { select: { title: true } } },
+          },
         },
       });
       expect(result).toEqual(request);
@@ -96,7 +98,9 @@ describe('PayoutRequestRepository', () => {
         where: { status: 'pending' },
         include: {
           seller: { select: { id: true, email: true, fullName: true, username: true } },
-          transaction: { select: { id: true, projectId: true, project: { select: { title: true } } } },
+          transaction: {
+            select: { id: true, projectId: true, project: { select: { title: true } } },
+          },
         },
         orderBy: { createdAt: 'asc' },
         take: 50,
@@ -158,7 +162,11 @@ describe('PayoutRequestRepository', () => {
       mockPrisma.payoutRequest.findMany.mockResolvedValue([]);
       mockPrisma.payoutRequest.count.mockResolvedValue(0);
 
-      const result = await repo.listWithFilters({ status: 'pending', page: 1, limit: 20 });
+      const result = await repo.listWithFilters({
+        status: 'pending',
+        page: 1,
+        limit: 20,
+      });
 
       expect(mockPrisma.payoutRequest.findMany).toHaveBeenCalledWith(
         expect.objectContaining({

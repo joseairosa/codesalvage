@@ -177,7 +177,4 @@ export {
   PayoutPermissionError,
   PayoutNotFoundError,
 } from './PayoutService';
-export type {
-  SubmitPayoutDetailsInput,
-  ProcessBatchResult,
-} from './PayoutService';
+export type { SubmitPayoutDetailsInput, ProcessBatchResult } from './PayoutService';

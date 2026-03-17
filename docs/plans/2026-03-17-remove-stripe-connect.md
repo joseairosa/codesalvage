@@ -99,53 +99,53 @@ Type: Feature
 
 ### Files Being Deleted
 
-| File | Functions/Classes | Mapped To |
-|------|------------------|-----------|
-| `app/api/stripe/connect/onboard/route.ts` | `POST` handler (create Connect account, generate onboarding link) | Task 4 (new onboard API) |
-| `app/api/stripe/connect/onboard/__tests__/route.test.ts` | Tests for onboard route | Task 4 |
-| `app/api/stripe/connect/status/route.ts` | `GET` handler (check Connect account status) | Task 4 (new status API) |
-| `app/api/stripe/connect/status/__tests__/route.test.ts` | Tests for status route | Task 4 |
-| `app/api/stripe/connect/dashboard/route.ts` | `POST` handler (Stripe Express dashboard login link) | Out of Scope: REMOVED — no equivalent needed |
+| File                                                     | Functions/Classes                                                 | Mapped To                                    |
+| -------------------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------- |
+| `app/api/stripe/connect/onboard/route.ts`                | `POST` handler (create Connect account, generate onboarding link) | Task 4 (new onboard API)                     |
+| `app/api/stripe/connect/onboard/__tests__/route.test.ts` | Tests for onboard route                                           | Task 4                                       |
+| `app/api/stripe/connect/status/route.ts`                 | `GET` handler (check Connect account status)                      | Task 4 (new status API)                      |
+| `app/api/stripe/connect/status/__tests__/route.test.ts`  | Tests for status route                                            | Task 4                                       |
+| `app/api/stripe/connect/dashboard/route.ts`              | `POST` handler (Stripe Express dashboard login link)              | Out of Scope: REMOVED — no equivalent needed |
 
 ### Files Being Modified
 
-| File | What Changes | Mapped To |
-|------|-------------|-----------|
-| `prisma/schema.prisma` | Add `SellerPayoutDetails` + `PayoutRequest` models | Task 1 |
-| `lib/services/StripeService.ts` | Remove Connect methods (createConnectAccount, createAccountLink, getAccount, isAccountOnboarded, getOnboardingStatus, transferToSeller, createLoginLink). Keep createPaymentIntent, refundPayment. | Task 3 |
-| `lib/stripe.ts` | Remove `STRIPE_CONNECT_CONFIG`. Keep fee calculations. | Task 3 |
-| `lib/utils/cache.ts` | Remove `stripeConnectStatus` cache key | Task 3 |
-| `lib/services/index.ts` | Add PayoutService export, keep StripeService export | Task 2 |
-| `lib/repositories/index.ts` | Add PayoutRepository, SellerPayoutDetailsRepository exports | Task 2 |
-| `app/api/cron/release-escrow/route.ts` | Replace `stripeService.transferToSeller()` with PayoutRequest creation | Task 5 |
-| `app/api/checkout/create-intent/route.ts` | Replace `stripeAccountId`/`isVerifiedSeller` check with `SellerPayoutDetails` check | Task 6 |
-| `app/api/webhooks/stripe/stripe-handlers-subscription.ts` | Remove `handleAccountUpdated` function | Task 3 |
-| `app/api/webhooks/stripe/route.ts` | Remove `account.updated` case from switch | Task 3 |
-| `app/seller/onboard/page.tsx` | Full rewrite: in-house PayPal email form | Task 4 |
-| `app/seller/dashboard/page.tsx` | Remove Stripe verification self-heal, update onboarding step | Task 8 |
-| `app/dashboard/page.tsx` | Remove Stripe self-heal logic (lines 70-116), update onboarding steps and status cards | Task 8 |
-| `components/admin/AdminNav.tsx` | Add "Payouts" nav item | Task 7 |
-| `config/env.ts` | Add `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_MODE` | Task 2 |
-| `lib/services/EmailService.ts` | Add `sendPayoutCompletedNotification`, remove `sendStripeConnectConfirmedNotification` | Task 5 |
-| `lib/services/email/account-emails.ts` | Remove Stripe Connect confirmation email, add payout completed email | Task 5 |
+| File                                                      | What Changes                                                                                                                                                                                       | Mapped To |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| `prisma/schema.prisma`                                    | Add `SellerPayoutDetails` + `PayoutRequest` models                                                                                                                                                 | Task 1    |
+| `lib/services/StripeService.ts`                           | Remove Connect methods (createConnectAccount, createAccountLink, getAccount, isAccountOnboarded, getOnboardingStatus, transferToSeller, createLoginLink). Keep createPaymentIntent, refundPayment. | Task 3    |
+| `lib/stripe.ts`                                           | Remove `STRIPE_CONNECT_CONFIG`. Keep fee calculations.                                                                                                                                             | Task 3    |
+| `lib/utils/cache.ts`                                      | Remove `stripeConnectStatus` cache key                                                                                                                                                             | Task 3    |
+| `lib/services/index.ts`                                   | Add PayoutService export, keep StripeService export                                                                                                                                                | Task 2    |
+| `lib/repositories/index.ts`                               | Add PayoutRepository, SellerPayoutDetailsRepository exports                                                                                                                                        | Task 2    |
+| `app/api/cron/release-escrow/route.ts`                    | Replace `stripeService.transferToSeller()` with PayoutRequest creation                                                                                                                             | Task 5    |
+| `app/api/checkout/create-intent/route.ts`                 | Replace `stripeAccountId`/`isVerifiedSeller` check with `SellerPayoutDetails` check                                                                                                                | Task 6    |
+| `app/api/webhooks/stripe/stripe-handlers-subscription.ts` | Remove `handleAccountUpdated` function                                                                                                                                                             | Task 3    |
+| `app/api/webhooks/stripe/route.ts`                        | Remove `account.updated` case from switch                                                                                                                                                          | Task 3    |
+| `app/seller/onboard/page.tsx`                             | Full rewrite: in-house PayPal email form                                                                                                                                                           | Task 4    |
+| `app/seller/dashboard/page.tsx`                           | Remove Stripe verification self-heal, update onboarding step                                                                                                                                       | Task 8    |
+| `app/dashboard/page.tsx`                                  | Remove Stripe self-heal logic (lines 70-116), update onboarding steps and status cards                                                                                                             | Task 8    |
+| `components/admin/AdminNav.tsx`                           | Add "Payouts" nav item                                                                                                                                                                             | Task 7    |
+| `config/env.ts`                                           | Add `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_MODE`                                                                                                                                      | Task 2    |
+| `lib/services/EmailService.ts`                            | Add `sendPayoutCompletedNotification`, remove `sendStripeConnectConfirmedNotification`                                                                                                             | Task 5    |
+| `lib/services/email/account-emails.ts`                    | Remove Stripe Connect confirmation email, add payout completed email                                                                                                                               | Task 5    |
 
 ### Files Being Created
 
-| File | Purpose | Mapped To |
-|------|---------|-----------|
-| `prisma/migrations/YYYYMMDD_add_payout_models/migration.sql` | DB migration | Task 1 |
-| `lib/repositories/SellerPayoutDetailsRepository.ts` | CRUD for seller payout details | Task 2 |
-| `lib/repositories/PayoutRequestRepository.ts` | CRUD for payout requests | Task 2 |
-| `lib/services/PayoutService.ts` | Payout business logic, PayPal API integration | Task 2 |
-| `lib/paypal.ts` | PayPal client initialization | Task 2 |
-| `app/api/seller/onboard/route.ts` | POST: submit payout details + become seller | Task 4 |
-| `app/api/seller/onboard/status/route.ts` | GET: check onboarding status | Task 4 |
-| `app/api/cron/process-payouts/route.ts` | Weekly payout batch processing cron | Task 5 |
-| `app/admin/payouts/page.tsx` | Admin payout management page | Task 7 |
-| `components/admin/PayoutManagement.tsx` | Admin payout management client component | Task 7 |
-| `app/api/admin/payouts/route.ts` | GET: list payouts, POST: manual actions | Task 7 |
-| `app/api/admin/payouts/[id]/route.ts` | PATCH: mark completed/retry failed | Task 7 |
-| Tests for all new files | Unit tests | Tasks 2, 4, 5, 7 |
+| File                                                         | Purpose                                       | Mapped To        |
+| ------------------------------------------------------------ | --------------------------------------------- | ---------------- |
+| `prisma/migrations/YYYYMMDD_add_payout_models/migration.sql` | DB migration                                  | Task 1           |
+| `lib/repositories/SellerPayoutDetailsRepository.ts`          | CRUD for seller payout details                | Task 2           |
+| `lib/repositories/PayoutRequestRepository.ts`                | CRUD for payout requests                      | Task 2           |
+| `lib/services/PayoutService.ts`                              | Payout business logic, PayPal API integration | Task 2           |
+| `lib/paypal.ts`                                              | PayPal client initialization                  | Task 2           |
+| `app/api/seller/onboard/route.ts`                            | POST: submit payout details + become seller   | Task 4           |
+| `app/api/seller/onboard/status/route.ts`                     | GET: check onboarding status                  | Task 4           |
+| `app/api/cron/process-payouts/route.ts`                      | Weekly payout batch processing cron           | Task 5           |
+| `app/admin/payouts/page.tsx`                                 | Admin payout management page                  | Task 7           |
+| `components/admin/PayoutManagement.tsx`                      | Admin payout management client component      | Task 7           |
+| `app/api/admin/payouts/route.ts`                             | GET: list payouts, POST: manual actions       | Task 7           |
+| `app/api/admin/payouts/[id]/route.ts`                        | PATCH: mark completed/retry failed            | Task 7           |
+| Tests for all new files                                      | Unit tests                                    | Tasks 2, 4, 5, 7 |
 
 ## Assumptions
 
@@ -157,13 +157,13 @@ Type: Feature
 
 ## Risks and Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| PayPal Payouts API rejects batch (insufficient balance, invalid email) | Medium | High | PayoutRequest tracks individual failures with `failedReason`. Admin can retry. Email notification on failure. |
-| Existing seller migration misses some users | Low | Medium | Migration script logs all processed users. Post-migration verification query counts users with `payoutEmail` but no `SellerPayoutDetails`. |
-| Weekly payout timing (Friday 8pm HKT) falls on holiday/outage | Low | Low | PayoutRequests remain in `pending` until next successful batch. Admin can trigger manual batch. |
-| PayPal account limits hit for large batches | Low | Medium | Batch processes in chunks of 50. Logs remaining count for next run. |
-| Seller enters invalid PayPal email | Medium | Medium | Validate email format on submission. PayPal API returns error for invalid recipients — marked as `failed` with reason, seller notified to update. |
+| Risk                                                                   | Likelihood | Impact | Mitigation                                                                                                                                        |
+| ---------------------------------------------------------------------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PayPal Payouts API rejects batch (insufficient balance, invalid email) | Medium     | High   | PayoutRequest tracks individual failures with `failedReason`. Admin can retry. Email notification on failure.                                     |
+| Existing seller migration misses some users                            | Low        | Medium | Migration script logs all processed users. Post-migration verification query counts users with `payoutEmail` but no `SellerPayoutDetails`.        |
+| Weekly payout timing (Friday 8pm HKT) falls on holiday/outage          | Low        | Low    | PayoutRequests remain in `pending` until next successful batch. Admin can trigger manual batch.                                                   |
+| PayPal account limits hit for large batches                            | Low        | Medium | Batch processes in chunks of 50. Logs remaining count for next run.                                                                               |
+| Seller enters invalid PayPal email                                     | Medium     | Medium | Validate email format on submission. PayPal API returns error for invalid recipients — marked as `failed` with reason, seller notified to update. |
 
 ## Goal Verification
 

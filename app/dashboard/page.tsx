@@ -158,29 +158,29 @@ export default async function DashboardPage() {
       />
 
       {session.user.isSeller && !hasPayoutSetup && (
-          <Card className="mb-8 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50">
-            <CardContent className="flex items-center justify-between py-6">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="mt-0.5 h-6 w-6 flex-shrink-0 text-amber-600" />
-                <div>
-                  <h2 className="text-lg font-semibold text-amber-900">
-                    Complete Your Payout Setup
-                  </h2>
-                  <p className="mt-1 text-sm text-amber-800">
-                    You need to set up your payout details before buyers can purchase
-                    your projects. This only takes a minute.
-                  </p>
-                </div>
+        <Card className="mb-8 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50">
+          <CardContent className="flex items-center justify-between py-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-6 w-6 flex-shrink-0 text-amber-600" />
+              <div>
+                <h2 className="text-lg font-semibold text-amber-900">
+                  Complete Your Payout Setup
+                </h2>
+                <p className="mt-1 text-sm text-amber-800">
+                  You need to set up your payout details before buyers can purchase your
+                  projects. This only takes a minute.
+                </p>
               </div>
-              <Button asChild className="bg-amber-600 hover:bg-amber-700">
-                <Link href="/seller/onboard">
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Set Up Payouts
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+            <Button asChild className="bg-amber-600 hover:bg-amber-700">
+              <Link href="/seller/onboard">
+                <CreditCard className="mr-2 h-4 w-4" />
+                Set Up Payouts
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {session.user.isSeller && (
         <Card className="mb-8 border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">

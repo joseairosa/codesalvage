@@ -213,7 +213,8 @@ export default function SellerOnboardPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    7-day escrow protection on all transactions for buyer and seller safety
+                    7-day escrow protection on all transactions for buyer and seller
+                    safety
                   </p>
                 </CardContent>
               </Card>
@@ -224,7 +225,8 @@ export default function SellerOnboardPage() {
               <CardHeader>
                 <CardTitle>Set Up Your Payout Details</CardTitle>
                 <CardDescription>
-                  Enter your PayPal email to receive payouts. This takes less than a minute.
+                  Enter your PayPal email to receive payouts. This takes less than a
+                  minute.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -263,16 +265,11 @@ export default function SellerOnboardPage() {
                     <Checkbox
                       id="terms"
                       checked={acceptedTerms}
-                      onCheckedChange={(checked) =>
-                        setAcceptedTerms(checked === true)
-                      }
+                      onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
                     />
-                    <Label
-                      htmlFor="terms"
-                      className="text-sm font-normal leading-snug"
-                    >
-                      I accept the seller terms including the 15% platform fee,
-                      7-day escrow period, and weekly PayPal payouts
+                    <Label htmlFor="terms" className="text-sm font-normal leading-snug">
+                      I accept the seller terms including the 15% platform fee, 7-day
+                      escrow period, and weekly PayPal payouts
                     </Label>
                   </div>
 

@@ -14,7 +14,11 @@ vi.mock('@/lib/paypal', () => ({
   },
 }));
 
-import { PayoutService, PayoutValidationError, PayoutNotFoundError } from '../PayoutService';
+import {
+  PayoutService,
+  PayoutValidationError,
+  PayoutNotFoundError,
+} from '../PayoutService';
 
 const mockPayoutDetailsRepo = {
   create: vi.fn(),
@@ -213,8 +217,17 @@ describe('PayoutService', () => {
         status: 'pending',
         sellerId: 'user-1',
         amountCents: 82000,
-        seller: { id: 'user-1', email: 'seller@test.com', fullName: 'Seller', username: 'seller1' },
-        transaction: { id: 'txn-1', projectId: 'proj-1', project: { title: 'Test Project' } },
+        seller: {
+          id: 'user-1',
+          email: 'seller@test.com',
+          fullName: 'Seller',
+          username: 'seller1',
+        },
+        transaction: {
+          id: 'txn-1',
+          projectId: 'proj-1',
+          project: { title: 'Test Project' },
+        },
       });
       mockPayoutRequestRepo.updateStatus.mockResolvedValue({});
       mockEmailService.sendPayoutCompletedNotification.mockResolvedValue(undefined);
@@ -232,9 +245,9 @@ describe('PayoutService', () => {
     it('should throw not found when payout request does not exist', async () => {
       mockPayoutRequestRepo.findById.mockResolvedValue(null);
 
-      await expect(service.markCompleted('pr-nonexistent', 'admin-1', 'ref')).rejects.toThrow(
-        PayoutNotFoundError
-      );
+      await expect(
+        service.markCompleted('pr-nonexistent', 'admin-1', 'ref')
+      ).rejects.toThrow(PayoutNotFoundError);
     });
   });
 
@@ -279,8 +292,17 @@ describe('PayoutService', () => {
         payoutMethod: 'paypal',
         payoutEmail: 'seller1@paypal.com',
         status: 'pending',
-        seller: { id: 'user-1', email: 'seller1@test.com', fullName: 'Seller One', username: 'seller1' },
-        transaction: { id: 'txn-1', projectId: 'proj-1', project: { title: 'Project One' } },
+        seller: {
+          id: 'user-1',
+          email: 'seller1@test.com',
+          fullName: 'Seller One',
+          username: 'seller1',
+        },
+        transaction: {
+          id: 'txn-1',
+          projectId: 'proj-1',
+          project: { title: 'Project One' },
+        },
       },
       {
         id: 'pr-2',
@@ -290,8 +312,17 @@ describe('PayoutService', () => {
         payoutMethod: 'paypal',
         payoutEmail: 'seller2@paypal.com',
         status: 'pending',
-        seller: { id: 'user-2', email: 'seller2@test.com', fullName: 'Seller Two', username: 'seller2' },
-        transaction: { id: 'txn-2', projectId: 'proj-2', project: { title: 'Project Two' } },
+        seller: {
+          id: 'user-2',
+          email: 'seller2@test.com',
+          fullName: 'Seller Two',
+          username: 'seller2',
+        },
+        transaction: {
+          id: 'txn-2',
+          projectId: 'proj-2',
+          project: { title: 'Project Two' },
+        },
       },
     ];
 

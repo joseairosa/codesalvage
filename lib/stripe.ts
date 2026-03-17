@@ -119,4 +119,3 @@ export const ESCROW_HOLD_MS = ESCROW_HOLD_DAYS * 24 * 60 * 60 * 1000;
 export function calculateEscrowReleaseDate(paymentDate: Date = new Date()): Date {
   return new Date(paymentDate.getTime() + ESCROW_HOLD_MS);
 }
-

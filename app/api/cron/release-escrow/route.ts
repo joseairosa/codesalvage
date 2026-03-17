@@ -132,7 +132,10 @@ export async function GET() {
         // Create PayoutRequest instead of Stripe transfer
         await payoutService.createPayoutRequest(transaction.id);
 
-        console.log(`[${componentName}] Payout request created for transaction:`, transaction.id);
+        console.log(
+          `[${componentName}] Payout request created for transaction:`,
+          transaction.id
+        );
 
         successCount++;
 

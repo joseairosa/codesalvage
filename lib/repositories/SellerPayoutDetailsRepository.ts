@@ -44,7 +44,10 @@ export class SellerPayoutDetailsRepository {
     });
   }
 
-  async update(userId: string, data: UpdatePayoutDetailsInput): Promise<SellerPayoutDetails> {
+  async update(
+    userId: string,
+    data: UpdatePayoutDetailsInput
+  ): Promise<SellerPayoutDetails> {
     return this.prisma.sellerPayoutDetails.update({
       where: { userId },
       data,

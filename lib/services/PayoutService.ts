@@ -126,7 +126,10 @@ export class PayoutService {
    * Uses transaction.sellerReceivesCents as the payout amount (already commission-deducted).
    */
   async createPayoutRequest(transactionId: string) {
-    console.log(`[${componentName}] Creating payout request for transaction:`, transactionId);
+    console.log(
+      `[${componentName}] Creating payout request for transaction:`,
+      transactionId
+    );
 
     const transaction = await this.transactionRepo.findById(transactionId);
     if (!transaction) {
@@ -178,7 +181,9 @@ export class PayoutService {
       chunks.push(pending.slice(i, i + BATCH_SIZE));
     }
 
-    console.log(`[${componentName}] Processing ${pending.length} requests in ${chunks.length} chunk(s)`);
+    console.log(
+      `[${componentName}] Processing ${pending.length} requests in ${chunks.length} chunk(s)`
+    );
 
     for (const chunk of chunks) {
       // Mark chunk as processing
@@ -197,7 +202,8 @@ export class PayoutService {
           sender_batch_header: {
             sender_batch_id: `${batchId}-${chunks.indexOf(chunk)}`,
             email_subject: 'You have a payment from CodeSalvage',
-            email_message: 'Your payout from a project sale on CodeSalvage has been processed.',
+            email_message:
+              'Your payout from a project sale on CodeSalvage has been processed.',
           },
           items: chunk.map((req: PayoutRequestWithRelations) => ({
             recipient_type: 'EMAIL',
@@ -296,10 +302,7 @@ export class PayoutService {
     }
 
     if (request.status !== 'failed') {
-      throw new PayoutValidationError(
-        'Only failed payouts can be retried',
-        'status'
-      );
+      throw new PayoutValidationError('Only failed payouts can be retried', 'status');
     }
 
     await this.payoutRequestRepo.updateStatus(id, {
@@ -331,7 +334,10 @@ export class PayoutService {
     );
   }
 
-  private async sendPayoutFailedEmail(request: PayoutRequestWithRelations, reason: string) {
+  private async sendPayoutFailedEmail(
+    request: PayoutRequestWithRelations,
+    reason: string
+  ) {
     if (!request.seller.email) return;
     await this.emailService.sendPayoutFailedNotification(
       {

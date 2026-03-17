@@ -8,12 +8,7 @@
 'use client';
 
 import * as React from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -121,7 +116,11 @@ export function PayoutManagement() {
     fetchPayouts();
   }, [fetchPayouts]);
 
-  const handleAction = async (id: string, action: 'complete' | 'retry', externalReference?: string) => {
+  const handleAction = async (
+    id: string,
+    action: 'complete' | 'retry',
+    externalReference?: string
+  ) => {
     setActionLoading(id);
     try {
       const response = await fetch(`/api/admin/payouts/${id}`, {
@@ -152,7 +151,13 @@ export function PayoutManagement() {
       {/* Filters */}
       <Card>
         <CardContent className="flex items-center gap-4 pt-6">
-          <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
+          <Select
+            value={statusFilter}
+            onValueChange={(v) => {
+              setStatusFilter(v);
+              setPage(1);
+            }}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
@@ -167,7 +172,9 @@ export function PayoutManagement() {
 
           <div className="ml-auto flex items-center gap-2 text-sm text-gray-500">
             <DollarSign className="h-4 w-4" />
-            <span>{total} payout{total !== 1 ? 's' : ''}</span>
+            <span>
+              {total} payout{total !== 1 ? 's' : ''}
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -207,8 +214,12 @@ export function PayoutManagement() {
                       <tr key={payout.id} className="border-b last:border-0">
                         <td className="py-3 pr-4">
                           <div>
-                            <p className="font-medium">{payout.seller.fullName || payout.seller.username}</p>
-                            <p className="text-xs text-muted-foreground">{payout.payoutEmail}</p>
+                            <p className="font-medium">
+                              {payout.seller.fullName || payout.seller.username}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {payout.payoutEmail}
+                            </p>
                           </div>
                         </td>
                         <td className="py-3 pr-4 text-xs">
@@ -223,12 +234,16 @@ export function PayoutManagement() {
                           </Badge>
                         </td>
                         <td className="py-3 pr-4">
-                          <Badge className={`${STATUS_COLORS[payout.status] || ''} text-xs`}>
+                          <Badge
+                            className={`${STATUS_COLORS[payout.status] || ''} text-xs`}
+                          >
                             <StatusIcon className="mr-1 h-3 w-3" />
                             {payout.status}
                           </Badge>
                           {payout.failedReason && (
-                            <p className="mt-1 text-xs text-red-600">{payout.failedReason}</p>
+                            <p className="mt-1 text-xs text-red-600">
+                              {payout.failedReason}
+                            </p>
                           )}
                         </td>
                         <td className="py-3 pr-4 text-xs text-muted-foreground">
@@ -236,7 +251,8 @@ export function PayoutManagement() {
                         </td>
                         <td className="py-3">
                           <div className="flex gap-2">
-                            {(payout.status === 'pending' || payout.status === 'processing') && (
+                            {(payout.status === 'pending' ||
+                              payout.status === 'processing') && (
                               <>
                                 {completeId === payout.id ? (
                                   <div className="flex items-center gap-2">
@@ -250,7 +266,9 @@ export function PayoutManagement() {
                                       size="sm"
                                       variant="default"
                                       disabled={actionLoading === payout.id}
-                                      onClick={() => handleAction(payout.id, 'complete', completeRef)}
+                                      onClick={() =>
+                                        handleAction(payout.id, 'complete', completeRef)
+                                      }
                                     >
                                       {actionLoading === payout.id ? (
                                         <Loader2 className="h-3 w-3 animate-spin" />
@@ -261,7 +279,10 @@ export function PayoutManagement() {
                                     <Button
                                       size="sm"
                                       variant="ghost"
-                                      onClick={() => { setCompleteId(null); setCompleteRef(''); }}
+                                      onClick={() => {
+                                        setCompleteId(null);
+                                        setCompleteRef('');
+                                      }}
                                     >
                                       Cancel
                                     </Button>
@@ -295,11 +316,12 @@ export function PayoutManagement() {
                               </Button>
                             )}
 
-                            {payout.status === 'completed' && payout.externalReference && (
-                              <span className="text-xs text-muted-foreground">
-                                Ref: {payout.externalReference}
-                              </span>
-                            )}
+                            {payout.status === 'completed' &&
+                              payout.externalReference && (
+                                <span className="text-xs text-muted-foreground">
+                                  Ref: {payout.externalReference}
+                                </span>
+                              )}
                           </div>
                         </td>
                       </tr>

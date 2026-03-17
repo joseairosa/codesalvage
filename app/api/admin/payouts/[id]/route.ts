@@ -60,19 +60,12 @@ export async function PATCH(
     const { action, externalReference } = validatedData.data;
 
     if (action === 'complete') {
-      await payoutService.markCompleted(
-        id,
-        auth.user.id,
-        externalReference || 'manual'
-      );
+      await payoutService.markCompleted(id, auth.user.id, externalReference || 'manual');
     } else if (action === 'retry') {
       await payoutService.retryFailed(id);
     }
 
-    return NextResponse.json(
-      { success: true, action, id },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true, action, id }, { status: 200 });
   } catch (error) {
     if (error instanceof PayoutNotFoundError) {
       return NextResponse.json(
@@ -90,7 +83,10 @@ export async function PATCH(
 
     console.error('[Admin Payout Action] Error:', error);
     return NextResponse.json(
-      { error: 'Failed to process action', message: error instanceof Error ? error.message : 'Unknown error' },
+      {
+        error: 'Failed to process action',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 }
     );
   }

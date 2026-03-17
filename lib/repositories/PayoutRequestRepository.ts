@@ -111,7 +111,10 @@ export class PayoutRequestRepository {
     }) as Promise<PayoutRequestWithRelations[]>;
   }
 
-  async updateStatus(id: string, data: UpdatePayoutRequestStatusInput): Promise<PayoutRequest> {
+  async updateStatus(
+    id: string,
+    data: UpdatePayoutRequestStatusInput
+  ): Promise<PayoutRequest> {
     return this.prisma.payoutRequest.update({
       where: { id },
       data,
