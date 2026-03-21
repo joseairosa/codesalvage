@@ -7,7 +7,7 @@
 
 ## 1. Introduction
 
-This Cookie Policy explains how CodeSalvage ("we," "us," "our"), operated by **Hanamori Labs, LLC**, a Delaware limited liability company, uses cookies and similar tracking technologies on our website and platform (collectively, "the Platform").
+This Cookie Policy explains how CodeSalvage ("we," "us," "our"), operated by **[Hanamori Labs, LLC](https://hanamorilabs.com)**, a Delaware limited liability company, uses cookies and similar tracking technologies on our website and platform (collectively, "the Platform").
 
 By using the Platform, you consent to the use of cookies in accordance with this policy. If you do not agree, please adjust your browser settings or stop using the Platform.
 

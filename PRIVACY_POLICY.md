@@ -7,7 +7,7 @@
 
 ## 1. Introduction
 
-Welcome to CodeSalvage ("we," "us," "our," or "the Platform"), operated by **Hanamori Labs, LLC**, a Delaware limited liability company located at 1111b South Governors Avenue, Dover, DE 19904, United States. We are committed to protecting your privacy and handling your personal information responsibly.
+Welcome to CodeSalvage ("we," "us," "our," or "the Platform"), operated by **[Hanamori Labs, LLC](https://hanamorilabs.com)**, a Delaware limited liability company located at 1111b South Governors Avenue, Dover, DE 19904, United States. We are committed to protecting your privacy and handling your personal information responsibly.
 
 This Privacy Policy explains:
 

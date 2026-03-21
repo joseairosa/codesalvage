@@ -7,7 +7,7 @@
 
 ## 1. Agreement to Terms
 
-By accessing or using CodeSalvage ("the Platform," "we," "us," or "our"), operated by **Hanamori Labs, LLC**, a Delaware limited liability company, you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these Terms, you may not access or use the Platform.
+By accessing or using CodeSalvage ("the Platform," "we," "us," or "our"), operated by **[Hanamori Labs, LLC](https://hanamorilabs.com)**, a Delaware limited liability company, you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these Terms, you may not access or use the Platform.
 
 **Platform Description**: CodeSalvage is an online marketplace connecting sellers of unfinished code projects with buyers seeking starter code for development projects.
 
