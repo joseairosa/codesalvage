@@ -4,7 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**CodeSalvage** is a marketplace for incomplete software projects (50-95% complete). Sellers list unfinished side projects; buyers purchase and complete them. Built with Next.js 15 App Router, deployed on Railway.
+**CodeSalvage** is a marketplace for incomplete software projects (50-95% complete). Sellers list unfinished side projects; buyers purchase and complete them. Built with Next.js 15 App Router, deployed on Railway. Operated by **Hanamori Labs, LLC**.
+
+## Legal Entity
+
+- **Company:** Hanamori Labs, LLC
+- **Incorporation:** Delaware, USA
+- **Company Number:** 10553555
+- **EIN:** Waiting
+- **TIN:** Waiting
+- **Address:** 1111b South Governors Avenue, Dover, DE 19904 US
+- **Phone:** +1 (484) 291-8909
+- **Bank:** Column N.A., 1 Letterman Drive, Building A, Suite A4-700, San Francisco, CA 94129
+  - Routing: 121145433
+  - Account: 777242787206144
 
 ## Commands
 

@@ -1,15 +1,17 @@
 # Terms of Service
 
 **Effective Date**: January 28, 2026
-**Last Updated**: January 28, 2026
+**Last Updated**: March 21, 2026
 
 ---
 
 ## 1. Agreement to Terms
 
-By accessing or using CodeSalvage ("the Platform," "we," "us," or "our"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these Terms, you may not access or use the Platform.
+By accessing or using CodeSalvage ("the Platform," "we," "us," or "our"), operated by **Hanamori Labs, LLC**, a Delaware limited liability company, you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these Terms, you may not access or use the Platform.
 
 **Platform Description**: CodeSalvage is an online marketplace connecting sellers of unfinished code projects with buyers seeking starter code for development projects.
+
+**Operator**: Hanamori Labs, LLC, 1111b South Governors Avenue, Dover, DE 19904, United States.
 
 ---
 
@@ -450,7 +452,7 @@ You acknowledge that:
 
 ### 16.1 Limitation
 
-TO THE MAXIMUM EXTENT PERMITTED BY LAW, PROJECTFINISH SHALL NOT BE LIABLE FOR:
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, HANAMORI LABS, LLC (OPERATING AS CODESALVAGE) SHALL NOT BE LIABLE FOR:
 
 - Indirect, incidental, special, consequential, or punitive damages
 - Loss of profits, revenue, data, or use
@@ -519,7 +521,7 @@ Upon termination:
 
 ### 19.1 Governing Law
 
-These Terms are governed by the laws of the State of California, United States, without regard to conflict of law principles.
+These Terms are governed by the laws of the State of Delaware, United States, without regard to conflict of law principles.
 
 ### 19.2 Informal Resolution
 
@@ -533,7 +535,7 @@ Any dispute arising from these Terms or use of the Platform shall be resolved th
 - IP infringement claims
 
 **Arbitration Rules**: American Arbitration Association (AAA) rules
-**Location**: San Francisco, California
+**Location**: Dover, Delaware
 **Costs**: Each party bears their own costs unless otherwise determined by arbitrator
 
 ### 19.4 Class Action Waiver
@@ -568,7 +570,7 @@ Continued use of the Platform after changes constitutes acceptance of modified T
 
 ### 21.1 Entire Agreement
 
-These Terms constitute the entire agreement between you and CodeSalvage regarding use of the Platform.
+These Terms constitute the entire agreement between you and Hanamori Labs, LLC (operating as CodeSalvage) regarding use of the Platform.
 
 ### 21.2 Severability
 
@@ -590,7 +592,9 @@ We are not liable for failure to perform due to causes beyond our reasonable con
 
 ## 22. Contact Information
 
-**CodeSalvage**
+**Hanamori Labs, LLC** (operating as CodeSalvage)
+Address: 1111b South Governors Avenue, Dover, DE 19904, United States
+Phone: +1 (484) 291-8909
 Email: support@codesalvage.com
 Legal: legal@codesalvage.com
 
@@ -609,7 +613,7 @@ BY USING THE PLATFORM, YOU ACKNOWLEDGE THAT:
 
 ---
 
-**Last Updated**: January 28, 2026
+**Last Updated**: March 21, 2026
 **Effective Date**: January 28, 2026
 
-© 2026 CodeSalvage. All rights reserved.
+© 2026 Hanamori Labs, LLC. All rights reserved.

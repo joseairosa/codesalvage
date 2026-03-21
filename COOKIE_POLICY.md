@@ -1,13 +1,13 @@
 # Cookie Policy
 
 **Effective Date**: January 28, 2026
-**Last Updated**: January 28, 2026
+**Last Updated**: March 21, 2026
 
 ---
 
 ## 1. Introduction
 
-This Cookie Policy explains how CodeSalvage ("we," "us," "our") uses cookies and similar tracking technologies on our website and platform (collectively, "the Platform").
+This Cookie Policy explains how CodeSalvage ("we," "us," "our"), operated by **Hanamori Labs, LLC**, a Delaware limited liability company, uses cookies and similar tracking technologies on our website and platform (collectively, "the Platform").
 
 By using the Platform, you consent to the use of cookies in accordance with this policy. If you do not agree, please adjust your browser settings or stop using the Platform.
 
@@ -481,6 +481,8 @@ Under CCPA, you have the right to:
 
 If you have questions about this Cookie Policy:
 
+**Hanamori Labs, LLC** (operating as CodeSalvage)
+**Address**: 1111b South Governors Avenue, Dover, DE 19904, United States
 **Email**: privacy@codesalvage.com
 **Subject**: "Cookie Policy Inquiry"
 
@@ -515,7 +517,7 @@ If you have questions about this Cookie Policy:
 
 ---
 
-**Last Updated**: January 28, 2026
+**Last Updated**: March 21, 2026
 **Effective Date**: January 28, 2026
 
-© 2026 CodeSalvage. All rights reserved.
+© 2026 Hanamori Labs, LLC. All rights reserved.

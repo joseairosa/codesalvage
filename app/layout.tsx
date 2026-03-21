@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     'code marketplace',
     'developer marketplace',
   ],
-  authors: [{ name: 'CodeSalvage' }],
+  authors: [{ name: 'Hanamori Labs, LLC' }],
   openGraph: {
     type: 'website',
     locale: 'en_US',
