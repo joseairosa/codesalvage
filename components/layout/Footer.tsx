@@ -160,7 +160,7 @@ export function Footer() {
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             {/* Copyright */}
             <p className="text-sm text-gray-500">
-              ©{' '}{currentYear}{' '}
+              © {currentYear}{' '}
               <a
                 href="https://hanamorilabs.com"
                 target="_blank"
