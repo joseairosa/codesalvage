@@ -65,7 +65,9 @@ test.describe('Projects Browse Page', () => {
     const emptyState = page.getByText(/no projects found/i).first();
     const errorState = page.getByText(/failed to load/i).first();
 
-    await expect(projectCard.or(emptyState).or(errorState)).toBeVisible({ timeout: 30000 });
+    await expect(projectCard.or(emptyState).or(errorState)).toBeVisible({
+      timeout: 30000,
+    });
   });
 
   test('search input is present', async ({ page }) => {
