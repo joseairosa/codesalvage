@@ -144,27 +144,23 @@ export function calculateEscrowReleaseDate(paymentDate: Date = new Date()): Date
 /**
  * Stripe Connect configuration
  *
- * Uses the `controller` parameter instead of `type` to support
- * platforms in countries with loss-liability restrictions (e.g. Malaysia).
- * With controller, Stripe is set as loss-liable instead of the platform.
+ * Platform-owned liability model — Hanamori Labs (US LLC) owns loss liability
+ * and collects platform fees. Sellers get an Express dashboard for onboarding
+ * and payout management.
  */
 export const STRIPE_CONNECT_CONFIG = {
   /**
    * Controller configuration for Connect accounts
    *
-   * Express dashboard requires platform to be loss-liable, but MY-based
-   * platforms cannot be loss-liable. Solution: use 'full' dashboard type
-   * where Stripe handles losses and the connected account gets a full dashboard.
-   *
-   * - losses.payments: 'stripe' — Stripe is loss-liable (required for MY-based platforms)
-   * - fees.payer: 'account' — Connected account pays Stripe fees
-   * - stripe_dashboard.type: 'full' — Seller gets full Stripe dashboard
+   * - losses.payments: 'application' — Platform (Hanamori Labs) is loss-liable
+   * - fees.payer: 'application' — Platform pays Stripe fees (deducted from platform fee)
+   * - stripe_dashboard.type: 'express' — Seller gets lightweight Express dashboard
    * - requirement_collection: 'stripe' — Stripe collects identity/verification requirements
    */
   controller: {
-    losses: { payments: 'stripe' as const },
-    fees: { payer: 'account' as const },
-    stripe_dashboard: { type: 'full' as const },
+    losses: { payments: 'application' as const },
+    fees: { payer: 'application' as const },
+    stripe_dashboard: { type: 'express' as const },
     requirement_collection: 'stripe' as const,
   },
 
