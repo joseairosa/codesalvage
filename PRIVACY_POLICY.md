@@ -1,13 +1,13 @@
 # Privacy Policy
 
 **Effective Date**: January 28, 2026
-**Last Updated**: January 28, 2026
+**Last Updated**: March 21, 2026
 
 ---
 
 ## 1. Introduction
 
-Welcome to CodeSalvage ("we," "us," "our," or "the Platform"). We are committed to protecting your privacy and handling your personal information responsibly.
+Welcome to CodeSalvage ("we," "us," "our," or "the Platform"), operated by **[Hanamori Labs, LLC](https://hanamorilabs.com)**, a Delaware limited liability company located at 1111b South Governors Avenue, Dover, DE 19904, United States. We are committed to protecting your privacy and handling your personal information responsibly.
 
 This Privacy Policy explains:
 
@@ -374,7 +374,7 @@ We currently do not respond to "Do Not Track" browser signals.
 
 ### 7.1 Data Transfer
 
-CodeSalvage is based in the United States. By using the Platform, you consent to the transfer of your information to the United States, which may have different data protection laws than your country.
+CodeSalvage is operated by Hanamori Labs, LLC, based in Delaware, United States. By using the Platform, you consent to the transfer of your information to the United States, which may have different data protection laws than your country.
 
 ### 7.2 GDPR Rights (EU Users)
 
@@ -621,6 +621,9 @@ Continued use of the Platform after changes constitutes acceptance of the update
 
 If you have questions about this Privacy Policy or wish to exercise your privacy rights:
 
+**Hanamori Labs, LLC** (operating as CodeSalvage)
+**Address**: 1111b South Governors Avenue, Dover, DE 19904, United States
+**Phone**: +1 (484) 291-8909
 **Email**: privacy@codesalvage.com
 **Subject**: "Privacy Inquiry - [Your Name]"
 
@@ -750,7 +753,7 @@ All employees and contractors sign confidentiality agreements and receive privac
 
 **Sensitive Personal Information**: Categories requiring extra protection (SSN, health data, financial data)
 
-**Controller**: Entity that determines purposes and means of processing personal data (CodeSalvage)
+**Controller**: Entity that determines purposes and means of processing personal data (Hanamori Labs, LLC, operating as CodeSalvage)
 
 **Processor**: Entity that processes personal data on behalf of the controller (Stripe, SendGrid, etc.)
 
@@ -773,7 +776,7 @@ BY USING THE PLATFORM, YOU ACKNOWLEDGE THAT:
 
 ---
 
-**Last Updated**: January 28, 2026
+**Last Updated**: March 21, 2026
 **Effective Date**: January 28, 2026
 
-© 2026 CodeSalvage. All rights reserved.
+© 2026 Hanamori Labs, LLC. All rights reserved.

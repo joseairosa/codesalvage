@@ -160,10 +160,39 @@ export function Footer() {
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             {/* Copyright */}
             <p className="text-sm text-gray-500">
-              © {currentYear} CodeSalvage. All rights reserved.
+              © {currentYear}{' '}
+              <a
+                href="https://hanamorilabs.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-primary"
+              >
+                Hanamori Labs, LLC
+              </a>
+              . All rights reserved.
             </p>
 
-            {/* Legal links — add back when pages are created */}
+            {/* Legal links */}
+            <div className="flex gap-4">
+              <Link
+                href="/terms"
+                className="text-sm text-gray-500 transition-colors hover:text-primary"
+              >
+                Terms of Service
+              </Link>
+              <Link
+                href="/privacy"
+                className="text-sm text-gray-500 transition-colors hover:text-primary"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                href="/cookies"
+                className="text-sm text-gray-500 transition-colors hover:text-primary"
+              >
+                Cookie Policy
+              </Link>
+            </div>
           </div>
         </div>
       </div>

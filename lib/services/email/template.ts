@@ -113,7 +113,7 @@ export function renderEmailTemplate(data: EmailTemplateData, appUrl: string): st
           <tr>
             <td align="center" style="padding: 24px 16px 8px;">
               <p style="margin:0 0 6px;color:#64748b;font-size:13px;">
-                &copy; ${currentYear} CodeSalvage &mdash; Marketplace for Incomplete Software Projects
+                &copy; ${currentYear} <a href="https://hanamorilabs.com" style="color:#64748b;text-decoration:none;">Hanamori Labs, LLC</a> &mdash; Marketplace for Incomplete Software Projects
               </p>
               <p style="margin:0;color:#94a3b8;font-size:12px;">
                 <a href="${appUrl}" style="color:#47acb8;text-decoration:none;">codesalvage.com</a>
