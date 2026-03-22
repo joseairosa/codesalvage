@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/card';
 import { AlertCircle } from 'lucide-react';
 import Image from 'next/image';
+import { AuthSidePanel } from '@/components/auth/AuthSidePanel';
 
 interface SignInCardProps {
   loading: boolean;
@@ -64,17 +65,8 @@ export function SignInCard({
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Side illustration (visible on lg+) */}
-      <div className="hidden items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 p-12 lg:flex lg:w-1/2">
-        <Image
-          src="/images/auth-illustration.png"
-          alt="Welcome to CodeSalvage"
-          width={600}
-          height={400}
-          className="max-w-full"
-          priority
-        />
-      </div>
+      {/* Side panel (visible on lg+) */}
+      <AuthSidePanel />
 
       {/* Sign-in card */}
       <div className="flex w-full items-center justify-center px-4 py-12 sm:px-6 lg:w-1/2 lg:px-8">

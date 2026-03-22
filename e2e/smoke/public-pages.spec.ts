@@ -60,13 +60,11 @@ test.describe('Projects Browse Page', () => {
     await page.goto('/projects');
     await page.waitForLoadState('networkidle');
 
-    // Either project cards or an empty-state message should be present
-    const hasProjects = await page.locator('[data-testid="project-card"]').count();
-    const hasEmptyState = await page
-      .getByText(/no projects|be the first|nothing here/i)
-      .count();
+    // Wait for either project cards or an empty-state message to appear
+    const projectCard = page.locator('[data-testid="project-card"]').first();
+    const emptyState = page.getByText(/no projects|be the first|nothing here/i).first();
 
-    expect(hasProjects + hasEmptyState).toBeGreaterThan(0);
+    await expect(projectCard.or(emptyState)).toBeVisible({ timeout: 15000 });
   });
 
   test('search input is present', async ({ page }) => {
