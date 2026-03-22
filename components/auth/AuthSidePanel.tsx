@@ -6,8 +6,6 @@
  * and a branded tagline.
  */
 
-import Image from 'next/image';
-
 export function AuthSidePanel() {
   return (
     <div className="relative hidden overflow-hidden lg:flex lg:w-1/2">
@@ -31,19 +29,9 @@ export function AuthSidePanel() {
       />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center px-16">
-        {/* Logo */}
-        <Image
-          src="/images/branding/codesalvage_logo_horizontal.png"
-          alt="CodeSalvage"
-          width={280}
-          height={63}
-          className="mb-10 h-auto w-64 brightness-0 drop-shadow-2xl invert"
-          priority
-        />
-
+      <div className="relative z-10 flex flex-col items-center justify-center px-12">
         {/* Tagline */}
-        <h2 className="mb-4 text-center text-3xl font-bold tracking-tight text-white">
+        <h2 className="mb-6 text-center text-5xl font-bold leading-tight tracking-tight text-white lg:text-6xl">
           Where unfinished projects
           <br />
           <span className="bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">
@@ -51,7 +39,7 @@ export function AuthSidePanel() {
           </span>
         </h2>
 
-        <p className="max-w-sm text-center text-base leading-relaxed text-slate-400">
+        <p className="max-w-md text-center text-lg leading-relaxed text-slate-400">
           Join a marketplace of developers turning incomplete side projects into real
           products.
         </p>
