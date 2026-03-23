@@ -68,9 +68,6 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/start.sh ./start.sh
-COPY --from=builder /app/TERMS_OF_SERVICE.md ./TERMS_OF_SERVICE.md
-COPY --from=builder /app/PRIVACY_POLICY.md ./PRIVACY_POLICY.md
-COPY --from=builder /app/COOKIE_POLICY.md ./COOKIE_POLICY.md
 
 # Install only Prisma CLI (not all dependencies) before switching user
 RUN npm install prisma --save-exact --no-save
