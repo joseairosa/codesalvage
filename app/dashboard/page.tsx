@@ -76,8 +76,9 @@ export default async function DashboardPage() {
   if (session.user.isSeller && user?.stripeAccountId) {
     try {
       onboardingStatus = await stripeService.getOnboardingStatus(user.stripeAccountId);
-      const fullyOnboarded =
-        onboardingStatus.chargesEnabled && onboardingStatus.detailsSubmitted;
+      // detailsSubmitted = user completed the Connect form
+      // chargesEnabled may lag behind (Stripe review, or test mode)
+      const fullyOnboarded = onboardingStatus.detailsSubmitted;
       if (fullyOnboarded && !isVerifiedSeller) {
         await prisma.user.update({
           where: { id: session.user.id },
