@@ -42,9 +42,15 @@ docker-compose*.yml
 # CI/CD
 .github
 
-# Documentation
+# Documentation (keep TERMS_OF_SERVICE.md, PRIVACY_POLICY.md, COOKIE_POLICY.md for legal pages)
 README.md
-*.md
+CLAUDE.md
+BUYER_GUIDE.md
+SELLER_GUIDE.md
+FAQ.md
+LAUNCH_CHECKLIST.md
+RATE_LIMITING.md
+docs/
 ai_docs
 
 # Editor
