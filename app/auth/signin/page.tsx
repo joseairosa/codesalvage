@@ -84,7 +84,10 @@ function SignInContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken }),
       });
-      router.push(callbackUrl);
+      // Full navigation required so the browser sends the newly-set
+      // httpOnly session cookie on the next request (router.push reuses
+      // the existing request context and middleware won't see the cookie).
+      window.location.href = callbackUrl;
     } catch (err: any) {
       console.error('[SignIn] Email/Password sign-in error:', err);
       setError(err.message || 'Failed to sign in');
@@ -137,7 +140,7 @@ function SignInContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken }),
       });
-      router.push(callbackUrl);
+      window.location.href = callbackUrl;
     } catch (err: any) {
       console.error('[SignIn] Google sign-in error:', err);
       if (err.code === 'auth/account-exists-with-different-credential') {
@@ -171,7 +174,7 @@ function SignInContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken }),
       });
-      router.push(callbackUrl);
+      window.location.href = callbackUrl;
     } catch (err: any) {
       console.error('[SignIn] GitHub sign-in error:', err);
       if (err.code === 'auth/account-exists-with-different-credential') {

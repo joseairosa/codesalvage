@@ -92,9 +92,17 @@ export async function POST(request: Request) {
       );
     } catch (linkError) {
       // Stored account ID doesn't exist in Stripe (e.g. test-mode ID after switching to live).
-      // Clear it and create a fresh account so the seller can re-onboard.
-      const stripeErr = linkError as { code?: string };
-      if (stripeErr.code === 'resource_missing') {
+      // Two error shapes are possible:
+      //   - code === 'resource_missing': account not found (clean missing)
+      //   - rawType === 'invalid_request_error' with "not connected to your platform":
+      //     account exists in Stripe but belongs to a different platform (test-mode → live switch)
+      // In both cases: clear the stale ID and create a fresh live-mode account.
+      const stripeErr = linkError as { code?: string; rawType?: string };
+      const isStaleAccountId =
+        stripeErr.code === 'resource_missing' ||
+        (stripeErr.rawType === 'invalid_request_error' &&
+          (linkError as Error).message?.includes('not connected to your platform'));
+      if (isStaleAccountId) {
         console.warn(
           '[Stripe Onboard] Stored account ID not found in Stripe, resetting and creating new account:',
           accountId
