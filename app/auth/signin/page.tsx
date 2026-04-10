@@ -34,10 +34,26 @@ export default function SignInPage() {
   );
 }
 
+// Allow only same-origin redirects to prevent open redirect attacks.
+// window.location.href (used after sign-in) follows external URLs unconditionally
+// so an unvalidated callbackUrl from the query string could redirect users to
+// a phishing site after a legitimate sign-in.
+function sanitizeCallbackUrl(raw: string | null): string {
+  const fallback = '/dashboard';
+  if (!raw) return fallback;
+  try {
+    const url = new URL(raw, window.location.origin);
+    if (url.origin !== window.location.origin) return fallback;
+    return url.pathname + url.search + url.hash;
+  } catch {
+    return fallback;
+  }
+}
+
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';
+  const callbackUrl = sanitizeCallbackUrl(searchParams.get('callbackUrl'));
   const urlError = searchParams.get('error');
   const { status } = useSession();
 
