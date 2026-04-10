@@ -85,9 +85,12 @@ describe('StripeService', () => {
     });
 
     it('re-throws resource_missing error unchanged', async () => {
-      const resourceMissingError = Object.assign(new Error('No such account: acct_gone'), {
-        code: 'resource_missing',
-      });
+      const resourceMissingError = Object.assign(
+        new Error('No such account: acct_gone'),
+        {
+          code: 'resource_missing',
+        }
+      );
       mockAccountLinksCreate.mockRejectedValue(resourceMissingError);
 
       await expect(
