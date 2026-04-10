@@ -152,19 +152,24 @@ export const STRIPE_CONNECT_CONFIG = {
   /**
    * Controller configuration for Connect accounts
    *
-   * - losses.payments: 'application' — Platform (Hanamori Labs) is loss-liable
+   * Stripe enforces a hard coupling between dashboard type and loss liability:
+   *   - stripe_dashboard.type: 'express'  requires  losses.payments: 'application'
+   *     ('application' = platform liable, needs separate Stripe loss-liability acknowledgement)
+   *   - stripe_dashboard.type: 'none'     allows    losses.payments: 'stripe'
+   *     ('stripe' = Stripe covers negative balance losses, no special acknowledgement needed)
+   *
+   * We use 'none' + 'stripe' so onboarding works without the obscure dashboard
+   * acknowledgement flow. Sellers still go through Stripe's hosted onboarding
+   * and receive payouts — they just don't get an ongoing Stripe Express login,
+   * which is fine since all earnings/analytics are in the CodeSalvage dashboard.
+   *
    * - fees.payer: 'application' — Platform pays Stripe fees (deducted from platform fee)
-   * - stripe_dashboard.type: 'express' — Seller gets lightweight Express dashboard
    * - requirement_collection: 'stripe' — Stripe collects identity/verification requirements
    */
   controller: {
-    // 'stripe' = Stripe covers negative balance losses on connected accounts.
-    // 'application' would mean the platform (Hanamori Labs) is liable — which
-    // requires a separate loss-liability acknowledgement in the Stripe Dashboard
-    // that is not part of the standard platform profile flow.
     losses: { payments: 'stripe' as const },
     fees: { payer: 'application' as const },
-    stripe_dashboard: { type: 'express' as const },
+    stripe_dashboard: { type: 'none' as const },
     requirement_collection: 'stripe' as const,
   },
 
