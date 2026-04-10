@@ -177,6 +177,45 @@ describe('POST /api/stripe/connect/onboard', () => {
     });
   });
 
+  it('self-heals: resets stale account ID when invalid_request_error (live-mode test-mode mismatch)', async () => {
+    mockAuthenticateApiRequest.mockResolvedValue({ user: { id: 'user1' } });
+    mockPrismaUserFindUnique.mockResolvedValue({
+      ...mockUser,
+      stripeAccountId: 'acct_stale_test_mode',
+    });
+
+    const invalidRequestError = Object.assign(
+      new Error(
+        'You requested an account link for an account that is not connected to your platform or does not exist.'
+      ),
+      { rawType: 'invalid_request_error' }
+    );
+    mockCreateAccountLink
+      .mockRejectedValueOnce(invalidRequestError)
+      .mockResolvedValueOnce('https://connect.stripe.com/onboard/acct_live_fresh');
+    mockCreateConnectAccount.mockResolvedValue('acct_live_fresh');
+    mockPrismaUserUpdate.mockResolvedValue({});
+
+    const res = await POST(makeRequest());
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.url).toBe('https://connect.stripe.com/onboard/acct_live_fresh');
+    expect(body.accountId).toBe('acct_live_fresh');
+
+    // First update: clears the stale test-mode account
+    expect(mockPrismaUserUpdate).toHaveBeenCalledWith({
+      where: { id: 'user1' },
+      data: { stripeAccountId: null, isVerifiedSeller: false },
+    });
+
+    // Second update: saves the new live-mode account
+    expect(mockPrismaUserUpdate).toHaveBeenCalledWith({
+      where: { id: 'user1' },
+      data: { stripeAccountId: 'acct_live_fresh', isSeller: true },
+    });
+  });
+
   it('re-throws non-resource_missing Stripe errors', async () => {
     mockAuthenticateApiRequest.mockResolvedValue({ user: { id: 'user1' } });
     mockPrismaUserFindUnique.mockResolvedValue({
