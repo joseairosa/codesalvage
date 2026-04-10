@@ -158,7 +158,11 @@ export const STRIPE_CONNECT_CONFIG = {
    * - requirement_collection: 'stripe' — Stripe collects identity/verification requirements
    */
   controller: {
-    losses: { payments: 'application' as const },
+    // 'stripe' = Stripe covers negative balance losses on connected accounts.
+    // 'application' would mean the platform (Hanamori Labs) is liable — which
+    // requires a separate loss-liability acknowledgement in the Stripe Dashboard
+    // that is not part of the standard platform profile flow.
+    losses: { payments: 'stripe' as const },
     fees: { payer: 'application' as const },
     stripe_dashboard: { type: 'express' as const },
     requirement_collection: 'stripe' as const,
