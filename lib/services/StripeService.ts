@@ -100,7 +100,9 @@ export class StripeService {
       return accountLink.url;
     } catch (error) {
       console.error(`[${componentName}] Failed to create account link:`, error);
-      throw new Error('Failed to create onboarding link');
+      // Re-throw the original Stripe error so callers can inspect rawType/code
+      // to distinguish recoverable errors (stale account ID) from real failures.
+      throw error;
     }
   }
 
