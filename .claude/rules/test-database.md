@@ -105,7 +105,6 @@ describe('UserRepository (Integration)', () => {
 ```
 
 This command:
-
 1. Starts test containers
 2. Runs migrations
 3. Executes all tests
@@ -114,14 +113,12 @@ This command:
 ## Key Rules
 
 ✅ **Always:**
-
 - Start test DB before integration tests
 - Use separate ports (5445, 6391)
 - Clean up test data in `beforeEach`
 - Disconnect in `afterAll`
 
 ❌ **Never:**
-
 - Run tests against dev database (port 5444)
 - Run tests against production
 - Commit test database data
@@ -131,19 +128,16 @@ This command:
 ## Troubleshooting
 
 **Port conflict (5445 already in use):**
-
 ```bash
 npm run test:db:stop  # Stop previous containers
 npm run test:db:setup # Restart
 ```
 
 **Migrations out of sync:**
-
 ```bash
 npm run test:db:reset  # Wipe and rebuild
 ```
 
 **Tests hang on database calls:**
-
 - Check test DB is running: `docker ps | grep postgres-test`
 - Check connection: `DATABASE_URL="..." npx prisma migrate status`
